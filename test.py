@@ -1057,7 +1057,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     if choice=="Upload P&L":
         global latest_month
         latest_month='2023'
-	st.subheader("Upload {} P&L:".format(operator))
+        st.subheader("Upload {} P&L:".format(operator))
         col1,col2=st.columns(2) 
         with col1:
             with st.form("upload_form", clear_on_submit=True):
