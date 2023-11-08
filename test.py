@@ -1058,7 +1058,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         latest_month='2023'
         if all(entity_mapping["BS_separate_excel"]=="Y"):
             BS_separate_excel="Y"
-	else:
+        else:
             BS_separate_excel="N"
 		
         st.subheader("Upload {} P&L:".format(operator))
