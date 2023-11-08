@@ -1015,7 +1015,7 @@ def Upload_And_Process(uploaded_file,file_type):
                        
                 Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
                 Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
-		st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
 	    return Total_PL,Total_PL_detail,latest_month
 		
 
@@ -1075,16 +1075,16 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.write("{} uploaded.".format(uploaded_file.name))
 		    
             if not uploaded_finance:  
-	        st.error("P&L was not uploaded")
-	        st.stop()
+                st.error("P&L was not uploaded")
+                st.stop()
 	    else:
                 if BS_seperate_excel=="N":       # Finance/BS are in one excel
                     Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=\
 		                                                       Upload_And_Process(uploaded_finance,"Finance")
                 elif BS_seperate_excel=="Y":     # Finance/BS are in different excel
-	            if not uploaded_BS:
-		        st.error("Please upload Balance sheet")
-		        st.stop()
+                    if not uploaded_BS:
+                        st.error("Please upload Balance sheet")
+                        st.stop()
 		    else:            
                         Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
                         Total_BL,Total_BL_detail,latest_month=Upload_And_Process(uploaded_BS,"BS")
