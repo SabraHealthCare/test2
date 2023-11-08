@@ -936,7 +936,6 @@ def PL_Read_Process(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                 for dup in dup_tenant_account:
                     if dup.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"]):
                         st.warning("Warning: There are more than one '{}' accounts in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
-
             PL,PL_with_detail=Mapping_PL_Sabra(PL,entity_i)
             
             max_month_cols=str(max(list(PL.columns)))
@@ -986,13 +985,13 @@ def Upload_And_Process(uploaded_file,file_type):
         Total_PL_detail=pd.DataFrame()
         for entity_i in entity_mapping.index:   # entity_i is the entity code for each property
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
-		
+	
                 sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
                 sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
                 sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
                 property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
 
-		# ****Finance/BS/Occ are in one excel****
+		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     latest_month,PL,PL_with_detail=PL_Read_Process(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
 		    
@@ -1057,6 +1056,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     if choice=="Upload P&L":
         global latest_month
         latest_month='2023'
+        if all(entity_mapping["BS_separate_excel"]=="Y"):
+            BS_separate_excel="Y"
+	else:
+            BS_separate_excel="N"
+		
         st.subheader("Upload {} P&L:".format(operator))
         col1,col2=st.columns(2) 
         with col1:
@@ -1066,30 +1070,35 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     with col2:
                         st.subheader("Upload Balance Sheet:")
                         uploaded_BS=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False)
-                submitted = st.form_submit_button("Upload")
+                submitted = st.form_submit_button("Upload_PL")
             if submitted:
 		# clear cache for every upload
                 st.cache_data.clear()
                 st.cache_resource.clear()
                 st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
-                st.write("{} uploaded.".format(uploaded_file.name))
-		    
-            if not uploaded_finance:  
-                st.error("P&L was not uploaded")
-                st.stop()
-            else:
-                if BS_seperate_excel=="N":       # Finance/BS are in one excel
-                    Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=\
+                if uploaded_finance:
+                    with col1:
+                        st.write("{} uploaded.".format(uploaded_finance.name))
+		else:
+		    st.write("P&L wasn't upload.".format(uploaded_finance.name))
+		    st.stop()
+                if uploaded_BS:
+                    with col2:
+                        st.write("{} uploaded.".format(uploaded_BS.name))
+		else:
+		    st.write("Balance sheet wasn't upload.".format(uploaded_BS.name))
+		    st.stop()
+            if BS_seperate_excel=="N":  # Finance/BS are in one excel
+                Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=\
 		                                                       Upload_And_Process(uploaded_finance,"Finance")
-                elif BS_seperate_excel=="Y":     # Finance/BS are in different excel
-                    if not uploaded_BS:
-                        st.error("Please upload Balance sheet")
-                        st.stop()
-                    else:            
-                        Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
-                        Total_BL,Total_BL_detail,latest_month=Upload_And_Process(uploaded_BS,"BS")
-                        Total_PL=Total_PL.combine_first(Total_BL)
-                        Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
+             elif BS_seperate_excel=="Y":     # Finance/BS are in different excel  
+		# process Finance 
+                Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
+		# process BS 
+                Total_BL,Total_BL_detail,latest_month=Upload_And_Process(uploaded_BS,"BS")
+		# combine Finance and BS
+                Total_PL=Total_PL.combine_first(Total_BL)
+                Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
 			
         diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail)
        
