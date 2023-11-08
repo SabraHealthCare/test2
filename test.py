@@ -1085,7 +1085,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     if not uploaded_BS:
                         st.error("Please upload Balance sheet")
                         st.stop()
-		    else:            
+                    else:            
                         Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
                         Total_BL,Total_BL_detail,latest_month=Upload_And_Process(uploaded_BS,"BS")
                         Total_PL=Total_PL.combine_first(Total_BL)
