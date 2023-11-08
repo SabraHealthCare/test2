@@ -1009,12 +1009,12 @@ def Upload_And_Process(uploaded_file,file_type):
                         PL=PL.combine_first(PL_BS)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
                 elif file_type=="Finance" and BS_separate_excel=="Y": 
-		    latest_month,PL,PL_with_detail=PL_Read_Process(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
+                    latest_month,PL,PL_with_detail=PL_Read_Process(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
                 elif file_type=="BS" and BS_separate_excel=="Y": 
-		    latest_month,PL,PL_with_detail=PL_Read_Process(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
+                    latest_month,PL,PL_with_detail=PL_Read_Process(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
                        
-		Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
-		Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
+                Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
+                Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
 		st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
 	    return Total_PL,Total_PL_detail,latest_month
 		
