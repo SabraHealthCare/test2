@@ -1052,18 +1052,20 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
 	
+	
     if choice=="Upload P&L":
-        st.subheader("Upload {} P&L:".format(operator))
+	global latest_month
+        latest_month='2023'
+	st.subheader("Upload {} P&L:".format(operator))
         col1,col2=st.columns(2) 
         with col1:
-            with st.form("my-form", clear_on_submit=True):
-		
+            with st.form("upload_form", clear_on_submit=True):
                 uploaded_finance=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False)
-                if BS_seperate_excel=="Y":
+                if BS_separate_excel=="Y":
 		    with col2:
 			st.subheader("Upload Balance Sheet:")
 		        uploaded_BS=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False)
-                if Occ_seperate_excel=="Y":
+                if Occ_separate_excel=="Y":
 		    with col1:
 		        st.subheader("Upload Occupancy:")
 		        uploaded_occ=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False)
@@ -1075,13 +1077,20 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.cache_resource.clear()
                 st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
                 st.write("{} uploaded.".format(uploaded_file.name))
+		    
+        if uploaded_finance:  
+            if BS_seperate_excel=="N" and Occ_seperate_excel=="N":
+                Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=Upload_And_Process(uploaded_finance)
+            elif BS_seperate_excel=="Y" and Occ_seperate_excel=="N":
+	        if not uploaded_BS:
+		    st.error("Please upload Balance sheet")
+		    st.stop()
+		else:
+		    Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=Upload_And_Process(uploaded_finance)
             
-        if uploaded_finance:
-	    # initial parameter
-            global latest_month
-            latest_month='2023'
+	    
             Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=Upload_And_Process(uploaded_finance)
-            
+         elif uploaded_finance and BS_seperate_excel=="Y" and Occ_seperate_excel=="N":     
 	    # 1 Summary
             with st.expander("Summary of P&L" ,expanded=True):
                 ChangeWidgetFontSize('Summary of P&L', '25px')
