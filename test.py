@@ -1016,7 +1016,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
                 Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
                 st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
-	    return Total_PL,Total_PL_detail,latest_month
+    return Total_PL,Total_PL_detail,latest_month
 		
 
 
