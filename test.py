@@ -570,7 +570,7 @@ def Manage_Account_Mapping(new_tenant_account):
     return Sabra_main_account_value,Sabra_second_account_value     
 
 @st.cache_data(experimental_allow_widgets=True)
-def Read_Sheet(entity_i,sheet_type,sheet_name,uploaded_file):
+def Read_Sheet(entity_i,sheet_type,sheet_name,PL_sheet_list,uploaded_file):
     global account_mapping
     # read data from uploaded file
     count=0
@@ -715,11 +715,17 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail):
                     diff_detail_records["Diff (Sabra-P&L)"]=diff
                    
                     #if there is no record in diff_detail_records, means there is no mapping
-                    if diff_detail_records.shape[0]==0:
-                        diff_detail_records=pd.DataFrame({"Entity":entity,"Sabra_Account":matrix,"Tenant_Account":"Miss mapping accounts","Month":timeid,"Sabra":BPC_value,"Diff (Sabra-P&L)":diff,"P&L Value":0},index=[0])   
+                   if diff_detail_records.shape[0]==0:
+                    diff_detail_records=pd.DataFrame({"Entity":entity,"Sabra_Account":matrix,"Tenant_Account":"Miss mapping accounts","Month":timeid,"Sabra":BPC_value,"Diff (Sabra-P&L)":diff,"P&L Value":0},index=[0])   
                     diff_BPC_PL_detail=pd.concat([diff_BPC_PL_detail,diff_detail_records])
-
-    return diff_BPC_PL,diff_BPC_PL_detail
+    if diff_BPC_PL.shape[0]>0:
+        percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
+        diff_BPC_PL=diff_BPC_PL.merge(BPC_Account[["Category","Sabra_Account_Full_Name","BPC_Account_Name"]],left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")        
+        diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
+        diff_BPC_PL['Type comments below']=""
+    else:
+        percent_discrepancy_accounts=0
+    return diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts
 	
 
 @st.cache_data(experimental_allow_widgets=True)
@@ -907,11 +913,11 @@ def View_Discrepancy_Detail():
             download_report(Total_PL_detail.reset_index(drop=False),"Full P&L accounts mapping_{}".format(operator))
    
 @st.cache_data(experimental_allow_widgets=True)        
-def PL_Process(entity_i,sheet_type,uploaded_file):  
+def PL_Read_Process(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
     global latest_month
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     if True:
-            PL=Read_Sheet(entity_i,sheet_type,sheet_name,uploaded_file)
+            PL=Read_Sheet(entity_i,sheet_type,sheet_name,PL_sheet_list,uploaded_file)
             # mapping new tenant accounts
             new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
             
@@ -968,55 +974,50 @@ def PL_Process(entity_i,sheet_type,uploaded_file):
     return latest_month,PL,PL_with_detail
 
 @st.cache_data(experimental_allow_widgets=True)  
-def Upload_And_Process(uploaded_file):
-    global PL_sheet_list,latest_month,property_name
+def Upload_And_Process(uploaded_file,file_type):
+    global latest_month,property_name  # property_name is currently processed entity
     if True:
         if uploaded_file.name[-5:]=='.xlsx':
             PL_sheet_list=load_workbook(uploaded_file).sheetnames
-            
         else:
             PL_sheet_list=[]
+		
         Total_PL=pd.DataFrame()
         Total_PL_detail=pd.DataFrame()
         for entity_i in entity_mapping.index:   # entity_i is the entity code for each property
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
+		
                 sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
                 sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
                 sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
                 property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
 
-		# All the data is in "Sheet_Name_Finance" by default    
-                latest_month,PL,PL_with_detail=PL_Process(entity_i,"Sheet_Name_Finance")
-		
-		 # check if census data existed
-                if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
+		# ****Finance/BS/Occ are in one excel****
+		if file_type=="Finance" and BS_separate_excel=="N": 
+                    latest_month,PL,PL_with_detail=PL_Read_Process(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
+		    
+                    # check if census data in another sheet
+                    if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
-                    latest_month,PL_occ,PL_with_detail_occ=PL_Process(entity_i,"Sheet_Name_Occupancy") 
-                    PL=PL.combine_first(PL_occ)
-                    PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
+                        latest_month,PL_occ,PL_with_detail_occ=PL_Read_Process(entity_i,"Sheet_Name_Occupancy",PL_sheet_list,uploaded_file) 
+                        PL=PL.combine_first(PL_occ)
+                        PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
 		
-		# check if balance sheet data existed   
-                if sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
-                        latest_month,PL_BS,PL_with_detail_BS=PL_Process(entity_i,"Sheet_Name_Balance_Sheet")
+		    # check if balance sheet data existed   
+                    if sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
+                        latest_month,PL_BS,PL_with_detail_BS=PL_Read_Process(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
                         PL=PL.combine_first(PL_BS)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
-
+		elif file_type=="Finance" and BS_separate_excel=="Y": 
+		    latest_month,PL,PL_with_detail=PL_Read_Process(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
+		elif file_type=="BS" and BS_separate_excel=="Y": 
+		    latest_month,PL,PL_with_detail=PL_Read_Process(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
+                       
                 Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
                 Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
                 st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
-
+            return Total_PL,Total_PL_detail,latest_month
 		
-            diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail)
-	    
-            if diff_BPC_PL.shape[0]>0:
-                percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
-                diff_BPC_PL=diff_BPC_PL.merge(BPC_Account[["Category","Sabra_Account_Full_Name","BPC_Account_Name"]],left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")        
-                diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-                diff_BPC_PL['Type comments below']=""
-            else:
-                percent_discrepancy_accounts=0
-            
-    return Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month
 
 
 #----------------------------------website widges------------------------------------
@@ -1065,11 +1066,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 		    with col2:
 			st.subheader("Upload Balance Sheet:")
 		        uploaded_BS=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False)
-                if Occ_separate_excel=="Y":
-		    with col1:
-		        st.subheader("Upload Occupancy:")
-		        uploaded_occ=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False)
-		submitted = st.form_submit_button("Upload")
 
             if submitted:
 		# clear cache for every upload
@@ -1078,29 +1074,35 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
                 st.write("{} uploaded.".format(uploaded_file.name))
 		    
-        if uploaded_finance:  
-            if BS_seperate_excel=="N" and Occ_seperate_excel=="N":
-                Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=Upload_And_Process(uploaded_finance)
-            elif BS_seperate_excel=="Y" and Occ_seperate_excel=="N":
-	        if not uploaded_BS:
-		    st.error("Please upload Balance sheet")
-		    st.stop()
-		else:
-		    Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=Upload_And_Process(uploaded_finance)
-            
-	    
-            Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=Upload_And_Process(uploaded_finance)
-         elif uploaded_finance and BS_seperate_excel=="Y" and Occ_seperate_excel=="N":     
-	    # 1 Summary
-            with st.expander("Summary of P&L" ,expanded=True):
-                ChangeWidgetFontSize('Summary of P&L', '25px')
-                View_Summary(uploaded_finance)
+            if not uploaded_finance:  
+	        st.error("P&L was not uploaded")
+	        st.stop()
+	    else:
+                if BS_seperate_excel=="N":       # Finance/BS are in one excel
+                    Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=\
+		                                                       Upload_And_Process(uploaded_finance,"Finance")
+                elif BS_seperate_excel=="Y":     # Finance/BS are in different excel
+	            if not uploaded_BS:
+		        st.error("Please upload Balance sheet")
+		        st.stop()
+		    else:            
+                        Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
+                        Total_BL,Total_BL_detail,latest_month=Upload_And_Process(uploaded_BS,"BS")
+                        Total_PL=Total_PL.combine_first(Total_BL)
+                        Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
+			
+        diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail)
+       
+	# 1 Summary
+        with st.expander("Summary of P&L" ,expanded=True):
+            ChangeWidgetFontSize('Summary of P&L', '25px')
+            View_Summary(uploaded_finance)
 	        
-	    # 2 Discrepancy of Historic Data
-            with st.expander("Discrepancy for Historic Data",expanded=True):
-                ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-                View_Discrepancy(percent_discrepancy_accounts)
-                View_Discrepancy_Detail()
+        # 2 Discrepancy of Historic Data
+        with st.expander("Discrepancy for Historic Data",expanded=True):
+            ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
+            View_Discrepancy(percent_discrepancy_accounts)
+            View_Discrepancy_Detail()
                
     elif choice=="Manage Mapping":
         with st.expander("Manage Property Mapping" ,expanded=True):
