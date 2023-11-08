@@ -1077,7 +1077,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             if not uploaded_finance:  
                 st.error("P&L was not uploaded")
                 st.stop()
-	    else:
+            else:
                 if BS_seperate_excel=="N":       # Finance/BS are in one excel
                     Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=\
 		                                                       Upload_And_Process(uploaded_finance,"Finance")
