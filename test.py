@@ -993,7 +993,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
 
 		# ****Finance/BS/Occ are in one excel****
-		if file_type=="Finance" and BS_separate_excel=="N": 
+                if file_type=="Finance" and BS_separate_excel=="N": 
                     latest_month,PL,PL_with_detail=PL_Read_Process(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
 		    
                     # check if census data in another sheet
@@ -1008,15 +1008,15 @@ def Upload_And_Process(uploaded_file,file_type):
                         latest_month,PL_BS,PL_with_detail_BS=PL_Read_Process(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
                         PL=PL.combine_first(PL_BS)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
-		elif file_type=="Finance" and BS_separate_excel=="Y": 
+                elif file_type=="Finance" and BS_separate_excel=="Y": 
 		    latest_month,PL,PL_with_detail=PL_Read_Process(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
-		elif file_type=="BS" and BS_separate_excel=="Y": 
+                elif file_type=="BS" and BS_separate_excel=="Y": 
 		    latest_month,PL,PL_with_detail=PL_Read_Process(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
                        
-                Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
-                Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
-                st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
-            return Total_PL,Total_PL_detail,latest_month
+		Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
+		Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
+		st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
+	    return Total_PL,Total_PL_detail,latest_month
 		
 
 
