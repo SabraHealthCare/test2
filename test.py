@@ -1081,13 +1081,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                         st.write("{} uploaded.".format(uploaded_finance.name))
                 else:
                     st.write("P&L wasn't upload.".format(uploaded_finance.name))
-		    st.stop()
+                    st.stop()
                 if uploaded_BS:
                     with col2:
                         st.write("{} uploaded.".format(uploaded_BS.name))
-		else:
-		    st.write("Balance sheet wasn't upload.".format(uploaded_BS.name))
-		    st.stop()
+                else:
+                    st.write("Balance sheet wasn't upload.".format(uploaded_BS.name))
+                    st.stop()
             if BS_seperate_excel=="N":  # Finance/BS are in one excel
                 Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=\
 		                                                       Upload_And_Process(uploaded_finance,"Finance")
