@@ -1080,7 +1080,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     with col1:
                         st.write("{} uploaded.".format(uploaded_finance.name))
                 else:
-		    st.write("P&L wasn't upload.".format(uploaded_finance.name))
+                    st.write("P&L wasn't upload.".format(uploaded_finance.name))
 		    st.stop()
                 if uploaded_BS:
                     with col2:
