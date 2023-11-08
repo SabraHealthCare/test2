@@ -1063,7 +1063,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             with st.form("upload_form", clear_on_submit=True):
                 uploaded_finance=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False)
                 if BS_separate_excel=="Y":
-		    with col2:
+                    with col2:
 			st.subheader("Upload Balance Sheet:")
 		        uploaded_BS=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False)
 
