@@ -570,7 +570,7 @@ def Manage_Account_Mapping(new_tenant_account):
     return Sabra_main_account_value,Sabra_second_account_value     
 
 @st.cache_data(experimental_allow_widgets=True)
-def Read_Sheet(entity_i,sheet_type,sheet_name):
+def Read_Sheet(entity_i,sheet_type,sheet_name,uploaded_file):
     global account_mapping
     # read data from uploaded file
     count=0
@@ -907,11 +907,11 @@ def View_Discrepancy_Detail():
             download_report(Total_PL_detail.reset_index(drop=False),"Full P&L accounts mapping_{}".format(operator))
    
 @st.cache_data(experimental_allow_widgets=True)        
-def PL_Process(entity_i,sheet_type):  
+def PL_Process(entity_i,sheet_type,uploaded_file):  
     global latest_month
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     if True:
-            PL=Read_Sheet(entity_i,sheet_type,sheet_name)
+            PL=Read_Sheet(entity_i,sheet_type,sheet_name,uploaded_file)
             # mapping new tenant accounts
             new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
             
@@ -1057,8 +1057,17 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         col1,col2=st.columns(2) 
         with col1:
             with st.form("my-form", clear_on_submit=True):
-                uploaded_file=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False)
-                submitted = st.form_submit_button("Upload")
+		
+                uploaded_finance=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False)
+                if BS_seperate_excel=="Y":
+		    with col2:
+			st.subheader("Upload Balance Sheet:")
+		        uploaded_BS=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False)
+                if Occ_seperate_excel=="Y":
+		    with col1:
+		        st.subheader("Upload Occupancy:")
+		        uploaded_occ=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False)
+		submitted = st.form_submit_button("Upload")
 
             if submitted:
 		# clear cache for every upload
@@ -1067,16 +1076,16 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
                 st.write("{} uploaded.".format(uploaded_file.name))
             
-        if uploaded_file:
+        if uploaded_finance:
 	    # initial parameter
             global latest_month
             latest_month='2023'
-            Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=Upload_And_Process(uploaded_file)
+            Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=Upload_And_Process(uploaded_finance)
             
 	    # 1 Summary
             with st.expander("Summary of P&L" ,expanded=True):
                 ChangeWidgetFontSize('Summary of P&L', '25px')
-                View_Summary(uploaded_file)
+                View_Summary(uploaded_finance)
 	        
 	    # 2 Discrepancy of Historic Data
             with st.expander("Discrepancy for Historic Data",expanded=True):
