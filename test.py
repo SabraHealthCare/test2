@@ -715,8 +715,8 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail):
                     diff_detail_records["Diff (Sabra-P&L)"]=diff
                    
                     #if there is no record in diff_detail_records, means there is no mapping
-                   if diff_detail_records.shape[0]==0:
-                    diff_detail_records=pd.DataFrame({"Entity":entity,"Sabra_Account":matrix,"Tenant_Account":"Miss mapping accounts","Month":timeid,"Sabra":BPC_value,"Diff (Sabra-P&L)":diff,"P&L Value":0},index=[0])   
+                    if diff_detail_records.shape[0]==0:
+                        diff_detail_records=pd.DataFrame({"Entity":entity,"Sabra_Account":matrix,"Tenant_Account":"Miss mapping accounts","Month":timeid,"Sabra":BPC_value,"Diff (Sabra-P&L)":diff,"P&L Value":0},index=[0])   
                     diff_BPC_PL_detail=pd.concat([diff_BPC_PL_detail,diff_detail_records])
     if diff_BPC_PL.shape[0]>0:
         percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
