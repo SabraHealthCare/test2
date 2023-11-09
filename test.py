@@ -1008,8 +1008,10 @@ def Upload_And_Process(uploaded_file,file_type):
                         PL=PL.combine_first(PL_BS)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
                 elif file_type=="Finance" and BS_separate_excel=="Y": 
+                    st.write("file_type==Finance BS_separate_excel==Y")
                     latest_month,PL,PL_with_detail=PL_Read_Process(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
                 elif file_type=="BS" and BS_separate_excel=="Y": 
+                    st.write("file_type==BS BS_separate_excel==Y")
                     latest_month,PL,PL_with_detail=PL_Read_Process(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
                        
                 Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
@@ -1093,7 +1095,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=\
 		                                                       Upload_And_Process(uploaded_finance,"Finance")
                 elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
-                    st.write("BS_separate_excel==Y")
 		    # process Finance 
                     Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
 		    # process BS 
