@@ -1070,8 +1070,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     with col2:
                         st.subheader("Upload Balance Sheet:")
                         uploaded_BS=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False,key="BS_upload")
-                submitted = st.form_submit_button("Upload_PL")
-            if submitted:
+            submitted = st.form_submit_button("Upload_PL")
+        if submitted:
 		# clear cache for every upload
                 st.cache_data.clear()
                 st.cache_resource.clear()
