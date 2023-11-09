@@ -697,11 +697,10 @@ def View_Summary(uploaded_file):
 			    hide_index=True)
         with col2:
             st.button("I'll fix and re-upload P&L")
-            continue_run=st.button("Confirm and continue to run")
+            continue_run=st.button("Confirm and continue to run", on_click=clicked, args=["continue_button"]) 
             st.write("")#-----------------------write to error log-----------------------
         		    
-        if not continue_run:
-            st.write("1")
+        if not st.session_state.clicked["continue_button"]:
             st.stop()
     st.write("2")		
     latest_month_data = latest_month_data.pivot(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month)
@@ -1031,7 +1030,7 @@ authenticator = Authenticate(
     )
 # set button status
 if 'clicked' not in st.session_state:
-    st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
+    st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False,"continue_button":False}
 
 # login widget
 col1,col2=st.columns(2)
