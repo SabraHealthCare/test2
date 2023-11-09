@@ -552,8 +552,8 @@ def Manage_Account_Mapping(new_tenant_account):
         elif Sabra_main_account['checked']==[] and Sabra_second_account['checked']==[]:
             st.warning("Please select Sabra account for '{}'".format(new_tenant_account))
             st.stop()
-	elif Sabra_main_account['checked']==[]:
-	    Sabra_main_account_value=''
+        elif Sabra_main_account['checked']==[]:
+            Sabra_main_account_value=''
             
         if Sabra_second_account['checked']==[]:
             Sabra_second_account_value=''
