@@ -1086,12 +1086,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.write("Balance sheet wasn't upload.")
             st.stop()
         if BS_separate_excel=="N":  # Finance/BS are in one excel
-            Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
+            Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             # process Finance 
-            Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
+            Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
 	    # process BS 
-            Total_BL,Total_BL_detail,latest_month=Upload_And_Process(uploaded_BS,"BS")
+            Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
@@ -1104,7 +1104,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             ChangeWidgetFontSize('Summary of P&L', '25px')
             View_Summary(uploaded_finance)
 	        
-                # 2 Discrepancy of Historic Data
+        # 2 Discrepancy of Historic Data
         with st.expander("Discrepancy for Historic Data",expanded=True):
             ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
             View_Discrepancy(percent_discrepancy_accounts)
