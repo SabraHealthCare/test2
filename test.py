@@ -758,7 +758,7 @@ def View_Summary(uploaded_file):
 	
     if missing_check.shape[0]>0:
         st.error("No data detected for below accounts: ")
-        col1,col2=st.columns([2,3])
+        col1,col2=st.columns([2,1])
         with col1:
             st.dataframe(missing_check[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
 		    column_config={
@@ -939,10 +939,10 @@ def PL_Read_Process(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                     if dup.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"]):
                         st.warning("Warning: There are more than one '{}' accounts in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
             PL,PL_with_detail=Mapping_PL_Sabra(PL,entity_i)
-            
-            max_month_cols=str(max(list(PL.columns)))
+              
 	    # check the latest reporting month
-            if latest_month=="2023":	    
+            if latest_month=="2023":	
+                max_month_cols=str(max(list(PL.columns)))
                 latest_month=max_month_cols
                 col4,col5,col6=st.columns([2,1,2])
                 with col4:
