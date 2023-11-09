@@ -937,16 +937,17 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     PL,PL_with_detail=Map_PL_Sabra(PL,entity_i)         
     # check the latest reporting month
     return PL,PL_with_detail
-
+	
+@st.cache_data
 def Check_Reporting_Month(PL):	
     latest_month=str(max(list(PL.columns)))
     col4,col5,col6=st.columns([2,1,2])
     with col4:  
-            st.warning("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
+        st.warning("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
     with col5:		
-                st.button('Yes', on_click=clicked, args=["yes_button"])         
+        st.button('Yes', on_click=clicked, args=["yes_button"])         
     with col6:
-                st.button("No", on_click=clicked, args=["no_button"])       
+        st.button("No", on_click=clicked, args=["no_button"])       
     if st.session_state.clicked["no_button"]:
         col1,col2=st.columns(2)
         with col1:
