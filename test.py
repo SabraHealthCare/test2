@@ -1096,7 +1096,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
 
-	latest_month=Check_Latest_Month(Total_PL)    
+        latest_month=Check_Latest_Month(Total_PL)    
         diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month)
        
 	# 1 Summary
