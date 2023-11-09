@@ -887,7 +887,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)    
 
     # Start checking process
-    #st.write("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********" )  
+    st.write("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********" )  
     tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
     if tenantAccount_col_no==None:
         st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
@@ -937,7 +937,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         
     # Map PL accounts and Sabra account
     PL,PL_with_detail=Map_PL_Sabra(PL,entity_i)
-    st.write(PL.columns)          
+    st.write(3,PL)          
     # check the latest reporting month
     return PL,PL_with_detail
 
@@ -987,7 +987,6 @@ def Upload_And_Process(uploaded_file,file_type):
         Total_PL_detail=pd.DataFrame()
         for entity_i in entity_mapping.index:   # entity_i is the entity code for each property
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
-	
                 sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
                 sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
                 sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
@@ -1011,6 +1010,7 @@ def Upload_And_Process(uploaded_file,file_type):
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
                 elif file_type=="Finance" and BS_separate_excel=="Y": 
                     PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
+                    st.write(2,PL)
                 elif file_type=="BS" and BS_separate_excel=="Y": 
                     PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
     return Total_PL,Total_PL_detail
@@ -1069,33 +1069,35 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     uploaded_BS=st.file_uploader("",type={"xlsx","xlsm","xls"},accept_multiple_files=False,key="BS_upload")
             submitted = st.form_submit_button("Upload_PL")
         if submitted:
-		# clear cache for every upload
-                st.cache_data.clear()
-                st.cache_resource.clear()
-                st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
+	    # clear cache for every upload
+	    st.cache_data.clear()
+	    st.cache_resource.clear()
+	    st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
         if uploaded_finance:
             with col1:
-                st.write("{} uploaded.".format(uploaded_finance.name))
+                st.markdown("✔️ :green[P&L uploaded]")
         else:
             st.write("P&L wasn't upload.")
             st.stop()
         if uploaded_BS:
             with col2:
-                st.write("{} uploaded.".format(uploaded_BS.name))
+                st.markdown("✔️ :green[Balance sheet uploaded]")
         else:
             st.write("Balance sheet wasn't upload.")
             st.stop()
+	
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             # process Finance 
             Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
+            st.write(Total_PL)
 	    # process BS 
             Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
-        st.write(Total_PL)
+
         latest_month=Check_Latest_Month(Total_PL)    
         diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month)
        
