@@ -684,7 +684,6 @@ def View_Summary(uploaded_file):
     missing_check=latest_month_data[["Property_Name","Category","ENTITY",latest_month]][latest_month_data["Category"].\
 	    isin(['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"])].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
     missing_check=missing_check[missing_check[latest_month]==0]
-
 	
     if missing_check.shape[0]>0:
         st.error("No data detected for below accounts: ")
@@ -696,15 +695,15 @@ def View_Summary(uploaded_file):
 			        "Category":"Sabra account-Total",
 		                 latest_month:latest_month[4:6]+"/"+latest_month[0:4]},
 			    hide_index=True)
-       
         with col2:
             st.button("I'll fix and re-upload P&L")
             continue_run=st.button("Confirm and continue to run")
             st.write("")#-----------------------write to error log-----------------------
         		    
         if not continue_run:
+            st.write("1")
             st.stop()
-		
+    st.write("2")		
     latest_month_data = latest_month_data.pivot(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month)
     latest_month_data.reset_index(drop=False,inplace=True)
     latest_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
@@ -940,7 +939,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     # check the latest reporting month
     return PL,PL_with_detail
 
-def Check_Latest_Month(PL):	
+def Check_Reporting_Month(PL):	
     latest_month=str(max(list(PL.columns)))
     col4,col5,col6=st.columns([2,1,2])
     with col4:  
@@ -950,26 +949,27 @@ def Check_Latest_Month(PL):
     with col6:
                 st.button("No", on_click=clicked, args=["no_button"])       
     if st.session_state.clicked["no_button"]:
-            col1,col2=st.columns(2)
-            with col1:
-                with st.form("latest_month", clear_on_submit=True):
-                    st.write("Please select reporting month for the uploading data" )  
-                    col3,col4=st.columns(2)
-                    with col3:
-                        year = st.selectbox('Year', range(2023, date.today().year+1))
-                    with col4:
-                        month = st.selectbox('Month', range(1, 13))
-                    confirm_month=st.form_submit_button("Submit")
-                if confirm_month:
-                    if month<10:
-                        latest_month=str(year)+"0"+str(month)
-                    else:
-                        latest_month=str(year)+str(month)
+        col1,col2=st.columns(2)
+        with col1:
+            with st.form("latest_month", clear_on_submit=True):
+                st.write("Please select reporting month for the uploading data" )  
+                col3,col4=st.columns(2)
+                with col3:
+                    year = st.selectbox('Year', range(2023, date.today().year+1))
+                with col4:
+                    month = st.selectbox('Month', range(1, 13))
+                confirm_month=st.form_submit_button("Submit")
+            if confirm_month:
+                if month<10:
+                    latest_month=str(year)+"0"+str(month)
                 else:
-                    st.stop()
+                    latest_month=str(year)+str(month)
+		return latest_month
+            else:
+                st.stop()
     elif not st.session_state.clicked["yes_button"]:
-            st.stop()
-    return latest_month
+        st.stop()
+    
 
 
 
@@ -1097,7 +1097,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
-        latest_month=Check_Latest_Month(Total_PL)    
+        latest_month=Check_Reporting_Month(Total_PL)    
         diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month)
        
 	# 1 Summary
