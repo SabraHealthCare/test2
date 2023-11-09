@@ -1070,7 +1070,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 if BS_separate_excel=="Y":
                     st.subheader("Upload Balance Sheet:")
                     uploaded_BS=st.file_uploader("",type={"xlsx","xlsm","xls"},accept_multiple_files=False,key="BS_upload")
-            submitted = st.form_submit_button("Upload_PL")
+                submitted = st.form_submit_button("Upload_PL")
         if submitted:
 		# clear cache for every upload
                 st.cache_data.clear()
