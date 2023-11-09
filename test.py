@@ -1060,11 +1060,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             BS_separate_excel="Y"
         else:
             BS_separate_excel="N"
-		
-        st.subheader("Upload {} P&L:".format(operator))
         col1,col2=st.columns(2) 
-        with col1:
-            with st.form("upload_form", clear_on_submit=True):
+       
+        with st.form("upload_form", clear_on_submit=True):
+            with col1:
+                st.subheader("Upload {} P&L:".format(operator))
                 uploaded_finance=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False)
                 if BS_separate_excel=="Y":
                     with col2:
