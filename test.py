@@ -935,40 +935,40 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                 if dup.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"]):
                     st.warning("Warning: There are more than one '{}' accounts in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
         
-	# Map PL accounts and Sabra account
-        PL,PL_with_detail=Map_PL_Sabra(PL,entity_i)
+    # Map PL accounts and Sabra account
+    PL,PL_with_detail=Map_PL_Sabra(PL,entity_i)
               
-	# check the latest reporting month
-        if latest_month=="2023":	
-            max_month_cols=str(max(list(PL.columns)))
-            latest_month=max_month_cols
-            col4,col5,col6=st.columns([2,1,2])
-            with col4:
-                st.warning("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
-            with col5:		
+    # check the latest reporting month
+    if latest_month=="2023":	
+        max_month_cols=str(max(list(PL.columns)))
+        latest_month=max_month_cols
+        col4,col5,col6=st.columns([2,1,2])
+        with col4:  
+            st.warning("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
+        with col5:		
                 st.button('Yes', on_click=clicked, args=["yes_button"])         
-            with col6:
+        with col6:
                 st.button("No", on_click=clicked, args=["no_button"])       
-            if st.session_state.clicked["no_button"]:
-                col1,col2=st.columns(2)
-                with col1:
-                    with st.form("latest_month", clear_on_submit=True):
-                        st.write("Please select reporting month for the uploading data" )  
-                        col3,col4=st.columns(2)
-                        with col3:
-                            year = st.selectbox('Year', range(2023, date.today().year+1))
-                        with col4:
-                            month = st.selectbox('Month', range(1, 13))
-                        confirm_month=st.form_submit_button("Submit")
-                    if confirm_month:
-                        if month<10:
-                            latest_month=str(year)+"0"+str(month)
-                        else:
-                            latest_month=str(year)+str(month)
+        if st.session_state.clicked["no_button"]:
+            col1,col2=st.columns(2)
+            with col1:
+                with st.form("latest_month", clear_on_submit=True):
+                    st.write("Please select reporting month for the uploading data" )  
+                    col3,col4=st.columns(2)
+                    with col3:
+                        year = st.selectbox('Year', range(2023, date.today().year+1))
+                    with col4:
+                        month = st.selectbox('Month', range(1, 13))
+                    confirm_month=st.form_submit_button("Submit")
+                if confirm_month:
+                    if month<10:
+                        latest_month=str(year)+"0"+str(month)
                     else:
-                        st.stop()
-            elif not st.session_state.clicked["yes_button"]:
-                st.stop()
+                        latest_month=str(year)+str(month)
+                else:
+                    st.stop()
+        elif not st.session_state.clicked["yes_button"]:
+            st.stop()
     return PL,PL_with_detail
 
 @st.cache_data(experimental_allow_widgets=True)  
@@ -1014,7 +1014,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
                 Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
                 st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
-    return Total_PL,Total_PL_detail,latest_month
+    return Total_PL,Total_PL_detail
 		
 
 
