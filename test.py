@@ -918,6 +918,7 @@ def PL_Read_Process(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     if True:
             PL=Read_Sheet(entity_i,sheet_type,sheet_name,PL_sheet_list,uploaded_file)
+            st.write(PL)
             # mapping new tenant accounts
             new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
             
@@ -946,7 +947,6 @@ def PL_Read_Process(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                 with col4:
                     st.warning("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
                 with col5:		
-			
                     st.button('Yes', on_click=clicked, args=["yes_button"])         
                 with col6:
                     st.button("No", on_click=clicked, args=["no_button"])       
