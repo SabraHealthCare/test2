@@ -616,7 +616,7 @@ def Map_PL_Sabra(PL,entity):
     return PL,PL_with_detail
     
 @st.cache_data
-def Compare_PL_Sabra(Total_PL,PL_with_detail):
+def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
     PL_with_detail=PL_with_detail.reset_index(drop=False)
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)"])
     diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","P&L Value","Diff (Sabra-P&L)","Sabra"])
@@ -937,19 +937,20 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         
     # Map PL accounts and Sabra account
     PL,PL_with_detail=Map_PL_Sabra(PL,entity_i)
-              
+    st.write(PL.columns)          
     # check the latest reporting month
-    if latest_month=="2023":	
-        max_month_cols=str(max(list(PL.columns)))
-        latest_month=max_month_cols
-        col4,col5,col6=st.columns([2,1,2])
-        with col4:  
+    return PL,PL_with_detail
+
+def Check_Latest_Month(PL):	
+    latest_month=str(max(list(PL.columns)))
+    col4,col5,col6=st.columns([2,1,2])
+    with col4:  
             st.warning("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
-        with col5:		
+    with col5:		
                 st.button('Yes', on_click=clicked, args=["yes_button"])         
-        with col6:
+    with col6:
                 st.button("No", on_click=clicked, args=["no_button"])       
-        if st.session_state.clicked["no_button"]:
+    if st.session_state.clicked["no_button"]:
             col1,col2=st.columns(2)
             with col1:
                 with st.form("latest_month", clear_on_submit=True):
@@ -967,9 +968,11 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                         latest_month=str(year)+str(month)
                 else:
                     st.stop()
-        elif not st.session_state.clicked["yes_button"]:
+    elif not st.session_state.clicked["yes_button"]:
             st.stop()
-    return PL,PL_with_detail
+    return latest_month
+
+
 
 @st.cache_data(experimental_allow_widgets=True)  
 def Upload_And_Process(uploaded_file,file_type):
@@ -1010,10 +1013,6 @@ def Upload_And_Process(uploaded_file,file_type):
                     PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
                 elif file_type=="BS" and BS_separate_excel=="Y": 
                     PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
-                       
-                Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
-                Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
-                st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
     return Total_PL,Total_PL_detail
 		
 
@@ -1050,8 +1049,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
-	
-	
     if choice=="Upload P&L":
         global latest_month
         latest_month='2023'
@@ -1089,28 +1086,29 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.write("Balance sheet wasn't upload.")
             st.stop()
         if BS_separate_excel=="N":  # Finance/BS are in one excel
-            Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
+            Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             # process Finance 
-            Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
+            Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
 	    # process BS 
-            Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
+            Total_BL,Total_BL_detail,latest_month=Upload_And_Process(uploaded_BS,"BS")
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
-			
-        diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail)
+
+	latest_month=Check_Latest_Month(Total_PL)    
+        diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month)
        
-	        # 1 Summary
+	# 1 Summary
         with st.expander("Summary of P&L" ,expanded=True):
-                    ChangeWidgetFontSize('Summary of P&L', '25px')
-                    View_Summary(uploaded_finance)
+            ChangeWidgetFontSize('Summary of P&L', '25px')
+            View_Summary(uploaded_finance)
 	        
                 # 2 Discrepancy of Historic Data
         with st.expander("Discrepancy for Historic Data",expanded=True):
-                    ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-                    View_Discrepancy(percent_discrepancy_accounts)
-                    View_Discrepancy_Detail()
+            ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
+            View_Discrepancy(percent_discrepancy_accounts)
+            View_Discrepancy_Detail()
                
     elif choice=="Manage Mapping":
         with st.expander("Manage Property Mapping" ,expanded=True):
