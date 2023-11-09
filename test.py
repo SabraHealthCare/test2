@@ -1088,30 +1088,30 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 else:
                     st.write("Balance sheet wasn't upload.".format(uploaded_BS.name))
                     st.stop()
-            if BS_separate_excel=="N":  # Finance/BS are in one excel
-                Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=\
+                if BS_separate_excel=="N":  # Finance/BS are in one excel
+                    Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=\
 		                                                       Upload_And_Process(uploaded_finance,"Finance")
-            elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
-		# process Finance 
-                Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
-		# process BS 
-                Total_BL,Total_BL_detail,latest_month=Upload_And_Process(uploaded_BS,"BS")
-		# combine Finance and BS
-                Total_PL=Total_PL.combine_first(Total_BL)
-                Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
+                elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
+		    # process Finance 
+                   Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
+		    # process BS 
+                   Total_BL,Total_BL_detail,latest_month=Upload_And_Process(uploaded_BS,"BS")
+		    # combine Finance and BS
+                    Total_PL=Total_PL.combine_first(Total_BL)
+                    otal_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
 			
-        diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail)
+                diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail)
        
-	# 1 Summary
-        with st.expander("Summary of P&L" ,expanded=True):
-            ChangeWidgetFontSize('Summary of P&L', '25px')
-            View_Summary(uploaded_finance)
+	        # 1 Summary
+                with st.expander("Summary of P&L" ,expanded=True):
+                    ChangeWidgetFontSize('Summary of P&L', '25px')
+                    View_Summary(uploaded_finance)
 	        
-        # 2 Discrepancy of Historic Data
-        with st.expander("Discrepancy for Historic Data",expanded=True):
-            ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-            View_Discrepancy(percent_discrepancy_accounts)
-            View_Discrepancy_Detail()
+                # 2 Discrepancy of Historic Data
+                with st.expander("Discrepancy for Historic Data",expanded=True):
+                    ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
+                    View_Discrepancy(percent_discrepancy_accounts)
+                    View_Discrepancy_Detail()
                
     elif choice=="Manage Mapping":
         with st.expander("Manage Property Mapping" ,expanded=True):
