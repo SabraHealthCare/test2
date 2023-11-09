@@ -938,7 +938,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     # check the latest reporting month
     return PL,PL_with_detail
 	
-@st.cache_data
+@st.cache_data(experimental_allow_widgets=True) 
 def Check_Reporting_Month(PL):	
     latest_month=str(max(list(PL.columns)))
     col4,col5,col6=st.columns([2,1,2])
