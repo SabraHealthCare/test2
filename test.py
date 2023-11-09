@@ -1077,7 +1077,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.cache_resource.clear()
                 st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
         if uploaded_finance:
-	    with col1:
+            with col1:
 	        st.write("{} uploaded.".format(uploaded_finance.name))
         else:
 	    st.write("P&L wasn't upload.")
