@@ -1093,7 +1093,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=\
 		                                                       Upload_And_Process(uploaded_finance,"Finance")
                 elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
-		    st.write("BS_separate_excel==Y")
+                    st.write("BS_separate_excel==Y")
 		    # process Finance 
                     Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
 		    # process BS 
