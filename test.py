@@ -1070,9 +1070,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             submitted = st.form_submit_button("Upload_PL")
         if submitted:
 	    # clear cache for every upload
-	    st.cache_data.clear()
-	    st.cache_resource.clear()
-	    st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
+            st.cache_data.clear()
+            st.cache_resource.clear()
+            st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
         if uploaded_finance:
             with col1:
                 st.markdown("✔️ :green[P&L uploaded]")
