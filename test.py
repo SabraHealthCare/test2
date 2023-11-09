@@ -1084,7 +1084,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.stop()
         if uploaded_BS:
             with col2:
-	        st.write("{} uploaded.".format(uploaded_BS.name))
+                st.write("{} uploaded.".format(uploaded_BS.name))
         else:
             st.write("Balance sheet wasn't upload.")
             st.stop()
