@@ -1089,12 +1089,14 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             # process Finance 
             Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
+            st.write(1,Total_PL)
 	    # process BS 
             Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
+            st.write(2,Total_BL)
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
-        st.write(Total_PL)
+            st.write(3,Total_PL)
         latest_month=Check_Latest_Month(Total_PL)    
         diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month)
        
