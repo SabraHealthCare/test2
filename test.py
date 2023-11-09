@@ -1056,6 +1056,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     if choice=="Upload P&L":
         global latest_month
         latest_month='2023'
+        st.write(entity_mapping)
         if all(entity_mapping["BS_separate_excel"]=="Y"):
             BS_separate_excel="Y"
         else:
