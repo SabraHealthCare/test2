@@ -936,7 +936,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                     st.warning("Warning: There are more than one '{}' accounts in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
         
 	# Map PL accounts and Sabra account
-	PL,PL_with_detail=Map_PL_Sabra(PL,entity_i)
+        PL,PL_with_detail=Map_PL_Sabra(PL,entity_i)
               
 	# check the latest reporting month
         if latest_month=="2023":	
