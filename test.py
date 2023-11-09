@@ -1056,7 +1056,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     if choice=="Upload P&L":
         global latest_month
         latest_month='2023'
-        st.write(entity_mapping)
         if all(entity_mapping["BS_separate_excel"]=="Y"):
             BS_separate_excel="Y"
         else:
@@ -1089,10 +1088,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 else:
                     st.write("Balance sheet wasn't upload.".format(uploaded_BS.name))
                     st.stop()
-            if BS_seperate_excel=="N":  # Finance/BS are in one excel
+            if BS_separate_excel=="N":  # Finance/BS are in one excel
                 Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=\
 		                                                       Upload_And_Process(uploaded_finance,"Finance")
-            elif BS_seperate_excel=="Y":     # Finance/BS are in different excel  
+            elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
 		# process Finance 
                 Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
 		# process BS 
