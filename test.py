@@ -1080,24 +1080,24 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             with col1:
                 st.write("{} uploaded.".format(uploaded_finance.name))
         else:
-	    st.write("P&L wasn't upload.")
-	    st.stop()
+            st.write("P&L wasn't upload.")
+            st.stop()
         if uploaded_BS:
-	    with col2:
+            with col2:
 	        st.write("{} uploaded.".format(uploaded_BS.name))
         else:
-	    st.write("Balance sheet wasn't upload.")
-	    st.stop()
+            st.write("Balance sheet wasn't upload.")
+            st.stop()
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
-	    # process Finance 
+            # process Finance 
             Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
 	    # process BS 
-	    Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
+            Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
 	    # combine Finance and BS
-	    Total_PL=Total_PL.combine_first(Total_BL)
-	    Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
+            Total_PL=Total_PL.combine_first(Total_BL)
+            Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
 			
         diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail)
        
