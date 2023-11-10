@@ -973,14 +973,14 @@ def Check_Reporting_Month(PL):
                     latest_month=str(year)+"0"+str(month)
                 else:
                     latest_month=str(year)+str(month)
+                st.write(1,latest_month)
                 return latest_month
             else:
                 st.stop()
     elif not st.session_state.clicked["yes_button"]:
         st.stop()
-    
-
-
+    elif st.session_state.clicked["yes_button"]:
+        return latest_month
 
 @st.cache_data(experimental_allow_widgets=True)  
 def Upload_And_Process(uploaded_file,file_type):
