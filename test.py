@@ -38,6 +38,18 @@ monthly_reporting_path="Total monthly reporting.csv"
 operator_list_path="Operator_list.csv"
 BPC_account_path="Sabra_account_list.csv"
 
+
+progress_text = "Operation in progress. Please wait."
+my_bar = st.progress(0, text=progress_text)
+
+for percent_complete in range(100):
+    time.sleep(0.01)
+    my_bar.progress(percent_complete + 1, text=progress_text)
+time.sleep(1)
+my_bar.empty()
+
+st.button("Rerun")
+
 # no cache
 def Read_CSV_FromS3(bucket,key):
     file_obj = s3.get_object(Bucket=bucket, Key=key)
@@ -892,11 +904,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)    
 
     # Start checking process
-    with st.empty():
-        st.write(f"⏳ ********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********" )
-        #time.sleep(1)
-        #st.write("✔️ 1 minute over!")
-    #st.write("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********" )  
+    st.write("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********" )  
     tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
     if tenantAccount_col_no==None:
         st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
