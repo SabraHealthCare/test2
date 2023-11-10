@@ -663,6 +663,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
 @st.cache_data(experimental_allow_widgets=True)
 def View_Summary(uploaded_file):
     global Total_PL
+    st.write(1,Total_PL.columns)
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ")  else ''*len(df)
     def color_missing(data):
@@ -1013,11 +1014,9 @@ def Upload_And_Process(uploaded_file,file_type):
                     PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
-            st.write(Total_PL.columns)
             #st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
+            st.write(Total_PL.columns)
     return Total_PL,Total_PL_detail
-	    	
-
 
 #----------------------------------website widges------------------------------------
 config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
@@ -1098,9 +1097,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
+            st.write(2,Total_PL.columns)
         latest_month=Check_Reporting_Month(Total_PL)    
         diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month)
-       
+
 	# 1 Summary
         with st.expander("Summary of P&L" ,expanded=True):
             ChangeWidgetFontSize('Summary of P&L', '25px')
