@@ -702,7 +702,7 @@ def View_Summary(uploaded_file):
         		    
         if not st.session_state.clicked["continue_button"]:
             st.stop()
-    st.write("2")		
+		
     latest_month_data = latest_month_data.pivot(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month)
     latest_month_data.reset_index(drop=False,inplace=True)
     latest_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
@@ -1013,6 +1013,7 @@ def Upload_And_Process(uploaded_file,file_type):
                     PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
+            st.write(Total_PL.columns)
             #st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
     return Total_PL,Total_PL_detail
 	    	
