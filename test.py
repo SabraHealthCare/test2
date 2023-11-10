@@ -25,15 +25,7 @@ s3 = boto3.client('s3')
 st.set_page_config(
    initial_sidebar_state="expanded",
     layout="wide")
-#placeholder = st.empty()
-
 placeholder = st.empty()
-
-with st.empty():
-    for seconds in range(60):
-        st.write(f"⏳ {seconds} seconds have passed")
-        time.sleep(1)
-    st.write("✔️ 1 minute over!")
 st.title("Sabra HealthCare Monthly Reporting App")
 sheet_name_discrepancy="Discrepancy_Review"
 bucket_mapping="sabramapping"
@@ -900,7 +892,11 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)    
 
     # Start checking process
-    st.write("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********" )  
+    with st.empty():
+        st.write(f"⏳ ********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********" )
+        #time.sleep(1)
+        #st.write("✔️ 1 minute over!")
+    #st.write("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********" )  
     tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
     if tenantAccount_col_no==None:
         st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
