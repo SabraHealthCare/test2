@@ -945,8 +945,6 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         
     # Map PL accounts and Sabra account
     PL,PL_with_detail=Map_PL_Sabra(PL,entity_i)         
-    # check the latest reporting month
-    if PL.columns[-1]==''
     return PL,PL_with_detail
 	
 @st.cache_data(experimental_allow_widgets=True) 
