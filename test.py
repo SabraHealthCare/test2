@@ -624,7 +624,8 @@ def Map_PL_Sabra(PL,entity):
     
 @st.cache_data
 def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
-    st.write(Total_PL)
+    st.write("Total_PL.columns.sort_values()",Total_PL.columns.sort_values())
+    st.write([t for t in Total_PL.columns.sort_values() if t<latest_month])
     PL_with_detail=PL_with_detail.reset_index(drop=False)
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)"])
     diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","P&L Value","Diff (Sabra-P&L)","Sabra"])
@@ -945,6 +946,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     # Map PL accounts and Sabra account
     PL,PL_with_detail=Map_PL_Sabra(PL,entity_i)         
     # check the latest reporting month
+    if PL.columns[-1]==''
     return PL,PL_with_detail
 	
 @st.cache_data(experimental_allow_widgets=True) 
@@ -1104,7 +1106,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
-            st.write(2,Total_PL.columns)
+            
         latest_month=Check_Reporting_Month(Total_PL)    
         diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month)
 
