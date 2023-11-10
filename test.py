@@ -379,10 +379,10 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
     search_row_size=min(15,PL_row_size)
     month_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
     year_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
-    
+
     for row_i in range(search_row_size):
         for col_i in range(PL_col_size):
-            month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i])
+            month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i])       
     year_count=[]        
     month_count=[]
     max_len=0
@@ -402,36 +402,43 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
     year_sort_index = np.argsort(np.array(year_count))
     for month_index_i in range(-1,-4,-1): # only check three of the most possible rows
         #month_sort_index[-1] is the index number of month_count in which has max month count
-        #month_sort_index[i] is also the index/row number of PL
-        if month_count[month_sort_index[month_index_i]]>1:
-            month_row=list(month_table.iloc[month_sort_index[month_index_i],])
-           
+        #month_row_index is also the index/row number of PL
+        month_row_index=month_sort_index[month_index_i]
+        if month_count[month_row_index]>1:
+            month_row=list(month_table.iloc[month_row_index,])
+
 	    # if True, it is the correct month row
             if Month_continuity_check(month_row):
-		    
-                for year_index_i in range(-1,-4,-1):
-                    year_row=list(year_table.iloc[year_sort_index[year_index_i],])
-		     # if month and year are not in the same places in the columns, year_row is not the correct one
+                
+                for year_index_i in range(0,-4,-1):
+                    if year_index_i==0:
+                        #in most case,year and month are in the same row, so first check month row
+                        year_row_index=month_row_index
+                    elif year_sort_index[year_index_i]!=month_row_index:  
+                        year_row_index=year_sort_index[year_index_i]
+                        #month row and year row is supposed to be adjacent
+                        if abs(year_row_index-month_row_index)>2:
+                            continue
+                    
+                    year_row=list(year_table.iloc[year_row_index,])
+		            # if month and year are not in the same places in the columns, year_row is not the correct one
                     if not all([year_row[i]==month_row[i] if month_row[i]==0 else year_row[i]!=0 for i in range(len(month_row))]):
                         continue
+            
                     # check validation of year
-                    if Year_continuity_check(year_row) \
-                        and year_count[year_sort_index[year_index_i]]==month_count[month_sort_index[month_index_i]]:
-                       
-                        PL_date_header=year_table.iloc[year_sort_index[year_index_i],].apply(lambda x:str(int(x)))+\
-                        month_table.iloc[month_sort_index[month_index_i],].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                        
-                        return PL_date_header,month_sort_index[month_index_i]
+                    if Year_continuity_check(year_row) and year_count[year_row_index]==month_count[month_row_index]:
+                        PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
+                        month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
+                        return PL_date_header,month_row_index
                     
                     # all the year rows are not valid, add year to month
                     else:
                         continue
 
-		# all the year rows are not valid, add year to month
-                year_table.iloc[year_sort_index[year_index_i],]=Add_year_to_header(list(month_table.iloc[month_sort_index[month_index_i],]))
-                PL_date_header=year_table.iloc[year_sort_index[year_index_i],].apply(lambda x:str(int(x)))+\
-                month_table.iloc[month_sort_index[month_index_i],].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                original=PL.iloc[month_sort_index[month_index_i],]
+		        # all the year rows are not valid, add year to month
+                year_table.iloc[year_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
+                PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
+                original_header=PL.iloc[month_row_index,]
                 
                 d_str = ''
                 for i in range(len(PL_date_header)):
@@ -439,13 +446,13 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                             continue
                         else:
                             date=str(PL_date_header[i][4:6])+"/"+str(PL_date_header[i][0:4])
-                            d_str +=",  "+str(original[i])+" — "+ date
+                            d_str +=",  "+str(original_header[i])+" — "+ date
                 
                 st.warning("Warning: Fail to identify 'year' in the month header of sheet '"+sheet_name+"'. Filled year as:")
                 st.markdown(d_str[1:])
                 return PL_date_header,month_sort_index[month_index_i]
                         
-            # month is not continuous, check next one
+            # month is not continuous, check next
             else:
                 continue
                 
