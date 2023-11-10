@@ -624,8 +624,6 @@ def Map_PL_Sabra(PL,entity):
     
 @st.cache_data
 def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
-    st.write("Total_PL.columns.sort_values()",Total_PL.columns.sort_values(),latest_month)
-    st.write([t for t in Total_PL.columns.sort_values() if t<latest_month])
     PL_with_detail=PL_with_detail.reset_index(drop=False)
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)"])
     diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","P&L Value","Diff (Sabra-P&L)","Sabra"])
@@ -672,7 +670,6 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
 @st.cache_data(experimental_allow_widgets=True)
 def View_Summary(uploaded_file):
     global Total_PL
-    st.write(1,Total_PL.columns)
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ")  else ''*len(df)
     def color_missing(data):
