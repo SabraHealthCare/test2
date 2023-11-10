@@ -20,6 +20,13 @@ from st_aggrid import AgGrid, GridUpdateMode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 s3 = boto3.client('s3')
 
+
+#---------------------------define parameters--------------------------
+st.set_page_config(
+   initial_sidebar_state="expanded",
+    layout="wide")
+#placeholder = st.empty()
+
 placeholder = st.empty()
 
 # Replace the placeholder with some text:
@@ -35,11 +42,6 @@ with placeholder.container():
 
 # Clear all those elements:
 placeholder.empty()
-#---------------------------define parameters--------------------------
-st.set_page_config(
-   initial_sidebar_state="expanded",
-    layout="wide")
-placeholder = st.empty()
 st.title("Sabra HealthCare Monthly Reporting App")
 sheet_name_discrepancy="Discrepancy_Review"
 bucket_mapping="sabramapping"
