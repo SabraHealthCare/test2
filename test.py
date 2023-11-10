@@ -624,6 +624,7 @@ def Map_PL_Sabra(PL,entity):
     
 @st.cache_data
 def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
+    st.write(Total_PL)
     PL_with_detail=PL_with_detail.reset_index(drop=False)
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)"])
     diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","P&L Value","Diff (Sabra-P&L)","Sabra"])
@@ -1022,7 +1023,6 @@ def Upload_And_Process(uploaded_file,file_type):
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
             #st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
-            st.write(Total_PL.columns)
     return Total_PL,Total_PL_detail
 
 #----------------------------------website widges------------------------------------
