@@ -963,14 +963,13 @@ def Check_Reporting_Month(PL):
                 with col3:
                     year = st.selectbox('Year', range(2023, date.today().year+1))
                 with col4:
-                    month = st.selectbox('Month', range(1, 13))
+                    month = st.selectbox('Month', range(1, 13),index=8)
                 confirm_month=st.form_submit_button("Submit")
             if confirm_month:
                 if month<10:
                     latest_month=str(year)+"0"+str(month)
                 else:
                     latest_month=str(year)+str(month)
-                st.write(1,latest_month)
                 return latest_month
             else:
                 st.stop()
