@@ -892,63 +892,58 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)    
 
     # Start checking process
-    progress_text = "********Check property—'"+property_name+"' in sheet '"+sheet_name+"'********"
-    my_bar = st.progress(0, text=progress_text)
-    st.snow()
-    for percent_complete in range(50):
-        time.sleep(0.01)
-        my_bar.progress(percent_complete + 1, text=progress_text)
-    my_bar.empty()
+    with st.spinner("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********"):
     #st.write("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********" )  
-    tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
-    if tenantAccount_col_no==None:
-        st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
-        st.stop()    
-    date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
+        tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
+        if tenantAccount_col_no==None:
+            st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
+            st.stop()    
+        date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
   
-    if len(date_header[0])==1 and date_header[0]==[0]:
-        st.error("Fail to identify month/year header in sheet '{}', please add it and re-upload.".format(sheet_name))
-        st.stop()     
-    PL.columns=date_header[0]
+        if len(date_header[0])==1 and date_header[0]==[0]:
+            st.error("Fail to identify month/year header in sheet '{}', please add it and re-upload.".format(sheet_name))
+            st.stop()     
+        PL.columns=date_header[0]
 
-    #set tenant_account as index of PL
-    PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)
+        #set tenant_account as index of PL
+        PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)
 	
-    #remove row above date row and remove column without date col name
-    PL=PL.iloc[date_header[1]+1:,PL.columns!='0']
+        #remove row above date row and remove column without date col name
+        PL=PL.iloc[date_header[1]+1:,PL.columns!='0']
     
-    #remove rows with nan tenant account
-    nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
-    PL.drop(nan_index, inplace=True)
-    #set index as str ,strip
-    PL.index=map(lambda x:str(x).strip(),PL.index)
-    PL=PL.map(lambda x: 0 if (x!=x) or (type(x)==str) or x==" " else x)
-    # remove columns with all nan/0
-    PL=PL.loc[:,(PL!= 0).any(axis=0)]
-    # remove rows with all nan/0 value
-    PL=PL.loc[(PL!= 0).any(axis=1),:]
+        #remove rows with nan tenant account
+        nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
+        PL.drop(nan_index, inplace=True)
+        #set index as str ,strip
+        PL.index=map(lambda x:str(x).strip(),PL.index)
+        PL=PL.map(lambda x: 0 if (x!=x) or (type(x)==str) or x==" " else x)
+        # remove columns with all nan/0
+        PL=PL.loc[:,(PL!= 0).any(axis=0)]
+        # remove rows with all nan/0 value
+        PL=PL.loc[(PL!= 0).any(axis=1),:]
 
-    # mapping new tenant accounts
-    new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
+        # mapping new tenant accounts
+        new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
             
-    if len(new_tenant_account_list)>0:
-        st.warning("Please complete mapping for below P&L accounts:")
-        for i in range(len(new_tenant_account_list)):
-            st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
-            Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
-            #insert new record to the bottom line of account_mapping
-            account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]           
-            Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping,operator) 
+        if len(new_tenant_account_list)>0:
+            st.warning("Please complete mapping for below P&L accounts:")
+            for i in range(len(new_tenant_account_list)):
+                st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
+                Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
+                #insert new record to the bottom line of account_mapping
+                account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]           
+                Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping,operator) 
             
-        #if there are duplicated accounts in P&L, ask for confirming
-        dup_tenant_account=set([x for x in PL.index if list(PL.index).count(x) > 1])
-        if len(dup_tenant_account)>0:
-            for dup in dup_tenant_account:
-                if dup.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"]):
-                    st.warning("Warning: There are more than one '{}' accounts in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
+            #if there are duplicated accounts in P&L, ask for confirming
+            dup_tenant_account=set([x for x in PL.index if list(PL.index).count(x) > 1])
+            if len(dup_tenant_account)>0:
+                for dup in dup_tenant_account:
+                    if dup.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"]):
+                        st.warning("Warning: There are more than one '{}' accounts in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
         
-    # Map PL accounts and Sabra account
-    PL,PL_with_detail=Map_PL_Sabra(PL,entity_i)         
+        # Map PL accounts and Sabra account
+        PL,PL_with_detail=Map_PL_Sabra(PL,entity_i)  
+    st.success('Done!')
     return PL,PL_with_detail
 	
 @st.cache_data(experimental_allow_widgets=True) 
@@ -1079,7 +1074,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 if BS_separate_excel=="Y":
                     st.subheader("Upload Balance Sheet:")
                     uploaded_BS=st.file_uploader("",type={"xlsx","xlsm","xls"},accept_multiple_files=False,key="BS_upload")
-            submitted = st.form_submit_button("Upload_PL")
+            submitted = st.form_submit_button("Upload")
         if submitted:
 	    # clear cache for every upload
             st.cache_data.clear()
