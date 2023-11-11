@@ -1078,18 +1078,18 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.cache_data.clear()
             st.cache_resource.clear()
             st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
-        if uploaded_finance:
-            with col1:
-                st.markdown("✔️ :green[P&L uploaded]")
-        else:
-            st.write("P&L wasn't upload.")
-            st.stop()
-        if uploaded_BS:
-            with col2:
-                st.markdown("✔️ :green[Balance sheet uploaded]")
-        else:
-            st.write("Balance sheet wasn't upload.")
-            st.stop()
+            if uploaded_finance:
+                with col1:
+                    st.markdown("✔️ :green[P&L uploaded]")
+            else:
+                st.write("P&L wasn't upload.")
+                st.stop()
+            if uploaded_BS:
+                with col2:
+                    st.markdown("✔️ :green[Balance sheet uploaded]")
+            else:
+                st.write("Balance sheet wasn't upload.")
+                st.stop()
 	
         if BS_separate_excel=="N":  # Finance/BS are in one excel
 	
