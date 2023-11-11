@@ -1092,21 +1092,22 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.stop()
 	
         if BS_separate_excel=="N":  # Finance/BS are in one excel
-	
-            Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
+            with st.spinner('Wait for P&L process'):
+                Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             # process Finance 
-            with st.spinner('Wait for it Finance'):
+            with st.spinner('Wait for P&L process'):
                 Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
 	    # process BS 
-            with st.spinner('Wait for it BS'):
+            with st.spinner('Wait for Balance Sheet process'):
                 Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
-            
-        latest_month=Check_Reporting_Month(Total_PL)    
-        diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month)
+        
+        with st.spinner('Wait for data checking'):    
+            latest_month=Check_Reporting_Month(Total_PL)    
+            diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month)
 
 	# 1 Summary
         with st.expander("Summary of P&L" ,expanded=True):
