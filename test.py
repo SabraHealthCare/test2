@@ -893,6 +893,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
 
     # Start checking process
     with st.spinner("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********"):
+        time.sleep(2)
     #st.write("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********" )  
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
         if tenantAccount_col_no==None:
@@ -943,7 +944,6 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         
         # Map PL accounts and Sabra account
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_i)  
-    st.success('Done!')
     return PL,PL_with_detail
 	
 @st.cache_data(experimental_allow_widgets=True) 
