@@ -893,8 +893,6 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
 
     # Start checking process
     with st.spinner("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********"):
-        time.sleep(2)
-    #st.write("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********" )  
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
@@ -1094,12 +1092,15 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.stop()
 	
         if BS_separate_excel=="N":  # Finance/BS are in one excel
+	
             Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             # process Finance 
-            Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
+            with st.spinner('Wait for it Finance'):
+                Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
 	    # process BS 
-            Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
+            with st.spinner('Wait for it BS'):
+                Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
