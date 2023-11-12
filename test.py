@@ -1066,6 +1066,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         else:
             BS_separate_excel="N"
          
+       
         with st.form("upload_form", clear_on_submit=True):
             col1,col2=st.columns(2)
             with col1:
@@ -1094,34 +1095,34 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.write("Balance sheet wasn't upload.")
                 st.stop()
 
-            if BS_separate_excel=="N":  # Finance/BS are in one excel
-                with st.spinner('Wait for P&L process'):
-                    Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
-            elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
-                # process Finance 
-                with st.spinner('Wait for P&L process'):
-                    Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
-	        # process BS 
-                with st.spinner('Wait for Balance Sheet process'):
-                    Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
-	        # combine Finance and BS
-                Total_PL=Total_PL.combine_first(Total_BL)
-                Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
+        if BS_separate_excel=="N":  # Finance/BS are in one excel
+            with st.spinner('Wait for P&L process'):
+                Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
+        elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
+            # process Finance 
+            with st.spinner('Wait for P&L process'):
+                Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
+	    # process BS 
+            with st.spinner('Wait for Balance Sheet process'):
+                Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
+	    # combine Finance and BS
+            Total_PL=Total_PL.combine_first(Total_BL)
+            Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
         
-            with st.spinner('Wait for data checking'):    
-                latest_month=Check_Reporting_Month(Total_PL)    
-                diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month)
+        with st.spinner('Wait for data checking'):    
+            latest_month=Check_Reporting_Month(Total_PL)    
+            diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month)
 
-	    # 1 Summary
-            with st.expander("Summary of P&L" ,expanded=True):
-                ChangeWidgetFontSize('Summary of P&L', '25px')
-                View_Summary(uploaded_finance)
+	# 1 Summary
+        with st.expander("Summary of P&L" ,expanded=True):
+            ChangeWidgetFontSize('Summary of P&L', '25px')
+            View_Summary(uploaded_finance)
 	        
-            # 2 Discrepancy of Historic Data
-            with st.expander("Discrepancy for Historic Data",expanded=True):
-                ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-                View_Discrepancy(percent_discrepancy_accounts)
-                View_Discrepancy_Detail()
+        # 2 Discrepancy of Historic Data
+        with st.expander("Discrepancy for Historic Data",expanded=True):
+            ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
+            View_Discrepancy(percent_discrepancy_accounts)
+            View_Discrepancy_Detail()
                
     elif choice=="Manage Mapping":
         with st.expander("Manage Property Mapping" ,expanded=True):
