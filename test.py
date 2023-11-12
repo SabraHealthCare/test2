@@ -737,7 +737,7 @@ def View_Summary(uploaded_file):
         submit_latest_month=st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     
     upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
-    upload_latest_month["Operator"]=operator
+    upload_latest_month=upload_latest_month.merge(entity_mapping[["Operator","GEOGRAPHY","TENANT","FACILITY_TYPE"]].reset_index(drop=False),on="ENTITY",how="left")
     upload_latest_month["TIME"]=latest_month
     upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
     upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
@@ -1080,13 +1080,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
         if uploaded_finance:
             with col1:
-                st.markdown("✔️ :green[P&L uploaded]")
+                st.markdown("✔️ :green[P&L selected]")
         else:
             st.write("P&L wasn't upload.")
             st.stop()
         if uploaded_BS:
             with col2:
-                st.markdown("✔️ :green[Balance sheet uploaded]")
+                st.markdown("✔️ :green[Balance sheet selected]")
         else:
             st.write("Balance sheet wasn't upload.")
             st.stop()
@@ -1247,7 +1247,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.success("there is no un-uploaded data")
             else:
                 data=pd.read_csv(BytesIO(data_obj['Body'].read()),header=0)
-                data=data[list(filter(lambda x:"Unnamed" not in x ,data.columns))]
+                data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
 		
                 # summary for operator upload
                 upload_summary=data[["Operator","TIME","Latest_Upload_Time"]].drop_duplicates(["Operator","TIME","Latest_Upload_Time"]) 
@@ -1265,13 +1265,17 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.write("")
                 st.write("")
                 st.subheader("Download reporting data")    
-                # create EPM formula for download data
+                
+		# create EPM formula for download data
                 col_size=data.shape[1]
                 row_size=data.shape[0]
                 col_name_list=list(data.columns)
                 time_col_letter=colnum_letter(col_name_list.index("TIME"))
                 entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
                 account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
+                data_col_letter=colnum_letter(col_name_list.index("FACILITY_TYPE"))
+                data_col_letter=colnum_letter(col_name_list.index("GEOGRAPHY"))
+                data_col_letter=colnum_letter(col_name_list.index("TENANT"))
                 data_col_letter=colnum_letter(col_name_list.index("Amount"))
                 uploud_data=data.copy()
                 uploud_data["TIME"]=uploud_data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
