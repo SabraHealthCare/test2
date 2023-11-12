@@ -951,7 +951,7 @@ def Check_Reporting_Month(PL):
     latest_month=str(max(list(PL.columns)))
     col4,col5,col6=st.columns([2,1,2])
     with col4:  
-        st.warning("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
+        st.warning("fting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
     with col5:		
         st.button('Yes', on_click=clicked, args=["yes_button"])         
     with col6:
@@ -967,7 +967,7 @@ def Check_Reporting_Month(PL):
                 with col4:
                     st.write(2,st.session_state.latest_month)
                     month = st.selectbox('Month', range(1, 13),index=int(st.session_state.latest_month))
-                confirm_month=st.form_submit_button("Submit",on_click=latest_month_clicked, args=[month])
+                confirm_month=st.form_submit_button("Submit",on_click=latest_month_clicked, args=month)
             if confirm_month:
                 if month<10:
                     latest_month=str(year)+"0"+str(month)
