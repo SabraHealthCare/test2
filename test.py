@@ -954,7 +954,9 @@ def Check_Reporting_Month(PL):
         st.button('Yes', on_click=clicked, args=["yes_button"])         
     with col6:
         st.button("No", on_click=clicked, args=["no_button"])       
-    if st.session_state.clicked["no_button"]:
+    if st.session_state.clicked["yes_button"]:
+        return latest_month
+    elif st.session_state.clicked["no_button"]:
         col1,col2=st.columns(2)
         with col1:
             with st.form("latest_month"):
@@ -974,10 +976,8 @@ def Check_Reporting_Month(PL):
                 return latest_month
             else:
                 st.stop()
-    elif not st.session_state.clicked["yes_button"]:
+    else:
         st.stop()
-    elif st.session_state.clicked["yes_button"]:
-        return latest_month
 
 @st.cache_data(experimental_allow_widgets=True)  
 def Upload_And_Process(uploaded_file,file_type):
