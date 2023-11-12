@@ -965,6 +965,7 @@ def Check_Reporting_Month(PL):
                 with col3:
                     year = st.selectbox('Year', range(2023, date.today().year+1))
                 with col4:
+                    st.write(2,st.session_state.latest_month)
                     month = st.selectbox('Month', range(1, 13),index=int(st.session_state.latest_month))
                 confirm_month=st.form_submit_button("Submit",on_click=latest_month_clicked, args=[month])
             if confirm_month:
@@ -1080,6 +1081,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.cache_resource.clear()
             st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
             st.session_state.latest_month=date.today().month-2
+            st.write(1,st.session_state.latest_month)
             if uploaded_finance:
                 with col1:
                     st.markdown("✔️ :green[P&L uploaded]")
