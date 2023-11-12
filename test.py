@@ -947,8 +947,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
 @st.cache_data(experimental_allow_widgets=True) 
 def Check_Reporting_Month(PL):	
     latest_month=str(max(list(PL.columns)))
-    if not st.session_state.latest_month:
-        st.session_state.latest_month=int(latest_month[4:6])
+
     col4,col5,col6=st.columns([2,1,2])
     with col4:  
         st.warning("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
@@ -1082,6 +1081,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.cache_data.clear()
             st.cache_resource.clear()
             st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
+            st.session_state.latest_month=date.today().month-1
             if uploaded_finance:
                 with col1:
                     st.markdown("✔️ :green[P&L uploaded]")
