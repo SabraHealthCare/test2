@@ -965,7 +965,7 @@ def Check_Reporting_Month(PL):
                     year = st.selectbox('Year', range(2023, date.today().year+1))
                 with col4:
                     month = st.selectbox('Month', range(1, 13),index=st.session_state.latest_month)
-		    st.session_state.latest_month=month
+                    st.session_state.latest_month=month
                 confirm_month=st.form_submit_button("Submit")
             if confirm_month:
                 if month<10:
@@ -1093,7 +1093,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             else:
                 st.write("Balance sheet wasn't upload.")
                 st.stop()
-	
+        st.write(st.session_state)
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             with st.spinner('Wait for P&L process'):
                 Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
