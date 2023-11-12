@@ -67,6 +67,8 @@ def Upload_File_toS3(uploaded_file, bucket, key):
 # Function to update the value in session state
 def clicked(button_name):
     st.session_state.clicked[button_name] = True
+def latest_month_clicked(latest_month):
+    st.session_state.latest_month = latest_month
 	
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
 def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  # how = replace, append...
@@ -947,40 +949,36 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
 @st.cache_data(experimental_allow_widgets=True) 
 def Check_Reporting_Month(PL):	
     latest_month=str(max(list(PL.columns)))
-    with st.empty():
-        col4,col5,col6=st.columns([2,1,2])
-        with col4:  
-            st.warning("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
-        with col5:		
-            st.button('Yes', on_click=clicked, args=["yes_button"])         
-        with col6:
-            st.button("No", on_click=clicked, args=["no_button"])       
-        if st.session_state.clicked["no_button"]:
-            col1,col2=st.columns(2)
-            with col1:
-                with st.form("latest_month", clear_on_submit=True):
-                    st.write("Please select reporting month for the uploading data" )  
-                    col3,col4=st.columns(2)
-                    with col3:
-                        year = st.selectbox('Year', range(2023, date.today().year+1))
-                    with col4:
-                        month = st.selectbox('Month', range(1, 13),index=st.session_state.latest_month)
-                    confirm_month=st.form_submit_button("Submit")
-                if confirm_month:
-                    st.session_state.latest_month=month
-                    if month<10:
-                        latest_month=str(year)+"0"+str(month)
-                    
-                    else:
-                        latest_month=str(year)+str(month)
-                
-                    return latest_month
+    col4,col5,col6=st.columns([2,1,2])
+    with col4:  
+        st.warning("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
+    with col5:		
+        st.button('Yes', on_click=clicked, args=["yes_button"])         
+    with col6:
+        st.button("No", on_click=clicked, args=["no_button"])       
+    if st.session_state.clicked["no_button"]:
+        col1,col2=st.columns(2)
+        with col1:
+            with st.form("latest_month", clear_on_submit=True):
+                st.write("Please select reporting month for the uploading data" )  
+                col3,col4=st.columns(2)
+                with col3:
+                    year = st.selectbox('Year', range(2023, date.today().year+1))
+                with col4:
+                    month = st.selectbox('Month', range(1, 13),index=st.session_state.latest_month)
+                confirm_month=st.form_submit_button("Submit",on_click=latest_month_clicked, args=[latest_month]))
+            if confirm_month:
+                if month<10:
+                    latest_month=str(year)+"0"+str(month)
                 else:
-                    st.stop()
-        elif not st.session_state.clicked["yes_button"]:
-            st.stop()
-        elif st.session_state.clicked["yes_button"]:
-            return latest_month
+                    latest_month=str(year)+str(month)
+                return latest_month
+            else:
+                st.stop()
+    elif not st.session_state.clicked["yes_button"]:
+        st.stop()
+    elif st.session_state.clicked["yes_button"]:
+        return latest_month
 
 @st.cache_data(experimental_allow_widgets=True)  
 def Upload_And_Process(uploaded_file,file_type):
