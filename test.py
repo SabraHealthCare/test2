@@ -1094,7 +1094,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             else:
                 st.write("Balance sheet wasn't upload.")
                 st.stop()
-        st.write(st.session_state)
+
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             with st.spinner('Wait for P&L process'):
                 Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
