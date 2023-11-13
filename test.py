@@ -737,7 +737,7 @@ def View_Summary(uploaded_file):
         submit_latest_month=st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     
     upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
-    upload_latest_month=upload_latest_month.merge(entity_mapping[["Operator","GEOGRAPHY","TENANT","FACILITY_TYPE"]].reset_index(drop=False),on="ENTITY",how="left")
+    upload_latest_month=upload_latest_month.merge(entity_mapping[["Operator","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE"]].reset_index(drop=False),on="ENTITY",how="left")
     upload_latest_month["TIME"]=latest_month
     upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
     upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
@@ -1273,9 +1273,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 time_col_letter=colnum_letter(col_name_list.index("TIME"))
                 entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
                 account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
-                data_col_letter=colnum_letter(col_name_list.index("FACILITY_TYPE"))
-                data_col_letter=colnum_letter(col_name_list.index("GEOGRAPHY"))
-                data_col_letter=colnum_letter(col_name_list.index("TENANT"))
+                facility_col_letter=colnum_letter(col_name_list.index("FACILITY_TYPE"))
+                state_col_letter=colnum_letter(col_name_list.index("GEOGRAPHY"))
+                leasename_col_letter=colnum_letter(col_name_list.index("LEASE_NAME"))
+                inv_col_letter=colnum_letter(col_name_list.index("INV_TYPE"))
                 data_col_letter=colnum_letter(col_name_list.index("Amount"))
                 uploud_data=data.copy()
                 uploud_data["TIME"]=uploud_data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
@@ -1283,8 +1284,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                     if uploud_data.loc[r-2,"EPM_Formula"]=="Uploaded":
                         continue
                     else:
-                        formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
-		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r)
+                        formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
+		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
                         uploud_data.loc[r-2,"EPM_Formula"]=formula
                 download_file=uploud_data.to_csv(index=False).encode('utf-8')
 
