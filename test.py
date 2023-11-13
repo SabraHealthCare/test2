@@ -38,6 +38,7 @@ monthly_reporting_path="Total monthly reporting.csv"
 operator_list_path="Operator_list.csv"
 BPC_account_path="Sabra_account_list.csv"
 
+
 # no cache
 def Read_CSV_FromS3(bucket,key):
     file_obj = s3.get_object(Bucket=bucket, Key=key)
