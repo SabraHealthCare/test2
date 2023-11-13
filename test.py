@@ -613,6 +613,8 @@ def Map_PL_Sabra(PL,entity):
                     PL.loc[i,month]=before_conversion/monthrange(int(str(month)[0:4]), int(str(month)[4:6]))[1]
                 elif conversion[0]=="*":
                     PL.loc[i,month]= before_conversion*float(conversion.split("*")[0])
+
+
     PL=PL.drop(["Tenant_Formated_Account","Conversion"], axis=1)
     
     PL_with_detail=copy.copy(PL)
@@ -631,7 +633,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)"])
     diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","P&L Value","Diff (Sabra-P&L)","Sabra"])
     for entity in entity_mapping.index:
-        for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
+        for matrix in BPC_Account["BPC_Account_Name"]:#.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
             for timeid in [t for t in Total_PL.columns.sort_values() if t<latest_month][-2:]: # only compare two months
                 try:
                     BPC_value=int(BPC_pull.loc[entity,matrix][timeid+'00'])
