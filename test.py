@@ -1088,7 +1088,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if BS_separate_excel=="Y" and uploaded_BS:
             with col2:
                 st.markdown("✔️ :green[Balance sheet selected]")
-	elif BS_separate_excel=="Y" and not uploaded_BS:
+        elif BS_separate_excel=="Y" and not uploaded_BS:
             st.write("Balance sheet wasn't upload.")
             st.stop()
 
