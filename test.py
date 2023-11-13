@@ -70,14 +70,16 @@ def clicked(button_name):
     st.session_state.clicked[button_name] = True
 	
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
-def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  # how = replace, append...
+def Update_File_inS3(bucket,key,new_data,operator,month=None):  # how = replace, append...
     original_file =s3.get_object(Bucket=bucket, Key=key)
     if int(original_file["ContentLength"])<=2:  # empty file
         original_data=pd.DataFrame()
     else:
         original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
+        original_data=original_data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
         if month:
 	    # remove original data by operator and month 
+            st.write(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)])
             original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)].index)
         elif not month:
             original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
@@ -681,7 +683,7 @@ def View_Summary(uploaded_file):
     for month in months:
         m_str += ", " + month
     st.write("Reporting months detected in P&L : "+m_str[1:])   
-    st.write("The reporting month is:  "+latest_month[4:6]+"/"+latest_month[0:4])
+    st.write("The reporting month is "+latest_month[4:6]+"/"+latest_month[0:4])
     
     Total_PL.index=Total_PL.index.set_names(["ENTITY", "Sabra_Account"]) 
     Total_PL=Total_PL.fillna(0)
@@ -746,9 +748,6 @@ def View_Summary(uploaded_file):
     
     if submit_latest_month:
         # save tenant P&L to S3
-        if not Upload_File_toS3(uploaded_file,bucket_PL,"{}/{}_P&L_{}-{}".format(operator,operator,latest_month[4:6],latest_month[0:4])):
-            st.write(" ")  #----------record into error report------------------------	
-        
         if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
             with col2:
                 st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
