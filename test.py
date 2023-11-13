@@ -616,7 +616,7 @@ def Map_PL_Sabra(PL,entity):
                     st.write(float(conversion.split("*")[1])
                     st.write(PL.loc[i,month])
                     PL.loc[i,month]= before_conversion*float(conversion.split("*")[1])
-	            st.write(PL.loc[i,month])
+                    st.write(PL.loc[i,month])
 
 
     PL=PL.drop(["Tenant_Formated_Account","Conversion"], axis=1)
