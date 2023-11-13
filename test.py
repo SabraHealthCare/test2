@@ -70,7 +70,7 @@ def clicked(button_name):
     st.session_state.clicked[button_name] = True
 	
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
-def Update_File_inS3(bucket,key,new_data,operator,month=None):  # how = replace, append...
+def Update_File_inS3(bucket,key,new_data,operator,month=None):  # replace original data
     original_file =s3.get_object(Bucket=bucket, Key=key)
     if int(original_file["ContentLength"])<=2:  # empty file
         original_data=pd.DataFrame()
