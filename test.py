@@ -613,7 +613,7 @@ def Map_PL_Sabra(PL,entity):
                 elif conversion=="/monthdays":		
                     PL.loc[i,month]=before_conversion/monthrange(int(str(month)[0:4]), int(str(month)[4:6]))[1]
                 elif conversion[0]=="*":
-                    st.write(float(conversion.split("*")[1])
+                    st.write(float(conversion.split("*")[1]))
                     st.write(PL.loc[i,month])
                     PL.loc[i,month]= before_conversion*float(conversion.split("*")[1])
                     st.write(PL.loc[i,month])
