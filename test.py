@@ -1085,10 +1085,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         else:
             st.write("P&L wasn't upload.")
             st.stop()
-        if uploaded_BS:
+        if BS_separate_excel=="Y" and uploaded_BS:
             with col2:
                 st.markdown("✔️ :green[Balance sheet selected]")
-        else:
+	elif BS_separate_excel=="Y" and not uploaded_BS:
             st.write("Balance sheet wasn't upload.")
             st.stop()
 
