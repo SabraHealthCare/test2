@@ -1277,7 +1277,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 facility_col_letter=colnum_letter(col_name_list.index("FACILITY_TYPE"))
                 state_col_letter=colnum_letter(col_name_list.index("GEOGRAPHY"))
                 leasename_col_letter=colnum_letter(col_name_list.index("LEASE_NAME"))
-                inv_col_letter=colnum_letter(col_name_list.index("INV_TYPE"))
+                #inv_col_letter=colnum_letter(col_name_list.index("INV_TYPE"))
                 data_col_letter=colnum_letter(col_name_list.index("Amount"))
                 uploud_data=data.copy()
                 uploud_data["TIME"]=uploud_data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
@@ -1285,8 +1285,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                     if uploud_data.loc[r-2,"EPM_Formula"]=="Uploaded":
                         continue
                     else:
-                        formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
-		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
+                        formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},"INV_Equity","D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
+		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r)
                         uploud_data.loc[r-2,"EPM_Formula"]=formula
                 download_file=uploud_data.to_csv(index=False).encode('utf-8')
 
