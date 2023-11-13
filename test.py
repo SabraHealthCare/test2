@@ -76,7 +76,7 @@ def Update_File_inS3(bucket,key,new_data,operator,month=None):  # replace origin
         original_data=pd.DataFrame()
     else:
         original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
-        original_data=original_data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
+        original_data=original_data[new_data.columns]
         if month:
 	    # remove original data by operator and month 
             st.write(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)])
@@ -87,6 +87,7 @@ def Update_File_inS3(bucket,key,new_data,operator,month=None):  # replace origin
     # append new data to original data
     new_data=new_data.reset_index(drop=False)
     updated_data = pd.concat([original_data,new_data]).reset_index(drop=True)
+    
     return Save_CSV_ToS3(updated_data,bucket,key)
 
 
