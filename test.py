@@ -738,7 +738,7 @@ def View_Summary(uploaded_file):
         submit_latest_month=st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     
     upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
-    upload_latest_month=upload_latest_month.merge(entity_mapping[["Operator","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE"]].reset_index(drop=False),on="ENTITY",how="left")
+    upload_latest_month=upload_latest_month.merge(entity_mapping[["Operator","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]].reset_index(drop=False),on="ENTITY",how="left")
     upload_latest_month["TIME"]=latest_month
     upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
     upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
