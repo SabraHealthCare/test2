@@ -79,7 +79,7 @@ def Update_File_inS3(bucket,key,new_data,operator,month=None):  # replace origin
         original_data=original_data[new_data.columns]
         if month:
 	    # remove original data by operator and month 
-            st.write(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)])
+            #st.write(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)])
             original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)].index)
         elif not month:
             original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
