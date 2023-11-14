@@ -635,6 +635,8 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
     diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","P&L Value","Diff (Sabra-P&L)","Sabra"])
     for entity in entity_mapping.index:
         for matrix in BPC_Account["BPC_Account_Name"]:#.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
+            if matrix =='T_CASH_AND_EQUIV':
+                continue
             for timeid in [t for t in Total_PL.columns.sort_values() if t<latest_month][-2:]: # only compare two months
                 try:
                     BPC_value=int(BPC_pull.loc[entity,matrix][timeid+'00'])
