@@ -758,7 +758,8 @@ def View_Summary(uploaded_file):
                 st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
         else:
             st.write(" ")  #----------record into error report------------------------	
-    
+    else:
+        st.stop()
     download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
 
 # don't use cache
