@@ -731,10 +731,11 @@ def View_Summary(uploaded_file):
         else:
             latest_month_data.loc[i,"Sabra_Account"]="        "+latest_month_data.loc[i,"Sabra_Account"]
 		
+    entity_columns=latest_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
-        latest_month_data["Total"] = latest_month_data.drop(["Sabra_Account","Category"],axis=1).sum(axis=1)
+        latest_month_data["Total"] = latest_month_data[entity_columns].sum(axis=1)
     st.markdown("{} {}/{} reporting data:".format(operator,latest_month[4:6],latest_month[0:4]))      
-    st.markdown(latest_month_data.drop(["Category"],axis=1).style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
+    st.markdown(latest_month_data[["Sabra_Account","Total"]+list(entity_columns)].style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
     st.write("")
 	
