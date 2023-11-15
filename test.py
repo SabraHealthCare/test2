@@ -38,7 +38,6 @@ monthly_reporting_path="Total monthly reporting.csv"
 operator_list_path="Operator_list.csv"
 BPC_account_path="Sabra_account_list.csv"
 
-
 # no cache
 def Read_CSV_FromS3(bucket,key):
     file_obj = s3.get_object(Bucket=bucket, Key=key)
@@ -635,8 +634,8 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
     diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","P&L Value","Diff (Sabra-P&L)","Sabra"])
     for entity in entity_mapping.index:
         for matrix in BPC_Account["BPC_Account_Name"]:#.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
-            if matrix =='T_CASH_AND_EQUIV':
-                continue
+            #if matrix =='T_CASH_AND_EQUIV':
+               #continue
             for timeid in [t for t in Total_PL.columns.sort_values() if t<latest_month][-2:]: # only compare two months
                 try:
                     BPC_value=int(BPC_pull.loc[entity,matrix][timeid+'00'])
