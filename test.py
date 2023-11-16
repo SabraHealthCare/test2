@@ -76,8 +76,10 @@ def Update_File_inS3(bucket,key,new_data,operator,month=None):  # replace origin
     else:
         original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
         original_data=original_data[new_data.columns]
+
         if month:
             st.write("operator,month",operator,month,original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)])
+            original_data.TIME = df.TIME.astype(str)
 	    # remove original data by operator and month 
             #st.write(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)])
             original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)].index)
