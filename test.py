@@ -744,7 +744,8 @@ def View_Summary(uploaded_file):
     col1,col2=st.columns([13,20])
     with col1:
         submit_latest_month=st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
-    
+    with col2:
+        download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
     upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
     upload_latest_month=upload_latest_month.merge(entity_mapping[["Operator","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]].reset_index(drop=False),on="ENTITY",how="left")
     upload_latest_month["TIME"]=latest_month
@@ -755,17 +756,17 @@ def View_Summary(uploaded_file):
     if submit_latest_month:
         # save tenant P&L to S3
         if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
-            with col2:
-                st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
+            st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
         else:
             st.write(" ")  #----------record into error report------------------------	
     else:
         st.stop()
-    download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
+    
 
 # don't use cache
 def View_Discrepancy(percent_discrepancy_accounts): 
     global diff_BPC_PL
+
     if diff_BPC_PL.shape[0]>0:
         st.error("{0:.1f}% P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.".format(percent_discrepancy_accounts*100))
         edited_diff_BPC_PL = st.data_editor(
@@ -790,15 +791,15 @@ def View_Discrepancy(percent_discrepancy_accounts):
 			disabled =False,
             		required =False)
 		}) 
-
-                                
-        download_report(edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy_{}".format(operator))
-        col1,col2=st.columns([1,3]) 
-        with col1:    
+        col1,col2,col3=st.columns([1,1,4]) 
+        with col1:                        
+            download_report(edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy")
+        
+        with col2:    
             submit_com=st.button("Submit comments")
         if submit_com:
             with st.empty():
-                with col2:
+                with col3:
                     st.markdown("✔️ :green[Comments uploaded]")
                     st.write(" ")
                 Update_File_inS3(bucket_PL,discrepancy_path,edited_diff_BPC_PL,operator,latest_month)
