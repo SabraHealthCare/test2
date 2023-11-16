@@ -1217,7 +1217,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 if confirm_button:
                     if selected_row:
                         if len(selected_row)==un_confirmed_account.shape[0]: # select all
-                            account_mapping["Confirm"]=None
+                            account_mapping["Confirm"]=None 
                         else:#select part
                             for i in range(len(selected_row)):
                                 tenant_account=un_confirmed_account[un_confirmed_account["Index"]==selected_row[i]["Index"]]["Tenant_Account"].item()
