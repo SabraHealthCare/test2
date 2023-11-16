@@ -793,7 +793,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
 		}) 
         col1,col2,col3=st.columns([1,1,4]) 
         with col1:                        
-            download_report(edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy")
+            download_report(edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy_{}".format(operator))
         
         with col2:    
             submit_com=st.button("Submit comments")
