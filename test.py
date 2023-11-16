@@ -77,12 +77,13 @@ def Update_File_inS3(bucket,key,new_data,operator,month=None):  # replace origin
         original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
         original_data=original_data[new_data.columns]
         if month:
+            st.write("operator,month",operator,month,original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)])
 	    # remove original data by operator and month 
             #st.write(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)])
             original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)].index)
         elif not month:
             original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
-    
+    st.write(original_data)
     # append new data to original data
     new_data=new_data.reset_index(drop=False)
     updated_data = pd.concat([original_data,new_data]).reset_index(drop=True)
@@ -752,7 +753,7 @@ def View_Summary(uploaded_file):
     upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
     upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
     upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
-    
+    Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month)
     if submit_latest_month:
         # save tenant P&L to S3
         if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
