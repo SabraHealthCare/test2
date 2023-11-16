@@ -741,7 +741,7 @@ def View_Summary(uploaded_file):
     st.write("")
 	
     # upload latest month data to AWS
-    col1,col2=st.columns([13,20])
+    col1,col2=st.columns([1,3])
     with col1:
         submit_latest_month=st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     with col2:
@@ -791,7 +791,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
 			disabled =False,
             		required =False)
 		}) 
-        col1,col2,col3=st.columns([2,2,6]) 
+        col1,col2,col3=st.columns([2,2,4]) 
         with col1:                        
             download_report(edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy_{}".format(operator))
         
@@ -850,7 +850,7 @@ def View_Discrepancy_Detail():
         st.markdown(diff_BPC_PL_detail.style.set_table_styles(styles).apply(color_coding, axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)	
         st.write("")
-        col1,col2=st.columns(2)
+        col1,col2=st.columns([1,3])
         with col1:
             download_report(diff_BPC_PL_detail_for_download,"P&L accounts mapping for discrepancy_{}".format(operator))
         with col2:
