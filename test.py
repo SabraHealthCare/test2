@@ -852,9 +852,9 @@ def View_Discrepancy_Detail():
         st.write("")
         col1,col2=st.columns([1,3])
         with col1:
-            download_report(diff_BPC_PL_detail_for_download,"accounts mapping for discrepancy_{}".format(operator))
-        with col2:
             download_report(Total_PL_detail.reset_index(drop=False),"Full mapping_{}".format(operator))
+        with col2:
+            download_report(diff_BPC_PL_detail_for_download,"accounts mapping for discrepancy_{}".format(operator))
    
 @st.cache_data(experimental_allow_widgets=True)        
 def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
