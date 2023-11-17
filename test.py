@@ -71,12 +71,14 @@ def clicked(button_name):
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
 def Update_File_inS3(bucket,key,new_data,operator,month=None):  # replace original data
     original_file =s3.get_object(Bucket=bucket, Key=key)
-    if int(original_file["ContentLength"])<=2:  # empty file
-        original_data=pd.DataFrame()
-    else:
+    try:
         original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
         original_data=original_data[new_data.columns]
-
+        empty_file=False
+    except:
+        original_data=pd.DataFrame()
+        empty_file=True
+    if not empty_file:	    
         if month:
             original_data.TIME = original_data.TIME.astype(str)
 	    # remove original data by operator and month 
@@ -791,9 +793,10 @@ def View_Discrepancy(percent_discrepancy_accounts):
 			disabled =False,
             		required =False)
 		}) 
+        edited_diff_BPC_PL["Operator"]=operator
         col1,col2,col3=st.columns([2,2,4]) 
         with col1:                        
-            download_report(edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy_{}".format(operator))
+            download_report(edited_diff_BPC_PL[["Operator","Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy_{}".format(operator))
         
         with col2:    
             submit_com=st.button("Submit comments")
