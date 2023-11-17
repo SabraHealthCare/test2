@@ -746,7 +746,8 @@ def View_Summary(uploaded_file):
     col1,col2=st.columns([2,3])
     with col1:
         submit_latest_month=st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]))
-    
+    with col2:	
+        download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
     upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
     upload_latest_month=upload_latest_month.merge(entity_mapping[["Operator","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]].reset_index(drop=False),on="ENTITY",how="left")
     upload_latest_month["TIME"]=latest_month
@@ -760,10 +761,8 @@ def View_Summary(uploaded_file):
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
         else:
             st.write(" ")  #----------record into error report------------------------	
-    else:
-        st.stop()
-    with col2:	
-        download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
+
+    
 
 # don't use cache
 def View_Discrepancy(percent_discrepancy_accounts): 
