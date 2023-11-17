@@ -74,9 +74,11 @@ def Update_File_inS3(bucket,key,new_data,operator,month=None):  # replace origin
     try:
         original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
         original_data=original_data[new_data.columns]
+        st.write("not empty")
         empty_file=False
     except:
         original_data=pd.DataFrame()
+        st.write("empty")
         empty_file=True
     if not empty_file:	    
         if month:
