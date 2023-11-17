@@ -810,7 +810,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
                 with col3:
                     st.markdown("✔️ :green[Comments uploaded]")
                     st.write(" ")
-                Update_File_inS3(bucket_PL,discrepancy_path,edited_diff_BPC_PL,operator,latest_month)
+                Update_File_inS3(bucket_PL,discrepancy_path,edited_diff_BPC_PL,operator)
     else:
         st.success("All previous data in P&L ties with Sabra data")
   
