@@ -743,7 +743,7 @@ def View_Summary(uploaded_file):
     st.write("")
 	
     # upload latest month data to AWS
-    col1,col2=st.columns([1,3])
+    col1,col2=st.columns([2,5])
     with col1:
         submit_latest_month=st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     with col2:	
