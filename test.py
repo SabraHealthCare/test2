@@ -71,7 +71,6 @@ def clicked(button_name):
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
 def Update_File_inS3(bucket,key,new_data,operator,month=None):  # replace original data
     original_file =s3.get_object(Bucket=bucket, Key=key)
-    st.write("not empty1")
     try:
         original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
         original_data=original_data[new_data.columns]
