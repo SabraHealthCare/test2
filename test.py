@@ -728,8 +728,8 @@ def View_Summary(uploaded_file):
     for i in range(latest_month_data.shape[0]):
         if latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra" and latest_month_data.loc[i,'Category'] !="Facility Information":
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
-    
-    latest_month_data=latest_month_data[~latest_month_data["Sabra_Account"] == 'Total_Sabra']
+    drop_row=latest_month_data["Sabra_Account"] == 'Total_Sabra'
+    latest_month_data=latest_month_data[~drop_row]
     entity_columns=latest_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
         latest_month_data["Total"] = latest_month_data[entity_columns].sum(axis=1)
