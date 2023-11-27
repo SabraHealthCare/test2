@@ -1055,6 +1055,7 @@ if st.session_state["authentication_status"] is False:
 #---------------operator account-----------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
     operator=st.session_state["operator"]
+    col1,col2=st.columns([3,1])
     with col1:
         st.title("Sabra HealthCare Monthly Reporting App")
     with col2:
