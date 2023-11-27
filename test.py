@@ -720,6 +720,10 @@ def View_Summary(uploaded_file):
     latest_month_data = latest_month_data.pivot(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month)
     latest_month_data.reset_index(drop=False,inplace=True)
     latest_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
+    sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet","Additional Statistical Information","Government Funds"]
+    latest_month_data.Category = latest_month_data.Category.astype("category")
+    latest_month_data.Category = latest_month_data.Category.cat.set_categories(sorter)
+    latest_month_data=latest_month_data.sort_values(["Category"]) 
     latest_month_data = (pd.concat([latest_month_data.groupby(by='Category',as_index=False).sum().\
                        assign(Sabra_Account="Total_Sabra"),latest_month_data]).\
                          sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns])
@@ -730,10 +734,7 @@ def View_Summary(uploaded_file):
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
     drop_facility_info_total=latest_month_data["Sabra_Account"] == 'Total_Sabra'
     latest_month_data=latest_month_data[~drop_facility_info_total]
-    sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet","Additional Statistical Information","Government Funds"]
-    latest_month_data.Category = latest_month_data.Category.astype("category")
-    latest_month_data.Category = latest_month_data.Category.cat.set_categories(sorter)
-    latest_month_data=latest_month_data.sort_values(["Category"]) 
+
 
 	
     entity_columns=latest_month_data.drop(["Sabra_Account"],axis=1).columns	
