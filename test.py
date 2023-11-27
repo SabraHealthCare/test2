@@ -728,9 +728,14 @@ def View_Summary(uploaded_file):
     for i in range(latest_month_data.shape[0]):
         if latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra" and latest_month_data.loc[i,'Category'] !="Facility Information":
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
-    drop_row=latest_month_data["Sabra_Account"] == 'Total_Sabra'
-    latest_month_data=latest_month_data[~drop_row]
-    entity_columns=latest_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
+    drop_facility_info_total=latest_month_data["Sabra_Account"] == 'Total_Sabra'
+    latest_month_data=latest_month_data[~drop_facility_info_total]
+    latest_month_data = latest_month_data.set_index('Category')
+    sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet",,"Additional Statistical Information","Government Funds"]
+    latest_month_data.loc[sorter]
+    latest_month_data.reindex(sorter)
+	
+    entity_columns=latest_month_data.drop(["Sabra_Account"],axis=1).columns	
     if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
         latest_month_data["Total"] = latest_month_data[entity_columns].sum(axis=1)
         latest_month_data=latest_month_data[["Sabra_Account","Total"]+list(entity_columns)]
