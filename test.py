@@ -731,7 +731,7 @@ def View_Summary(uploaded_file):
     drop_facility_info_total=latest_month_data["Sabra_Account"] == 'Total_Sabra'
     latest_month_data=latest_month_data[~drop_facility_info_total]
     latest_month_data = latest_month_data.set_index('Category')
-    sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet","Additional Statistical Information","Government Funds"]
+    sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet"]
     latest_month_data.loc[sorter]
     latest_month_data.reindex(sorter)
 	
