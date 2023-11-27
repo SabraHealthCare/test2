@@ -26,6 +26,7 @@ st.set_page_config(
    initial_sidebar_state="expanded",
     layout="wide")
 placeholder = st.empty()
+st.title("Sabra HealthCare Monthly Reporting App")
 sheet_name_discrepancy="Discrepancy_Review"
 bucket_mapping="sabramapping"
 bucket_PL="operatorpl"
@@ -1055,11 +1056,7 @@ if st.session_state["authentication_status"] is False:
 #---------------operator account-----------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
     operator=st.session_state["operator"]
-    col1,col2=st.columns([3,1])
-    with col1:
-        st.title("Sabra HealthCare Monthly Reporting App")
-    with col2:
-        st.title(operator)
+    st.title(operator)
     BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
