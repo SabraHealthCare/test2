@@ -733,7 +733,6 @@ def View_Summary(uploaded_file):
     sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet","Additional Statistical Information","Government Funds"]
     latest_month_data.Category = latest_month_data.Category.astype("category")
     latest_month_data.Category = latest_month_data.Category.cat.set_categories(sorter)
-    Categories (10, object): ["Facility Information"<"Patient Days"<"Revenue"<"Operating Expenses"<"Non-Operating Expenses"<"Labor Expenses"<"Management Fee"<"Balance Sheet"<"Additional Statistical Information"<"Government Funds"]
     latest_month_data=latest_month_data.sort_values(["Category"]) 
 
 	
