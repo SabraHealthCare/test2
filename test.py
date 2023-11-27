@@ -730,10 +730,12 @@ def View_Summary(uploaded_file):
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
     drop_facility_info_total=latest_month_data["Sabra_Account"] == 'Total_Sabra'
     latest_month_data=latest_month_data[~drop_facility_info_total]
-    latest_month_data = latest_month_data.set_index('Category')
-    sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet"]
-    latest_month_data.loc[sorter]
-    latest_month_data.reindex(sorter)
+    sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet","Additional Statistical Information","Government Funds"]
+    latest_month_data.Category = latest_month_data.Category.astype("category")
+    latest_month_data.Category = latest_month_data.Category.cat.set_categories(sorter)
+    Categories (10, object): ["Facility Information"<"Patient Days"<"Revenue"<"Operating Expenses"<"Non-Operating Expenses"<"Labor Expenses"<"Management Fee"<"Balance Sheet"<"Additional Statistical Information"<"Government Funds"]
+    latest_month_data=latest_month_data.sort_values(["Category"]) 
+
 	
     entity_columns=latest_month_data.drop(["Sabra_Account"],axis=1).columns	
     if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
