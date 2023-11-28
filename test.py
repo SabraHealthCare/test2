@@ -722,7 +722,7 @@ def View_Summary(uploaded_file):
 
     latest_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
     latest_month_data=latest_month_data[latest_month_data["Sabra_Account"]==latest_month_data["Sabra_Account"]]	
-
+    st.write(latest_month_data)
 	
     sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet","Additional Statistical Information","Government Funds"]
     latest_month_data.Category = latest_month_data.Category.astype("category")
