@@ -747,7 +747,6 @@ def View_Summary(uploaded_file):
         latest_month_data=latest_month_data[["Sabra_Account","Total"]+list(entity_columns)]
     else:
         latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]
-    st.write(latest_month_data)
     
     st.markdown("{} {}/{} reporting data:".format(operator,latest_month[4:6],latest_month[0:4]))      
     st.markdown(latest_month_data.style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
