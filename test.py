@@ -745,7 +745,7 @@ def View_Summary(uploaded_file):
     #latest_month_data=latest_month_data[~drop_facility_info_total]
 
     entity_columns=latest_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
-    if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
+    if len(latest_month_data.columns)>4:  # if there are more than one property, add total column
         latest_month_data["Total"] = latest_month_data[entity_columns].sum(axis=1)
         latest_month_data=latest_month_data[["Sabra_Account","Total"]+list(entity_columns)]
     else:
