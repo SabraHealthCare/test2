@@ -738,17 +738,17 @@ def View_Summary(uploaded_file):
     for i in range(latest_month_data.shape[0]):
         if latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra" and latest_month_data.loc[i,'Category'] !="Facility Information":
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
-    drop_facility_info_total=latest_month_data["Sabra_Account"] == 'Total_Sabra'
-    latest_month_data=latest_month_data[~drop_facility_info_total]
+    #drop_facility_info_total=latest_month_data["Sabra_Account"] == 'Total_Sabra'
+    #latest_month_data=latest_month_data[~drop_facility_info_total]
 
 
-	
-    entity_columns=latest_month_data.drop(["Sabra_Account"],axis=1).columns	
-    if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
+    entity_columns=latest_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
+    if len(entity_columns)>1:  # if there are more than one property, add total column
         latest_month_data["Total"] = latest_month_data[entity_columns].sum(axis=1)
         latest_month_data=latest_month_data[["Sabra_Account","Total"]+list(entity_columns)]
     else:
         latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]
+	    
     st.markdown("{} {}/{} reporting data:".format(operator,latest_month[4:6],latest_month[0:4]))      
     st.markdown(latest_month_data.style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
