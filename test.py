@@ -732,7 +732,7 @@ def View_Summary(uploaded_file):
     latest_month_data = (pd.concat([latest_month_data.groupby(by='Category',as_index=False).sum().\
                        assign(Sabra_Account="Total_Sabra"),latest_month_data]).\
                          sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns])
-     
+    st.write(1,latest_month_data)     
     set_empty=list(latest_month_data.columns).remove("Category")
     for i in range(latest_month_data.shape[0]):
         if latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra" and latest_month_data.loc[i,'Category'] !="Facility Information" and latest_month_data.loc[i,'Category'] !="Additional Statistical Information":
@@ -740,7 +740,7 @@ def View_Summary(uploaded_file):
         elif latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra" and (latest_month_data.loc[i,'Category'] =="Facility Information" or latest_month_data.loc[i,'Category'] =="Additional Statistical Information"):
             latest_month_data.loc[i,set_empty]=""
             latest_month_data.loc[i,"Sabra_Account"]=latest_month_data.loc[i,'Category']
-            
+    st.write(2,latest_month_data)                
     #drop_facility_info_total=latest_month_data["Sabra_Account"] == 'Total_Sabra'
     #latest_month_data=latest_month_data[~drop_facility_info_total]
 
