@@ -734,6 +734,7 @@ def View_Summary(uploaded_file):
                          sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns])
     st.write(1,latest_month_data)     
     set_empty=list(latest_month_data.columns).remove("Category")
+    st.write(latest_month_data.columns,set_empty)
     for i in range(latest_month_data.shape[0]):
         if latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra" and latest_month_data.loc[i,'Category'] !="Facility Information" and latest_month_data.loc[i,'Category'] !="Additional Statistical Information":
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
