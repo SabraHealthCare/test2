@@ -724,6 +724,7 @@ def View_Summary(uploaded_file):
     latest_month_data=latest_month_data[latest_month_data["Sabra_Account"]==latest_month_data["Sabra_Account"]]	
 	
     sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet","Additional Statistical Information","Government Funds"]
+    sorter=list(filter(lambda x:x in latest_month_data["Category"].unique(),sorter))
     latest_month_data.Category = latest_month_data.Category.astype("category")
     latest_month_data.Category = latest_month_data.Category.cat.set_categories(sorter)
     latest_month_data=latest_month_data.sort_values(["Category"]) 
