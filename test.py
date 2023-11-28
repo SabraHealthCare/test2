@@ -678,7 +678,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
 def View_Summary(uploaded_file):
     global Total_PL
     def highlight_total(df):
-        return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
+        return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") or df.Sabra_Account.startswith("Licensed Beds") or df.Sabra_Account.startswith("Operating Beds") else ''*len(df)
     def color_missing(data):
         return f'background-color: red'
 
@@ -722,10 +722,9 @@ def View_Summary(uploaded_file):
 
     latest_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
     latest_month_data=latest_month_data[latest_month_data["Sabra_Account"]==latest_month_data["Sabra_Account"]]	
-
+    st.write(latest_month_data)
 	
     sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet","Additional Statistical Information","Government Funds"]
-    sorter=list(filter(lambda x:x in latest_month_data["Category"].unique(),sorter))
     latest_month_data.Category = latest_month_data.Category.astype("category")
     latest_month_data.Category = latest_month_data.Category.cat.set_categories(sorter)
     latest_month_data=latest_month_data.sort_values(["Category"]) 
@@ -734,27 +733,21 @@ def View_Summary(uploaded_file):
                        assign(Sabra_Account="Total_Sabra"),latest_month_data]).\
                          sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns])
      
-    set_empty=list(latest_month_data.columns)
-    set_empty.remove("Category")
+    
     for i in range(latest_month_data.shape[0]):
         if latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra" and latest_month_data.loc[i,'Category'] !="Facility Information":
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
-        #elif latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra":# and (latest_month_data.loc[i,'Category'] =="Facility Information" or latest_month_data.loc[i,'Category'] =="Additional Statistical Information"):
-            #latest_month_data.loc[i,set_empty]=""
-            #latest_month_data.loc[i,"Sabra_Account"]=latest_month_data.loc[i,'Category']
-    st.write(1,latest_month_data)
     drop_facility_info_total=latest_month_data["Sabra_Account"] == 'Total_Sabra'
     latest_month_data=latest_month_data[~drop_facility_info_total]
-    st.write(2,latest_month_data)
 
 
-    entity_columns=latest_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
-    if len(entity_columns)>1:  # if there are more than one property, add total column
+	
+    entity_columns=latest_month_data.drop(["Sabra_Account"],axis=1).columns	
+    if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
         latest_month_data["Total"] = latest_month_data[entity_columns].sum(axis=1)
         latest_month_data=latest_month_data[["Sabra_Account","Total"]+list(entity_columns)]
     else:
         latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]
-	    
     st.markdown("{} {}/{} reporting data:".format(operator,latest_month[4:6],latest_month[0:4]))      
     st.markdown(latest_month_data.style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
