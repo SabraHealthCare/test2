@@ -678,7 +678,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
 def View_Summary(uploaded_file):
     global Total_PL
     def highlight_total(df):
-        return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") or df.Sabra_Account.startswith("Licensed Beds") or df.Sabra_Account.startswith("Operating Beds") else ''*len(df)
+        return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     def color_missing(data):
         return f'background-color: red'
 
@@ -722,7 +722,6 @@ def View_Summary(uploaded_file):
 
     latest_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
     latest_month_data=latest_month_data[latest_month_data["Sabra_Account"]==latest_month_data["Sabra_Account"]]	
-    st.write(latest_month_data)
 	
     sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet","Additional Statistical Information","Government Funds"]
     latest_month_data.Category = latest_month_data.Category.astype("category")
@@ -733,10 +732,14 @@ def View_Summary(uploaded_file):
                        assign(Sabra_Account="Total_Sabra"),latest_month_data]).\
                          sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns])
      
-    
+    set_empty=list(latest_month_data.columns)
+    set_empty.remove("Category")
     for i in range(latest_month_data.shape[0]):
         if latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra" :#and latest_month_data.loc[i,'Category'] !="Facility Information":
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
+        elif latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra" and (latest_month_data.loc[i,'Category'] =="Facility Information" or latest_month_data.loc[i,'Category'] =="Additional Statistical Information"):
+            latest_month_data.loc[i,set_empty]=""
+            #latest_month_data.loc[i,"Sabra_Account"]=latest_month_data.loc[i,'Category']
     #drop_facility_info_total=latest_month_data["Sabra_Account"] == 'Total_Sabra'
     #latest_month_data=latest_month_data[~drop_facility_info_total]
 
