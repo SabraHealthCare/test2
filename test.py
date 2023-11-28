@@ -678,7 +678,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
 def View_Summary(uploaded_file):
     global Total_PL
     def highlight_total(df):
-        return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") or df.Sabra_Account.startswith("Licensed Beds") or df.Sabra_Account.startswith("Operating Beds") else ''*len(df)
+        return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)# or df.Sabra_Account.startswith("Licensed Beds") or df.Sabra_Account.startswith("Operating Beds") else ''*len(df)
     def color_missing(data):
         return f'background-color: red'
 
