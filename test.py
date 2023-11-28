@@ -738,7 +738,7 @@ def View_Summary(uploaded_file):
         if latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra" and latest_month_data.loc[i,'Category'] !="Facility Information" and latest_month_data.loc[i,'Category'] !="Additional Statistical Information":
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
         elif latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra" and (latest_month_data.loc[i,'Category'] =="Facility Information" or latest_month_data.loc[i,'Category'] =="Additional Statistical Information"):
-            latest_month_data.loc[i]=""
+            latest_month_data.loc[i]=0
             latest_month_data.loc[i,"Sabra_Account"]=latest_month_data.loc[i,'Category']
             
     #drop_facility_info_total=latest_month_data["Sabra_Account"] == 'Total_Sabra'
