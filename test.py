@@ -734,11 +734,12 @@ def View_Summary(uploaded_file):
      
     set_empty=list(latest_month_data.columns)
     set_empty.remove("Category")
+    set_empty.remove("Sabra_Account")
     for i in range(latest_month_data.shape[0]):
         if latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra" :#and latest_month_data.loc[i,'Category'] !="Facility Information":
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
-        elif latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra" and (latest_month_data.loc[i,'Category'] =="Facility Information" or latest_month_data.loc[i,'Category'] =="Additional Statistical Information"):
-            latest_month_data.loc[i,set_empty]=""
+            if latest_month_data.loc[i,'Category'] =="Facility Information" or latest_month_data.loc[i,'Category'] =="Additional Statistical Information"):
+                latest_month_data.loc[i,set_empty]=""
             #latest_month_data.loc[i,"Sabra_Account"]=latest_month_data.loc[i,'Category']
     #drop_facility_info_total=latest_month_data["Sabra_Account"] == 'Total_Sabra'
     #latest_month_data=latest_month_data[~drop_facility_info_total]
