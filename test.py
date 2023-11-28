@@ -136,7 +136,13 @@ td_props = [('font-size', '14px'), ('text-align', 'left')]
 
 # Aggregate styles in a list
 styles = [dict(selector="th", props=th_props),dict(selector="td", props=td_props)]
+th_props_account_col = [('font-size', '30px'), ('text-align', 'left'),
+            ('font-weight', 'bold'),('color', '#6d6d6d'),
+            ('background-color', '#eeeeef'), ('border','1px solid #eeeeef')]
 
+# Intialize a list of tuples containing the CSS styles for table data
+td_props_account_col = [('font-size', '30px'), ('text-align', 'left')]
+styles_sabra_account=[dict(selector="th", props=th_props_account_col),dict(selector="td", props=td_props_account_col)]
 def left_align(s, props='text-align: left;'):
     return props
 css='''
@@ -749,7 +755,7 @@ def View_Summary(uploaded_file):
         latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]
     
     st.markdown("{} {}/{} reporting data:".format(operator,latest_month[4:6],latest_month[0:4]))      
-    st.markdown(latest_month_data.style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
+    st.markdown(latest_month_data.style.set_table_styles({'Sabra_Account': styles_sabra_account}).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
     st.write("")
 	
