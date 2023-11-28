@@ -136,7 +136,7 @@ td_props = [('font-size', '14px'), ('text-align', 'left')]
 
 # Aggregate styles in a list
 styles = [dict(selector="th", props=th_props),dict(selector="td", props=td_props)]
-th_props_account_col = [('font-size', '30px'), ('text-align', 'left'),
+th_props_account_col = [('font-size', '10px'), ('text-align', 'left'),
             ('font-weight', 'bold'),('color', '#6d6d6d'),
             ('background-color', '#eeeeef'), ('border','1px solid #eeeeef')]
 
