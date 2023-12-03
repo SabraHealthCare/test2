@@ -556,7 +556,7 @@ def Manage_Account_Mapping(new_tenant_account):
         with col2:
             st.write("Sabra second account")
             Sabra_second_account= streamlit_tree_select.tree_select(parent_hierarchy_second,only_leaf_checkboxes=True,key=new_tenant_account+"1")
-        submitted = st.form_submit_button("Submit")  
+        submitted = st.form_submit_button("Submit",key=new_tenant_account)  
     if submitted:
         if len(Sabra_main_account['checked'])==1:
             Sabra_main_account_value=Sabra_main_account['checked'][0].upper()          
@@ -953,8 +953,10 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                 st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
                 Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
                 #insert new record to the bottom line of account_mapping
-                account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
-                account_mapping=account_mapping.reset_index(drop=True)
+                #account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
+                #account_mapping=account_mapping.reset_index(drop=True)
+                new_mapping==[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
+                account_mapping=account_mapping.append(pd.DataFrame(new_mapping, columns=account_mapping.columns, ignore_index=True)
             Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping,operator) 
             
             #if there are duplicated accounts in P&L, ask for confirming
