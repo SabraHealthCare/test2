@@ -876,6 +876,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     global latest_month,account_mapping
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     count=0
+    property_name=entity_mapping.loc[entity_i,"Property_Name"]
     # read data from uploaded file
     while(True):
         try:
@@ -883,7 +884,6 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
             break
         except:
             col1,col2=st.columns(2) 
-            property_name=entity_mapping.loc[entity_i,"Property_Name"]
             with col1: 
                 if sheet_type=="Sheet_Name_Finance":  
                     st.warning("Please provide sheet name of P&L data for property {}. ".format(property_name))
