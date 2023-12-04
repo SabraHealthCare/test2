@@ -977,13 +977,13 @@ def Check_Reporting_Month(PL):
     if st.session_state.clicked["yes_button"]:
         return latest_month
     elif st.session_state.clicked["no_button"]:
-	with col4:  
+        with col4:  
             with st.form("latest_month"):
                 st.write("Please select reporting month:" )  
-                col3,col4=st.columns(2)
-                with col3:
+                col7,col8=st.columns(2)
+                with col7:
                     year = st.selectbox('Year', range(2023, date.today().year+1))
-                with col4:
+                with col8:
                     month = st.selectbox('Month', range(1, 13),index=date.today().month-2)
                 confirm_month=st.form_submit_button("Submit")
         if confirm_month:
