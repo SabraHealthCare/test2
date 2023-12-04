@@ -956,7 +956,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                 #account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
                 #account_mapping=account_mapping.reset_index(drop=True)
                 new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
-                account_mapping=account_mapping.append(pd.DataFrame(new_mapping_row, columns=account_mapping.columns), ignore_index=True)
+                account_mapping.append(pd.DataFrame(new_mapping_row, columns=account_mapping.columns), ignore_index=True)
             Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping,operator) 
             
             #if there are duplicated accounts in P&L, ask for confirming
