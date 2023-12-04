@@ -539,8 +539,8 @@ def Manage_Entity_Mapping(operator):
                 entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]=entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"] 
             i+=1
         st.write(entity_mapping)
-        download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format("Sabra Senior Living"))
-        #download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format("Sabra Senior Living"))
+        download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
+        #download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
         
 	    # update entity_mapping in S3     
         Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)   
@@ -750,7 +750,7 @@ def View_Summary(uploaded_file):
     else:
         latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]
     
-    st.markdown("{} {}/{} reporting data:".format("Sabra Senior Living",latest_month[4:6],latest_month[0:4]))      
+    st.markdown("{} {}/{} reporting data:".format(operator,latest_month[4:6],latest_month[0:4]))      
     st.markdown(latest_month_data.style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
     st.write("")
@@ -758,9 +758,9 @@ def View_Summary(uploaded_file):
     # upload latest month data to AWS
     col1,col2=st.columns([2,3])
     with col1:
-        download_report(latest_month_data,"{} {}-{} Reporting".format("Sabra Senior Living",latest_month[4:6],latest_month[0:4]))
+        download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
     with col2:	
-        submit_latest_month=st.button("Confirm and upload {} {}-{} reporting".format("Sabra Senior Living",latest_month[4:6],latest_month[0:4]))
+        submit_latest_month=st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]))
     upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
     upload_latest_month=upload_latest_month.merge(entity_mapping[["Operator","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]].reset_index(drop=False),on="ENTITY",how="left")
     upload_latest_month["TIME"]=latest_month
@@ -771,7 +771,7 @@ def View_Summary(uploaded_file):
     if submit_latest_month:
         # save tenant P&L to S3
         if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
-            st.success("{} {} reporting data was uploaded to Sabra system successfully!".format("Sabra Senior Living",latest_month[4:6]+"/"+latest_month[0:4]))
+            st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
         else:
             st.write(" ")  #----------record into error report------------------------	
     else:
@@ -809,7 +809,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
         edited_diff_BPC_PL["Operator"]=operator
         col1,col2,col3=st.columns([2,2,4]) 
         with col1:                        
-            download_report(edited_diff_BPC_PL[["Operator","Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy_{}".format("Sabra Senior Living"))
+            download_report(edited_diff_BPC_PL[["Operator","Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy_{}".format(operator))
         
         with col2:    
             submit_com=st.button("Submit comments")
@@ -868,9 +868,9 @@ def View_Discrepancy_Detail():
         st.write("")
         col1,col2=st.columns([1,3])
         with col1:
-            download_report(Total_PL_detail.reset_index(drop=False),"Full mapping_{}".format("Sabra Senior Living"))
+            download_report(Total_PL_detail.reset_index(drop=False),"Full mapping_{}".format(operator))
         with col2:
-            download_report(diff_BPC_PL_detail_for_download,"accounts mapping for discrepancy_{}".format("Sabra Senior Living"))
+            download_report(diff_BPC_PL_detail_for_download,"accounts mapping for discrepancy_{}".format(operator))
    
 @st.cache_data(experimental_allow_widgets=True)        
 def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
@@ -1070,7 +1070,7 @@ if st.session_state["authentication_status"] is False:
 #---------------operator account-----------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
     operator=st.session_state["operator"]
-    st.title("Sabra senior living")
+    st.title(operator)
     #st.title(operator)
     BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
