@@ -875,7 +875,7 @@ def View_Discrepancy_Detail():
 def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
     global latest_month,account_mapping
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
-    
+    count=0
     # read data from uploaded file
     while(True):
         try:
@@ -898,7 +898,8 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                     else:
                         sheet_name = st.text_input(property_name)
                     submitted = st.form_submit_button("Submit")
-                if submitted:   
+                if submitted:
+                    count+=1
                     continue
                 else:
                     st.stop()
