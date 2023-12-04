@@ -886,7 +886,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
             col1,col2=st.columns(2) 
             with col1: 
                 if sheet_type=="Sheet_Name_Finance":  
-                    st.warning("Please provide sheet name of ****P&L**** data for property ****{}****. ".format(property_name))
+                    st.warning("Please provide sheet name of **P&L** data for property **{}**. ".format(property_name))
                 elif sheet_type=="Sheet_Name_Occupancy":
                     st.warning("Please provide sheet name of **Occupancy** data for property **{}**. ".format(property_name))
                 elif sheet_type=="Sheet_Name_Balance_Sheet":
@@ -971,11 +971,11 @@ def Check_Reporting_Month(PL):
     latest_month=str(max(list(PL.columns)))
     col4,col5,col6=st.columns([5,2,8])
     with col4:  
-        st.warning("The reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
+        st.warning("The reporting month is: **{}/{}**. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
     with col5:		
-        st.button('Yes', on_click=clicked, args=["yes_button"])         
+        st.button('**Yes**', on_click=clicked, args=["yes_button"])         
     with col6:
-        st.button("No", on_click=clicked, args=["no_button"])       
+        st.button("**No**", on_click=clicked, args=["no_button"])       
     if st.session_state.clicked["yes_button"]:
         return latest_month
     elif st.session_state.clicked["no_button"]:
