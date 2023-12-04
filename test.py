@@ -953,8 +953,6 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                 st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
                 Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
                 #insert new record to the bottom line of account_mapping
-                #account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
-                #account_mapping=account_mapping.reset_index(drop=True)
                 new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
                 account_mapping=pd.concat([account_mapping, pd.DataFrame([new_mapping_row],columns=account_mapping.columns)],ignore_index=True)
             Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping,operator) 
