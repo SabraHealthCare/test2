@@ -623,7 +623,8 @@ class Authenticate:
         st.subheader("Your Profile")
         st.write("Username:",self.username)
         st.write("Email:   ",self.credentials['usernames'][username]["email"] )
-        st.write("From:    ",self.credentials['usernames'][username]["operator"] )
+        #st.write("From:    ",self.credentials['usernames'][username]["operator"] )
+        st.write("From:    ","Sabra Healthcare" )
 
         st.write("")
         st.subheader("Edit Your Profile")
