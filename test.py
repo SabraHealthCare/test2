@@ -540,9 +540,8 @@ def Manage_Entity_Mapping(operator):
             i+=1
         st.write(entity_mapping)
         download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
-        #download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
-        
-	    # update entity_mapping in S3     
+
+	# update entity_mapping in S3     
         Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)   
         return entity_mapping
 
@@ -878,35 +877,31 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     
     # read data from uploaded file
-    count=0
     while(True):
         try:
             PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
             break
         except:
             col1,col2=st.columns(2) 
+            property_name=entity_mapping.loc[entity_i,"Property_Name"]
             with col1: 
                 if sheet_type=="Sheet_Name_Finance":  
-                    st.warning("Please provide sheet name of P&L data for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                    st.warning("Please provide sheet name of P&L data for property {}. ".format(property_name))
                 elif sheet_type=="Sheet_Name_Occupancy":
-                    st.warning("Please provide sheet name of Occupancy data for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                    st.warning("Please provide sheet name of Occupancy data for property {}. ".format(property_name))
                 elif sheet_type=="Sheet_Name_Balance_Sheet":
-                    st.warning("Please provide sheet name of Balance Sheet data in for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
-		    
-            if len(PL_sheet_list)>0:
-                with st.form(key=str(count)):                
-                    sheet_name=st.selectbox(entity_mapping.loc[entity_i,"Property_Name"],[""]+PL_sheet_list)
+                    st.warning("Please provide sheet name of Balance Sheet data in for property {}. ".format(property_name))
+			
+                with st.form(key=property_name+sheet_type):      
+                    if len(PL_sheet_list)>0:
+                        sheet_name=st.selectbox(entity_mapping.loc[entity_i,"Property_Name"],[""]+PL_sheet_list)
+                    else:
+                        sheet_name = st.text_input(property_name)
                     submitted = st.form_submit_button("Submit")
-                    count+=1
-            else:
-                with st.form(key=str(count)):     
-                    sheet_name = st.text_input(entity_mapping.loc[entity_i,"Property_Name"])
-                    submitted = st.form_submit_button("Submit")
-                    count+=1
-            if submitted:   
-                continue
-            else:
-                st.stop()
+                if submitted:   
+                    continue
+                else:
+                    st.stop()
 		    
     if count>0:
         # update sheet name in entity_mapping
