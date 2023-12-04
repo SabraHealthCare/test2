@@ -886,7 +886,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
             col1,col2=st.columns(2) 
             with col1: 
                 if sheet_type=="Sheet_Name_Finance":  
-                    st.warning("Please provide sheet name of **:orange[P&L]** data for property **:orange[{}]**. ".format(property_name))
+                    st.warning("Please provide sheet name of **:black[P&L]** data for property **:black[{}]**. ".format(property_name))
                 elif sheet_type=="Sheet_Name_Occupancy":
                     st.warning("Please provide sheet name of **Occupancy** data for property **{}**. ".format(property_name))
                 elif sheet_type=="Sheet_Name_Balance_Sheet":
