@@ -977,7 +977,7 @@ def Check_Reporting_Month(PL):
     if st.session_state.clicked["yes_button"]:
         return latest_month
     elif st.session_state.clicked["no_button"]:
-	col9,col10=st.columns(2)
+        col9,col10=st.columns(2)
         with col9:  
             with st.form("latest_month"):
                 st.write("Please select reporting month:" )  
