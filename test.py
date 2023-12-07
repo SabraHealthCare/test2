@@ -770,28 +770,6 @@ def View_Summary():
     upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
     upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
     upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
-
-# create EPM formula for download data
-def EMP_Formula(data,data_col):
-    col_size=data.shape[1]
-    row_size=data.shape[0]
-    col_name_list=list(data.columns)
-    data=data.reset_index(drop=False)
-
-    time_col_letter=colnum_letter(col_name_list.index("TIME"))
-    entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
-    account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
-    facility_col_letter=colnum_letter(col_name_list.index("FACILITY_TYPE"))
-    state_col_letter=colnum_letter(col_name_list.index("GEOGRAPHY"))
-    leasename_col_letter=colnum_letter(col_name_list.index("LEASE_NAME"))
-    inv_col_letter=colnum_letter(col_name_list.index("INV_TYPE"))
-    data_col_letter=colnum_letter(col_name_list.index("Amount"))
-    uploud_data=data.copy()
-    
-    for r in range(2,row_size+2):
-        formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
-		    format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
-        uploud_data.loc[r-2,"EPM_Formula"]=formula
 	
     if submit_latest_month:
         # save tenant P&L to S3
@@ -809,14 +787,38 @@ def EMP_Formula(data,data_col):
     else:
         st.stop()
     
+# create EPM formula for download data
+def EMP_Formula(data,data_col):
+    col_size=data.shape[1]
+    row_size=data.shape[0]
+    col_name_list=list(data.columns)
+    data=data.reset_index(drop=False)
+
+    time_col_letter=colnum_letter(col_name_list.index("TIME"))
+    entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
+    account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
+    facility_col_letter=colnum_letter(col_name_list.index("FACILITY_TYPE"))
+    state_col_letter=colnum_letter(col_name_list.index("GEOGRAPHY"))
+    leasename_col_letter=colnum_letter(col_name_list.index("LEASE_NAME"))
+    inv_col_letter=colnum_letter(col_name_list.index("INV_TYPE"))
+    data_col_letter=colnum_letter(col_name_list.index("Amount"))    
+    for r in range(2,row_size+2):
+        formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
+		    format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
+        data.loc[r-2,"EPM_Formula"]=formula
+    return data
 
 # don't use cache
 def View_Discrepancy(percent_discrepancy_accounts): 
     global diff_BPC_PL
     if diff_BPC_PL.shape[0]>0:
         st.error("{0:.1f}% P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.".format(percent_discrepancy_accounts*100))
-
         diff_BPC_PL["Operator"]=operator
+        diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
+	# insert dim to diff_BPC_PL
+        diff_BPC_PL["TIME"]=diff_BPC_PL["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
+        Update_File_inS3(bucket_PL,discrepancy_path,diff_BPC_PL,operator)
+	    
         edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>10]  
         edited_diff_BPC_PL["Type comments below"]=""
         edited_diff_BPC_PL = st.data_editor(
@@ -841,18 +843,10 @@ def View_Discrepancy(percent_discrepancy_accounts):
 			disabled =False,
             		required =False)
 		}) 
-	# insert comments to diff_BPC_PL
-        st.write(diff_BPC_PL)
-        st.write(diff_BPC_PL.index)
-        diff_BPC_PL=pd.merge(diff_BPC_PL,edited_diff_BPC_PL[["Property_Name","TIME","Type comments below"]],on=["Property_Name","TIME"],how="left")
-        # insert dim to diff_BPC_PL
-        
-        diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
-        diff_BPC_PL["TIME"]=diff_BPC_PL["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
-        st.write(diff_BPC_PL)                 
+	       
         col1,col2,col3=st.columns([2,2,4]) 
         with col1:                        
-            download_report(diff_BPC_PL[["GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE","Operator","Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)","Diff_Percent"]],"discrepancy_{}".format(operator))
+            download_report(edited_diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)","Type comments below"]],"discrepancy_{}".format(operator))
         
         with col2:    
             submit_com=st.button("Submit comments")
@@ -861,7 +855,10 @@ def View_Discrepancy(percent_discrepancy_accounts):
                 with col3:
                     st.markdown("✔️ :green[Comments uploaded]")
                     st.write(" ")
-                Update_File_inS3(bucket_PL,discrepancy_path,edited_diff_BPC_PL,operator)
+                # insert comments to diff_BPC_PL
+                diff_BPC_PL=pd.merge(diff_BPC_PL,edited_diff_BPC_PL[["Property_Name","TIME","Type comments below"]],on=["Property_Name","TIME"],how="left")
+                Update_File_inS3(bucket_PL,discrepancy_path,diff_BPC_PL,operator)
+	
     else:
         st.success("All previous data in P&L ties with Sabra data")
   
