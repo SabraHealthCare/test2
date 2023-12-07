@@ -844,7 +844,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
 	# insert comments to diff_BPC_PL
         diff_BPC_PL=pd.merge(diff_BPC_PL,edited_diff_BPC_PL[["ENTITY","TIME","Type comments below"]],on=["ENTITY","TIME"],how="left")
         # insert dim to diff_BPC_PL
-	diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["ENTITY","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
+        diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["ENTITY","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
         diff_BPC_PL["TIME"]=diff_BPC_PL["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
         st.write(diff_BPC_PL)                 
         col1,col2,col3=st.columns([2,2,4]) 
