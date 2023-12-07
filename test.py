@@ -791,7 +791,7 @@ def EMP_Formula(data,data_col):
     for r in range(2,row_size+2):
         formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
 		    format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
-                    uploud_data.loc[r-2,"EPM_Formula"]=formula
+        uploud_data.loc[r-2,"EPM_Formula"]=formula
 	
     if submit_latest_month:
         # save tenant P&L to S3
