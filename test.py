@@ -633,7 +633,7 @@ def Map_PL_Sabra(PL,entity):
 @st.cache_data
 def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
     PL_with_detail=PL_with_detail.reset_index(drop=False)
-    diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)","Diff_Perc"])
+    diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)","Diff_Percent"])
     diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","Sabra","P&L Value","Diff (Sabra-P&L)",""])
 
 
@@ -652,27 +652,29 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
                     continue
                 diff=BPC_value-PL_value
                 diff_percent=abs(diff)/max(abs(PL_value),abs(BPC_value))*100
-                if diff_percent>=10: 
+                if diff_percent>=1: 
+                    # for diff_BPC_PL			
                     diff_single_record=pd.DataFrame({"TIME":timeid,"ENTITY":entity,"Sabra_Account":matrix,"Sabra":BPC_value,\
-                                                     "P&L":PL_value,"Diff (Sabra-P&L)":diff,"Diff_Perc":diff_percent},index=[0])
+                                                     "P&L":PL_value,"Diff (Sabra-P&L)":diff,"Diff_Percent":diff_percent},index=[0])
                     diff_BPC_PL=pd.concat([diff_BPC_PL,diff_single_record],ignore_index=True)
+                    
+		    # for diff_detail_records
                     diff_detail_records=PL_with_detail.loc[(PL_with_detail["Sabra_Account"]==matrix)&(PL_with_detail["Entity"]==entity)]\
 			                [["Entity","Sabra_Account","Tenant_Account",timeid]].rename(columns={timeid:"P&L Value"})
-                    diff_detail_records["Month"]=timeid
-                    diff_detail_records["Sabra"]=BPC_value
-                    diff_detail_records["Diff (Sabra-P&L)"]=diff
-	
-                   
                     #if there is no record in diff_detail_records, means there is no mapping
                     if diff_detail_records.shape[0]==0:
                         diff_detail_records=pd.DataFrame({"Entity":entity,"Sabra_Account":matrix,"Tenant_Account":"Miss mapping accounts","Month":timeid,\
-							"Sabra":BPC_value,"P&L Value":0,"Diff (Sabra-P&L)":diff},index=[0])   
+							"Sabra":BPC_value,"P&L Value":0,"Diff (Sabra-P&L)":diff},index=[0]) 
+		    else:
+                        diff_detail_records["Month"]=timeid
+                        diff_detail_records["Sabra"]=BPC_value
+                        diff_detail_records["Diff (Sabra-P&L)"]=diff
+
                     diff_BPC_PL_detail=pd.concat([diff_BPC_PL_detail,diff_detail_records])
     if diff_BPC_PL.shape[0]>0:
         percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
         diff_BPC_PL=diff_BPC_PL.merge(BPC_Account[["Category","Sabra_Account_Full_Name","BPC_Account_Name"]],left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")        
         diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-        diff_BPC_PL['Type comments below']=""
     else:
         percent_discrepancy_accounts=0
     return diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts
@@ -775,9 +777,7 @@ def EMP_Formula(data,data_col):
     row_size=data.shape[0]
     col_name_list=list(data.columns)
     data=data.reset_index(drop=False)
-    data=data.merge(entity_mapping[["ENTITY","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
-    data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
-    
+
     time_col_letter=colnum_letter(col_name_list.index("TIME"))
     entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
     account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
@@ -813,12 +813,14 @@ def EMP_Formula(data,data_col):
 # don't use cache
 def View_Discrepancy(percent_discrepancy_accounts): 
     global diff_BPC_PL
-    
-
     if diff_BPC_PL.shape[0]>0:
         st.error("{0:.1f}% P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.".format(percent_discrepancy_accounts*100))
+
+	diff_BPC_PL["Operator"]=operator
+	edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>10][["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]]  
+	edited_diff_BPC_PL["Type comments below"]=""
         edited_diff_BPC_PL = st.data_editor(
-	diff_BPC_PL,
+	edited_diff_BPC_PL,
 	width = 1200,
 	column_order=("Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)","Type comments below"),
 	hide_index=True,
@@ -839,10 +841,15 @@ def View_Discrepancy(percent_discrepancy_accounts):
 			disabled =False,
             		required =False)
 		}) 
-        edited_diff_BPC_PL["Operator"]=operator
+	# insert comments to diff_BPC_PL
+        diff_BPC_PL=pd.merge(diff_BPC_PL,edited_diff_BPC_PL[["ENTITY","TIME","Type comments below"]],on=["ENTITY","TIME"],how="left")
+        # insert dim to diff_BPC_PL
+	diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["ENTITY","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
+        diff_BPC_PL["TIME"]=diff_BPC_PL["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
+        st.write(diff_BPC_PL)                 
         col1,col2,col3=st.columns([2,2,4]) 
         with col1:                        
-            download_report(edited_diff_BPC_PL[["Operator","Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy_{}".format(operator))
+            download_report(diff_BPC_PL[["GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE","Operator","Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)","Diff_Percent"]],"discrepancy_{}".format(operator))
         
         with col2:    
             submit_com=st.button("Submit comments")
