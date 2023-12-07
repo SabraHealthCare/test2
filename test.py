@@ -121,6 +121,7 @@ def Initial_Mapping(operator):
     account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
     # read property mapping
     entity_mapping =Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
+
     entity_mapping = entity_mapping[entity_mapping["Operator"]==operator]
     entity_mapping=entity_mapping.set_index("ENTITY")
     return entity_mapping,account_mapping
@@ -540,8 +541,7 @@ def Manage_Entity_Mapping(operator):
             i+=1
         st.write(entity_mapping)
         download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
-
-	# update entity_mapping in S3     
+        # update entity_mapping in S3     
         Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)   
         return entity_mapping
 
@@ -633,8 +633,10 @@ def Map_PL_Sabra(PL,entity):
 @st.cache_data
 def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
     PL_with_detail=PL_with_detail.reset_index(drop=False)
-    diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)"])
-    diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","P&L Value","Diff (Sabra-P&L)","Sabra"])
+    diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)","Diff_Perc"])
+    diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","Sabra","P&L Value","Diff (Sabra-P&L)",""])
+
+
     for entity in entity_mapping.index:
         for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
             for timeid in [t for t in Total_PL.columns.sort_values() if t<latest_month][-2:]: # only compare two months
@@ -649,21 +651,22 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
                 if BPC_value==0 and PL_value==0:
                     continue
                 diff=BPC_value-PL_value
-                if abs(diff)>=10: #.001*max(abs(PL_value),abs(BPC_value)):
+                diff_percent=abs(diff)/max(abs(PL_value),abs(BPC_value))*100
+                if diff_percent>=10: 
                     diff_single_record=pd.DataFrame({"TIME":timeid,"ENTITY":entity,"Sabra_Account":matrix,"Sabra":BPC_value,\
-                                                     "P&L":PL_value,"Diff (Sabra-P&L)":diff},index=[0])
-                    
+                                                     "P&L":PL_value,"Diff (Sabra-P&L)":diff,"Diff_Perc":diff_percent},index=[0])
                     diff_BPC_PL=pd.concat([diff_BPC_PL,diff_single_record],ignore_index=True)
-
                     diff_detail_records=PL_with_detail.loc[(PL_with_detail["Sabra_Account"]==matrix)&(PL_with_detail["Entity"]==entity)]\
 			                [["Entity","Sabra_Account","Tenant_Account",timeid]].rename(columns={timeid:"P&L Value"})
                     diff_detail_records["Month"]=timeid
                     diff_detail_records["Sabra"]=BPC_value
                     diff_detail_records["Diff (Sabra-P&L)"]=diff
+	
                    
                     #if there is no record in diff_detail_records, means there is no mapping
                     if diff_detail_records.shape[0]==0:
-                        diff_detail_records=pd.DataFrame({"Entity":entity,"Sabra_Account":matrix,"Tenant_Account":"Miss mapping accounts","Month":timeid,"Sabra":BPC_value,"Diff (Sabra-P&L)":diff,"P&L Value":0},index=[0])   
+                        diff_detail_records=pd.DataFrame({"Entity":entity,"Sabra_Account":matrix,"Tenant_Account":"Miss mapping accounts","Month":timeid,\
+							"Sabra":BPC_value,"P&L Value":0,"Diff (Sabra-P&L)":diff},index=[0])   
                     diff_BPC_PL_detail=pd.concat([diff_BPC_PL_detail,diff_detail_records])
     if diff_BPC_PL.shape[0]>0:
         percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
@@ -676,7 +679,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
 	
 
 @st.cache_data(experimental_allow_widgets=True)
-def View_Summary(uploaded_file):
+def View_Summary():
     global Total_PL
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
@@ -688,7 +691,7 @@ def View_Summary(uploaded_file):
     for month in months:
         m_str += ", " + month
     st.write("Reporting months detected in P&L : "+m_str[1:])   
-    st.write("The reporting month is **{}/{}**".format(latest_month[4:6],latest_month[0:4]))
+    st.write("The reporting month is "+latest_month[4:6]+"/"+latest_month[0:4])
     
     Total_PL.index=Total_PL.index.set_names(["ENTITY", "Sabra_Account"]) 
     Total_PL=Total_PL.fillna(0)
@@ -741,7 +744,7 @@ def View_Summary(uploaded_file):
         if latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra":
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
             if latest_month_data.loc[i,'Category'] =="Facility Information" or latest_month_data.loc[i,'Category'] =="Additional Statistical Information":
-                latest_month_data.loc[i,set_empty]=""	
+                latest_month_data.loc[i,set_empty]=""
     entity_columns=latest_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
         latest_month_data["Total"] = latest_month_data[entity_columns].sum(axis=1)
@@ -749,7 +752,7 @@ def View_Summary(uploaded_file):
     else:
         latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]
     
-    st.markdown("**{} {}/{} reporting data:**".format(operator,latest_month[4:6],latest_month[0:4]))      
+    st.markdown("{} {}/{} reporting data:".format(operator,latest_month[4:6],latest_month[0:4]))      
     st.markdown(latest_month_data.style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
     st.write("")
@@ -761,16 +764,46 @@ def View_Summary(uploaded_file):
     with col2:	
         submit_latest_month=st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]))
     upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
-    upload_latest_month=upload_latest_month.merge(entity_mapping[["Operator","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]].reset_index(drop=False),on="ENTITY",how="left")
     upload_latest_month["TIME"]=latest_month
     upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
     upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
     upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
 
+# create EPM formula for download data
+def EMP_Formula(data,data_col):
+    col_size=data.shape[1]
+    row_size=data.shape[0]
+    col_name_list=list(data.columns)
+    data=data.reset_index(drop=False)
+    data=data.merge(entity_mapping[["ENTITY","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
+    data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
+    
+    time_col_letter=colnum_letter(col_name_list.index("TIME"))
+    entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
+    account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
+    facility_col_letter=colnum_letter(col_name_list.index("FACILITY_TYPE"))
+    state_col_letter=colnum_letter(col_name_list.index("GEOGRAPHY"))
+    leasename_col_letter=colnum_letter(col_name_list.index("LEASE_NAME"))
+    inv_col_letter=colnum_letter(col_name_list.index("INV_TYPE"))
+    data_col_letter=colnum_letter(col_name_list.index("Amount"))
+    uploud_data=data.copy()
+    
+    for r in range(2,row_size+2):
+        formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
+		    format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
+                    uploud_data.loc[r-2,"EPM_Formula"]=formula
+	
     if submit_latest_month:
         # save tenant P&L to S3
+        if not Upload_File_toS3(uploaded_finance,bucket_PL,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
+                st.write(" ")  #----------record into error report------------------------	
+        if BS_separate_excel=="Y":
+            if not Upload_File_toS3(uploaded_BS,bucket_PL,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
+                st.write(" ")  #----------record into error report------------------------	
+
         if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
+            
         else:
             st.write(" ")  #----------record into error report------------------------	
     else:
@@ -780,6 +813,7 @@ def View_Summary(uploaded_file):
 # don't use cache
 def View_Discrepancy(percent_discrepancy_accounts): 
     global diff_BPC_PL
+    
 
     if diff_BPC_PL.shape[0]>0:
         st.error("{0:.1f}% P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.".format(percent_discrepancy_accounts*100))
@@ -875,9 +909,9 @@ def View_Discrepancy_Detail():
 def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
     global latest_month,account_mapping
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
-    count=0
-    property_name=entity_mapping.loc[entity_i,"Property_Name"]
+    
     # read data from uploaded file
+    count=0
     while(True):
         try:
             PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
@@ -886,25 +920,26 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
             col1,col2=st.columns(2) 
             with col1: 
                 if sheet_type=="Sheet_Name_Finance":  
-                    st.warning("Please provide sheet name of **P&L** data for property **{}**. ".format(property_name))
+                    st.warning("Please provide sheet name of P&L data for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
                 elif sheet_type=="Sheet_Name_Occupancy":
-                    st.warning("Please provide sheet name of **Occupancy** data for property **{}**. ".format(property_name))
+                    st.warning("Please provide sheet name of Occupancy data for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
                 elif sheet_type=="Sheet_Name_Balance_Sheet":
-                    st.warning("Please provide sheet name of **Balance Sheet** data in for property **{}**. ".format(property_name))
-                    #st.write("Combining **bold and :orange[colored text] is totally** fine! Just like with other markdown features.")
-
+                    st.warning("Please provide sheet name of Balance Sheet data in for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
 		    
-                with st.form(key=property_name+sheet_type):      
-                    if len(PL_sheet_list)>0:
-                        sheet_name=st.selectbox(entity_mapping.loc[entity_i,"Property_Name"],[""]+PL_sheet_list)
-                    else:
-                        sheet_name = st.text_input(property_name)
+            if len(PL_sheet_list)>0:
+                with st.form(key=str(count)):                
+                    sheet_name=st.selectbox(entity_mapping.loc[entity_i,"Property_Name"],[""]+PL_sheet_list)
                     submitted = st.form_submit_button("Submit")
-                if submitted:
                     count+=1
-                    continue
-                else:
-                    st.stop()
+            else:
+                with st.form(key=str(count)):     
+                    sheet_name = st.text_input(entity_mapping.loc[entity_i,"Property_Name"])
+                    submitted = st.form_submit_button("Submit")
+                    count+=1
+            if submitted:   
+                continue
+            else:
+                st.stop()
 		    
     if count>0:
         # update sheet name in entity_mapping
@@ -969,26 +1004,24 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
 @st.cache_data(experimental_allow_widgets=True) 
 def Check_Reporting_Month(PL):	
     latest_month=str(max(list(PL.columns)))
-    col4,col5,col6=st.columns([5,2,8])
+    col4,col5,col6=st.columns([5,1,8])
     with col4:  
-        st.warning("The reporting month is: **{}/{}**. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
+        st.warning("The reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
     with col5:		
-        st.button('**Yes**', on_click=clicked, args=["yes_button"])         
+        st.button('Yes', on_click=clicked, args=["yes_button"])         
     with col6:
-        st.button("**No**", on_click=clicked, args=["no_button"])       
+        st.button("No", on_click=clicked, args=["no_button"])       
     if st.session_state.clicked["yes_button"]:
         return latest_month
     elif st.session_state.clicked["no_button"]:
-        col9,col10=st.columns(2)
-        with col9:  
-            with st.form("latest_month"):
-                st.write("Please select reporting month:" )  
-                col7,col8=st.columns(2)
-                with col7:
-                    year = st.selectbox('Year', range(2023, date.today().year+1))
-                with col8:
-                    month = st.selectbox('Month', range(1, 13),index=date.today().month-2)
-                confirm_month=st.form_submit_button("Submit")
+        with st.form("latest_month"):
+            st.write("Please select reporting month:" )  
+            col3,col4=st.columns(2)
+            with col3:
+                year = st.selectbox('Year', range(2023, date.today().year+1))
+            with col4:
+                month = st.selectbox('Month', range(1, 13),index=date.today().month-2)
+            confirm_month=st.form_submit_button("Submit")
         if confirm_month:
             if month<10:
                 latest_month=str(year)+"0"+str(month)
@@ -1071,9 +1104,9 @@ if st.session_state["authentication_status"] is False:
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
     operator=st.session_state["operator"]
     st.title(operator)
-    #st.title(operator)
     BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
+
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
     if choice=="Upload P&L":
@@ -1083,13 +1116,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             BS_separate_excel="Y"
         else:
             BS_separate_excel="N"
-         
-       
+
         with st.form("upload_form", clear_on_submit=True):
             col1,col2=st.columns(2)
             with col1:
                 st.subheader("Upload P&L:")
                 uploaded_finance=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False,key="Finance_upload")
+                
             with col2:
                 if BS_separate_excel=="Y":
                     st.subheader("Upload Balance Sheet:")
@@ -1100,20 +1133,20 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.cache_data.clear()
             st.cache_resource.clear()
             st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False,"continue_button":False}
-
         if uploaded_finance:
             with col1:
                 st.markdown("✔️ :green[P&L selected]")
+
         else:
             st.write("P&L wasn't upload.")
             st.stop()
         if BS_separate_excel=="Y" and uploaded_BS:
             with col2:
                 st.markdown("✔️ :green[Balance sheet selected]")
+                s3.upload_fileobj(uploaded_BS, bucket_PL, "{}/{}_BS.xlsx".format(operator,operator))
         elif BS_separate_excel=="Y" and not uploaded_BS:
             st.write("Balance sheet wasn't upload.")
             st.stop()
-
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             with st.spinner('Wait for P&L process'):
                 Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
@@ -1135,8 +1168,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	# 1 Summary
         with st.expander("Summary of P&L" ,expanded=True):
             ChangeWidgetFontSize('Summary of P&L', '25px')
-            View_Summary(uploaded_finance)
-	        
+            View_Summary()
+      
         # 2 Discrepancy of Historic Data
         with st.expander("Discrepancy for Historic Data",expanded=True):
             ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
@@ -1273,7 +1306,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
 		
                 # summary for operator upload
-                upload_summary=data[["Operator","TIME","Latest_Upload_Time"]].drop_duplicates(["Operator","TIME","Latest_Upload_Time"]) 
                 upload_summary["TIME"]=upload_summary["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
                 col1,col2,col3=st.columns((3,1,1))
                 with col2:
@@ -1301,25 +1333,28 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 leasename_col_letter=colnum_letter(col_name_list.index("LEASE_NAME"))
                 inv_col_letter=colnum_letter(col_name_list.index("INV_TYPE"))
                 data_col_letter=colnum_letter(col_name_list.index("Amount"))
-                uploud_data=data.copy()
-                uploud_data["TIME"]=uploud_data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
+                formula_col_letter=colnum_letter(col_name_list.index("EPM_Formula"))
+                data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
                 for r in range(2,row_size+2):
-                    if uploud_data.loc[r-2,"EPM_Formula"]=="Uploaded":
-                        continue
-                    else:
-                        formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
+                    formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
 		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
-                        uploud_data.loc[r-2,"EPM_Formula"]=formula
-                download_file=uploud_data.to_csv(index=False).encode('utf-8')
+                    data.loc[r-2,"EPM_Formula"]=formula
+		    data.loc[r-2,"load Status"]="""{}{}={}{}""".format(data_col_letter,r,formula_col_letter,r)
+		consistence_check="Consistence check:"&AND({}2:{}{})"]"
+			
+                download_file=data.to_csv(index=False).encode('utf-8')
 
-                st.write("Do you want to label the downloaded data as 'uploaded' to avoid duplicate upload? ")
-                col1,col2=st.columns(2)
-                with col1:
-                    yes_button=st.button('Yes, label all the downloaded data as "Uploaded"', on_click=clicked, args=["yes_button"]) 
-                with col2:
-                    no_button=st.button("No,Just download. I won't upload data this time.", on_click=clicked, args=["no_button"])          
-                if yes_button:
-                    data["EPM_Formula"]="Uploaded"
-                    st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
-                if no_button:
-                    st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
+                #st.write("Do you want to label the downloaded data as 'uploaded' to avoid duplicate upload? ")
+                #col1,col2=st.columns(2)
+                #with col1:
+                #    yes_button=st.button('Yes, label all the downloaded data as "Uploaded"', on_click=clicked, args=["yes_button"]) 
+                #with col2:
+                #    no_button=st.button("No,Just download. I won't upload data this time.", on_click=clicked, args=["no_button"])          
+                #if yes_button:
+                    #data["EPM_Formula"]="Uploaded"
+                    #st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
+                #if no_button:
+                    #st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
+                
+                st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
+
