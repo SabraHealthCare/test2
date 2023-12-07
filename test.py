@@ -1347,7 +1347,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
                     data.loc[r-2,"EPM_Formula"]=formula
                     data.loc[r-2,"load Status"]="""{}{}={}{}""".format(data_col_letter,r,formula_col_letter,r)
-                consistence_check="Consistence check:"&AND({}2:{}{})"]"
+                consistence_check="""="Consistence check:"&AND({}2:{}{})"""
                 data[consistence_check]=""
 			
                 download_file=data.to_csv(index=False).encode('utf-8')
