@@ -44,10 +44,10 @@ def Read_CSV_FromS3(bucket,key):
     data = pd.read_csv(BytesIO(file_obj['Body'].read()),header=0)
     return data
 
-# no cache
+# no cache,   save a dataframe to S3 
 def Save_CSV_ToS3(data,bucket,key):   
     try:
-        data=data[list(filter(lambda x: x not in ["Unnamed:","index"] ,data.columns))]
+        data=data[list(filter(lambda x: x!="index" and "Unnamed:" not in x,data.columns))]
         csv_buffer = StringIO()
         data.to_csv(csv_buffer)
         s3_resource = boto3.resource('s3')
@@ -56,7 +56,7 @@ def Save_CSV_ToS3(data,bucket,key):
     except:
         return False
 
-# no Cache
+# no Cache , directly save the uploaded .xlsx file to S3 
 def Upload_File_toS3(uploaded_file, bucket, key):  
     try:
         s3.upload_fileobj(uploaded_file, bucket, key)
