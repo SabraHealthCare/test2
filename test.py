@@ -69,7 +69,7 @@ def clicked(button_name):
     st.session_state.clicked[button_name] = True
 	
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
-def Update_File_inS3(bucket,key,new_data,operator,month=None):  # replace original data
+def Update_File_inS3(bucket,key,new_data,operator):  # replace original data
     original_file =s3.get_object(Bucket=bucket, Key=key)
     try:
         original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
@@ -79,11 +79,12 @@ def Update_File_inS3(bucket,key,new_data,operator,month=None):  # replace origin
         original_data=pd.DataFrame()
         empty_file=True
     if not empty_file:	    
-        if month:
+        if "TIME" in original_data.columns and "TIME" in new_data.columns:
             original_data.TIME = original_data.TIME.astype(str)
 	    # remove original data by operator and month 
-            original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)].index)
-        elif not month:
+            months_of_new_data=new_data["TIME"].unique()
+            original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))].index)
+        elif "TIME" not in original_data.columns and "TIME" not in new_data.columns:
             original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
     # append new data to original data
     new_data=new_data.reset_index(drop=False)
@@ -779,7 +780,7 @@ def View_Summary():
             if not Upload_File_toS3(uploaded_BS,bucket_PL,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
                 st.write(" ")  #----------record into error report------------------------	
 
-        if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
+        if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator): 
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
             
         else:
