@@ -119,15 +119,15 @@ def Initial_Paramaters(operator):
 @st.cache_resource
 def Initial_Mapping(operator):
     # read account mapping
-    #account_mapping_all = Read_CSV_FromS3(bucket_mapping,account_mapping_filename)  
-    #account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]==operator]
-    #account_mapping["Tenant_Formated_Account"]=list(map(lambda x:x.upper().strip(),account_mapping["Tenant_Account"]))
-    #account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
+    account_mapping_all = Read_CSV_FromS3(bucket_mapping,account_mapping_filename)  
+    account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]==operator]
+    account_mapping["Tenant_Formated_Account"]=list(map(lambda x:x.upper().strip(),account_mapping["Tenant_Account"]))
+    account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
     # read property mapping
     entity_mapping=Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
     st.write(entity_mapping)
     entity_mapping=entity_mapping.loc[entity_mapping["Operator"]==operator]
-    st.write("entity_mapping",entity_mapping)
+    entity_mapping=entity_mapping.set_index("ENTITY")
     return entity_mapping,account_mapping
 
 
@@ -1116,8 +1116,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     st.title(operator)
     BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
-    #entity_mapping=entity_mapping.set_index("ENTITY")
-    st.write("entity_mapping",entity_mapping)
+
 	
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
