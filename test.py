@@ -97,6 +97,7 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
         updated_data=EPM_Formula(updated_data,value_name)
         st.write("new_data",new_data,"col_names",col_names)	
         st.write("updated_data",updated_data)
+        st.write("updated_data_col",updated_data.columns)
     return Save_CSV_ToS3(updated_data,bucket,key)
 
 
