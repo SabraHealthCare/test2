@@ -93,12 +93,9 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
     col_names=list(filter(lambda x:x !="index",new_data.columns))
     updated_data = pd.concat([original_data,new_data]).reset_index(drop=True)
     updated_data=updated_data[col_names]
-    st.write("updated_data_col1",updated_data.columns)
     if value_name is not False: # set formula 
         updated_data=EPM_Formula(updated_data,value_name)
-        st.write("new_data",new_data,"col_names",col_names)	
         st.write("updated_data",updated_data)
-        st.write("updated_data_col2",updated_data.columns)
     return Save_CSV_ToS3(updated_data,bucket,key)
 
 
@@ -798,11 +795,10 @@ def View_Summary():
         st.stop()
     
 # create EPM formula for download data
-def EPM_Formula(data,value_name):
+def EPM_Formula(data,value_name): # make sure there is no col on index for data
     col_size=data.shape[1]
     row_size=data.shape[0]
     col_name_list=list(data.columns)
-    data=data.reset_index(drop=False)
     time_col_letter=colnum_letter(col_name_list.index("TIME"))
     entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
     account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
