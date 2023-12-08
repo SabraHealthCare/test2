@@ -126,7 +126,7 @@ def Initial_Mapping(operator):
     # read property mapping
     entity_mapping =Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
     st.write("$$$$$$$$$$$",entity_mapping)
-    st.write(entity_mapping.loc[entity_mapping["Operator"].isin([operator]))
+    st.write(entity_mapping.loc[entity_mapping["Operator"].isin([operator])])
     #entity_mapping=entity_mapping1.set_index("ENTITY")
     #st.write("entity_mapping1")
     #st.write(entity_mapping1)
