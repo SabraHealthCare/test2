@@ -126,11 +126,11 @@ def Initial_Mapping(operator):
     # read property mapping
     entity_mapping=Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
     entity_mapping=entity_mapping.reset_index(drop=True)
-    new_dataframe=pd.DataFrame()
-    new_dataframe=entity_mapping[entity_mapping["Operator"]==operator].copy()
-    #new_dataframe=new_dataframe.set_index("ENTITY")
-    st.write("new_dataframe",new_dataframe)
-    return new_dataframe,account_mapping
+
+    entity_mapping=entity_mapping[entity_mapping["Operator"]==operator].copy()
+    
+    entity_mapping=entity_mapping.set_index("ENTITY")
+    return entity_mapping,account_mapping
 
 
 # Intialize a list of tuples containing the CSS styles for table headers
