@@ -1167,12 +1167,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             # process Finance 
             with st.spinner('Wait for P&L process'):
+                Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
                 Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
-                st.write("done")
+   
 	    # process BS 
-            
             st.write("uploaded_BS",uploaded_BS)
-            Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
+            
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
