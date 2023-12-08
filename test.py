@@ -509,7 +509,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
 
 #@st.cache_data(experimental_allow_widgets=True)
 def Manage_Entity_Mapping(operator):
-    global entity_mapping
+    #global entity_mapping
     #all the properties are supposed to be in entity_mapping. 
     entity_mapping_updation=pd.DataFrame(columns=["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"])
     number_of_property=entity_mapping.shape[0]
