@@ -506,7 +506,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
 
 #@st.cache_data(experimental_allow_widgets=True)
 def Manage_Entity_Mapping(operator):
-    #global entity_mapping
+    global entity_mapping
     #all the properties are supposed to be in entity_mapping. 
     entity_mapping_updation=pd.DataFrame(columns=["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"])
     number_of_property=entity_mapping.shape[0]
@@ -1055,7 +1055,7 @@ def Upload_And_Process(uploaded_file,file_type):
 		
         Total_PL=pd.DataFrame()
         Total_PL_detail=pd.DataFrame()
-        st.write(entity_mapping.index)
+ 
         for entity_i in entity_mapping.index:   # entity_i is the entity code for each property
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
                 sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
@@ -1118,8 +1118,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     st.title(operator)
     BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
-    st.write(entity_mapping)
-	
+  
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
     if choice=="Upload P&L":
