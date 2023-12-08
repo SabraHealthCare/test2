@@ -128,7 +128,8 @@ def Initial_Mapping(operator):
     st.write("entity_mapping",entity_mapping)
     st.write("operator",operator,len(operator))
     st.write(entity_mapping.loc[292,"Operator"])
-    st.write("operator in operator",operator==entity_mapping.loc[292,"Operator"])
+    st.write("operator in operator")
+    st.write(operator==entity_mapping.loc[292,"Operator"])
     entity_mapping1 = entity_mapping.loc[entity_mapping["Operator"]==entity_mapping.loc[292,"Operator"]]
     #entity_mapping1=entity_mapping1.set_index("ENTITY")
     st.write("entity_mapping1")
