@@ -1053,7 +1053,10 @@ def Upload_And_Process(uploaded_file,file_type):
 		
         Total_PL=pd.DataFrame()
         Total_PL_detail=pd.DataFrame()
+        st.write(entity_mapping.index)
         for entity_i in entity_mapping.index:   # entity_i is the entity code for each property
+            st.write(entity_i)
+            st.write(entity_mapping.loc[entity_i,:])
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
                 sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
                 sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
