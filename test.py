@@ -1046,6 +1046,8 @@ def Check_Reporting_Month(PL):
 
 @st.cache_data(experimental_allow_widgets=True)  
 def Upload_And_Process(uploaded_file,file_type):
+    if file_type=="BS":
+        st.write(uploaded_file)
     global latest_month,property_name  # property_name is currently processed entity
     if True:
         if uploaded_file.name[-5:]=='.xlsx':
