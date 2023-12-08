@@ -128,10 +128,10 @@ def Initial_Mapping(operator):
     st.write("operator",operator,len(operator))
     st.write(entity_mapping.loc[292,"Operator"])
     st.write("operator in operator",operator==entity_mapping.loc[292,"Operator"])
-    entity_mapping = entity_mapping.loc[entity_mapping["Operator"]=="Ensign"]
-    entity_mapping=entity_mapping.set_index("ENTITY")
-    st.write("entity_mapping")
-    st.write(entity_mapping)
+    entity_mapping1 = entity_mapping.loc[entity_mapping["Operator"]==entity_mapping.loc[292,"Operator"]]
+    entity_mapping1=entity_mapping1.set_index("ENTITY")
+    st.write("entity_mapping1")
+    st.write(entity_mapping1)
     return entity_mapping,account_mapping
 
 
