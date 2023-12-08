@@ -47,7 +47,7 @@ def Read_CSV_FromS3(bucket,key):
 # no cache
 def Save_CSV_ToS3(data,bucket,key):   
     try:
-        data=data[list(filter(lambda x:"Unnamed:" not in x or 'index' not in x,data.columns))]
+        data=data[list(filter(lambda x: x not in ["Unnamed:","index"] ,data.columns))]
         csv_buffer = StringIO()
         data.to_csv(csv_buffer)
         s3_resource = boto3.resource('s3')
