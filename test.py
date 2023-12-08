@@ -69,7 +69,7 @@ def clicked(button_name):
     st.session_state.clicked[button_name] = True
 	
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
-def Update_File_inS3(bucket,key,new_data,operator):  # replace original data
+def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace original data
     original_file =s3.get_object(Bucket=bucket, Key=key)
     try:
         original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
@@ -86,10 +86,13 @@ def Update_File_inS3(bucket,key,new_data,operator):  # replace original data
             original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))].index)
         elif "TIME" not in original_data.columns and "TIME" not in new_data.columns:
             original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
+
+        
     # append new data to original data
     new_data=new_data.reset_index(drop=False)
     updated_data = pd.concat([original_data,new_data]).reset_index(drop=True)
-    
+    if value_name is not False: # set formula 
+	updated_data=EPM_Formula(updated_data,value_name)
     return Save_CSV_ToS3(updated_data,bucket,key)
 
 
@@ -789,12 +792,11 @@ def View_Summary():
         st.stop()
     
 # create EPM formula for download data
-def EMP_Formula(data,data_col):
+def EPM_Formula(data,value_name):
     col_size=data.shape[1]
     row_size=data.shape[0]
     col_name_list=list(data.columns)
     data=data.reset_index(drop=False)
-
     time_col_letter=colnum_letter(col_name_list.index("TIME"))
     entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
     account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
@@ -802,7 +804,7 @@ def EMP_Formula(data,data_col):
     state_col_letter=colnum_letter(col_name_list.index("GEOGRAPHY"))
     leasename_col_letter=colnum_letter(col_name_list.index("LEASE_NAME"))
     inv_col_letter=colnum_letter(col_name_list.index("INV_TYPE"))
-    data_col_letter=colnum_letter(col_name_list.index("Amount"))    
+    data_col_letter=colnum_letter(col_name_list.index(value_name))    
     for r in range(2,row_size+2):
         formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
 		    format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
@@ -818,7 +820,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
         diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
 	# insert dim to diff_BPC_PL
         diff_BPC_PL["TIME"]=diff_BPC_PL["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
-        Update_File_inS3(bucket_PL,discrepancy_path,diff_BPC_PL,operator)
+        Update_File_inS3(bucket_PL,discrepancy_path,diff_BPC_PL,operator,"Amount")
 	    
         edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>10]  
         edited_diff_BPC_PL["Type comments below"]=""
