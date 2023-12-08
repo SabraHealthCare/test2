@@ -125,7 +125,7 @@ def Initial_Mapping(operator):
     account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
     # read property mapping
     entity_mapping=Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
-
+    st.write(entity_mapping)
     return entity_mapping.loc[entity_mapping["Operator"]==operator],account_mapping
 
 
