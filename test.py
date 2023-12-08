@@ -128,7 +128,7 @@ def Initial_Mapping(operator):
     entity_mapping=entity_mapping.reset_index(drop=True)
     new_dataframe=pd.DataFrame()
     new_dataframe=entity_mapping[entity_mapping["Operator"]==operator].copy()
-    new_dataframe=new_dataframe.set_index("ENTITY")
+    #new_dataframe=new_dataframe.set_index("ENTITY")
     st.write("new_dataframe",new_dataframe)
     return new_dataframe,account_mapping
 
