@@ -125,9 +125,6 @@ def Initial_Mapping(operator):
     account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
     # read property mapping
     entity_mapping=Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
-    #st.write(entity_mapping.loc[entity_mapping["Operator"]==operator])
-    #test=test.set_index("ENTITY")
-    #st.write("test",test)
 
     return entity_mapping.loc[entity_mapping["Operator"]==operator],account_mapping
 
@@ -1056,8 +1053,6 @@ def Upload_And_Process(uploaded_file,file_type):
         Total_PL_detail=pd.DataFrame()
         st.write(entity_mapping.index)
         for entity_i in entity_mapping.index:   # entity_i is the entity code for each property
-            st.write(entity_i)
-            st.write(entity_mapping.loc[entity_i,:])
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
                 sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
                 sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
@@ -1119,7 +1114,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     st.title(operator)
     BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
-    st.write(entity_mapping,account_mapping)
+    entity_mapping=entity_mapping.set_index("ENTITY")
 	
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
