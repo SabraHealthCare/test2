@@ -130,6 +130,7 @@ def Initial_Mapping(operator):
     st.write("operator in operator",operator in entity_mapping["Operator"])
     entity_mapping = entity_mapping[entity_mapping["Operator"]==operator]
     entity_mapping=entity_mapping.set_index("ENTITY")
+    st.write("entity_mapping")
     st.write(entity_mapping)
     return entity_mapping,account_mapping
 
