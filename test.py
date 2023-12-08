@@ -116,7 +116,7 @@ def Initial_Paramaters(operator):
     return BPC_pull,month_dic,year_dic
 
 
-@st.cache_resource
+#@st.cache_resource
 def Initial_Mapping(operator):
     # read account mapping
     account_mapping_all = Read_CSV_FromS3(bucket_mapping,account_mapping_filename)  
