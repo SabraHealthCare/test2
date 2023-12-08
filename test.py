@@ -127,7 +127,7 @@ def Initial_Mapping(operator):
     entity_mapping=Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
     st.write("entity_mapping.shape",entity_mapping.shape)
     st.write(entity_mapping["Operator"]==operator)
-    st.write(entity[entity_mapping["Operator"]==operator])
+    st.write(entity_mapping[entity_mapping["Operator"]==operator])
     new_dataframe=pd.DataFrame()
 
     st.write("new_dataframe",new_dataframe)
