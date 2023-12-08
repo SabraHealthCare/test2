@@ -128,6 +128,7 @@ def Initial_Mapping(operator):
     entity_mapping=entity_mapping.set_index("Operator")
     entity_mapping=entity_mapping.loc[operator]
     entity_mapping=entity_mapping.set_index("ENTITY",drop=False)
+    st.write("entity_mapping",entity_mapping)
     return entity_mapping,account_mapping
 
 
