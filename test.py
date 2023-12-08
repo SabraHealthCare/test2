@@ -128,7 +128,6 @@ def Initial_Mapping(operator):
     entity_mapping=entity_mapping.set_index("Operator")
     entity_mapping=entity_mapping.loc[operator]
     entity_mapping=entity_mapping.set_index("ENTITY",drop=False)
-    st.write("entity_mapping",entity_mapping)
     return entity_mapping,account_mapping
 
 
@@ -1117,7 +1116,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     st.title(operator)
     BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
-
+    st.write(entity_mapping)
 	
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
