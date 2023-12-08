@@ -128,7 +128,7 @@ def Initial_Mapping(operator):
     st.write("$$$$$$$$$$$",entity_mapping)
     #st.write(entity_mapping.loc[entity_mapping["Operator"].isin([operator])])
     entity_mapping=entity_mapping.loc[entity_mapping["Operator"].isin([operator])]
-    entity_mapping=entity_mapping1.set_index("ENTITY")
+    entity_mapping=entity_mapping.set_index("ENTITY")
     st.write("entity_mapping")
     st.write(entity_mapping)
     return entity_mapping,account_mapping
