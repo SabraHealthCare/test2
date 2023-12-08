@@ -125,11 +125,12 @@ def Initial_Mapping(operator):
     account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
     # read property mapping
     entity_mapping=Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
-    entity_mapping=entity_mapping.set_index("Operator")
-    entity_mapping1=entity_mapping.loc[operator]
-    entity_mapping1=entity_mapping1.set_index("ENTITY",drop=False)
-    st.write("entity_mapping1",entity_mapping1)
-    return entity_mapping1,account_mapping
+    st.write(entity_mapping.shape)
+    new_dataframe=pd.DataFrame()
+    new_dataframe=entity_mapping[entity_mapping["Operator"]=operator])
+    new_dataframe=new_dataframe.set_index("ENTITY",drop=False)
+    st.write("new_dataframe",new_dataframe)
+    return new_dataframe,account_mapping
 
 
 # Intialize a list of tuples containing the CSS styles for table headers
