@@ -1118,7 +1118,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     st.title(operator)
     BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
-
+    st.write(entity_mapping,account_mapping)
+	
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
     if choice=="Upload P&L":
