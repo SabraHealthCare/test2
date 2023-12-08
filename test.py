@@ -96,7 +96,7 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
     return Save_CSV_ToS3(updated_data,bucket,key)
 
 
-@st.cache_data
+#@st.cache_data
 def Initial_Paramaters(operator):
     # drop down list of operator
     if operator!="Sabra":
