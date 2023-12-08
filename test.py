@@ -124,10 +124,10 @@ def Initial_Mapping(operator):
     account_mapping["Tenant_Formated_Account"]=list(map(lambda x:x.upper().strip(),account_mapping["Tenant_Account"]))
     account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
     # read property mapping
-    entity_mapping_all =Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
-    entity_mapping=entity_mapping_all.loc[entity_mapping_all["Operator"]==operator]
-    #entity_mapping=entity_mapping.set_index("ENTITY")
-    st.write("entity_mapping1",entity_mapping)
+    entity_mapping=Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
+    test=entity_mapping.loc[entity_mapping["Operator"]==operator]
+    #test=test.set_index("ENTITY")
+    st.write("test",test)
 
     return entity_mapping,account_mapping
 
