@@ -129,7 +129,7 @@ def Initial_Mapping(operator):
     st.write(entity_mapping["Operator"]==operator)
     st.write(entity_mapping[entity_mapping["Operator"]==operator])
     new_dataframe=pd.DataFrame()
-
+    new_dataframe=entity_mapping[entity_mapping["Operator"]==operator].copy()
     st.write("new_dataframe",new_dataframe)
     return new_dataframe,account_mapping
 
