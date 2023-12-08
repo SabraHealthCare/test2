@@ -1150,14 +1150,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if uploaded_finance:
             with col1:
                 st.markdown("✔️ :green[P&L selected]")
-
         else:
             st.write("P&L wasn't upload.")
             st.stop()
         if BS_separate_excel=="Y" and uploaded_BS:
             with col2:
                 st.markdown("✔️ :green[Balance sheet selected]")
-                s3.upload_fileobj(uploaded_BS, bucket_PL, "{}/{}_BS.xlsx".format(operator,operator))
+
         elif BS_separate_excel=="Y" and not uploaded_BS:
             st.write("Balance sheet wasn't upload.")
             st.stop()
@@ -1167,11 +1166,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             # process Finance 
             with st.spinner('Wait for P&L process'):
-                Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
+
                 Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
-   
-	    # process BS 
-            st.write("uploaded_BS",uploaded_BS)
+		# process BS 
+                Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
+
+
             
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
