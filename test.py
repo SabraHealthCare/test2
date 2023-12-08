@@ -125,12 +125,13 @@ def Initial_Mapping(operator):
     account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
     # read property mapping
     entity_mapping=Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
+    entity_mapping=entity_mapping.reset_index(drop=True)
     st.write("entity_mapping.shape",entity_mapping.shape)
     st.write(entity_mapping["Operator"]==operator)
     st.write(entity_mapping[entity_mapping["Operator"]==operator])
     new_dataframe=pd.DataFrame()
     new_dataframe=entity_mapping[entity_mapping["Operator"]==operator].copy()
-    new_dataframe=new_dataframe.set_index("ENTITY")
+    #new_dataframe=new_dataframe.set_index("ENTITY")
     st.write("new_dataframe",new_dataframe)
     return new_dataframe,account_mapping
 
