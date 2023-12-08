@@ -90,12 +90,9 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
         
     # append new data to original data
     new_data=new_data.reset_index(drop=False)
-    #col_names=list(filter(lambda x:x !="index",new_data.columns))
-    updated_data = pd.concat([original_data,new_data]).reset_index(drop=True)
-    #updated_data=updated_data[col_names]
+    updated_data = pd.concat([original_data,new_data])
     if value_name is not False: # set formula 
         updated_data=EPM_Formula(updated_data,value_name)
-        st.write("updated_data",updated_data)
     return Save_CSV_ToS3(updated_data,bucket,key)
 
 
