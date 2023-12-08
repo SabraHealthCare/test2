@@ -1046,8 +1046,6 @@ def Check_Reporting_Month(PL):
 
 @st.cache_data(experimental_allow_widgets=True)  
 def Upload_And_Process(uploaded_file,file_type):
-    if file_type=="BS":
-        st.write(uploaded_file)
     global latest_month,property_name  # property_name is currently processed entity
     if True:
         if uploaded_file.name[-5:]=='.xlsx':
@@ -1172,9 +1170,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
                 st.write("done")
 	    # process BS 
-            with st.spinner('Wait for Balance Sheet process'):
-                st.write("uploaded_BS",uploaded_BS)
-                Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
+            
+            st.write("uploaded_BS",uploaded_BS)
+            Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
