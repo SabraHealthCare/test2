@@ -795,6 +795,8 @@ def View_Summary():
     
 # create EPM formula for download data
 def EPM_Formula(data,value_name): # make sure there is no col on index for data
+    data["EPM_Formula"]=""
+    data["Upload_Check"]=""
     col_size=data.shape[1]
     row_size=data.shape[0]
     col_name_list=list(data.columns)
@@ -806,10 +808,15 @@ def EPM_Formula(data,value_name): # make sure there is no col on index for data
     leasename_col_letter=colnum_letter(col_name_list.index("LEASE_NAME"))
     inv_col_letter=colnum_letter(col_name_list.index("INV_TYPE"))
     data_col_letter=colnum_letter(col_name_list.index(value_name))    
+    EPM_Formula_col_letter=colnum_letter(col_name_list.index("EPM_Formula"))
+    upload_Check_col_letter=colnum_letter(col_name_list.index("Upload_Check"))
     for r in range(2,row_size+2):
-        formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
+        upload_formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
 		    format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
-        data.loc[r-2,"EPM_Formula"]=formula
+        data.loc[r-2,"EPM_Formula"]=upload_formula
+        upload_check_formula="={}{}={}{}".format(EPM_Formula_col_letter,r,data_col_letter,r)
+        data.loc[r-2,"Upload_Check"]=upload_check_formula
+    data["""="Consistence check:"&AND({}2:{}{})""".format(upload_Check_col_letter,upload_Check_col_letter,row_size+1)]=""
     return data
 
 # don't use cache
@@ -1315,12 +1322,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     elif choice=="Review Monthly reporting":
             st.subheader("Summary")
             data_obj =s3.get_object(Bucket=bucket_PL, Key=monthly_reporting_path)
+
             if int(data_obj["ContentLength"])<=2:  # empty file
                 st.success("there is no un-uploaded data")
             else:
                 data=pd.read_csv(BytesIO(data_obj['Body'].read()),header=0)
                 data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
-		
+                data["Upload_Check"]=""
                 # summary for operator upload
                 upload_summary["TIME"]=upload_summary["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
                 col1,col2,col3=st.columns((3,1,1))
@@ -1350,28 +1358,17 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 inv_col_letter=colnum_letter(col_name_list.index("INV_TYPE"))
                 data_col_letter=colnum_letter(col_name_list.index("Amount"))
                 formula_col_letter=colnum_letter(col_name_list.index("EPM_Formula"))
+                upload_check_col_letter=colnum_letter(col_name_list.index("Upload_Check"))
                 data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
                 for r in range(2,row_size+2):
                     formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
 		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
                     data.loc[r-2,"EPM_Formula"]=formula
-                    data.loc[r-2,"load Status"]="""{}{}={}{}""".format(data_col_letter,r,formula_col_letter,r)
-                consistence_check="""="Consistence check:"&AND({}2:{}{})"""
-                data[consistence_check]=""
-			
+                    data.loc[r-2,"Upload_Check"]="""{}{}={}{}""".format(data_col_letter,r,formula_col_letter,r)
+                consistence_check="""="Consistence check:"&AND({}2:{}{})""".format(upload_status_col_letter,upload_status_col_letter,row_size+1)
+                data[consistence_check]=""	
                 download_file=data.to_csv(index=False).encode('utf-8')
 
-                #st.write("Do you want to label the downloaded data as 'uploaded' to avoid duplicate upload? ")
-                #col1,col2=st.columns(2)
-                #with col1:
-                #    yes_button=st.button('Yes, label all the downloaded data as "Uploaded"', on_click=clicked, args=["yes_button"]) 
-                #with col2:
-                #    no_button=st.button("No,Just download. I won't upload data this time.", on_click=clicked, args=["no_button"])          
-                #if yes_button:
-                    #data["EPM_Formula"]="Uploaded"
-                    #st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
-                #if no_button:
-                    #st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
                 
                 st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
 
