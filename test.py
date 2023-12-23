@@ -1333,7 +1333,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 # summary for operator upload
                 data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
                 col1,col2,col3=st.columns((3,1,1))
-                summary=data["TIME","Operator","Latest_Upload_Time"].unique()
+                summary=data[["TIME","Operator","Latest_Upload_Time"]].unique()
                 with col2:
                     data=filters_widgets(data,["Operator","TIME"],"Horizontal")
                 with col1:
