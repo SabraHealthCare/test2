@@ -127,9 +127,7 @@ def Initial_Mapping(operator):
     # read property mapping
     entity_mapping=Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
     entity_mapping=entity_mapping.reset_index(drop=True)
-
-    entity_mapping=entity_mapping[entity_mapping["Operator"]==operator].copy()
-    
+    entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
     entity_mapping=entity_mapping.set_index("ENTITY")
     return entity_mapping,account_mapping
 
@@ -826,7 +824,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
     if diff_BPC_PL.shape[0]>0:
         st.error("{0:.1f}% P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.".format(percent_discrepancy_accounts*100))
         diff_BPC_PL["Operator"]=operator
-        diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
+        diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["ENTITY","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
 	# insert dim to diff_BPC_PL
         diff_BPC_PL["TIME"]=diff_BPC_PL["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
         Update_File_inS3(bucket_PL,discrepancy_path,diff_BPC_PL,operator,"P&L")
@@ -1350,30 +1348,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 BPC_pull=Read_CSV_FromS3(bucket_mapping,BPC_pull_filename)
                 BPC_pull.columns=list(map(lambda x :str(x) if x!="ACCOUNT" else "Sabra_Account", BPC_pull.columns))
                 data=data.merge(BPC_pull[["ENTITY","Sabra_Account","mean"]], on=["ENTITY","Sabra_Account"],how="left")	
-		    
-		# create EPM formula for download data
-                col_size=data.shape[1]
-                row_size=data.shape[0]
-                col_name_list=list(data.columns)
-                time_col_letter=colnum_letter(col_name_list.index("TIME"))
-                entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
-                account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
-                facility_col_letter=colnum_letter(col_name_list.index("FACILITY_TYPE"))
-                state_col_letter=colnum_letter(col_name_list.index("GEOGRAPHY"))
-                leasename_col_letter=colnum_letter(col_name_list.index("LEASE_NAME"))
-                inv_col_letter=colnum_letter(col_name_list.index("INV_TYPE"))
-                data_col_letter=colnum_letter(col_name_list.index("Amount"))
-                formula_col_letter=colnum_letter(col_name_list.index("EPM_Formula"))
-                upload_check_col_letter=colnum_letter(col_name_list.index("Upload_Check"))
-                data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
-                for r in range(2,row_size+2):
-                    formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
-		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
-                    data.loc[r-2,"EPM_Formula"]=formula
-                    data.loc[r-2,"Upload_Check"]="""{}{}={}{}""".format(data_col_letter,r,formula_col_letter,r)
+		# add "GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"
+                entity_mapping=Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
+                data=data.merge(entity_mapping[["ENTITY","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
                 consistence_check="""="Consistence check:"&AND({}2:{}{})""".format(upload_status_col_letter,upload_status_col_letter,row_size+1)
-                
-                # add average column for each line
+
+                data=EPM_Formula(data,"Amount")
         
                 data[consistence_check]=""	
                 download_file=data.to_csv(index=False).encode('utf-8')
