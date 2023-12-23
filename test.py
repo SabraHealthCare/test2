@@ -1349,7 +1349,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 # add Average column for each line
                 BPC_pull=Read_CSV_FromS3(bucket_mapping,BPC_pull_filename)
                 BPC_pull.columns=list(map(lambda x :str(x) if x!="ACCOUNT" else "Sabra_Account", BPC_pull.columns))
-                data=data.merge(BPC_pull[["ENTITY","ACCOUNT","Mean"]], on=["ENTITY","Sabra_Account"],how="left")	
+                data=data.merge(BPC_pull[["ENTITY","Sabra_Account","mean"]], on=["ENTITY","Sabra_Account"],how="left")	
 		    
 		# create EPM formula for download data
                 col_size=data.shape[1]
