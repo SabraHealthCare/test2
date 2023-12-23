@@ -1346,7 +1346,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.subheader("Download reporting data")    
 		    
                 # add Average column for each line
-		BPC_pull=Read_CSV_FromS3(bucket_mapping,BPC_pull_filename)
+                BPC_pull=Read_CSV_FromS3(bucket_mapping,BPC_pull_filename)
                 BPC_pull.columns=list(map(lambda x :str(x) if x!="ACCOUNT" else "Sabra_Account", BPC_pull.columns))
                 data=data.merge(BPC_pull[["ENTITY","ACCOUNT","Mean"]], on=["ENTITY","Sabra_Account"],how="left")	
 		    
