@@ -1331,10 +1331,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
                 data["Upload_Check"]=""
                 # summary for operator upload
-                upload_summary["TIME"]=upload_summary["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
+                data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
                 col1,col2,col3=st.columns((3,1,1))
                 with col2:
-                    upload_summary=filters_widgets(upload_summary,["Operator","TIME"],"Horizontal")
+                    data=filters_widgets(data,["Operator","TIME"],"Horizontal")
                 with col1:
                     st.dataframe(
 			    upload_summary,
