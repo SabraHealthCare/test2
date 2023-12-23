@@ -105,7 +105,7 @@ def Initial_Paramaters(operator):
         BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
         BPC_pull=BPC_pull.set_index(["ENTITY","ACCOUNT"])
         BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
-        
+                  
         month_dic={10:["october","oct","10/","-10","/10","10"],11:["november","nov","11/","-11","/11","11"],12:["december","dec","12/","-12","/12","12"],1:["january","jan","01/","1/","-1","-01","/1","/01"],\
                    2:["february","feb","02/","2/","-2","-02","/2","/02"],3:["march","mar","03/","3/","-3","-03","/3","/03"],4:["april","apr","04/","4/","-4","-04","/4","/04"],\
                    5:["may","05/","5/","-5","-05","/5","/05"],6:["june","jun","06/","6/","-06","-6","/6","/06"],\
@@ -1343,9 +1343,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 			        "Latest_Upload_Time":"Latest submit"},
 			    hide_index=True)
                 st.write("")
-                st.write("")
                 st.subheader("Download reporting data")    
-                
+		    
+                # add Average column for each line
+		BPC_pull=Read_CSV_FromS3(bucket_mapping,BPC_pull_filename)
+                BPC_pull.columns=list(map(lambda x :str(x) if x!="ACCOUNT" else "Sabra_Account", BPC_pull.columns))
+                data=data.merge(BPC_pull[["ENTITY","ACCOUNT","Mean"]], on=["ENTITY","Sabra_Account"],how="left")	
+		    
 		# create EPM formula for download data
                 col_size=data.shape[1]
                 row_size=data.shape[0]
@@ -1367,9 +1371,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                     data.loc[r-2,"EPM_Formula"]=formula
                     data.loc[r-2,"Upload_Check"]="""{}{}={}{}""".format(data_col_letter,r,formula_col_letter,r)
                 consistence_check="""="Consistence check:"&AND({}2:{}{})""".format(upload_status_col_letter,upload_status_col_letter,row_size+1)
+                
+                # add average column for each line
+        
                 data[consistence_check]=""	
                 download_file=data.to_csv(index=False).encode('utf-8')
 
-                
                 st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
 
