@@ -1351,14 +1351,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 		# add "GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"
                 entity_mapping=Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
                 data=data.merge(entity_mapping[["ENTITY","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
-                row_size=data.shape[0]
-                col_name_list=list(data.columns)
-                upload_status_col_letter=colnum_letter(col_name_list.index("EPM_Formula"))
-                consistence_check="""="Consistence check:"&AND({}2:{}{})""".format(upload_status_col_letter,upload_status_col_letter,row_size+1)
 
-                data=EPM_Formula(data,"Amount")
-                data[consistence_check]=""	
+                data=EPM_Formula(data,"Amount")	
                 download_file=data.to_csv(index=False).encode('utf-8')
-
                 st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
 
