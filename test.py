@@ -1207,11 +1207,21 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             col1,col2=st.columns(2)
             with col1:
                 new_tenant_account=st.text_input("Enter new tenant account and press enter to apply:")
+                st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account)) 
                 if new_tenant_account:
-                    st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account)) 
-                    Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account)
-	            #insert new record to the bottom line of account_mapping
-                    account_mapping.loc[len(account_mapping.index)]=[Sabra_main_account_value,Sabra_second_account_value,new_tenant_account,new_tenant_account.upper(),"N"]   
+                        Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account)
+                    if "," in new_tenant_account:  # there is a list of new tenant accounts mapping to one sabra account
+                        new_tenant_account=new_tenant_account.split(",")
+                        new_row=[]
+                        for account_i in range(len(new_tenant_account)):
+                            new_row.append([Sabra_main_account_value,Sabra_second_account_value,new_tenant_account[account_i],new_tenant_account[account_i].upper(),"N"] )
+			new_accounts_df = pd.DataFrame(new_row, columns=account_mapping.columns)
+                        #insert new records to the bottom line of account_mapping one by one
+                        account_mapping = pd.concat([account_mapping, new_accounts_df], axis=1)
+                        
+		    else:
+	                #insert new record to the bottom line of account_mapping
+                        account_mapping.loc[len(account_mapping.index)]=[Sabra_main_account_value,Sabra_second_account_value,new_tenant_account,new_tenant_account.upper(),"N"]   
                     Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping)
     
     elif choice=="Edit Account": 
