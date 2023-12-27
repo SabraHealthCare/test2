@@ -1223,8 +1223,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     else:
 	                #insert new record to the bottom line of account_mapping
                         account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account,new_tenant_account.upper(),"N"]   
-                    Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping)
-    
+                    Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping,operator)
+
     elif choice=="Edit Account": 
 	# update user details widget
         try:
