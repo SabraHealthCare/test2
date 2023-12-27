@@ -1210,6 +1210,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account)) 
                 if new_tenant_account:
                     Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account)
+                    st.write(account_mapping)
                     if "," in new_tenant_account:  # there is a list of new tenant accounts mapping to one sabra account
                         new_tenant_account=new_tenant_account.split(",")
                         new_row=[]
