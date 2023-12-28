@@ -85,6 +85,7 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
             months_of_new_data=new_data["TIME"].unique()
             original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))].index)
         elif "TIME" not in original_data.columns and "TIME" not in new_data.columns:
+            st.write(original_data)
             original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
 
         
