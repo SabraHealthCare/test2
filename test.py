@@ -1222,7 +1222,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                         new_accounts_df = pd.DataFrame(new_row, columns=account_mapping.columns)
                         st.write(new_accounts_df)
                         #insert new records to the bottom line of account_mapping one by one
-                        account_mapping = pd.concat([account_mapping, new_accounts_df], axis=1)
+                        account_mapping = pd.concat([account_mapping, new_accounts_df], ignore_index=True)
                         account_mapping=account_mapping.reset_index(drop=True)
                         st.write(account_mapping)
                         
