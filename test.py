@@ -73,6 +73,7 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
     original_file =s3.get_object(Bucket=bucket, Key=key)
     try:
         original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
+        original_data=original_data.reset_index(drop=True)
         original_data=original_data[new_data.columns]
         empty_file=False
     except:
