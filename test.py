@@ -73,8 +73,6 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
     original_file =s3.get_object(Bucket=bucket, Key=key)
     try:
         original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
-        original_data=original_data.reset_index(drop=True)
-        st.write(new_data.columns)
         original_data=original_data[new_data.columns]
         empty_file=False
     except:
@@ -87,7 +85,6 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
             months_of_new_data=new_data["TIME"].unique()
             original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))].index)
         elif "TIME" not in original_data.columns and "TIME" not in new_data.columns:
-            st.write(original_data)
             original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
 
         
@@ -96,7 +93,6 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
     updated_data = pd.concat([original_data,new_data])
     if value_name is not False: # set formula 
         updated_data=EPM_Formula(updated_data,value_name)
-        st.write(updated_data)
     return Save_CSV_ToS3(updated_data,bucket,key)
 
 
@@ -1220,11 +1216,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                         for account_i in range(len(new_tenant_account)):
                             new_row.append([operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account[account_i],new_tenant_account[account_i].upper(),"N"])
                         new_accounts_df = pd.DataFrame(new_row, columns=account_mapping.columns)
-                        st.write(new_accounts_df)
                         #insert new records to the bottom line of account_mapping one by one
                         account_mapping = pd.concat([account_mapping, new_accounts_df], ignore_index=True)
-                        account_mapping=account_mapping.reset_index(drop=True)
-                        st.write(account_mapping)
+
                         
                     else:
 	                #insert new record to the bottom line of account_mapping
