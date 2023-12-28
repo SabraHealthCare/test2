@@ -1220,6 +1220,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                         for account_i in range(len(new_tenant_account)):
                             new_row.append([operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account[account_i],new_tenant_account[account_i].upper(),"N"])
                         new_accounts_df = pd.DataFrame(new_row, columns=account_mapping.columns)
+                        st.write(new_accounts_df)
                         #insert new records to the bottom line of account_mapping one by one
                         account_mapping = pd.concat([account_mapping, new_accounts_df], axis=1)
                         account_mapping=account_mapping.reset_index(drop=True)
