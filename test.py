@@ -1213,7 +1213,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account)) 
                 if new_tenant_account:
                     Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account)
-                    st.write(account_mapping)
+                    
                     if "," in new_tenant_account:  # there is a list of new tenant accounts mapping to one sabra account
                         new_tenant_account=new_tenant_account.split(",")
                         new_row=[]
@@ -1222,7 +1222,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                         new_accounts_df = pd.DataFrame(new_row, columns=account_mapping.columns)
                         #insert new records to the bottom line of account_mapping one by one
                         account_mapping = pd.concat([account_mapping, new_accounts_df], axis=1)
-                        account_mapping=account_mapping.reset_index(drop=True)	
+                        account_mapping=account_mapping.reset_index(drop=True)
+                        st.write(account_mapping)
                         
                     else:
 	                #insert new record to the bottom line of account_mapping
