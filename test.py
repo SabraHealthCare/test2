@@ -1205,7 +1205,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             ChangeWidgetFontSize('Manage Account Mapping', '25px')
             col1,col2=st.columns(2)
             with col1:
-                new_tenant_account=st.text_input("Enter new tenant account and press enter to apply. For multiple accounts mapping to the same Sabra account, use commas to separate them. For example: RevenueA,RevenueB,RevenueC")
+                new_tenant_account=st.text_input("Enter new tenant account and press enter to apply. For multiple accounts mapping to the same Sabra account, use commas to separate them. For example: Revenue_A,Revenue_B,Revenue_C")
                 
                 if new_tenant_account:
                     st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account)) 
