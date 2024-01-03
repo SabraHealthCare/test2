@@ -1370,6 +1370,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
 
                 # insert Video
-                video=Read_CSV_FromS3(bucket_mapping,"Sabra App video.mp4")
+                video=s3.get_object(Bucket=bucket_mapping, Key="Sabra App video.mp4")
                 video_bytes = video.read()
                 st.video(video_bytes, format="mp4", start_time=0)
