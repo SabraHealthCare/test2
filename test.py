@@ -1225,8 +1225,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	                #insert new record to the bottom line of account_mapping
                         account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account,new_tenant_account.upper(),"N"]   
                     Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping,operator)
+    elif choice=='Instructions':
 
-	
+        # insert Video
+        video=s3.get_object(Bucket=bucket_mapping, Key="Sabra App video.mp4")
+        st.video(BytesIO(video['Body'].read()), format="mp4", start_time=0)
     elif choice=="Edit Account": 
 	# update user details widget
         try:
@@ -1369,7 +1372,3 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 download_file=data.to_csv(index=False).encode('utf-8')
                 st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
 
-                # insert Video
-                video=s3.get_object(Bucket=bucket_mapping, Key="Sabra App video.mp4")
-                
-                st.video(BytesIO(video['Body'].read()), format="mp4", start_time=0)
