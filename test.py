@@ -1372,4 +1372,4 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 # insert Video
                 video=s3.get_object(Bucket=bucket_mapping, Key="Sabra App video.mp4")
                 
-                st.video(BytesIO(file_obj['Body'].read()), format="mp4", start_time=0)
+                st.video(BytesIO(video['Body'].read()), format="mp4", start_time=0)
