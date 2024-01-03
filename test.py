@@ -1371,4 +1371,5 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
                 # insert Video
                 video=Read_CSV_FromS3(bucket_mapping,"Sabra App video.mp4")
-                st.video(video, format="mp4", start_time=0)
+                video_bytes = video.read()
+                st.video(video_bytes, format="mp4", start_time=0)
