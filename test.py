@@ -1224,13 +1224,15 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(",".join(new_tenant_account_list))
                     
                     if len(new_tenant_account_list)>1:  # there is a list of new tenant accounts mapping to one sabra account
+                        st.write("len(new_tenant_account_list)>1",new_tenant_account_list)    
                         new_row=[]
                         for account_i in range(len(new_tenant_account_list)):
                             new_row.append([operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account[account_i],new_tenant_account[account_i].upper(),"N"])
                         new_accounts_df = pd.DataFrame(new_row, columns=account_mapping.columns)
+                        st.write("new_accounts_df",new_accounts_df)
                         #insert new records to the bottom line of account_mapping one by one
                         account_mapping = pd.concat([account_mapping, new_accounts_df], ignore_index=True)
-
+                        st.write("account_mapping",account_mapping) 
                     elif len(new_tenant_account_list)==1:
 	                #insert new record to the bottom line of account_mapping
                         account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[0],new_tenant_account_list[0].upper(),"N"]   
