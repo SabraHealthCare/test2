@@ -4,20 +4,20 @@ xlwt
 pyodbc
 datetime
 openpyxl
-#xlrd
 streamlit
-#gcsfs
-#pyodbc
 s3fs
 boto3
 streamlit_modal
 streamlit_authenticator
 streamlit_tree_select
 streamlit-aggrid==0.3.4
-streamlit_authenticator
-sendgrid
-Pillow
+#sendgrid
+#Pillow
 
+onedrivesdk==2.1.2  
+
+# Active Directory Authentication Library
+adal==1.2.7  
 
 
 git+https://github.com/streamlit/files-connection 
