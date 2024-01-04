@@ -1209,9 +1209,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 
                 if new_tenant_account:
                     new_tenant_account_list=list(set(map(lambda x:x.strip(),new_tenant_account.split(",") )))
-                    st.write(new_tenant_account_list)
+             
                     duplicate_accounts=list(filter(lambda x:x.upper() in list(account_mapping['Tenant_Formated_Account']),new_tenant_account_list))
-                    st.write("duplicate_accounts",duplicate_accounts)
+                   
                     if len(duplicate_accounts)>1:
                         st.write("{} are already existed in mapping list and will be skip.".format(",".join(duplicate_accounts)))
                     elif len(duplicate_accounts)==1:
@@ -1219,20 +1219,19 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 		
 		    # remove duplicated accounts
                     new_tenant_account_list=list(set(new_tenant_account_list) - set(duplicate_accounts))
-                    st.write(new_tenant_account_list) 	
+                    	
                     st.markdown("## Map **'{}'** to Sabra account".format(",".join(new_tenant_account_list))) 
                     Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(",".join(new_tenant_account_list))
                     
-                    if len(new_tenant_account_list)>1:  # there is a list of new tenant accounts mapping to one sabra account
-                        st.write("len(new_tenant_account_list)>1",new_tenant_account_list)    
+                    if len(new_tenant_account_list)>1:  # there is a list of new tenant accounts mapping to one sabra account   
                         new_row=[]
                         for account_i in range(len(new_tenant_account_list)):
                             new_row.append([operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[account_i],new_tenant_account_list[account_i].upper(),"N"])
                         new_accounts_df = pd.DataFrame(new_row, columns=account_mapping.columns)
-                        st.write("new_accounts_df",new_accounts_df)
+
                         #insert new records to the bottom line of account_mapping one by one
                         account_mapping = pd.concat([account_mapping, new_accounts_df], ignore_index=True)
-                        st.write("account_mapping",account_mapping) 
+
                     elif len(new_tenant_account_list)==1:
 	                #insert new record to the bottom line of account_mapping
                         account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[0],new_tenant_account_list[0].upper(),"N"]   
