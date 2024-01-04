@@ -11,6 +11,6 @@ streamlit_modal
 streamlit_authenticator
 streamlit_tree_select
 streamlit-aggrid==0.3.4
-msal==1.14.0 
-requests==2.26.0 
+msal
+requests
 git+https://github.com/streamlit/files-connection 
