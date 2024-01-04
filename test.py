@@ -51,7 +51,7 @@ headers = {
 response = requests.get(api_url, headers=headers)
 
 # Print the response
-print(response.json())
+st.write("Yes",response.json())
 
 
 s3 = boto3.client('s3')
