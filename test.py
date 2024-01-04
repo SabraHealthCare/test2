@@ -1209,7 +1209,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 
                 if new_tenant_account:
                     new_tenant_account_list=list(set(map(lambda x:x.strip(),new_tenant_account.split(",") )))
-                    duplicate_accounts=list(filter(lambda x:x.upper() in account_mapping['Tenant_Formated_Account'],new_tenant_account_list))
+                    st.write(new_tenant_account_list)
+                    duplicate_accounts=list(filter(lambda x:x.upper() in list(account_mapping['Tenant_Formated_Account']),new_tenant_account_list))
+                    st.write("duplicate_accounts",duplicate_accounts)
                     if len(duplicate_accounts)>1:
                         st.write("{} are already existed in mapping list and will be skip.".format(",".join(duplicate_accounts)))
                     elif len(duplicate_accounts)==1:
