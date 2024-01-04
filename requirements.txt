@@ -13,9 +13,6 @@ streamlit_tree_select
 streamlit-aggrid==0.3.4
 #sendgrid
 
-onedrivesdk==2.0.1
-# Active Directory Authentication Library
-adal==1.2.7  
-
-
+msal==1.14.0  # Replace with the version you want
+requests==2.26.0 
 git+https://github.com/streamlit/files-connection 
