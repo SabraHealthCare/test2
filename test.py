@@ -25,7 +25,7 @@ from msal import ConfidentialClientApplication
 # Your app registration details
 client_id = 'ba5ec75b-3fc0-4a7b-a6a4-cf21c33a36a4'
 client_secret = 'Q5m8Q~LjOn6iDYrGWBzI4TytPmG.hTvgEdWJmaFK'
-tenant_id = '0320f41e-ae52-4dde-b651-e3b02d5637c1'
+tenant_id = '71ffff7c-7e53-4daa-a503-f7b94631bd53'
 authority = 'https://login.microsoftonline.com/' + tenant_id
 
 # MSAL configuration
