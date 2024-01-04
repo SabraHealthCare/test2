@@ -21,7 +21,7 @@ from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 import requests
 #from msal #import ConfidentialClientApplication
-import msal
+#import msal
 # Microsoft Graph API endpoint for OneDrive
 graph_api_endpoint = 'https://graph.microsoft.com/v1.0/me/drive/root'
 
