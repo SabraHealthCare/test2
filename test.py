@@ -20,61 +20,37 @@ from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 
 import requests
-from urllib.parse import urlencode
+from msal import ConfidentialClientApplication
 
 # Your app registration details
-client_id = 'your_client_id'
-client_secret = 'your_client_secret'
-redirect_uri = 'your_redirect_uri'
-authorization_url = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize'
-token_url = 'https://login.microsoftonline.com/common/oauth2/v2.0/token'
 client_id = 'ba5ec75b-3fc0-4a7b-a6a4-cf21c33a36a4'
 client_secret = 'Q5m8Q~LjOn6iDYrGWBzI4TytPmG.hTvgEdWJmaFK'
-# Step 1: Get Authorization Code
-auth_params = {
-    'client_id': 'ba5ec75b-3fc0-4a7b-a6a4-cf21c33a36a4',
-    'redirect_uri': 'https://sabratest2.streamlit.app/callback',
-    'response_type': 'code',
-    'scope': 'offline_access User.Read Files.ReadWrite.All',
+tenant_id = '0320f41e-ae52-4dde-b651-e3b02d5637c1'
+authority = 'https://login.microsoftonline.com/' + tenant_id
+
+# MSAL configuration
+msal_app = ConfidentialClientApplication(
+    client_id,
+    authority=authority,
+    client_credential=client_secret,
+)
+
+# Acquire a token
+token_response = msal_app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
+
+# Use the access token to make requests to OneDrive API
+access_token = token_response['access_token']
+api_url = 'https://graph.microsoft.com/v1.0/me/drive/root'
+
+headers = {
+    'Authorization': 'Bearer ' + access_token,
+    'Content-Type': 'application/json',
 }
 
-auth_url = authorization_url + '?' + urlencode(auth_params)
-st.write(f'Please visit the following URL to authenticate: {auth_url}')
+response = requests.get(api_url, headers=headers)
 
-auth_code = input('Enter the authorization code from the redirect URL: ')
-
-# Step 2: Exchange Authorization Code for Access Token
-token_data = {
-    'grant_type': 'authorization_code',
-    'code': auth_code,
-    'redirect_uri': redirect_uri,
-    'client_id': client_id,
-    'client_secret': client_secret,
-}
-
-token_response = requests.post(token_url, data=token_data)
-access_token = token_response.json().get('access_token')
-
-# Step 3: Use Access Token to Access OneDrive API
-if access_token:
-    api_url = 'https://graph.microsoft.com/v1.0/me/drive/root'
-    headers = {
-        'Authorization': 'Bearer ' + access_token,
-        'Content-Type': 'application/json',
-    }
-
-    response = requests.get(api_url, headers=headers)
-
-    # Print the response
-    st.write(response.json())
-else:
-    st.write('Failed to obtain access token.')
-	
-
-
-
-
-
+# Print the response
+print(response.json())
 
 
 s3 = boto3.client('s3')
