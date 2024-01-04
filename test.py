@@ -1229,7 +1229,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                         #insert new records to the bottom line of account_mapping one by one
                         account_mapping = pd.concat([account_mapping, new_accounts_df], ignore_index=True)
 
-                    else len(new_tenant_account_list)==1:
+                    elif len(new_tenant_account_list)==1:
 	                #insert new record to the bottom line of account_mapping
                         account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[0],new_tenant_account_list[0].upper(),"N"]   
                     Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping,operator)
