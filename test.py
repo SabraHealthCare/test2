@@ -1219,8 +1219,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 		
 		    # remove duplicated accounts
                     new_tenant_account_list=list(set(new_tenant_account_list) - set(duplicate_accounts))
-                      	
-                    st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account)) 
+                    st.write(new_tenant_account_list) 	
+                    st.markdown("## Map **'{}'** to Sabra account".format(",".join(new_tenant_account_list))) 
                     Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(",".join(new_tenant_account_list))
                     
                     if len(new_tenant_account_list)>1:  # there is a list of new tenant accounts mapping to one sabra account
