@@ -18,10 +18,28 @@ import json
 import yaml
 from st_aggrid import AgGrid, GridUpdateMode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
-
-
 import requests
 from msal import ConfidentialClientApplication
+s3 = boto3.client('s3')
+
+
+#---------------------------define parameters--------------------------
+st.set_page_config(
+   initial_sidebar_state="expanded",
+    layout="wide")
+placeholder = st.empty()
+st.title("Sabra HealthCare Monthly Reporting App")
+sheet_name_discrepancy="Discrepancy_Review"
+bucket_mapping="sabramapping"
+bucket_PL="operatorpl"
+account_mapping_filename="Account_Mapping.csv"
+BPC_pull_filename="BPC_Pull.csv"
+entity_mapping_filename ="Entity_Mapping.csv"
+discrepancy_path="Total_Diecrepancy_Review.csv"
+monthly_reporting_path="Total monthly reporting.csv"
+operator_list_path="Operator_list.csv"
+BPC_account_path="Sabra_account_list.csv"
+
 
 # Your app registration details
 client_id = 'ba5ec75b-3fc0-4a7b-a6a4-cf21c33a36a4'
@@ -54,25 +72,6 @@ response = requests.get(api_url, headers=headers)
 st.write("Yes",response.json())
 
 
-s3 = boto3.client('s3')
-
-
-#---------------------------define parameters--------------------------
-st.set_page_config(
-   initial_sidebar_state="expanded",
-    layout="wide")
-placeholder = st.empty()
-st.title("Sabra HealthCare Monthly Reporting App")
-sheet_name_discrepancy="Discrepancy_Review"
-bucket_mapping="sabramapping"
-bucket_PL="operatorpl"
-account_mapping_filename="Account_Mapping.csv"
-BPC_pull_filename="BPC_Pull.csv"
-entity_mapping_filename ="Entity_Mapping.csv"
-discrepancy_path="Total_Diecrepancy_Review.csv"
-monthly_reporting_path="Total monthly reporting.csv"
-operator_list_path="Operator_list.csv"
-BPC_account_path="Sabra_account_list.csv"
 
 # no cache
 def Read_CSV_FromS3(bucket,key):
