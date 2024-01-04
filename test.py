@@ -19,56 +19,40 @@ from st_aggrid import AgGrid, GridUpdateMode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 
-from onedrivesdk.session import Session
-from onedrivesdk import Multipart, HttpProvider
-from adal import AuthenticationContext
+import requests
+from msal import ConfidentialClientApplication
 
-# OneDrive App Configuration
+# Microsoft Graph API endpoint for OneDrive
+graph_api_endpoint = 'https://graph.microsoft.com/v1.0/me/drive/root'
+
+# Your app registration details
 client_id = 'ba5ec75b-3fc0-4a7b-a6a4-cf21c33a36a4'
 client_secret = 'Q5m8Q~LjOn6iDYrGWBzI4TytPmG.hTvgEdWJmaFK'
-redirect_uri = 'https://sabratest2.streamlit.app/auth/callback'
-authority_url = 'https://login.microsoftonline.com/common'
-resource_url = 'https://graph.microsoft.com'
+tenant_id = 'your_tenant_id'
+authority = 'https://login.microsoftonline.com/' + tenant_id
 
-@st.cache(allow_output_mutation=True)
-def get_onedrive_session():
-    session = Session({
-        'client_id': client_id,
-        'client_secret': client_secret,
-        'redirect_uri': redirect_uri,
-        'authority_url': authority_url,
-        'resource_url': resource_url,
-        'http_provider': HttpProvider(),
-    })
+# Create a ConfidentialClientApplication
+app = ConfidentialClientApplication(
+    client_id,
+    authority=authority,
+    client_credential=client_secret
+)
 
-    auth_url = session.get_authorization_request_url(['wl.signin', 'wl.offline_access', 'onedrive.readwrite'])
-    return session, auth_url
+# Acquire a token
+token_response = app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
 
-def get_access_token(session, auth_code):
-    auth_context = AuthenticationContext(authority_url)
-    token_response = auth_context.acquire_token_with_authorization_code(
-        auth_code, redirect_uri, resource_url, client_id, client_secret
-    )
-    return token_response.get('accessToken')
+# Make a request to Microsoft Graph
+headers = {
+    'Authorization': 'Bearer ' + token_response['access_token'],
+    'Content-Type': 'application/json'
+}
 
-st.title("OneDrive Streamlit App")
+response = requests.get(graph_api_endpoint, headers=headers)
 
-session, auth_url = get_onedrive_session()
+# Print the response
+print(response.json())
 
-if 'auth_code' not in st.session_state:
-    st.warning("Please authenticate with OneDrive.")
-    st.write(f"[Click here to authenticate]({auth_url})")
-    if st.button("Enter Authentication Code"):
-        auth_code = st.text_input("Enter the authentication code from the redirect URL:")
-        if auth_code:
-            st.session_state.auth_code = auth_code
-            access_token = get_access_token(session, auth_code)
-            st.session_state.access_token = access_token
-            st.success("Authentication successful!")
-    st.stop()
 
-# Now you can use the 'session' and 'access_token' to interact with OneDrive API.
-# Add your code here to perform OneDrive operations.
 
 
 
