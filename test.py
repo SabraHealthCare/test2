@@ -1205,31 +1205,40 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             ChangeWidgetFontSize('Manage Account Mapping', '25px')
             col1,col2=st.columns(2)
             with col1:
-                new_tenant_account=st.text_input("Enter new tenant account and press enter to apply. For multiple accounts mapping to the same Sabra account, use commas to separate them. For example: Revenue_A,Revenue_B,Revenue_C")
+                new_tenant_account=st.text_input("Enter new tenant account and press enter to apply. If there are multiple accounts mapping to the same Sabra account, use commas to separate them. For example: Revenue_A,Revenue_B,Revenue_C")
                 
                 if new_tenant_account:
+                    new_tenant_account_list=list(set(map(lambda x:x.strip(),new_tenant_account.split(",") )))
+                    duplicate_accounts=list(filter(lambda x:x.upper() in new_account_mapping['Tenant_Formated_Account'],tenant_account_list))
+                    if len(duplicate_accounts)>1:
+                        st.write("{} are already existed in mapping list and will be skip.".format(",".join(duplicate_accounts)))
+                    elif len(duplicate_accounts)==1:
+                        st.write("{} is already existed in mapping list and will be skip.".format(duplicate_accounts[0]))
+		
+		    # remove duplicated accounts
+                    new_tenant_account_list=list(set(new_tenant_account_list) - set(duplicate_accounts))
+                      	
                     st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account)) 
-                    Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account)
+                    Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(",".join(new_tenant_account_list))
                     
-                    if "," in new_tenant_account:  # there is a list of new tenant accounts mapping to one sabra account
-                        new_tenant_account=new_tenant_account.split(",")
+                    if len(new_tenant_account_list)>1:  # there is a list of new tenant accounts mapping to one sabra account
                         new_row=[]
-                        for account_i in range(len(new_tenant_account)):
+                        for account_i in range(len(new_tenant_account_list)):
                             new_row.append([operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account[account_i],new_tenant_account[account_i].upper(),"N"])
                         new_accounts_df = pd.DataFrame(new_row, columns=account_mapping.columns)
                         #insert new records to the bottom line of account_mapping one by one
                         account_mapping = pd.concat([account_mapping, new_accounts_df], ignore_index=True)
 
-                        
-                    else:
+                    else len(new_tenant_account_list)==1:
 	                #insert new record to the bottom line of account_mapping
-                        account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account,new_tenant_account.upper(),"N"]   
+                        account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[0],new_tenant_account_list[0].upper(),"N"]   
                     Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping,operator)
+			
     elif choice=='Instructions':
-
         # insert Video
         video=s3.get_object(Bucket=bucket_mapping, Key="Sabra App video.mp4")
         st.video(BytesIO(video['Body'].read()), format="mp4", start_time=0)
+	    
     elif choice=="Edit Account": 
 	# update user details widget
         try:
