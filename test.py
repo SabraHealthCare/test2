@@ -19,38 +19,7 @@ from st_aggrid import AgGrid, GridUpdateMode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 
-import requests
-from msal import ConfidentialClientApplication
 
-# Your app registration details
-client_id = 'ba5ec75b-3fc0-4a7b-a6a4-cf21c33a36a4'
-client_secret = 'Q5m8Q~LjOn6iDYrGWBzI4TytPmG.hTvgEdWJmaFK'
-tenant_id = '71ffff7c-7e53-4daa-a503-f7b94631bd53'
-authority = 'https://login.microsoftonline.com/' + tenant_id
-
-# MSAL configuration
-msal_app = ConfidentialClientApplication(
-    client_id,
-    authority=authority,
-    client_credential=client_secret,
-)
-
-# Acquire a token
-token_response = msal_app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
-
-# Use the access token to make requests to OneDrive API
-access_token = token_response['access_token']
-api_url = 'https://graph.microsoft.com/v1.0/me/drive/root'
-
-headers = {
-    'Authorization': 'Bearer ' + access_token,
-    'Content-Type': 'application/json',
-}
-
-response = requests.get(api_url, headers=headers)
-
-# Print the response
-print(response.json())
 
 
 s3 = boto3.client('s3')
