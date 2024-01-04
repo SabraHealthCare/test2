@@ -12,10 +12,8 @@ streamlit_authenticator
 streamlit_tree_select
 streamlit-aggrid==0.3.4
 #sendgrid
-#Pillow
 
-onedrivesdk==2.1.2  
-
+onedrivesdk==2.0.1
 # Active Directory Authentication Library
 adal==1.2.7  
 
