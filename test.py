@@ -40,11 +40,10 @@ operator_list_path="Operator_list.csv"
 BPC_account_path="Sabra_account_list.csv"
 
 
-# App registration details for OneDrive
 client_id = 'ba5ec75b-3fc0-4a7b-a6a4-cf21c33a36a4'
 client_secret = 'Q5m8Q~LjOn6iDYrGWBzI4TytPmG.hTvgEdWJmaFK'
-tenant_id = '71ffff7c-7e53-4daa-a503-f7b94631bd53'
-authority = 'https://login.microsoftonline.com/' + tenant_id
+redirect_uri = 'https://sabra-test.streamlit.app/callback'
+authority = 'https://login.microsoftonline.com/71ffff7c-7e53-4daa-a503-f7b94631bd53'
 
 # MSAL configuration
 msal_app = ConfidentialClientApplication(
@@ -53,18 +52,14 @@ msal_app = ConfidentialClientApplication(
     client_credential=client_secret,
 )
 
-# Acquire a token
-token_response = msal_app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
+def get_access_token():
+    token_response = msal_app.acquire_token_by_authorization_code(
+        request.args['code'],
+        scopes=["https://graph.microsoft.com/.default"],
+        redirect_uri=redirect_uri,
+    )
+    return token_response['access_token']
 
-# Use the access token to make requests to OneDrive API
-access_token = token_response['access_token']
-api_url = 'https://graph.microsoft.com/v1.0/me/drive/root'
-
-headers = {
-    'Authorization': 'Bearer ' + access_token,
-    'Content-Type': 'application/json',
-}
-response = requests.get(api_url, headers=headers)
 
 def upload_file_to_onedrive(access_token, local_file_path, onedrive_folder_path):
     # Microsoft Graph API endpoint for uploading files
@@ -1215,8 +1210,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.stop()
 
 
-        
-        onedrive_folder_path = 'Documents'  # Specify the OneDrive folder where you want to save the file
+        access_token = get_access_token()
+        onedrive_folder_path = '/Documents'  # Specify the OneDrive folder where you want to save the file
         upload_file_to_onedrive(access_token, uploaded_finance.name, onedrive_folder_path)
         st.write("uploaded")
 	    
