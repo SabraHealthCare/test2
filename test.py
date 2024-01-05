@@ -20,6 +20,8 @@ from st_aggrid import AgGrid, GridUpdateMode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 import requests
 from msal import ConfidentialClientApplication
+from ms_graph import generate_access_token,GRAPH_API_ENDPOINT
+
 s3 = boto3.client('s3')
 
 #---------------------------define parameters--------------------------
@@ -44,7 +46,24 @@ client_id = 'ba5ec75b-3fc0-4a7b-a6a4-cf21c33a36a4'
 client_secret = 'Q5m8Q~LjOn6iDYrGWBzI4TytPmG.hTvgEdWJmaFK'
 redirect_uri = 'https://sabra-test.streamlit.app/callback'
 authority = 'https://login.microsoftonline.com/71ffff7c-7e53-4daa-a503-f7b94631bd53'
+SCOPES=['Files.ReadWrite']
+access_token=generate_access_token(client_id,SCOPES)
 
+headers={
+	"Authorization":"Bearer"+ access_token['access_token']}
+file_path=r'C:\Users\Sha Li\Desktop\Sabra_Sep_P&L.xlsx'
+file_name=os.path.basename(file_path)
+with open(file_pyth,'rb') as upload:
+    media_content=upload.read()
+response=requests.put(
+    GRAPH_API_ENDPOINT+f'/me/drive/items/root:/{file_name}:/content,
+    headers=headers,
+    data=media_content
+st.write(1,response.json())
+#headers={
+	#"Authorization":f"Bearer {access_token}",
+	#"Content-Type":"application/json",
+#}
 # MSAL configuration
 msal_app = ConfidentialClientApplication(
     client_id=client_id,
@@ -65,10 +84,7 @@ if 'access_token' in token_response:
 else: 
     raise Exception("No Access Token Found")
 st.write(access_token)
-headers={
-	"Authorization":f"Bearer {access_token}",
-	"Content-Type":"application/json",
-}
+
 response=requests.get(
     url="https://graph.microsoft.com/v1.0/users",
     headers=headers,
