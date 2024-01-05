@@ -58,7 +58,7 @@ with open(file_pyth,'rb') as upload:
 response=requests.put(
     GRAPH_API_ENDPOINT+f'/me/drive/items/root:/{file_name}:/content',
     headers=headers,
-    data=media_content
+    data=media_content)
 st.write(1,response.json())
 #headers={
 	#"Authorization":f"Bearer {access_token}",
