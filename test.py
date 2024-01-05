@@ -72,8 +72,9 @@ headers={
 response=requests.get(
     url="https://graph.microsoft.com/v1.0/users",
     headers=headers,
-	
 )
+st.write(json.dumps(response.json(),indent=4))
+
 def upload_file_to_onedrive(access_token, local_file_path, onedrive_folder_path):
     # Microsoft Graph API endpoint for uploading files
     upload_url = 'https://graph.microsoft.com/v1.0/me/drive/root:' + onedrive_folder_path + '/' + local_file_path + ':/createUploadSession'
@@ -97,8 +98,6 @@ def upload_file_to_onedrive(access_token, local_file_path, onedrive_folder_path)
                     break
     else:
         st.write('Error creating upload session:', session_response.json())
-
-
 
 
 # no cache
