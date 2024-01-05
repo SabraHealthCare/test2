@@ -52,14 +52,14 @@ msal_app = ConfidentialClientApplication(
     client_credential=client_secret,
 )
 
-token_response = msal_app.acquire_token_silent(
+token_response =msal_app.acquire_token_silent(
         #request.args['code'],
         scopes=["https://graph.microsoft.com/.default"],
 	account=None,
         #redirect_uri=redirect_uri,
 )
 if not token_response:
-    token_response = msal_app.acquire_token_slient(scopes=["https://graph.microsoft.com/.default"])
+    token_response = msal_app.acquire_token_silent(scopes=["https://graph.microsoft.com/.default"])
 if 'access_token' in token_response:
     access_token=token_response['access_token']
 else: 
