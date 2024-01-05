@@ -59,7 +59,7 @@ token_response =msal_app.acquire_token_silent(
         #redirect_uri=redirect_uri,
 )
 if not token_response:
-    token_response = msal_app.acquire_token_silent(scopes=["https://graph.microsoft.com/.default"])
+    token_response = msal_app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
 if 'access_token' in token_response:
     access_token=token_response['access_token']
 else: 
