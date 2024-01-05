@@ -64,12 +64,7 @@ headers = {
     'Authorization': 'Bearer ' + access_token,
     'Content-Type': 'application/json',
 }
-
 response = requests.get(api_url, headers=headers)
-
-# Print the response
-st.write("Yes",response.json())
-
 
 def upload_file_to_onedrive(access_token, local_file_path, onedrive_folder_path):
     # Microsoft Graph API endpoint for uploading files
@@ -1221,7 +1216,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
 
         
-        onedrive_folder_path = '/Public Files/Portfolio Management/Data Analyst Group/01. PowerBi Master/01. Published/SHM_Proporties summary'  # Specify the OneDrive folder where you want to save the file
+        onedrive_folder_path = 'Documents'  # Specify the OneDrive folder where you want to save the file
         upload_file_to_onedrive(access_token, uploaded_finance.name, onedrive_folder_path)
         st.write("uploaded")
 	    
