@@ -22,7 +22,6 @@ import requests
 from msal import ConfidentialClientApplication
 s3 = boto3.client('s3')
 
-
 #---------------------------define parameters--------------------------
 st.set_page_config(
    initial_sidebar_state="expanded",
@@ -41,7 +40,7 @@ operator_list_path="Operator_list.csv"
 BPC_account_path="Sabra_account_list.csv"
 
 
-# Your app registration details
+# App registration details for OneDrive
 client_id = 'ba5ec75b-3fc0-4a7b-a6a4-cf21c33a36a4'
 client_secret = 'Q5m8Q~LjOn6iDYrGWBzI4TytPmG.hTvgEdWJmaFK'
 tenant_id = '71ffff7c-7e53-4daa-a503-f7b94631bd53'
@@ -70,6 +69,32 @@ response = requests.get(api_url, headers=headers)
 
 # Print the response
 st.write("Yes",response.json())
+
+
+def upload_file_to_onedrive(access_token, local_file_path, onedrive_folder_path):
+    # Microsoft Graph API endpoint for uploading files
+    upload_url = 'https://graph.microsoft.com/v1.0/me/drive/root:' + onedrive_folder_path + '/' + local_file_path + ':/createUploadSession'
+
+    # Create the upload session
+    session_response = requests.post(upload_url, headers={'Authorization': 'Bearer ' + access_token})
+
+    if session_response.status_code == 200:
+        upload_url = session_response.json()['uploadUrl']
+
+        # Upload the file in chunks
+        with open(local_file_path, 'rb') as file:
+            while True:
+                chunk = file.read(327680)  # 320 KB chunk size (adjust as needed)
+                if not chunk:
+                    break
+                chunk_response = requests.put(upload_url, headers={'Authorization': 'Bearer ' + access_token, 'Content-Range': f'bytes {file.tell() - len(chunk)}-{file.tell() - 1}/{file.tell()}'}, data=chunk)
+
+                if chunk_response.status_code != 202:
+                    print('Error uploading chunk:', chunk_response.json())
+                    break
+    else:
+        print('Error creating upload session:', session_response.json())
+
 
 
 
@@ -1193,6 +1218,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         else:
             st.write("P&L wasn't upload.")
             st.stop()
+
+
+        
+        onedrive_folder_path = '/Documents'  # Specify the OneDrive folder where you want to save the file
+        upload_file_to_onedrive(access_token, uploaded_finance.name, onedrive_folder_path)
+
+	    
         if BS_separate_excel=="Y" and uploaded_BS:
             with col2:
                 st.markdown("✔️ :green[Balance sheet selected]")
