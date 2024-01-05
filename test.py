@@ -90,10 +90,10 @@ def upload_file_to_onedrive(access_token, local_file_path, onedrive_folder_path)
                 chunk_response = requests.put(upload_url, headers={'Authorization': 'Bearer ' + access_token, 'Content-Range': f'bytes {file.tell() - len(chunk)}-{file.tell() - 1}/{file.tell()}'}, data=chunk)
 
                 if chunk_response.status_code != 202:
-                    print('Error uploading chunk:', chunk_response.json())
+                    st.error('Error uploading chunk:', chunk_response.json())
                     break
     else:
-        print('Error creating upload session:', session_response.json())
+        st.error('Error creating upload session:', session_response.json())
 
 
 
@@ -1221,9 +1221,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
 
         
-        onedrive_folder_path = '/Documents'  # Specify the OneDrive folder where you want to save the file
+        onedrive_folder_path = '/Public Files/Portfolio Management/Data Analyst Group/01. PowerBi Master/01. Published/SHM_Proporties summary'  # Specify the OneDrive folder where you want to save the file
         upload_file_to_onedrive(access_token, uploaded_finance.name, onedrive_folder_path)
-
+        st.write("uploaded")
 	    
         if BS_separate_excel=="Y" and uploaded_BS:
             with col2:
