@@ -90,10 +90,10 @@ def upload_file_to_onedrive(access_token, local_file_path, onedrive_folder_path)
                 chunk_response = requests.put(upload_url, headers={'Authorization': 'Bearer ' + access_token, 'Content-Range': f'bytes {file.tell() - len(chunk)}-{file.tell() - 1}/{file.tell()}'}, data=chunk)
 
                 if chunk_response.status_code != 202:
-                    st.error('Error uploading chunk:', chunk_response.json())
+                    st.write('Error uploading chunk:', chunk_response.json())
                     break
     else:
-        st.error('Error creating upload session:', session_response.json())
+        st.write('Error creating upload session:', session_response.json())
 
 
 
