@@ -17,6 +17,6 @@ streamlit-aggrid==0.3.4
 streamlit_authenticator
 sendgrid
 Pillow
-msal=1.18.0
+msal==1.18.0
 requests
 git+https://github.com/streamlit/files-connection 
