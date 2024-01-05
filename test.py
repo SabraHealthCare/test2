@@ -47,20 +47,34 @@ authority = 'https://login.microsoftonline.com/71ffff7c-7e53-4daa-a503-f7b94631b
 
 # MSAL configuration
 msal_app = ConfidentialClientApplication(
-    client_id,
+    client_id=client_id,
     authority=authority,
     client_credential=client_secret,
 )
 
-def get_access_token():
-    token_response = msal_app.acquire_token_by_authorization_code(
-        request.args['code'],
+token_response = msal_app.acquire_token_cilent(
+        #request.args['code'],
         scopes=["https://graph.microsoft.com/.default"],
-        redirect_uri=redirect_uri,
-    )
-    return token_response['access_token']
-
-
+	account=None,
+        #redirect_uri=redirect_uri,
+)
+if not token_response:
+    
+token_response = msal_app.acquire_token_client(scopes=["https://graph.microsoft.com/.default"])
+if 'access_token' in token_response:
+    access_token=token_response['access_token']
+else: 
+    raise Exception("No Access Token Found")
+st.write(access_token)
+headers={
+	"Authorization":f"Bearer {access_token}",
+	"Content-Type":"application/json",
+}
+response=requests.get(
+    url="https://graph.microsoft.com/v1.0/users",
+    headers=headers,
+	
+)
 def upload_file_to_onedrive(access_token, local_file_path, onedrive_folder_path):
     # Microsoft Graph API endpoint for uploading files
     upload_url = 'https://graph.microsoft.com/v1.0/me/drive/root:' + onedrive_folder_path + '/' + local_file_path + ':/createUploadSession'
