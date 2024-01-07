@@ -60,10 +60,10 @@ response=requests.put(
     headers=headers,
     data=media_content)
 st.write(1,response.json())
-#headers={
-	#"Authorization":f"Bearer {access_token}",
-	#"Content-Type":"application/json",
-#}
+headers={
+	"Authorization":f"Bearer {access_token}",
+	"Content-Type":"application/json",
+}
 # MSAL configuration
 msal_app = ConfidentialClientApplication(
     client_id=client_id,
