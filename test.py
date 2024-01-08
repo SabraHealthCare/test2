@@ -67,7 +67,7 @@ headers = {
 }
 
 response = requests.get(
-    url="https://graph.microsoft.com/v1.0/.default",
+    url = "https://graph.microsoft.com/.default",
     headers=headers,
 )
 
