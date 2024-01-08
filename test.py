@@ -73,7 +73,13 @@ response = requests.get(
 
 # Process the API response as needed
 st.write("API Response:", response.status_code, response.json())
-
+if response.status_code == 403:
+    st.write("Authorization_RequestDenied: Insufficient privileges to complete the operation.")
+    # You may want to log the details from the response for further investigation
+    st.write("API Response:", response.status_code, response.json())
+else:
+    # Process the API response for other status codes
+    st.write("API Response:", response.status_code, response.json())
 def upload_file_to_onedrive(access_token, local_file_path, onedrive_folder_path):
     # Microsoft Graph API endpoint for uploading files
     upload_url = 'https://graph.microsoft.com/v1.0/me/drive/root:' + onedrive_folder_path + '/' + local_file_path + ':/createUploadSession'
