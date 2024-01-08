@@ -64,6 +64,7 @@ token_response =msal_app.acquire_token_silent(
         #redirect_uri=redirect_uri,
 )
 if not token_response:
+    st.write("No token")
     token_response = msal_app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
 if 'access_token' in token_response:
     access_token=token_response['access_token']
@@ -72,7 +73,6 @@ else:
 st.write("Token:",access_token)
 headers={
 	"Authorization":f"Bearer {access_token}",
-	#"Content-Type":"Delegated/json",
 }
 response=requests.get(
     url="https://graph.microsoft.com/v1.0/users",
