@@ -40,8 +40,6 @@ monthly_reporting_path="Total monthly reporting.csv"
 operator_list_path="Operator_list.csv"
 BPC_account_path="Sabra_account_list.csv"
 
-
-
 client_id = 'ba5ec75b-3fc0-4a7b-a6a4-cf21c33a36a4'
 client_secret = 'Q5m8Q~LjOn6iDYrGWBzI4TytPmG.hTvgEdWJmaFK'
 redirect_uri = 'https://sabra-test.streamlit.app/callback'
@@ -66,16 +64,14 @@ headers = {
     "Authorization": f"Bearer {access_token}",
 }
 
+# Adjust the API endpoint for OneDrive
 response = requests.get(
-    url="https://graph.microsoft.com/v1.0/users",
+    url="https://graph.microsoft.com/v1.0/me/drive/root/children",
     headers=headers,
 )
 
 # Process the API response as needed
 st.write("response", response.json())
-
-
-
 
 
 
