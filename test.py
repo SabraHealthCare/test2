@@ -69,7 +69,7 @@ if 'access_token' in token_response:
     access_token=token_response['access_token']
 else: 
     raise Exception("No Access Token Found")
-st.write("get token",access_token)
+st.write("Token:",access_token)
 headers={
 	"Authorization":f"Bearer {access_token}",
 	"Content-Type":"application/json",
