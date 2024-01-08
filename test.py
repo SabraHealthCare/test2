@@ -1236,10 +1236,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.stop()
 
 
-        access_token = get_access_token()
-        onedrive_folder_path = '/Documents'  # Specify the OneDrive folder where you want to save the file
-        upload_file_to_onedrive(access_token, uploaded_finance.name, onedrive_folder_path)
-        st.write("uploaded")
+ 
+        #onedrive_folder_path = '/Documents'  # Specify the OneDrive folder where you want to save the file
+        #upload_file_to_onedrive(access_token, uploaded_finance.name, onedrive_folder_path)
+        #st.write("uploaded")
 	    
         if BS_separate_excel=="Y" and uploaded_BS:
             with col2:
