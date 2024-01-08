@@ -20,8 +20,7 @@ from st_aggrid import AgGrid, GridUpdateMode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 import requests
 from msal import ConfidentialClientApplication
-from ms_graph import generate_access_token,GRAPH_API_ENDPOINT
-import json
+#from ms_graph import generate_access_token,GRAPH_API_ENDPOINT
 s3 = boto3.client('s3')
 
 #---------------------------define parameters--------------------------
