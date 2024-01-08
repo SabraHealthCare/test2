@@ -72,7 +72,7 @@ else:
 st.write("Token:",access_token)
 headers={
 	"Authorization":f"Bearer {access_token}",
-	"Content-Type":"Delegated/json",
+	#"Content-Type":"Delegated/json",
 }
 response=requests.get(
     url="https://graph.microsoft.com/v1.0/users",
