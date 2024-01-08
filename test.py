@@ -49,10 +49,7 @@ SCOPES=['Files.ReadWrite']
 
 
 
-headers={
-	"Authorization":f"Bearer {access_token}",
-	"Content-Type":"application/json",
-}
+
 # MSAL configuration
 msal_app = ConfidentialClientApplication(
     client_id=client_id,
@@ -73,7 +70,10 @@ if 'access_token' in token_response:
 else: 
     raise Exception("No Access Token Found")
 st.write(access_token)
-
+headers={
+	"Authorization":f"Bearer {access_token}",
+	"Content-Type":"application/json",
+}
 response=requests.get(
     url="https://graph.microsoft.com/v1.0/users",
     headers=headers,
