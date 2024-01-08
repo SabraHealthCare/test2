@@ -49,27 +49,42 @@ SCOPES=['Files.ReadWrite']
 
 
 
-
-# MSAL configuration
 msal_app = ConfidentialClientApplication(
-    client_id=client_id,
+    client_id,
     authority=authority,
-    client_credential=client_secret,
+    client_credential=client_secret
 )
 
-token_response =msal_app.acquire_token_silent(
-        #request.args['code'],
-        scopes=["https://graph.microsoft.com/.default"],
-	account=None,
-        #redirect_uri=redirect_uri,
+# Acquire a token for the client
+token_response = msal_app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
+
+# Extract the access token from the token response
+access_token = token_response['access_token']
+
+# Use the access token in your API request
+headers = {
+    "Authorization": f"Bearer {access_token}",
+}
+
+response = requests.get(
+    url="https://graph.microsoft.com/v1.0/users",
+    headers=headers,
 )
-if not token_response:
-    st.write("No token")
-    token_response = msal_app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
-if 'access_token' in token_response:
-    access_token=token_response['access_token']
-else: 
-    raise Exception("No Access Token Found")
+
+# Process the API response as needed
+print(response.json())
+
+
+
+
+
+
+
+
+
+
+
+
 st.write("Token:",access_token)
 headers={
 	"Authorization":f"Bearer {access_token}",
