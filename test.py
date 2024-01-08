@@ -72,7 +72,7 @@ response = requests.get(
 )
 
 # Process the API response as needed
-print(response.json())
+print("response",response.json())
 
 
 
