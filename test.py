@@ -41,13 +41,12 @@ operator_list_path="Operator_list.csv"
 BPC_account_path="Sabra_account_list.csv"
 
 
+
 client_id = 'ba5ec75b-3fc0-4a7b-a6a4-cf21c33a36a4'
 client_secret = 'Q5m8Q~LjOn6iDYrGWBzI4TytPmG.hTvgEdWJmaFK'
 redirect_uri = 'https://sabra-test.streamlit.app/callback'
 authority = 'https://login.microsoftonline.com/71ffff7c-7e53-4daa-a503-f7b94631bd53'
-SCOPES=['Files.ReadWrite']
-
-
+SCOPES = ['Files.ReadWrite']
 
 msal_app = ConfidentialClientApplication(
     client_id,
@@ -60,7 +59,8 @@ token_response = msal_app.acquire_token_for_client(scopes=["https://graph.micros
 
 # Extract the access token from the token response
 access_token = token_response['access_token']
-st.write("Token:",access_token)
+st.write("Token:", access_token)
+
 # Use the access token in your API request
 headers = {
     "Authorization": f"Bearer {access_token}",
@@ -72,8 +72,7 @@ response = requests.get(
 )
 
 # Process the API response as needed
-st.write("response",response.json())
-
+st.write("response", response.json())
 
 
 
