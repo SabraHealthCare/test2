@@ -50,7 +50,7 @@ BPC_account_path="Sabra_account_list.csv"
 
 
 client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
-client_secret = 'rLJ8Q~ZyaxjT471np5TwGAYCkYqBjxacOHfb1bbJ'
+client_secret = '1h28Q~Tw-xwTMPW9w0TqjbeaOhkYVDrDQ8VHcbkd'
 redirect_uri = 'https://sabra-test.streamlit.app/auth-callback'
 authority = 'https://login.microsoftonline.com/71ffff7c-7e53-4daa-a503-f7b94631bd53'
 SCOPES = ['User.Read']
