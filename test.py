@@ -60,7 +60,7 @@ token_response = msal_app.acquire_token_for_client(scopes=["https://graph.micros
 
 # Extract the access token from the token response
 access_token = token_response['access_token']
-
+st.write("Token:",access_token)
 # Use the access token in your API request
 headers = {
     "Authorization": f"Bearer {access_token}",
@@ -79,21 +79,6 @@ print(response.json())
 
 
 
-
-
-
-
-
-
-st.write("Token:",access_token)
-headers={
-	"Authorization":f"Bearer {access_token}",
-}
-response=requests.get(
-    url="https://graph.microsoft.com/v1.0/users",
-    headers=headers,
-)
-st.write(json.dumps(response.json(),indent=4))
 
 def upload_file_to_onedrive(access_token, local_file_path, onedrive_folder_path):
     # Microsoft Graph API endpoint for uploading files
