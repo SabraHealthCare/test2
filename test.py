@@ -67,13 +67,12 @@ headers = {
 }
 
 response = requests.get(
-    url = "https://graph.microsoft.com/.default",
+    url="https://graph.microsoft.com/v1.0/me",
     headers=headers,
 )
 
 # Process the API response as needed
-st.write("response", response.json())
-
+st.write("API Response:", response.status_code, response.json())
 
 def upload_file_to_onedrive(access_token, local_file_path, onedrive_folder_path):
     # Microsoft Graph API endpoint for uploading files
