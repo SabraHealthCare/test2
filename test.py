@@ -1287,7 +1287,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             if len(previous_month_list)>0:		
                 View_Discrepancy(percent_discrepancy_accounts)
                 View_Discrepancy_Detail()
-	    else:
+            else:
                 st.write("There is no previous month data in tenant P&L")
     elif choice=="Manage Mapping":
         with st.expander("Manage Property Mapping" ,expanded=True):
