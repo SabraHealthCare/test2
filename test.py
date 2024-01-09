@@ -595,29 +595,29 @@ def Manage_Entity_Mapping(operator):
         with col4:
             st.write("Balance sheet Sheetname")  
         i=0
-        for entity_i in entity_mapping.index:
+        for entity in entity_mapping.index:
             col1,col2,col3,col4=st.columns([4,3,3,3])
             with col1:
                 st.write("")
-                st.write(entity_mapping.loc[entity_i,"Property_Name"])
+                st.write(entity_mapping.loc[entity,"Property_Name"])
             with col2:
-                entity_mapping_updation.loc[i,"Sheet_Name_Finance"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Finance"],key="P&L"+entity_i)    
+                entity_mapping_updation.loc[i,"Sheet_Name_Finance"]=st.text_input("",placeholder =entity_mapping.loc[entity,"Sheet_Name_Finance"],key="P&L"+entity)    
             with col3: 
-                entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="Census"+entity_i)     
+                entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping.loc[entity,"Sheet_Name_Occupancy"],key="Census"+entity)     
             with col4:
-                entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
+                entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping.loc[entity,"Sheet_Name_Balance_Sheet"],key="BS"+entity) 
             i+=1 
         submitted = st.form_submit_button("Submit")
             
     if submitted:
         i=0
-        for entity_i in entity_mapping.index:
+        for entity in entity_mapping.index:
             if entity_mapping_updation.loc[i,"Sheet_Name_Finance"]:
-                entity_mapping.loc[entity_i,"Sheet_Name_Finance"]=entity_mapping_updation.loc[i,"Sheet_Name_Finance"] 
+                entity_mapping.loc[entity,"Sheet_Name_Finance"]=entity_mapping_updation.loc[i,"Sheet_Name_Finance"] 
             if entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]:
-                entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"]=entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]
+                entity_mapping.loc[entity,"Sheet_Name_Occupancy"]=entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]
             if  entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"]:
-                entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]=entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"] 
+                entity_mapping.loc[entity,"Sheet_Name_Balance_Sheet"]=entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"] 
             i+=1
         st.write(entity_mapping)
         download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
@@ -904,7 +904,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
     if diff_BPC_PL.shape[0]>0:
         st.error("{0:.1f}% P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.".format(percent_discrepancy_accounts*100))
         diff_BPC_PL["Operator"]=operator
-        diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["ENTITY","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
+        diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
 	# insert dim to diff_BPC_PL
         diff_BPC_PL["TIME"]=diff_BPC_PL["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
         Update_File_inS3(bucket_PL,discrepancy_path,diff_BPC_PL,operator,"P&L")
