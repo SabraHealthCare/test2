@@ -897,6 +897,7 @@ def EPM_Formula(data,value_name): # make sure there is no col on index for data
         data.loc[r-2,"Upload_Check"]=upload_check_formula
     data["""="Consistence check:"&AND({}2:{}{})""".format(upload_Check_col_letter,upload_Check_col_letter,row_size+1)]=""
     return data
+
 def View_Discrepancy_Detail():
     global diff_BPC_PL,diff_BPC_PL_detail,Total_PL_detail,Total_PL
     # Sabra detail accounts mapping table
@@ -946,6 +947,7 @@ def View_Discrepancy_Detail():
             download_report(Total_PL_detail.reset_index(drop=False),"Full mapping_{}".format(operator))
         with col2:
             download_report(diff_BPC_PL_detail_for_download,"accounts mapping for discrepancy_{}".format(operator))
+
 # don't use cache
 def View_Discrepancy(percent_discrepancy_accounts): 
     global diff_BPC_PL
@@ -998,7 +1000,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
                     # insert comments to diff_BPC_PL
                     diff_BPC_PL=pd.merge(diff_BPC_PL,edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Type comments below"]],on=["Property_Name","TIME","Sabra_Account_Full_Name"],how="left")
                     Update_File_inS3(bucket_PL,discrepancy_path,diff_BPC_PL,operator,"P&L")
-	View_Discrepancy_Detail()
+            View_Discrepancy_Detail()
         else:
             st.success("All previous data in P&L ties with Sabra data")
   
