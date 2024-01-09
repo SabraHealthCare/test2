@@ -916,7 +916,7 @@ def View_Discrepancy_Detail():
 			rename(columns={"Property_Name":"Property","Sabra_Account_Full_Name":"Sabra Account"})
         return diff_BPC_PL_detail
     if diff_BPC_PL.shape[0]>0:      
-        diff_BPC_PL_detail=Diff_Detail_Process(diff_BPC_PL_detail)    
+        diff_BPC_PL_detail=Diff_Detail_Process(diff_BPC_PL_detail)    # format it to display
         diff_BPC_PL_detail_for_download=diff_BPC_PL_detail.copy()
         
         diff_BPC_PL_detail=filters_widgets(diff_BPC_PL_detail,["Property","Month","Sabra Account"],"Horizontal")
@@ -957,7 +957,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
         # save all the discrepancy 
         diff_BPC_PL["Operator"]=operator
         diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
-	# insert dim to diff_BPC_PL
+	# insert dims to diff_BPC_PL
         diff_BPC_PL["TIME"]=diff_BPC_PL["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
         Update_File_inS3(bucket_PL,discrepancy_path,diff_BPC_PL,operator,"P&L")
 
@@ -1006,8 +1006,6 @@ def View_Discrepancy(percent_discrepancy_accounts):
             View_Discrepancy_Detail()
         else:
             st.success("All previous data in P&L ties with Sabra data")
-  
-
    
 @st.cache_data(experimental_allow_widgets=True)        
 def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
