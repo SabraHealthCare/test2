@@ -1269,7 +1269,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
-            st.write(Total_PL)
+        st.write(Total_PL)
         
         with st.spinner('Wait for data checking'):    
             latest_month=Check_Reporting_Month(Total_PL)  
