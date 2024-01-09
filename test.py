@@ -545,7 +545,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
         # only one month in header:month and year must exist for one month header
         elif month_count[month_sort_index[month_index_i]]==1:
             # month and year must match 
-            st.write("There is only one month in sheet——'"+sheet_name+"'")
+            #st.write("There is only one month in sheet——'"+sheet_name+"'")
             col_month=0
             #find the col number of month
             while(month_table.iloc[month_sort_index[month_index_i],col_month]==0):
