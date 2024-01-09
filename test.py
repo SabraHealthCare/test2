@@ -951,17 +951,20 @@ def View_Discrepancy_Detail():
 # don't use cache
 def View_Discrepancy(percent_discrepancy_accounts): 
     global diff_BPC_PL
-    if diff_BPC_PL.shape[0]>0:
-        st.error("{0:.1f}% P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.".format(percent_discrepancy_accounts*100))
+    edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>10] 
+	
+    if percent_discrepancy_accounts>0:
+        # save all the discrepancy 
         diff_BPC_PL["Operator"]=operator
         diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
 	# insert dim to diff_BPC_PL
         diff_BPC_PL["TIME"]=diff_BPC_PL["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
         Update_File_inS3(bucket_PL,discrepancy_path,diff_BPC_PL,operator,"P&L")
 
-	
+	# only display the big discrepancy
         edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>10] 
         if edited_diff_BPC_PL.shape[0]>0:
+            st.error("{0:.1f}% P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.".format(percent_discrepancy_accounts*100))
             edited_diff_BPC_PL["Type comments below"]=""
             edited_diff_BPC_PL = st.data_editor(
 	    edited_diff_BPC_PL,
