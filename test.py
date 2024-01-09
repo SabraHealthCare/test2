@@ -718,9 +718,13 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
     
     if len(month_list)>2:  # only compare 2 months
         month_list=month_list[-2:]
+	    
     for entity in entity_mapping.index:
-        for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
-            for timeid in month_list: 
+        for timeid in month_list: 
+	    # if this entity don't have data for this timeid(new/transferred property), skip to next month
+            if all(Total_PL.loc[entity,][timeid]!=Total_PL.loc[entity,][timeid]):
+                break
+            for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
                 try:
                     BPC_value=int(BPC_pull.loc[entity,matrix][timeid+'00'])
                 except:
