@@ -1244,7 +1244,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
  
         #onedrive_folder_path = '/Documents'  # Specify the OneDrive folder where you want to save the file
         #upload_file_to_onedrive(access_token, uploaded_finance.name, onedrive_folder_path)
-        #st.write("uploaded")
+ 
 	    
         if BS_separate_excel=="Y" and uploaded_BS:
             with col2:
@@ -1259,24 +1259,18 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             # process Finance 
             with st.spinner('Wait for P&L process'):
-
                 Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
 		# process BS 
                 Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
-
-
             
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
-        st.write(Total_PL)
         
         with st.spinner('Wait for data checking'):    
             latest_month=Check_Reporting_Month(Total_PL)  
             previous_month_list=[month for month in Total_PL.columns.sort_values() if month<latest_month]
-            st.write(previous_month_list)
-            if len(previous_month_list)>0:   # there are previous month in P&L
-                st.write(1,previous_month_list)
+            if len(previous_month_list)>0:   # there are previous months in P&L
                 diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month,previous_month_list)
 
 	# 1 Summary
