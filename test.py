@@ -711,15 +711,16 @@ def Map_PL_Sabra(PL,entity):
     return PL,PL_with_detail
     
 @st.cache_data
-def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
+def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
     PL_with_detail=PL_with_detail.reset_index(drop=False)
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)","Diff_Percent"])
     diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","Sabra","P&L Value","Diff (Sabra-P&L)",""])
-
-
+    
+    if len(month_list)>2:  # only compare 2 months
+        month_list=month_list[-2:]
     for entity in entity_mapping.index:
         for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
-            for timeid in [t for t in Total_PL.columns.sort_values() if t<latest_month][-2:]: # only compare two months
+            for timeid in month_list: 
                 try:
                     BPC_value=int(BPC_pull.loc[entity,matrix][timeid+'00'])
                 except:
@@ -1266,8 +1267,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
         
         with st.spinner('Wait for data checking'):    
-            latest_month=Check_Reporting_Month(Total_PL)    
-            diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month)
+            latest_month=Check_Reporting_Month(Total_PL)  
+            previous_month_list=[month for month in Total_PL.columns.sort_values() if month<latest_month]
+            if len(previous_month_list)>0:   # there are previous month in P&L
+                diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month,previous_month_list)
 
 	# 1 Summary
         with st.expander("Summary of P&L" ,expanded=True):
@@ -1277,9 +1280,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         # 2 Discrepancy of Historic Data
         with st.expander("Discrepancy for Historic Data",expanded=True):
             ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-            View_Discrepancy(percent_discrepancy_accounts)
-            View_Discrepancy_Detail()
-               
+            if len(previous_month_list)>0:		
+                View_Discrepancy(percent_discrepancy_accounts)
+                View_Discrepancy_Detail()
+	    else:
+                st.write("There is no previous month data in tenant P&L")
     elif choice=="Manage Mapping":
         with st.expander("Manage Property Mapping" ,expanded=True):
             ChangeWidgetFontSize('Manage Property Mapping', '25px')
