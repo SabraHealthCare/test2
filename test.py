@@ -897,61 +897,6 @@ def EPM_Formula(data,value_name): # make sure there is no col on index for data
         data.loc[r-2,"Upload_Check"]=upload_check_formula
     data["""="Consistence check:"&AND({}2:{}{})""".format(upload_Check_col_letter,upload_Check_col_letter,row_size+1)]=""
     return data
-
-# don't use cache
-def View_Discrepancy(percent_discrepancy_accounts): 
-    global diff_BPC_PL
-    if diff_BPC_PL.shape[0]>0:
-        st.error("{0:.1f}% P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.".format(percent_discrepancy_accounts*100))
-        diff_BPC_PL["Operator"]=operator
-        diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
-	# insert dim to diff_BPC_PL
-        diff_BPC_PL["TIME"]=diff_BPC_PL["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
-        Update_File_inS3(bucket_PL,discrepancy_path,diff_BPC_PL,operator,"P&L")
-	    
-        edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>10]  
-        edited_diff_BPC_PL["Type comments below"]=""
-        edited_diff_BPC_PL = st.data_editor(
-	edited_diff_BPC_PL,
-	width = 1200,
-	column_order=("Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)","Type comments below"),
-	hide_index=True,
-	disabled=("Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"),
-	column_config={
-       		"Sabra_Account_Full_Name": "Sabra_Account",
-       		 "Property_Name": "Property",
-		 "TIME":"Month",
-		"P&L":st.column_config.TextColumn(
-			"Tenant P&L",help="Tenant P&L is aggregated by detail tenant accounts connected with 'Sabra Account'"),
-        	"Diff (Sabra-P&L)": st.column_config.TextColumn(
-            		"Diff (Sabra-P&L)",help="Diff = Sabra-TenantP&L"),
-		"Sabra": st.column_config.TextColumn(
-            		"Sabra",help="Sabra data for previous month"),
-		 "Type comments below":st.column_config.TextColumn(
-            		"Type comments below",
-            		help="Please provide an explanation and solution on discrepancy, like: confirm the changed. overwrite Sabra data with new one...",
-			disabled =False,
-            		required =False)
-		}) 
-	       
-        col1,col2,col3=st.columns([2,2,4]) 
-        with col1:                        
-            download_report(edited_diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)","Type comments below"]],"discrepancy_{}".format(operator))
-        
-        with col2:    
-            submit_com=st.button("Submit comments")
-        if submit_com:
-            with st.empty():
-                with col3:
-                    st.markdown("✔️ :green[Comments uploaded]")
-                    st.write(" ")
-                # insert comments to diff_BPC_PL
-                diff_BPC_PL=pd.merge(diff_BPC_PL,edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Type comments below"]],on=["Property_Name","TIME","Sabra_Account_Full_Name"],how="left")
-                Update_File_inS3(bucket_PL,discrepancy_path,diff_BPC_PL,operator,"P&L")
-	
-    else:
-        st.success("All previous data in P&L ties with Sabra data")
-  
 def View_Discrepancy_Detail():
     global diff_BPC_PL,diff_BPC_PL_detail,Total_PL_detail,Total_PL
     # Sabra detail accounts mapping table
@@ -1001,6 +946,63 @@ def View_Discrepancy_Detail():
             download_report(Total_PL_detail.reset_index(drop=False),"Full mapping_{}".format(operator))
         with col2:
             download_report(diff_BPC_PL_detail_for_download,"accounts mapping for discrepancy_{}".format(operator))
+# don't use cache
+def View_Discrepancy(percent_discrepancy_accounts): 
+    global diff_BPC_PL
+    if diff_BPC_PL.shape[0]>0:
+        st.error("{0:.1f}% P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.".format(percent_discrepancy_accounts*100))
+        diff_BPC_PL["Operator"]=operator
+        diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
+	# insert dim to diff_BPC_PL
+        diff_BPC_PL["TIME"]=diff_BPC_PL["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
+        Update_File_inS3(bucket_PL,discrepancy_path,diff_BPC_PL,operator,"P&L")
+
+	
+        edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>10] 
+        if edited_diff_BPC_PL.shape[0]>0:
+            edited_diff_BPC_PL["Type comments below"]=""
+            edited_diff_BPC_PL = st.data_editor(
+	    edited_diff_BPC_PL,
+	    width = 1200,
+	    column_order=("Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)","Type comments below"),
+	    hide_index=True,
+	    disabled=("Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"),
+	    column_config={
+       		"Sabra_Account_Full_Name": "Sabra_Account",
+       		 "Property_Name": "Property",
+		 "TIME":"Month",
+		"P&L":st.column_config.TextColumn(
+			"Tenant P&L",help="Tenant P&L is aggregated by detail tenant accounts connected with 'Sabra Account'"),
+        	"Diff (Sabra-P&L)": st.column_config.TextColumn(
+            		"Diff (Sabra-P&L)",help="Diff = Sabra-TenantP&L"),
+		"Sabra": st.column_config.TextColumn(
+            		"Sabra",help="Sabra data for previous month"),
+		 "Type comments below":st.column_config.TextColumn(
+            		"Type comments below",
+            		help="Please provide an explanation and solution on discrepancy, like: confirm the changed. overwrite Sabra data with new one...",
+			disabled =False,
+            		required =False)
+		}) 
+	       
+            col1,col2,col3=st.columns([2,2,4]) 
+            with col1:                        
+                download_report(edited_diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)","Type comments below"]],"discrepancy_{}".format(operator))
+        
+            with col2:    
+                submit_com=st.button("Submit comments")
+            if submit_com:
+                with st.empty():
+                    with col3:
+                        st.markdown("✔️ :green[Comments uploaded]")
+                        st.write(" ")
+                    # insert comments to diff_BPC_PL
+                    diff_BPC_PL=pd.merge(diff_BPC_PL,edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Type comments below"]],on=["Property_Name","TIME","Sabra_Account_Full_Name"],how="left")
+                    Update_File_inS3(bucket_PL,discrepancy_path,diff_BPC_PL,operator,"P&L")
+	View_Discrepancy_Detail()
+        else:
+            st.success("All previous data in P&L ties with Sabra data")
+  
+
    
 @st.cache_data(experimental_allow_widgets=True)        
 def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
@@ -1283,7 +1285,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
             if len(previous_month_list)>0:		
                 View_Discrepancy(percent_discrepancy_accounts)
-                View_Discrepancy_Detail()
+                
             else:
                 st.write("There is no previous month data in tenant P&L")
     elif choice=="Manage Mapping":
