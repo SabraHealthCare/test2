@@ -149,7 +149,7 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
     original_file =s3.get_object(Bucket=bucket, Key=key)
     try:
         original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
-        original_data=original_data[new_data.columns]
+        original_data=original_data.loc[new_data.columns,:]
         empty_file=False
     except:
         original_data=pd.DataFrame()
@@ -472,6 +472,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
     year_count=[]        
     month_count=[]
     max_len=0
+    st.write(month_table)
     for row_i in range(search_row_size):
         # save the number of valid months of each row to month_count
         valid_month=list(filter(lambda x:x!=0,month_table.iloc[row_i,]))
@@ -545,7 +546,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
         # only one month in header:month and year must exist for one month header
         elif month_count[month_sort_index[month_index_i]]==1:
             # month and year must match 
-            #st.write("There is only one month in sheet——'"+sheet_name+"'")
+            st.write("There is only one month in sheet——'"+sheet_name+"'")
             col_month=0
             #find the col number of month
             while(month_table.iloc[month_sort_index[month_index_i],col_month]==0):
@@ -722,7 +723,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
     for entity in entity_mapping.index:
         for timeid in month_list: 
 	    # if this entity don't have data for this timeid(new/transferred property), skip to next month
-            if all(Total_PL.loc[entity,][timeid]!=Total_PL.loc[entity,][timeid]):
+            if all(list(map(lambda x:x!=x,Total_PL.loc[entity,][timeid]))):
                 break
             for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
                 try:
@@ -1006,6 +1007,8 @@ def View_Discrepancy(percent_discrepancy_accounts):
             View_Discrepancy_Detail()
         else:
             st.success("All previous data in P&L ties with Sabra data")
+    else:
+            st.success("All previous data in P&L ties with Sabra data")
    
 @st.cache_data(experimental_allow_widgets=True)        
 def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
@@ -1141,8 +1144,7 @@ def Upload_And_Process(uploaded_file,file_type):
     if True:
         if uploaded_file.name[-5:]=='.xlsx':
             PL_sheet_list=load_workbook(uploaded_file).sheetnames
-            if file_type=="BS":
-                st.write(PL_sheet_list)
+           
         else:
             PL_sheet_list=[]
 		
