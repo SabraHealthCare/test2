@@ -792,7 +792,7 @@ def View_Summary():
     missing_check=missing_check[missing_check[latest_month]==0]
 	
     if missing_check.shape[0]>0:
-        st.error("No data detected for below accounts: ")
+        st.error("No data detected for below properties on specific accounts: ")
         col1,col2=st.columns([2,1])
         with col1:
             st.dataframe(missing_check[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
