@@ -568,7 +568,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                 # count_num/str is count of numous/character data under month
                 # for a real month column, numous data is supposed to be more than character data
             if count_str>0 and count_num/count_str<0.8:
-		st.write(count_str,count_num)
+                st.write(count_str,count_num)
                 continue
                 
             else:
