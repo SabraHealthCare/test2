@@ -552,8 +552,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
             while(month_table.iloc[month_sort_index[month_index_i],col_month]==0):
                 col_month+=1
                 
-                #if month_table.iloc[month_sort_index[index_i],col_month]!=1:
-                #if there is no year in month, continue 
+            #if there is no year in month, continue 
             if  year_table.iloc[month_sort_index[month_index_i],col_month]==0:
                 continue
            
@@ -569,9 +568,11 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                 # count_num/str is count of numous/character data under month
                 # for a real month column, numous data is supposed to be more than character data
             if count_str>0 and count_num/count_str<0.8:
+		st.write(count_str,count_num)
                 continue
                 
             else:
+                
                 PL_date_header=year_table.iloc[month_sort_index[month_index_i],].apply(lambda x:str(int(x)))+\
                         month_table.iloc[month_sort_index[month_index_i],].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                         
