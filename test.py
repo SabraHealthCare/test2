@@ -548,31 +548,31 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
             # month and year must match 
             st.write("There is only one month in sheet——'"+sheet_name+"'")
             col_month=0
-            #find the col number of month
+            #col_month is the col number of month
             while(month_table.iloc[month_sort_index[month_index_i],col_month]==0):
                 col_month+=1
                 
-            #if there is no year in month, continue 
+            #if there is no year in month header, continue 
             if  year_table.iloc[month_sort_index[month_index_i],col_month]==0:
                 continue
            
             count_num=0
             count_str=0
+            count_non=0
             for row_month in range(month_sort_index[month_index_i],PL.shape[0]):
                 if PL.iloc[row_month,col_month]==None or pd.isna(PL.iloc[row_month,col_month]) or PL.iloc[row_month,col_month]=="":
+                    count_non+=1
                     continue
-                elif type(PL.iloc[row_month,col_month])==float or type(PL.iloc[row_month,col_month])==int:
+                if type(PL.iloc[row_month,col_month])==float or type(PL.iloc[row_month,col_month])==int:
                     count_num+=1
                 else:
                     count_str+=1
-                # count_num/str is count of numous/character data under month
+                # count_num is count of numous row under month header. count_str is the count of character data under month header
                 # for a real month column, numous data is supposed to be more than character data
-            if count_str>0 and count_num/count_str<0.8:
-                st.write(count_str,count_num)
+            if count_str>0 and (count_num+count_non)/count_str<0.8:
                 continue
                 
             else:
-                
                 PL_date_header=year_table.iloc[month_sort_index[month_index_i],].apply(lambda x:str(int(x)))+\
                         month_table.iloc[month_sort_index[month_index_i],].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                         
