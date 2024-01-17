@@ -42,15 +42,15 @@ BPC_account_path="Sabra_account_list.csv"
 
 
 
-#client_id = 'ba5ec75b-3fc0-4a7b-a6a4-cf21c33a36a4'
-#client_secret = 'Q5m8Q~LjOn6iDYrGWBzI4TytPmG.hTvgEdWJmaFK'
+client_id = 'ba5ec75b-3fc0-4a7b-a6a4-cf21c33a36a4'
+client_secret = 'Q5m8Q~LjOn6iDYrGWBzI4TytPmG.hTvgEdWJmaFK'
 #redirect_uri = 'https://sabra-test.streamlit.app/callback'
 #authority = 'https://login.microsoftonline.com/71ffff7c-7e53-4daa-a503-f7b94631bd53'
 #SCOPES = ['Files.ReadWrite']
 
 
-client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
-client_secret = '1h28Q~Tw-xwTMPW9w0TqjbeaOhkYVDrDQ8VHcbkd'
+#client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
+#client_secret = '1h28Q~Tw-xwTMPW9w0TqjbeaOhkYVDrDQ8VHcbkd'
 redirect_uri = 'https://sabra-test.streamlit.app/auth-callback'
 authority = 'https://login.microsoftonline.com/71ffff7c-7e53-4daa-a503-f7b94631bd53'
 SCOPES = ['Files.ReadWrite']
