@@ -49,46 +49,44 @@ BPC_account_path="Sabra_account_list.csv"
 #SCOPES = ['Files.ReadWrite']
 
 
-#client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
-#client_secret = '1h28Q~Tw-xwTMPW9w0TqjbeaOhkYVDrDQ8VHcbkd'
-#redirect_uri = 'https://sabra-test.streamlit.app/auth-callback'
-#authority = 'https://login.microsoftonline.com/71ffff7c-7e53-4daa-a503-f7b94631bd53'
-#SCOPES = ['User.Read']
+client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
+client_secret = '1h28Q~Tw-xwTMPW9w0TqjbeaOhkYVDrDQ8VHcbkd'
+redirect_uri = 'https://sabra-test.streamlit.app/auth-callback'
+authority = 'https://login.microsoftonline.com/71ffff7c-7e53-4daa-a503-f7b94631bd53'
+SCOPES = ['Files.ReadWrite']
 
+msal_app = ConfidentialClientApplication(
+    client_id,
+    authority=authority,
+    client_credential=client_secret
+)
 
+#Acquire a token for the client
+token_response = msal_app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
 
-#msal_app = ConfidentialClientApplication(
-    #client_id,
-    #authority=authority,
-    #client_credential=client_secret
-#)
+#Extract the access token from the token response
+access_token = token_response['access_token']
+st.write("Token:", access_token)
 
-# Acquire a token for the client
-#token_response = msal_app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
+#Use the access token in your API request
+headers = {
+    "Authorization": f"Bearer {access_token}",
+}
 
-# Extract the access token from the token response
-#access_token = token_response['access_token']
-#st.write("Token:", access_token)
-
-# Use the access token in your API request
-#headers = {
-#    "Authorization": f"Bearer {access_token}",
-#}
-
-#response = requests.get(
-#    url="https://graph.microsoft.com/v1.0/me",
-#    headers=headers,
-#)
-
+response = requests.get(
+    url="https://graph.microsoft.com/v1.0/me",
+    headers=headers,
+)
 # Process the API response as needed
-#st.write("API Response:", response.status_code, response.json())
-#if response.status_code == 403:
-#    st.write("Authorization_RequestDenied: Insufficient privileges to complete the operation.")
+st.write("API Response:", response.status_code, response.json())
+if response.status_code == 403:
+    st.write("Authorization_RequestDenied: Insufficient privileges to complete the operation.")
     # You may want to log the details from the response for further investigation
-#    st.write("API Response:", response.status_code, response.json())
-#else:
+    st.write("API Response:", response.status_code, response.json())
+else:
     # Process the API response for other status codes
-#    st.write("API Response:", response.status_code, response.json())
+    st.write("API Response:", response.status_code, response.json())
+	
 def upload_file_to_onedrive(access_token, local_file_path, onedrive_folder_path):
     # Microsoft Graph API endpoint for uploading files
     upload_url = 'https://graph.microsoft.com/v1.0/me/drive/root:' + onedrive_folder_path + '/' + local_file_path + ':/createUploadSession'
