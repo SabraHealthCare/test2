@@ -20,7 +20,7 @@ from st_aggrid import AgGrid, GridUpdateMode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 import requests
 from msal import ConfidentialClientApplication
-#from ms_graph import generate_access_token,GRAPH_API_ENDPOINT
+from ms_graph import generate_access_token,GRAPH_API_ENDPOINT
 s3 = boto3.client('s3')
 
 #---------------------------define parameters--------------------------
@@ -54,38 +54,37 @@ client_secret = 'Q5m8Q~LjOn6iDYrGWBzI4TytPmG.hTvgEdWJmaFK'
 redirect_uri = 'https://sabra-test.streamlit.app/auth-callback'
 authority = 'https://login.microsoftonline.com/71ffff7c-7e53-4daa-a503-f7b94631bd53'
 SCOPES = ['Files.ReadWrite']
-
-msal_app = ConfidentialClientApplication(
-    client_id,
-    authority=authority,
-    client_credential=client_secret
-)
-
-#Acquire a token for the client
-token_response = msal_app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
-
-#Extract the access token from the token response
-access_token = token_response['access_token']
-st.write("Token:", access_token)
-
-#Use the access token in your API request
-headers = {
-    "Authorization": f"Bearer {access_token}",
+#access_token=generate_access_token(client_id,SCOPES)
+headers={
+	'Authorization':'Bearer' +access_token["access_token"]
 }
 
-response = requests.get(
-    url="https://graph.microsoft.com/v1.0/me",
-    headers=headers,
-)
+
+#msal_app = ConfidentialClientApplication(
+#    client_id,
+#    authority=authority,
+#    client_credential=client_secret
+#)
+
+#Acquire a token for the client
+#token_response = msal_app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
+
+#Extract the access token from the token response
+#access_token = token_response['access_token']
+#st.write("Token:", access_token)
+
+#Use the access token in your API request
+#headers = {
+#    "Authorization": f"Bearer {access_token}",
+#}
+
+#response = requests.get(
+#    url="https://graph.microsoft.com/v1.0/me",
+#    headers=headers,
+#)
 # Process the API response as needed
-st.write("API Response:", response.status_code, response.json())
-if response.status_code == 403:
-    st.write("Authorization_RequestDenied: Insufficient privileges to complete the operation.")
-    # You may want to log the details from the response for further investigation
-    st.write("API Response:", response.status_code, response.json())
-else:
-    # Process the API response for other status codes
-    st.write("API Response:", response.status_code, response.json())
+#st.write("API Response:", response.status_code, response.json())
+#st.write("API Response:", response.status_code, response.json())
 	
 def upload_file_to_onedrive(access_token, local_file_path, onedrive_folder_path):
     # Microsoft Graph API endpoint for uploading files
