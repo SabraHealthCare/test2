@@ -46,7 +46,6 @@ authority = 'https://login.microsoftonline.com/' + tenant_id
 # shali's use id of onedrive
 user_id = '62d4a23f-e25f-4da2-9b52-7688740d9d48'
 
-
 def Upload_to_Onedrive(file_content):
     # Read the content of the uploaded file
     file_content = uploaded_file.read()
