@@ -60,7 +60,7 @@ def Upload_to_Onedrive(uploaded_file,file_name):
     access_token = token_response['access_token']
 
     # Set the API endpoint and headers
-    api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/Documents/file_name:/content'
+    api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/Documents/{file_name}:/content'
     headers = {
     'Authorization': 'Bearer ' + access_token,}
 
