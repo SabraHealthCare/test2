@@ -66,7 +66,8 @@ def Upload_to_Onedrive(uploaded_file,file_name):
 
     # Make the request to upload the file
     response = requests.put(api_url, headers=headers, data=file_content)
-
+     st.write(f"Status code for {uploaded_file.name}: {response.status_code}")
+     st.write(response.json())
 
 # no cache
 def Read_CSV_FromS3(bucket,key):
