@@ -46,7 +46,7 @@ authority = 'https://login.microsoftonline.com/' + tenant_id
 # shali's use id of onedrive
 user_id = '62d4a23f-e25f-4da2-9b52-7688740d9d48'
 
-def Upload_to_Onedrive(file_content):
+def Upload_to_Onedrive(file_content,file_name):
     # Read the content of the uploaded file
     file_content = uploaded_file.read()
 
@@ -60,7 +60,7 @@ def Upload_to_Onedrive(file_content):
     access_token = token_response['access_token']
 
     # Set the API endpoint and headers
-    api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/Documents/test_Shali.xlsx:/content'
+    api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/Documents/file_name:/content'
     headers = {
     'Authorization': 'Bearer ' + access_token,}
 
@@ -815,11 +815,11 @@ def View_Summary():
         # save tenant P&L to S3
         if not Upload_File_toS3(uploaded_finance,bucket_PL,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
                 st.write(" ")  #----------record into error report------------------------	
-                Upload_to_Onedrive(uploaded_finance)
+                Upload_to_Onedrive(uploaded_finance,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4]))
         if BS_separate_excel=="Y":
             if not Upload_File_toS3(uploaded_BS,bucket_PL,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
                 st.write(" ")  #----------record into error report------------------------	
-            Upload_to_Onedrive(uploaded_BS) 
+            Upload_to_Onedrive(uploaded_BS,{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])) 
         if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator): 
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
             
