@@ -47,9 +47,12 @@ authority = 'https://login.microsoftonline.com/' + tenant_id
 user_id = '62d4a23f-e25f-4da2-9b52-7688740d9d48'
 
 def Upload_to_Onedrive(uploaded_file,file_name):
+    st.write("Onedrive")
+    st.write(uploaded_file)
     # Read the content of the uploaded file
     file_content = uploaded_file.read()
-
+    st.write(file_content)
+    st.write(uploaded_file)
     # Acquire a token using client credentials flow
     app = ConfidentialClientApplication(
     client_id,
