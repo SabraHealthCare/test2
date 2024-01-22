@@ -50,9 +50,11 @@ def Upload_to_Onedrive(uploaded_file,file_name):
 
     # Read the content of the uploaded file
     #file_content = uploaded_file.read()
-    with uploaded_file as file:
-            # Read the content of the reopened file
-        file_content = file.read()
+    file_content = uploaded_file.read()
+
+        # Use BytesIO to create a stream from the file content
+    file_stream = BytesIO(file_content)
+
 
     # Use BytesIO to create a stream from the file content
     file_stream = BytesIO(file_content)
@@ -65,7 +67,7 @@ def Upload_to_Onedrive(uploaded_file,file_name):
 
     token_response = app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
     access_token = token_response['access_token']
-
+    
     # Set the API endpoint and headers
     api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/Documents/{file_name}:/content'
     headers = {
