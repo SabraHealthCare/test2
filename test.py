@@ -18,9 +18,8 @@ import json
 import yaml
 from st_aggrid import AgGrid, GridUpdateMode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
-import requests
 from msal import ConfidentialClientApplication
-from ms_graph import generate_access_token,GRAPH_API_ENDPOINT
+import requests
 s3 = boto3.client('s3')
 
 #---------------------------define parameters--------------------------
@@ -39,76 +38,36 @@ discrepancy_path="Total_Diecrepancy_Review.csv"
 monthly_reporting_path="Total monthly reporting.csv"
 operator_list_path="Operator_list.csv"
 BPC_account_path="Sabra_account_list.csv"
+#One drive authority. Set application details
+client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
+client_secret = '1h28Q~Tw-xwTMPW9w0TqjbeaOhkYVDrDQ8VHcbkd'
+tenant_id = '71ffff7c-7e53-4daa-a503-f7b94631bd53'
+authority = 'https://login.microsoftonline.com/' + tenant_id
+# shali's use id
+user_id = '62d4a23f-e25f-4da2-9b52-7688740d9d48'
 
 
 
-client_id = 'ba5ec75b-3fc0-4a7b-a6a4-cf21c33a36a4'
-client_secret = 'Q5m8Q~LjOn6iDYrGWBzI4TytPmG.hTvgEdWJmaFK'
-#redirect_uri = 'https://sabra-test.streamlit.app/callback'
-#authority = 'https://login.microsoftonline.com/71ffff7c-7e53-4daa-a503-f7b94631bd53'
-#SCOPES = ['Files.ReadWrite']
+def Upload_to_Onedrive(file_content):
+    # Read the content of the uploaded file
+    file_content = uploaded_file.read()
 
+    # Acquire a token using client credentials flow
+    app = ConfidentialClientApplication(
+    client_id,
+    authority=authority,
+    client_credential=client_secret)
 
-#client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
-#client_secret = '1h28Q~Tw-xwTMPW9w0TqjbeaOhkYVDrDQ8VHcbkd'
-redirect_uri = 'https://sabra-test.streamlit.app/auth-callback'
-authority = 'https://login.microsoftonline.com/71ffff7c-7e53-4daa-a503-f7b94631bd53'
-SCOPES = ['Files.ReadWrite']
-#access_token=generate_access_token(client_id,SCOPES)
-headers={
-	'Authorization':'Bearer' +access_token["access_token"]
-}
+    token_response = app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
+    access_token = token_response['access_token']
 
+    # Set the API endpoint and headers
+    api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/Documents/test_Shali.xlsx:/content'
+    headers = {
+    'Authorization': 'Bearer ' + access_token,}
 
-#msal_app = ConfidentialClientApplication(
-#    client_id,
-#    authority=authority,
-#    client_credential=client_secret
-#)
-
-#Acquire a token for the client
-#token_response = msal_app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
-
-#Extract the access token from the token response
-#access_token = token_response['access_token']
-#st.write("Token:", access_token)
-
-#Use the access token in your API request
-#headers = {
-#    "Authorization": f"Bearer {access_token}",
-#}
-
-#response = requests.get(
-#    url="https://graph.microsoft.com/v1.0/me",
-#    headers=headers,
-#)
-# Process the API response as needed
-#st.write("API Response:", response.status_code, response.json())
-#st.write("API Response:", response.status_code, response.json())
-	
-def upload_file_to_onedrive(access_token, local_file_path, onedrive_folder_path):
-    # Microsoft Graph API endpoint for uploading files
-    upload_url = 'https://graph.microsoft.com/v1.0/me/drive/root:' + onedrive_folder_path + '/' + local_file_path + ':/createUploadSession'
-
-    # Create the upload session
-    session_response = requests.post(upload_url, headers={'Authorization': 'Bearer ' + access_token})
-
-    if session_response.status_code == 200:
-        upload_url = session_response.json()['uploadUrl']
-
-        # Upload the file in chunks
-        with open(local_file_path, 'rb') as file:
-            while True:
-                chunk = file.read(327680)  # 320 KB chunk size (adjust as needed)
-                if not chunk:
-                    break
-                chunk_response = requests.put(upload_url, headers={'Authorization': 'Bearer ' + access_token, 'Content-Range': f'bytes {file.tell() - len(chunk)}-{file.tell() - 1}/{file.tell()}'}, data=chunk)
-
-                if chunk_response.status_code != 202:
-                    st.write('Error uploading chunk:', chunk_response.json())
-                    break
-    else:
-        st.write('Error creating upload session:', session_response.json())
+    # Make the request to upload the file
+    response = requests.put(api_url, headers=headers, data=file_content)
 
 
 # no cache
