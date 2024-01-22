@@ -823,10 +823,11 @@ def View_Summary():
     upload_latest_month["Operator"]=operator
     if submit_latest_month:
         # save tenant P&L to S3
+	Upload_to_Onedrive(uploaded_finance,"test.xlsx")
         if not Upload_File_toS3(uploaded_finance,bucket_PL,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
                 st.write(" ")  #----------record into error report------------------------	
                 #Upload_to_Onedrive(uploaded_finance,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4]))
-        Upload_to_Onedrive(uploaded_finance,"test.xlsx")
+
         if BS_separate_excel=="Y":
             if not Upload_File_toS3(uploaded_BS,bucket_PL,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
                 st.write(" ")  #----------record into error report------------------------	
