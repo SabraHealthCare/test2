@@ -51,7 +51,7 @@ def Upload_to_Onedrive(uploaded_file,file_name):
     st.write(uploaded_file)
     # Read the content of the uploaded file
     #file_content = uploaded_file.read()
-    file_stream =BytesIO(uploaded_file)
+    file_stream =BytesIO(uploaded_file.read())
     st.write(file_content)
     st.write(uploaded_file)
     # Acquire a token using client credentials flow
