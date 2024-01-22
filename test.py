@@ -819,7 +819,7 @@ def View_Summary():
         if BS_separate_excel=="Y":
             if not Upload_File_toS3(uploaded_BS,bucket_PL,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
                 st.write(" ")  #----------record into error report------------------------	
-            Upload_to_Onedrive(uploaded_BS,{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])) 
+            Upload_to_Onedrive(uploaded_BS,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])) 
         if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator): 
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
             
