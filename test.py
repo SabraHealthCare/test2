@@ -43,9 +43,8 @@ client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
 client_secret = '1h28Q~Tw-xwTMPW9w0TqjbeaOhkYVDrDQ8VHcbkd'
 tenant_id = '71ffff7c-7e53-4daa-a503-f7b94631bd53'
 authority = 'https://login.microsoftonline.com/' + tenant_id
-# shali's use id
+# shali's use id of onedrive
 user_id = '62d4a23f-e25f-4da2-9b52-7688740d9d48'
-
 
 
 def Upload_to_Onedrive(file_content):
@@ -817,10 +816,11 @@ def View_Summary():
         # save tenant P&L to S3
         if not Upload_File_toS3(uploaded_finance,bucket_PL,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
                 st.write(" ")  #----------record into error report------------------------	
+                Upload_to_Onedrive(uploaded_finance)
         if BS_separate_excel=="Y":
             if not Upload_File_toS3(uploaded_BS,bucket_PL,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
                 st.write(" ")  #----------record into error report------------------------	
-
+            Upload_to_Onedrive(uploaded_BS) 
         if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator): 
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
             
@@ -1202,11 +1202,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         else:
             st.write("P&L wasn't upload.")
             st.stop()
-
-
- 
-        #onedrive_folder_path = '/Documents'  # Specify the OneDrive folder where you want to save the file
-        #upload_file_to_onedrive(access_token, uploaded_finance.name, onedrive_folder_path)
  
 	    
         if BS_separate_excel=="Y" and uploaded_BS:
