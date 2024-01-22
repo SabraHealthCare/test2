@@ -50,7 +50,8 @@ def Upload_to_Onedrive(uploaded_file,file_name):
     st.write("Onedrive")
     st.write(uploaded_file)
     # Read the content of the uploaded file
-    file_content = uploaded_file.read()
+    #file_content = uploaded_file.read()
+    file_stream = io.BytesIO(uploaded_file)
     st.write(file_content)
     st.write(uploaded_file)
     # Acquire a token using client credentials flow
@@ -68,7 +69,7 @@ def Upload_to_Onedrive(uploaded_file,file_name):
     'Authorization': 'Bearer ' + access_token,}
 
     # Make the request to upload the file
-    response = requests.put(api_url, headers=headers, data=file_content)
+    response = requests.put(api_url, headers=headers, data=file_stream)
     st.write(f"Status code for {uploaded_file.name}: {response.status_code}")
     st.write(response.json())
 
