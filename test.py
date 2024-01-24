@@ -38,45 +38,60 @@ discrepancy_path="Total_Diecrepancy_Review.csv"
 monthly_reporting_path="Total monthly reporting.csv"
 operator_list_path="Operator_list.csv"
 BPC_account_path="Sabra_account_list.csv"
+
+
 #One drive authority. Set application details
 client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
 client_secret = '1h28Q~Tw-xwTMPW9w0TqjbeaOhkYVDrDQ8VHcbkd'
 tenant_id = '71ffff7c-7e53-4daa-a503-f7b94631bd53'
 authority = 'https://login.microsoftonline.com/' + tenant_id
-# shali's use id of onedrive
-user_id = '62d4a23f-e25f-4da2-9b52-7688740d9d48'
+user_id= '62d4a23f-e25f-4da2-9b52-7688740d9d48'  # shali's user id of onedrive
+PL_path="Documents"
+mapping_path="Documents/Mapping"
 
-def Upload_to_Onedrive(uploaded_file,file_name):
-
-    # Read the content of the uploaded file
-    #file_content = uploaded_file.read()
-    file_content = uploaded_file.read()
-
-        # Use BytesIO to create a stream from the file content
-    file_stream = BytesIO(file_content)
-
-
-    # Use BytesIO to create a stream from the file content
-    file_stream = BytesIO(file_content)
-
-    # Acquire a token using client credentials flow
-    app = ConfidentialClientApplication(
+# Acquire a token using client credentials flow
+app = ConfidentialClientApplication(
     client_id,
     authority=authority,
     client_credential=client_secret)
 
-    token_response = app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
-    access_token = token_response['access_token']
-    
-    # Set the API endpoint and headers
-    api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/Documents/{file_name}:/content'
-    headers = {
-    'Authorization': 'Bearer ' + access_token,}
+token_response = app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
+access_token = token_response['access_token']
+headers = {'Authorization': 'Bearer ' + access_token,}    
 
-    # Make the request to upload the file
-    response = requests.put(api_url, headers=headers, data=file_stream)
-    st.write(f"Status code for {uploaded_file.name}: {response.status_code}")
-    st.write(response.json())
+def Upload_to_Onedrive(uploaded_file,path,file_name):
+    try:
+        # Read the content of the uploaded file and Use BytesIO to create a stream from the file content
+        file_stream = BytesIO(uploaded_file.read())
+ 
+        # Set the API endpoint and headers
+        api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
+
+        # Make the request to upload the file
+        response = requests.put(api_url, headers=headers, data=file_stream)
+        return True
+    except:
+        st.write("")# error log
+        return False
+
+
+# no cache
+def Read_CSV_From_Onedrive(path,file_name):
+    # Set the API endpoint and headers for file download
+    api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/root:/{path}/{file_name}:/content'
+    # Make the request to download the file
+    response = requests.get(api_url, headers=headers)
+
+    # Check the status code
+    if response.status_code == 200:
+	# Content of the file is available in response.content
+        if file_name[-3:]=="CSV":
+            data = pd.read_csv(pd.BytesIO(response.content))
+	elif file_name[-4:]=="xlsx":
+            data = pd.read_excel(pd.BytesIO(response.content))
+        return data
+    else
+        return False
 
 # no cache
 def Read_CSV_FromS3(bucket,key):
@@ -140,8 +155,10 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
 def Initial_Paramaters(operator):
     # drop down list of operator
     if operator!="Sabra":
-        BPC_pull=Read_CSV_FromS3(bucket_mapping,BPC_pull_filename)
-        BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
+        BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename)
+        st.write(BPC_pull)
+        #BPC_pull=Read_CSV_FromS3(bucket_mapping,BPC_pull_filename)
+        #BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
         BPC_pull=BPC_pull.set_index(["ENTITY","ACCOUNT"])
         BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
                   
@@ -822,16 +839,18 @@ def View_Summary():
     upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
     upload_latest_month["Operator"]=operator
     if submit_latest_month:
+        # save tenant P&L to OneDrive
+        Upload_to_Onedrive(uploaded_finance,PL_path,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4]))
         # save tenant P&L to S3
-        Upload_to_Onedrive(uploaded_finance,"test.xlsx")
         if not Upload_File_toS3(uploaded_finance,bucket_PL,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
-                st.write(" ")  #----------record into error report------------------------	
-                #Upload_to_Onedrive(uploaded_finance,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4]))
+            st.write(" ")  #----------record into error report------------------------	
 
         if BS_separate_excel=="Y":
+            # save tenant BS to OneDrive
+            Upload_to_Onedrive(uploaded_BS,PL_path,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4]))
             if not Upload_File_toS3(uploaded_BS,bucket_PL,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
                 st.write(" ")  #----------record into error report------------------------	
-            #Upload_to_Onedrive(uploaded_BS,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])) 
+            
         if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator): 
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
             
