@@ -88,9 +88,10 @@ def Read_CSV_From_Onedrive(path,file_name):
             data = pd.read_csv(pd.BytesIO(response.content))
         elif file_name[-4:]=="xlsx":
             data = pd.read_excel(pd.BytesIO(response.content))
-        st.write("success")
+        st.write("read success")
         return data
     else:
+        st.write("read unsuccess")
         return False
 
 # no cache
@@ -821,11 +822,8 @@ def View_Summary():
         latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]
     
     st.markdown("{} {}/{} reporting data:".format(operator,latest_month[4:6],latest_month[0:4]))      
-    #st.markdown(latest_month_data.style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
-    #		.format(precision=0,thousands=",").hide(axis="index").to_markdown().to_html(),unsafe_allow_html=True)
-    
+   
     styled_table = (latest_month_data.fillna('').style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
-
     # Display the HTML using st.markdown
     st.markdown(styled_table, unsafe_allow_html=True)
     st.write("")
