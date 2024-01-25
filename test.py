@@ -839,7 +839,7 @@ def View_Summary():
     upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
     upload_latest_month["Operator"]=operator
     if submit_latest_month:
-        st.session_state.Confirm_and_upload_button = not st.session_state.Confirm_and_upload_button
+        
         # save tenant P&L to OneDrive
         Upload_to_Onedrive(uploaded_finance,PL_path,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4]))
         # save tenant P&L to S3
