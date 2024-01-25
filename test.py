@@ -827,20 +827,9 @@ def View_Summary():
     st.write("")
 
 
-    if 'Confirm_and_upload_button' not in st.session_state:
-        st.session_state.Confirm_and_upload_button = False
-
-    # Display the button with conditional styling
-
-    # Apply styling based on the button state
-    if st.session_state.Confirm_and_upload_button:
-        st.markdown(f"<style>div[data-baseweb='button'] button[data-baseweb-id='latest_month']{{background-color: yellow;}}</style>", unsafe_allow_html=True)
-        # Apply styling to change the background color
-        custom_background_color = "lightblue"	
-        st.markdown(f"<style>div[data-baseweb='button'] button[data-baseweb-id='latest_month']{{background-color: {custom_background_color};}}</style>", unsafe_allow_html=True)
-        
-
-	
+    custom_background_color = "lightblue"	
+    st.markdown(f"<style>div[data-baseweb='button'] button[data-baseweb-id='latest_month']{{background-color: {custom_background_color};}}</style>", unsafe_allow_html=True)
+        	
     # upload latest month data to AWS
     col1,col2=st.columns([2,3])
     with col1:
@@ -874,7 +863,9 @@ def View_Summary():
             st.write(" ")  #----------record into error report------------------------	
     else:
         st.stop()
-    
+    custom_background_color = "lightblue"	
+    st.markdown(f"<style>div[data-baseweb='button'] button[data-baseweb-id='latest_month']{{background-color: {custom_background_color};}}</style>", unsafe_allow_html=True)
+        
 # create EPM formula for download data
 def EPM_Formula(data,value_name): # make sure there is no col on index for data
     data["EPM_Formula"]=""
