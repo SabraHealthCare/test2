@@ -102,6 +102,8 @@ def Save_CSV_To_Onedrive(df,path,filename):
         else:
             st.write("") #error log
             return False
+    except:
+        return False
 
 
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
