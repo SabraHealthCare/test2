@@ -88,6 +88,7 @@ def Read_CSV_From_Onedrive(path,file_name):
             data = pd.read_csv(pd.BytesIO(response.content))
         elif file_name[-4:]=="xlsx":
             data = pd.read_excel(pd.BytesIO(response.content))
+        st.write("success")
         return data
     else:
         return False
