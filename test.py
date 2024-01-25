@@ -187,6 +187,19 @@ def Initial_Mapping(operator):
     entity_mapping=entity_mapping.set_index("ENTITY")
     return entity_mapping,account_mapping
 
+	
+# Intialize a list of tuples containing the CSS styles for table headers
+th_props = [('font-size', '14px'), ('text-align', 'left'),
+            ('font-weight', 'bold'),('color', '#6d6d6d'),
+            ('background-color', '#eeeeef'), ('border','1px solid #eeeeef')]
+
+# Intialize a list of tuples containing the CSS styles for table data
+td_props = [('font-size', '14px'), ('text-align', 'left')]
+
+# Aggregate styles in a list
+styles = [dict(selector="th", props=th_props),dict(selector="td", props=td_props)]
+
+
 def left_align(s, props='text-align: left;'):
     return props
 css='''
