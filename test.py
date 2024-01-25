@@ -824,7 +824,9 @@ def View_Summary():
     #st.markdown(latest_month_data.style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
     #		.format(precision=0,thousands=",").hide(axis="index").to_markdown().to_html(),unsafe_allow_html=True)
     styled_table = (latest_month_data.style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
-    styled_table_data = styled_table.data.replace('nan', '')
+    styled_table_str = styled_table.render()
+
+    styled_table_data = styled_table_str.data.replace('nan', '')
     # Display the HTML using st.markdown
     st.markdown(styled_table_data, unsafe_allow_html=True)
     st.write("")
