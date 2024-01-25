@@ -810,6 +810,7 @@ def View_Summary():
     set_empty=list(latest_month_data.columns)
     set_empty.remove("Category")
     set_empty.remove("Sabra_Account")
+    st.write("set_empty",set_empty)
     for i in range(latest_month_data.shape[0]):
         if latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra":
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
