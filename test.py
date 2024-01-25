@@ -187,15 +187,6 @@ def Initial_Mapping(operator):
     entity_mapping=entity_mapping.set_index("ENTITY")
     return entity_mapping,account_mapping
 
-
-
-# Display the script
-st.markdown(blink_script, unsafe_allow_html=True)
-
-
-
-
-
 def left_align(s, props='text-align: left;'):
     return props
 css='''
