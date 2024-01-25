@@ -46,7 +46,7 @@ tenant_id = '71ffff7c-7e53-4daa-a503-f7b94631bd53'
 authority = 'https://login.microsoftonline.com/' + tenant_id
 user_id= '62d4a23f-e25f-4da2-9b52-7688740d9d48'  # shali's user id of onedrive
 PL_path="Documents"
-mapping_path="Documents/Mapping"
+mapping_path="Documents"
 
 # Acquire a token using client credentials flow
 app = ConfidentialClientApplication(
