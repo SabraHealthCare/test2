@@ -827,12 +827,23 @@ def View_Summary():
     st.write("")
 
 
+    if 'Confirm_and_upload_button' not in st.session_state:
+        st.session_state.Confirm_and_upload_button = False
+
+    # Display the button with conditional styling
+
+    # Apply styling based on button state
+    if not st.session_state.Confirm_and_upload_button:
+        st.markdown(f"<style>div[data-baseweb='button'] button[data-baseweb-id='{latest_month}']{{background-color: yellow;}}</style>", unsafe_allow_html=True)
+
+
+	
     # upload latest month data to AWS
     col1,col2=st.columns([2,3])
     with col1:
         download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
     with col2:	
-        submit_latest_month=st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]))
+        submit_latest_month=st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]),key=latest_month)
     upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
     upload_latest_month["TIME"]=latest_month
     upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
@@ -840,6 +851,7 @@ def View_Summary():
     upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
     upload_latest_month["Operator"]=operator
     if submit_latest_month:
+        st.session_state.Confirm_and_upload_button = not st.session_state.Confirm_and_upload_button
         # save tenant P&L to OneDrive
         Upload_to_Onedrive(uploaded_finance,PL_path,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4]))
         # save tenant P&L to S3
