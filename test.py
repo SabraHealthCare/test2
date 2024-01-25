@@ -34,10 +34,10 @@ bucket_PL="operatorpl"
 account_mapping_filename="Account_Mapping.csv"
 BPC_pull_filename="BPC_Pull.csv"
 entity_mapping_filename ="Entity_Mapping.csv"
-discrepancy_path="Total_Diecrepancy_Review.csv"
-monthly_reporting_path="Total monthly reporting.csv"
-operator_list_path="Operator_list.csv"
-BPC_account_path="Sabra_account_list.csv"
+discrepancy_filename="Total_Diecrepancy_Review.csv"
+monthly_reporting_filename="Total monthly reporting.csv"
+operator_list_filename="Operator_list.csv"
+BPC_account_filename="Sabra_account_list.csv"
 
 #One drive authority. Set application details
 client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
@@ -45,8 +45,9 @@ client_secret = '1h28Q~Tw-xwTMPW9w0TqjbeaOhkYVDrDQ8VHcbkd'
 tenant_id = '71ffff7c-7e53-4daa-a503-f7b94631bd53'
 authority = 'https://login.microsoftonline.com/' + tenant_id
 user_id= '62d4a23f-e25f-4da2-9b52-7688740d9d48'  # shali's user id of onedrive
-PL_path="Documents"
-mapping_path="Documents"
+PL_path="Documents/Tenant Monthly Uploading/Tenant P&L"
+mapping_path="Documents/Tenant Monthly Uploading/Tenant Mapping"
+
 
 # Acquire a token using client credentials flow
 app = ConfidentialClientApplication(
@@ -181,7 +182,7 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
     updated_data = pd.concat([original_data,new_data])
     if value_name is not False: # set formula 
         updated_data=EPM_Formula(updated_data,value_name)
-    return Save_CSV_ToS3(updated_data,bucket,key)
+    return Save_CSV_ToS3(updated_data,bucket,key)  
 
 # Function to update the value in session state
 def clicked(button_name):
@@ -192,8 +193,6 @@ def Initial_Paramaters(operator):
     # drop down list of operator
     if operator!="Sabra":
         BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename)
-        st.write("BPC",BPC_pull)
-        BPC_pull=Read_CSV_FromS3(bucket_mapping,BPC_pull_filename)
         BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
         BPC_pull=BPC_pull.set_index(["ENTITY","ACCOUNT"])
         BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
@@ -212,12 +211,12 @@ def Initial_Paramaters(operator):
 #@st.cache_resource
 def Initial_Mapping(operator):
     # read account mapping
-    account_mapping_all = Read_CSV_FromS3(bucket_mapping,account_mapping_filename)  
+    account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename)
     account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]==operator]
     account_mapping.loc["Tenant_Formated_Account":]=list(map(lambda x:x.upper().strip(),account_mapping.loc["Tenant_Account":]))
     account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
     # read property mapping
-    entity_mapping=Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
+    entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename)
     entity_mapping=entity_mapping.reset_index(drop=True)
     entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
     entity_mapping=entity_mapping.set_index("ENTITY")
@@ -264,7 +263,7 @@ def Create_Tree_Hierarchy(bucket_mapping):
     #Create Tree select hierarchy
     parent_hierarchy_main=[{'label': "No need to map","value":"No need to map"}]
     parent_hierarchy_second=[{'label': "No need to map","value":"No need to map"}]
-    BPC_Account = Read_CSV_FromS3(bucket_mapping, BPC_account_path)
+    BPC_Account = Read_CSV_From_Onedrive(mapping_path,BPC_account_filename)
  
     for category in BPC_Account[BPC_Account["Type"]=="Main"]["Category"].unique():
         children_hierarchy=[]
@@ -640,8 +639,8 @@ def Manage_Entity_Mapping(operator):
             i+=1
         st.write(entity_mapping)
         download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
-        # update entity_mapping in S3     
-        Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)   
+        # update entity_mapping in Onedrive    
+        Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator):
         return entity_mapping
 
 @st.cache_data(experimental_allow_widgets=True)
@@ -878,18 +877,15 @@ def View_Summary():
     if submit_latest_month:
         
         # save tenant P&L to OneDrive
-        Upload_to_Onedrive(uploaded_finance,PL_path,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4]))
-        # save tenant P&L to S3
-        if not Upload_File_toS3(uploaded_finance,bucket_PL,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
+        if not Upload_to_Onedrive(uploaded_finance,PL_path,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
             st.write(" ")  #----------record into error report------------------------	
 
         if BS_separate_excel=="Y":
             # save tenant BS to OneDrive
-            Upload_to_Onedrive(uploaded_BS,PL_path,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4]))
-            if not Upload_File_toS3(uploaded_BS,bucket_PL,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
+            if not Upload_to_Onedrive(uploaded_BS,PL_path,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4]))
                 st.write(" ")  #----------record into error report------------------------	
             
-        if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator): 
+        if Update_File_Onedrive(PL_path,monthly_reporting_filename,upload_latest_month,operator):
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
             
         else:
@@ -984,8 +980,8 @@ def View_Discrepancy(percent_discrepancy_accounts):
         diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
 	# insert dims to diff_BPC_PL
         diff_BPC_PL["TIME"]=diff_BPC_PL["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
-        Update_File_inS3(bucket_PL,discrepancy_path,diff_BPC_PL,operator,"P&L")
-
+        Update_File_Onedrive(PL_path,discrepancy_filename,diff_BPC_PL,operator,"P&L")
+	    
 	# only display the big discrepancy
         edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>10] 
         if edited_diff_BPC_PL.shape[0]>0:
@@ -1027,7 +1023,8 @@ def View_Discrepancy(percent_discrepancy_accounts):
                         st.write(" ")
                     # insert comments to diff_BPC_PL
                     diff_BPC_PL=pd.merge(diff_BPC_PL,edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Type comments below"]],on=["Property_Name","TIME","Sabra_Account_Full_Name"],how="left")
-                    Update_File_inS3(bucket_PL,discrepancy_path,diff_BPC_PL,operator,"P&L")
+                   
+	            Update_File_Onedrive(PL_path,discrepancy_filename,diff_BPC_PL,operator,"P&L")
             View_Discrepancy_Detail()
         else:
             st.success("All previous data in P&L ties with Sabra data")
@@ -1073,9 +1070,8 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     if count>0:
         # update sheet name in entity_mapping
         entity_mapping.loc[entity_i,sheet_type]=sheet_name  
-        # update entity_mapping in S3     
-        Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)    
-
+        # update entity_mapping in onedrive  
+        Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
     # Start checking process
     with st.spinner("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
@@ -1117,8 +1113,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                 #insert new record to the bottom line of account_mapping
                 new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
                 account_mapping=pd.concat([account_mapping, pd.DataFrame([new_mapping_row],columns=account_mapping.columns)],ignore_index=True)
-            Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping,operator) 
-            
+            Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
             #if there are duplicated accounts in P&L, ask for confirming
             dup_tenant_account=set([x for x in PL.index if list(PL.index).count(x) > 1])
             if len(dup_tenant_account)>0:
@@ -1352,7 +1347,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     elif len(new_tenant_account_list)==1:
 	                #insert new record to the bottom line of account_mapping
                         account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[0],new_tenant_account_list[0].upper(),"N"]   
-                    Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping,operator)
+                    Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
 			
     elif choice=='Instructions':
         # insert Video
@@ -1377,7 +1372,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
 # ----------------for Sabra account--------------------	    
 elif st.session_state["authentication_status"] and st.session_state["operator"]=="Sabra":
-    operator_list=Read_CSV_FromS3(bucket_mapping,operator_list_path)
+    operator_list=Read_CSV_From_Onedrive(mapping_path,operator_list_filename)
     menu=["Review Monthly reporting","Review New Mapping","Edit Account","Register","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
 
@@ -1405,7 +1400,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     elif choice=="Review New Mapping":
         with st.expander("Review new mapping" ,expanded=True):
             ChangeWidgetFontSize('Review new mapping', '25px')
-            account_mapping =Read_CSV_FromS3(bucket_mapping, account_mapping_filename)
+            account_mapping =Read_CSV_From_Onedrive(mapping_path,account_mapping_filename)
             un_confirmed_account=account_mapping[account_mapping["Confirm"]=="N"]
             if un_confirmed_account.shape[0]==0:
                 st.write("There is no new mapping.")
@@ -1441,7 +1436,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                                 tenant_account=un_confirmed_account[un_confirmed_account["Index"]==selected_row[i]["Index"]]["Tenant_Account"].item()
                                 account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"]=None
                         # save account_mapping 
-                        if Save_CSV_ToS3(account_mapping,bucket_mapping, account_mapping_filename):           
+                        if Save_CSV_To_Onedrive(account_mapping,path,account_mapping_filename):    
                             st.success("Selected mappings have been archived successfully")
                         else:
                             st.error("Can't save the change, please contact Sha Li.")
@@ -1465,7 +1460,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
     elif choice=="Review Monthly reporting":
             st.subheader("Summary")
-            data_obj =s3.get_object(Bucket=bucket_PL, Key=monthly_reporting_path)
+            data_obj =s3.get_object(Bucket=bucket_PL, Key=monthly_reporting_filename)
 
             if int(data_obj["ContentLength"])<=2:  # empty file
                 st.success("there is no un-uploaded data")
@@ -1490,11 +1485,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.subheader("Download reporting data")    
 		    
                 # add average column for each line , average is from BPC_pull
-                BPC_pull=Read_CSV_FromS3(bucket_mapping,BPC_pull_filename)
+                BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename)
                 BPC_pull.columns=list(map(lambda x :str(x) if x!="ACCOUNT" else "Sabra_Account", BPC_pull.columns))
                 data=data.merge(BPC_pull[["ENTITY","Sabra_Account","mean"]], on=["ENTITY","Sabra_Account"],how="left")	
 		# add "GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE" from entity_mapping
-                entity_mapping=Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
+                entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename)
                 data=data.merge(entity_mapping[["ENTITY","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
 
                 data=EPM_Formula(data,"Amount")	
