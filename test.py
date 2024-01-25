@@ -814,7 +814,7 @@ def View_Summary():
         if latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra":
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
             if latest_month_data.loc[i,'Category'] =="Facility Information" or latest_month_data.loc[i,'Category'] =="Additional Statistical Information":
-                latest_month_data.loc[i,set_empty]="  "
+                latest_month_data.loc[i,set_empty]=""
     entity_columns=latest_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
         latest_month_data["Total"] = latest_month_data[entity_columns].sum(axis=1)
