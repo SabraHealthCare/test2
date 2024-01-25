@@ -188,16 +188,13 @@ def Initial_Mapping(operator):
     return entity_mapping,account_mapping
 
 
-# Intialize a list of tuples containing the CSS styles for table headers
-th_props = [('font-size', '14px'), ('text-align', 'left'),
-            ('font-weight', 'bold'),('color', '#6d6d6d'),
-            ('background-color', '#eeeeef'), ('border','1px solid #eeeeef')]
 
-# Intialize a list of tuples containing the CSS styles for table data
-td_props = [('font-size', '14px'), ('text-align', 'left')]
+# Display the script
+st.markdown(blink_script, unsafe_allow_html=True)
 
-# Aggregate styles in a list
-styles = [dict(selector="th", props=th_props),dict(selector="td", props=td_props)]
+
+
+
 
 def left_align(s, props='text-align: left;'):
     return props
@@ -825,13 +822,43 @@ def View_Summary():
     st.markdown(latest_month_data.style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
     st.write("")
+
+
+
+    # Intialize a list of tuples containing the CSS styles for table headers
+    th_props = [('font-size', '14px'), ('text-align', 'left'),
+            ('font-weight', 'bold'),('color', '#6d6d6d'),
+            ('background-color', '#eeeeef'), ('border','1px solid #eeeeef')]
+
+    # Intialize a list of tuples containing the CSS styles for table data
+    td_props = [('font-size', '14px'), ('text-align', 'left')]
+
+    # Aggregate styles in a list
+    styles = [dict(selector="th", props=th_props),dict(selector="td", props=td_props)]
+
+    button_id = "blink_button"
+
+    # Define the HTML and JavaScript code
+    blink_script = """
+        <script>
+            function blinkButton() {
+            var button = document.getElementById('""" + button_id + """');
+            button.style.transition = 'background-color 0.5s ease-in-out';
+            button.style.backgroundColor = '#FFFF00'; // Change to your highlight color
+
+            setTimeout(function() {
+                button.style.backgroundColor = ''; // Reset to default color
+            }, 500);
+        }
+        </script>
+    """
 	
     # upload latest month data to AWS
     col1,col2=st.columns([2,3])
     with col1:
         download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
     with col2:	
-        submit_latest_month=st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]))
+        submit_latest_month=st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]),key=button_id, on_click="blinkButton()")
     upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
     upload_latest_month["TIME"]=latest_month
     upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
