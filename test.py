@@ -156,8 +156,8 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
 def Initial_Paramaters(operator):
     # drop down list of operator
     if operator!="Sabra":
-        #BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename)
-        #st.write(BPC_pull)
+        BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename)
+        st.write("BPC",BPC_pull)
         BPC_pull=Read_CSV_FromS3(bucket_mapping,BPC_pull_filename)
         BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
         BPC_pull=BPC_pull.set_index(["ENTITY","ACCOUNT"])
