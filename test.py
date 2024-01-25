@@ -85,9 +85,9 @@ def Read_CSV_From_Onedrive(path,file_name):
     if response.status_code == 200:
 	# Content of the file is available in response.content
         if file_name[-3:]=="csv":
-            data = pd.read_csv(pd.BytesIO(response.content))
+            data = pd.read_csv(BytesIO(response.content))
         elif file_name[-4:]=="xlsx":
-            data = pd.read_excel(pd.BytesIO(response.content))
+            data = pd.read_excel(BytesIO(response.content))
         st.write("read success")
         return data
     else:
