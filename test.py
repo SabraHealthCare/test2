@@ -58,23 +58,19 @@ token_response = app.acquire_token_for_client(scopes=["https://graph.microsoft.c
 access_token = token_response['access_token']
 headers = {'Authorization': 'Bearer ' + access_token,}    
 
+#directly save the uploaded .xlsx file to onedrive
 def Upload_to_Onedrive(uploaded_file,path,file_name):
     try:
-        # Read the content of the uploaded file and Use BytesIO to create a stream from the file content
-        file_stream = BytesIO(uploaded_file.read())
- 
         # Set the API endpoint and headers
         api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
-
         # Make the request to upload the file
-        response = requests.put(api_url, headers=headers, data=file_stream)
+        response = requests.put(api_url, headers=headers, data=BytesIO(uploaded_file.read()))
         return True
     except:
         st.write("")# error log
         return False
 
-
-# no cache
+# no cache read csv/excel from onedrive , return dataframe
 def Read_CSV_From_Onedrive(path,file_name):
     # Set the API endpoint and headers for file download
     api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/root:/{path}/{file_name}:/content'
@@ -84,15 +80,55 @@ def Read_CSV_From_Onedrive(path,file_name):
     # Check the status code
     if response.status_code == 200:
 	# Content of the file is available in response.content
-        if file_name[-3:]=="csv":
-            data = pd.read_csv(BytesIO(response.content))
-        elif file_name[-4:]=="xlsx":
-            data = pd.read_excel(BytesIO(response.content))
-        st.write("read success")
-        return data
+        if file_name[-3:].lower()=="csv":
+            df = pd.read_csv(BytesIO(response.content))
+        elif file_name[-4:].lower()=="xlsx":
+            df = pd.read_excel(BytesIO(response.content))
+        return df
     else:
-        st.write("read unsuccess")
         return False
+
+# no cache, save a dataframe to OneDrive 
+def Save_CSV_To_Onedrive(df,path,filename):   
+    try:
+        df=df[list(filter(lambda x: x!="index" and "Unnamed:" not in x,df.columns))]
+        csv_string = df.to_csv(index=False)
+	# Define your Microsoft Graph API endpoint, user ID, file path, and headers
+        api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'    
+        response = requests.put(api_url, headers=headers, data=BytesIO(csv_string.encode()))
+        # Check the response
+        if response.status_code == 201:
+            return True
+        else:
+            st.write("") #error log
+            return False
+	    
+# For updating account_mapping, entity_mapping, latest_month_data, only for operator use
+def Update_File_Onedrive(path,filename,new_data,operator,value_name=False):  # replace original data
+    #original_file =Read_CSV_From_Onedrive(path,file_name)
+    try:
+        original_data =Read_CSV_From_Onedrive(path,file_name)
+        original_data=original_data.loc[new_data.columns,:]
+        empty_file=False
+    except:
+        original_data=pd.DataFrame()
+        empty_file=True
+    if not empty_file:	    
+        if "TIME" in original_data.columns and "TIME" in new_data.columns:
+            original_data.TIME = original_data.TIME.astype(str)
+	    # remove original data by operator and month 
+            months_of_new_data=new_data["TIME"].unique()
+            original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))].index)
+        elif "TIME" not in original_data.columns and "TIME" not in new_data.columns:
+            original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
+		
+    # append new data to original data
+    new_data=new_data.reset_index(drop=False)
+    updated_data = pd.concat([original_data,new_data])
+    if value_name is not False: # set formula 
+        updated_data=EPM_Formula(updated_data,value_name)
+    return Save_CSV_To_Onedrive(updated_data,path,filename)
+
 
 # no cache
 def Read_CSV_FromS3(bucket,key):
@@ -111,19 +147,14 @@ def Save_CSV_ToS3(data,bucket,key):
         return True
     except:
         return False
-
+	    
 # no Cache , directly save the uploaded .xlsx file to S3 
 def Upload_File_toS3(uploaded_file, bucket, key):  
     try:
         s3.upload_fileobj(uploaded_file, bucket, key)
         return True
     except:
-        return False   
-
-# Function to update the value in session state
-def clicked(button_name):
-    st.session_state.clicked[button_name] = True
-	
+        return False  
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
 def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace original data
     original_file =s3.get_object(Bucket=bucket, Key=key)
@@ -142,8 +173,6 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
             original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))].index)
         elif "TIME" not in original_data.columns and "TIME" not in new_data.columns:
             original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
-
-        
     # append new data to original data
     new_data=new_data.reset_index(drop=False)
     updated_data = pd.concat([original_data,new_data])
@@ -151,6 +180,9 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
         updated_data=EPM_Formula(updated_data,value_name)
     return Save_CSV_ToS3(updated_data,bucket,key)
 
+# Function to update the value in session state
+def clicked(button_name):
+    st.session_state.clicked[button_name] = True
 
 #@st.cache_data
 def Initial_Paramaters(operator):
