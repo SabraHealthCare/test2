@@ -832,8 +832,8 @@ def View_Summary():
 
     # Display the button with conditional styling
 
-    # Apply styling based on button state
-    if not st.session_state.Confirm_and_upload_button:
+    # Apply styling based on the button state
+    if st.session_state.Confirm_and_upload_button:
         st.markdown(f"<style>div[data-baseweb='button'] button[data-baseweb-id='{latest_month}']{{background-color: yellow;}}</style>", unsafe_allow_html=True)
 
 
