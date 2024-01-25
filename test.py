@@ -834,7 +834,7 @@ def View_Summary():
 
     # Apply styling based on the button state
     if st.session_state.Confirm_and_upload_button:
-        st.markdown(f"<style>div[data-baseweb='button'] button[data-baseweb-id='{latest_month}']{{background-color: yellow;}}</style>", unsafe_allow_html=True)
+        st.markdown(f"<style>div[data-baseweb='button'] button[data-baseweb-id='latest_month']{{background-color: yellow;}}</style>", unsafe_allow_html=True)
 
 
 	
@@ -843,7 +843,7 @@ def View_Summary():
     with col1:
         download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
     with col2:	
-        submit_latest_month=st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]),key=latest_month)
+        submit_latest_month=st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]),key='latest_month')
     upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
     upload_latest_month["TIME"]=latest_month
     upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
