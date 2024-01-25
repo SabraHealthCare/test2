@@ -825,11 +825,7 @@ def View_Summary():
     st.markdown(latest_month_data.style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
     st.write("")
-
-
-    custom_background_color = "lightblue"	
-    st.markdown(f"<style>div[data-baseweb='button'] button[data-baseweb-id='latest_month']{{background-color: {custom_background_color};}}</style>", unsafe_allow_html=True)
-        	
+  	
     # upload latest month data to AWS
     col1,col2=st.columns([2,3])
     with col1:
@@ -863,9 +859,7 @@ def View_Summary():
             st.write(" ")  #----------record into error report------------------------	
     else:
         st.stop()
-    custom_background_color = "lightblue"	
-    st.markdown(f"<style>div[data-baseweb='button'] button[data-baseweb-id='latest_month']{{background-color: {custom_background_color};}}</style>", unsafe_allow_html=True)
-        
+       
 # create EPM formula for download data
 def EPM_Formula(data,value_name): # make sure there is no col on index for data
     data["EPM_Formula"]=""
