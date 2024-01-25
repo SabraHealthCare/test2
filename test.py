@@ -823,11 +823,10 @@ def View_Summary():
     st.markdown("{} {}/{} reporting data:".format(operator,latest_month[4:6],latest_month[0:4]))      
     #st.markdown(latest_month_data.style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
     #		.format(precision=0,thousands=",").hide(axis="index").to_markdown().to_html(),unsafe_allow_html=True)
-    styled_table = (latest_month_data.style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)  # Use escape=False to allow HTML tags
-)
-
+    styled_table = (latest_month_data.style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)  # Use escape=False to allow HTML tags)
+    styled_table_data = styled_table.data.replace('nan', '')
     # Display the HTML using st.markdown
-    st.markdown(styled_table, unsafe_allow_html=True)
+    st.markdown(styled_table_data, unsafe_allow_html=True)
     st.write("")
   	
     # upload latest month data to AWS
