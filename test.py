@@ -842,7 +842,7 @@ def View_Summary():
         }
         </script>
     """
-	
+    st.markdown(blink_script, unsafe_allow_html=True)	
     # upload latest month data to AWS
     col1,col2=st.columns([2,3])
     with col1:
