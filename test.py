@@ -21,7 +21,7 @@ from st_aggrid.grid_options_builder import GridOptionsBuilder
 from msal import ConfidentialClientApplication
 import requests
 s3 = boto3.client('s3')
-
+pd.set_option('display.max_repr', 0)
 #---------------------------define parameters--------------------------
 st.set_page_config(
    initial_sidebar_state="expanded",
@@ -822,7 +822,7 @@ def View_Summary():
     
     st.markdown("{} {}/{} reporting data:".format(operator,latest_month[4:6],latest_month[0:4]))      
     st.markdown(latest_month_data.style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
-		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
+		.format(precision=0,thousands=",").hide(axis="index").to_markdown().to_html(),unsafe_allow_html=True)
     st.write("")
   	
     # upload latest month data to AWS
