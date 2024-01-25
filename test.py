@@ -813,7 +813,7 @@ def View_Summary():
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
             if latest_month_data.loc[i,'Category'] =="Facility Information" or latest_month_data.loc[i,'Category'] =="Additional Statistical Information":
                 st.write("set_empty",set_empty)                 
-		    #latest_month_data.loc[i,set_empty]=""
+	        latest_month_data.loc[i,set_empty]=""
     entity_columns=latest_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
         latest_month_data["Total"] = latest_month_data[entity_columns].sum(axis=1)
@@ -826,22 +826,7 @@ def View_Summary():
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
     st.write("")
 
-    button_id = "blink_button"
-    # Define the HTML and JavaScript code
-    blink_script = """
-        <script>
-            function blinkButton() {
-            var button = document.getElementById('""" + button_id + """');
-            button.style.transition = 'background-color 0.5s ease-in-out';
-            button.style.backgroundColor = '#FFFF00'; // Change to your highlight color
 
-            setTimeout(function() {
-                button.style.backgroundColor = ''; // Reset to default color
-            }, 500);
-        }
-        </script>
-    """
-    st.markdown(blink_script, unsafe_allow_html=True)	
     # upload latest month data to AWS
     col1,col2=st.columns([2,3])
     with col1:
