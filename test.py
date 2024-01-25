@@ -21,7 +21,7 @@ from st_aggrid.grid_options_builder import GridOptionsBuilder
 from msal import ConfidentialClientApplication
 import requests
 s3 = boto3.client('s3')
-pd.set_option('display.max_repr', 0)
+
 #---------------------------define parameters--------------------------
 st.set_page_config(
    initial_sidebar_state="expanded",
