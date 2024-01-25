@@ -835,7 +835,10 @@ def View_Summary():
     # Apply styling based on the button state
     if st.session_state.Confirm_and_upload_button:
         st.markdown(f"<style>div[data-baseweb='button'] button[data-baseweb-id='latest_month']{{background-color: yellow;}}</style>", unsafe_allow_html=True)
-
+        # Apply styling to change the background color
+        custom_background_color = "lightblue"	
+        st.markdown(f"<style>div[data-baseweb='button'] button[data-baseweb-id='latest_month']{{background-color: {custom_background_color};}}</style>", unsafe_allow_html=True)
+        
 
 	
     # upload latest month data to AWS
