@@ -827,7 +827,7 @@ def View_Summary():
     styled_table = (latest_month_data.fillna('').style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
 
     # Display the HTML using st.markdown
-    st.markdown(styled_table_data, unsafe_allow_html=True)
+    st.markdown(styled_table, unsafe_allow_html=True)
     st.write("")
   	
     # upload latest month data to AWS
