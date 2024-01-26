@@ -882,7 +882,7 @@ def View_Summary():
 
         if BS_separate_excel=="Y":
             # save tenant BS to OneDrive
-            if not Upload_to_Onedrive(uploaded_BS,PL_path,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4]))
+            if not Upload_to_Onedrive(uploaded_BS,PL_path,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
                 st.write(" ")  #----------record into error report------------------------	
             
         if Update_File_Onedrive(PL_path,monthly_reporting_filename,upload_latest_month,operator):
