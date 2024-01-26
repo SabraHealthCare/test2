@@ -61,16 +61,17 @@ headers = {'Authorization': 'Bearer ' + access_token,}
 
 #directly save the uploaded (.xlsx) file to onedrive
 def Upload_to_Onedrive(uploaded_file,path,file_name):
-    try:
+    #try:
         # Set the API endpoint and headers
         api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
         # Make the request to upload the file
         response = requests.put(api_url, headers=headers, data=BytesIO(uploaded_file.read()))
-        st.write("success")
+
+	st.write(response.status_code)
         return True
-    except:
-        st.write("error")# error log
-        return False
+    #except:
+        #st.write("error")# error log
+        #return False
 
 # no cache read csv/excel from onedrive , return dataframe
 def Read_CSV_From_Onedrive(path,file_name):
