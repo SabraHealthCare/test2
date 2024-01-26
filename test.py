@@ -67,6 +67,7 @@ def Upload_to_Onedrive(uploaded_file,path,file_name):
         # Make the request to upload the file
         response = requests.put(api_url, headers=headers, data=BytesIO(uploaded_file.read()))
         st.write(response.status_code)
+        st.write(response.content)
         return True
     #except:
         #st.write("error")# error log
