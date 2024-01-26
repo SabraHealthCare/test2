@@ -875,15 +875,14 @@ def View_Summary():
     upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
     upload_latest_month["Operator"]=operator
     if submit_latest_month:
-        
         # save tenant P&L to OneDrive
         if not Upload_to_Onedrive(uploaded_finance,PL_path,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
-            st.write(" ")  #----------record into error report------------------------	
+            st.write("unsuccess ")  #----------record into error report------------------------	
 
         if BS_separate_excel=="Y":
             # save tenant BS to OneDrive
             if not Upload_to_Onedrive(uploaded_BS,PL_path,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
-                st.write(" ")  #----------record into error report------------------------	
+                st.write(" unsuccess")  #----------record into error report------------------------	
             
         if Update_File_Onedrive(PL_path,monthly_reporting_filename,upload_latest_month,operator):
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
