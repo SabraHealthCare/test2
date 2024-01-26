@@ -1023,8 +1023,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
                         st.write(" ")
                     # insert comments to diff_BPC_PL
                     diff_BPC_PL=pd.merge(diff_BPC_PL,edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Type comments below"]],on=["Property_Name","TIME","Sabra_Account_Full_Name"],how="left")
-                   
-	            Update_File_Onedrive(PL_path,discrepancy_filename,diff_BPC_PL,operator,"P&L")
+                    Update_File_Onedrive(PL_path,discrepancy_filename,diff_BPC_PL,operator,"P&L")
             View_Discrepancy_Detail()
         else:
             st.success("All previous data in P&L ties with Sabra data")
