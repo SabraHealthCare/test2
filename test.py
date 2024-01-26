@@ -640,7 +640,7 @@ def Manage_Entity_Mapping(operator):
         st.write(entity_mapping)
         download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
         # update entity_mapping in Onedrive    
-        Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator):
+        Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
         return entity_mapping
 
 @st.cache_data(experimental_allow_widgets=True)
