@@ -875,6 +875,7 @@ def View_Summary():
     upload_latest_month["Operator"]=operator
     if submit_latest_month:
         # save tenant P&L to OneDrive
+        st.write("PL_path",PL_path)
         if not Upload_to_Onedrive(uploaded_finance,PL_path,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
             st.write("unsuccess ")  #----------record into error report------------------------	
 
