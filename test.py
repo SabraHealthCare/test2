@@ -65,6 +65,7 @@ def Upload_to_Onedrive(uploaded_file,path,file_name):
     api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
     # Make the request to upload the file
     response = requests.put(api_url, headers=headers, data=BytesIO(uploaded_file.read()))
+    st.write(response.status_code)
     if response.status_code==200:
         return True
     else:
@@ -875,7 +876,6 @@ def View_Summary():
     upload_latest_month["Operator"]=operator
     if submit_latest_month:
         # save tenant P&L to OneDrive
-        st.write("PL_path",PL_path)
 
         if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
             st.write("unsuccess ")  #----------record into error report------------------------	
