@@ -65,7 +65,6 @@ def Upload_to_Onedrive(uploaded_file,path,file_name):
     api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
     # Make the request to upload the file
     response = requests.put(api_url, headers=headers, data=BytesIO(uploaded_file.read()))
-    st.write(response)
     if response.status_code==200:
         return True
     else:
@@ -1260,11 +1259,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.cache_data.clear()
             st.cache_resource.clear()
             st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False,"continue_button":False}
-            x=Upload_to_Onedrive(uploaded_finance,PL_path,"avista_test.xlsx")
-            if x==True:
-                st.write("Success")
-            else:
-                st.write("unSuccess")	
         if uploaded_finance:
             with col1:
                 st.markdown("✔️ :green[P&L selected]")
