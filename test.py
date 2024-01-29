@@ -47,6 +47,7 @@ authority = 'https://login.microsoftonline.com/' + tenant_id
 user_id= '62d4a23f-e25f-4da2-9b52-7688740d9d48'  # shali's user id of onedrive
 PL_path="Documents/Tenant Monthly Uploading/Tenant P&L"
 mapping_path="Documents/Tenant Monthly Uploading/Tenant Mapping"
+master_template_path=PL_path+"/Master Template"
 
 
 # Acquire a token using client credentials flow
@@ -65,7 +66,6 @@ def Upload_to_Onedrive(uploaded_file,path,file_name):
     api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
     # Make the request to upload the file
     response = requests.put(api_url, headers=headers, data=BytesIO(uploaded_file.read()))
-    st.write(response.status_code)
     if response.status_code==200:
         return True
     else:
@@ -885,7 +885,7 @@ def View_Summary():
             if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
                 st.write(" unsuccess")  #----------record into error report------------------------	
             
-        if Update_File_Onedrive(PL_path,monthly_reporting_filename,upload_latest_month,operator):
+        if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_latest_month,operator):
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
             
         else:
@@ -980,7 +980,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
         diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
 	# insert dims to diff_BPC_PL
         diff_BPC_PL["TIME"]=diff_BPC_PL["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
-        Update_File_Onedrive(PL_path,discrepancy_filename,diff_BPC_PL,operator,"P&L")
+        Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,"P&L")
 	    
 	# only display the big discrepancy
         edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>10] 
@@ -1023,7 +1023,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
                         st.write(" ")
                     # insert comments to diff_BPC_PL
                     diff_BPC_PL=pd.merge(diff_BPC_PL,edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Type comments below"]],on=["Property_Name","TIME","Sabra_Account_Full_Name"],how="left")
-                    Update_File_Onedrive(PL_path,discrepancy_filename,diff_BPC_PL,operator,"P&L")
+                    Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,"P&L")
             View_Discrepancy_Detail()
         else:
             st.success("All previous data in P&L ties with Sabra data")
@@ -1459,12 +1459,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
     elif choice=="Review Monthly reporting":
             st.subheader("Summary")
-            data_obj =s3.get_object(Bucket=bucket_PL, Key=monthly_reporting_filename)
-
-            if int(data_obj["ContentLength"])<=2:  # empty file
-                st.success("there is no un-uploaded data")
-            else:
-                data=pd.read_csv(BytesIO(data_obj['Body'].read()),header=0)
+            data=Read_CSV_From_Onedrive(master_template_path,monthly_reporting_filename)
+            #if int(data_obj["ContentLength"])<=2:  # empty file
+            #   st.success("there is no un-uploaded data")
+            #else:
+            if True:
+                #data=pd.read_csv(BytesIO(data_obj['Body'].read()),header=0)
                 data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
                 data["Upload_Check"]=""
                 # summary for operator upload
