@@ -113,10 +113,7 @@ def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # 
     #try:
     if True:
         original_data =Read_CSV_From_Onedrive(path,file_name)
-        st.write("original_data",original_data)
-        st.write("original_data",original_data.columns)
-        st.write("original_data",new_data.columns)
-        original_data=original_data.loc[new_data.columns,:]
+        original_data=original_data[new_data.columns]
         empty_file=False
 
     #except:
