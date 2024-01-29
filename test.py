@@ -47,7 +47,7 @@ authority = 'https://login.microsoftonline.com/' + tenant_id
 user_id= '62d4a23f-e25f-4da2-9b52-7688740d9d48'  # shali's user id of onedrive
 PL_path="Documents/Tenant Monthly Uploading/Tenant P&L"
 mapping_path="Documents/Tenant Monthly Uploading/Tenant Mapping"
-master_template_path=PL_path+"/Master Template"
+master_template_path="Documents/Tenant Monthly Uploading/Master Template"
 
 
 # Acquire a token using client credentials flow
