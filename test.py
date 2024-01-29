@@ -90,7 +90,7 @@ def Read_CSV_From_Onedrive(path,file_name):
         return False
 
 # no cache, save a dataframe to OneDrive 
-def Save_CSV_To_Onedrive(df,path,filename):   
+def Save_as_CSV_Onedrive(df,path,filename):   
     try:
         df=df[list(filter(lambda x: x!="index" and "Unnamed:" not in x,df.columns))]
         csv_string = df.to_csv(index=False)
@@ -131,7 +131,7 @@ def Update_File_Onedrive(path,filename,new_data,operator,value_name=False):  # r
     updated_data = pd.concat([original_data,new_data])
     if value_name is not False: # set formula 
         updated_data=EPM_Formula(updated_data,value_name)
-    return Save_CSV_To_Onedrive(updated_data,path,filename)
+    return Save_as_CSV_Onedrive(updated_data,path,filename)
 
 
 # no cache
@@ -878,12 +878,12 @@ def View_Summary():
         # save tenant P&L to OneDrive
         st.write("PL_path",PL_path)
 
-        if not Upload_to_Onedrive(uploaded_finance,PL_path,"{}/{}_P&L_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
+        if not Upload_to_Onedrive(uploaded_finance,"{}/{}"format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
             st.write("unsuccess ")  #----------record into error report------------------------	
 
         if BS_separate_excel=="Y":
             # save tenant BS to OneDrive
-            if not Upload_to_Onedrive(uploaded_BS,PL_path,"{}/{}_BS_{}-{}.xlsx".format(operator,operator,latest_month[4:6],latest_month[0:4])):
+            if not Upload_to_Onedrive(uploaded_BS,"{}/{}"format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
                 st.write(" unsuccess")  #----------record into error report------------------------	
             
         if Update_File_Onedrive(PL_path,monthly_reporting_filename,upload_latest_month,operator):
@@ -1441,7 +1441,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                                 tenant_account=un_confirmed_account[un_confirmed_account["Index"]==selected_row[i]["Index"]]["Tenant_Account"].item()
                                 account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"]=None
                         # save account_mapping 
-                        if Save_CSV_To_Onedrive(account_mapping,path,account_mapping_filename):    
+                        if Save_as_CSV_Onedrive(account_mapping,path,account_mapping_filename):    
                             st.success("Selected mappings have been archived successfully")
                         else:
                             st.error("Can't save the change, please contact Sha Li.")
