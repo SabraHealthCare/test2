@@ -90,7 +90,7 @@ def Read_CSV_From_Onedrive(path,file_name):
         return False
 
 # no cache, save a dataframe to OneDrive 
-def Save_as_CSV_Onedrive(df,path,filename):   
+def Save_as_CSV_Onedrive(df,path,file_name):   
     try:
         df=df[list(filter(lambda x: x!="index" and "Unnamed:" not in x,df.columns))]
         csv_string = df.to_csv(index=False)
@@ -101,7 +101,7 @@ def Save_as_CSV_Onedrive(df,path,filename):
         if response.status_code == 201:
             return True
         else:
-            st.write("") #error log
+            st.write("unsuccess") #error log
             return False
     except:
         return False
@@ -115,7 +115,7 @@ def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # 
         original_data =Read_CSV_From_Onedrive(path,file_name)
         original_data=original_data[new_data.columns]
         empty_file=False
-
+        st.write("original_data",original_data)
     #except:
         #original_data=pd.DataFrame()
         #empty_file=True
@@ -125,6 +125,7 @@ def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # 
 	    # remove original data by operator and month 
             months_of_new_data=new_data["TIME"].unique()
             original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))].index)
+            st.write("original_data",original_data)
         elif "TIME" not in original_data.columns and "TIME" not in new_data.columns:
             original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
 		
@@ -133,6 +134,7 @@ def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # 
     updated_data = pd.concat([original_data,new_data])
     if value_name is not False: # set formula 
         updated_data=EPM_Formula(updated_data,value_name)
+    st.write("updated_data",updated_data)
     return Save_as_CSV_Onedrive(updated_data,path,file_name)
 
 
