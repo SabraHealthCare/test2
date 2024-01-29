@@ -877,7 +877,7 @@ def View_Summary():
         # save tenant P&L to OneDrive
         st.write("PL_path",PL_path)
 
-        if not Upload_to_Onedrive(uploaded_finance,"{}/{}"format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
+        if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
             st.write("unsuccess ")  #----------record into error report------------------------	
 
         if BS_separate_excel=="Y":
