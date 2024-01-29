@@ -1258,6 +1258,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.cache_data.clear()
             st.cache_resource.clear()
             st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False,"continue_button":False}
+            x=Upload_to_Onedrive(uploaded_finance,PL_path,"avista_test.xlsx")
+            if x==True:
+                st.write("Success")
+	    else:
+                st.write("unSuccess")	
         if uploaded_finance:
             with col1:
                 st.markdown("✔️ :green[P&L selected]")
