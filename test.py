@@ -91,21 +91,21 @@ def Read_CSV_From_Onedrive(path,file_name):
 
 # no cache, save a dataframe to OneDrive 
 def Save_as_CSV_Onedrive(df,path,file_name):   
-    if True:
+    try:
         df=df[list(filter(lambda x: x!="index" and "Unnamed:" not in x,df.columns))]
-        
         csv_string = df.to_csv(index=False)
 	# Define your Microsoft Graph API endpoint, user ID, file path, and headers
         api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'    
         response = requests.put(api_url, headers=headers, data=BytesIO(csv_string.encode()))
         # Check the response
-        if response.status_code == 201:
+        if response.status_code == 200:
             return True
         else:
-            st.write("response.status_code",response.status_code) #error log
+            st.write("") # error log
             return False
-    #except:
-        #return False
+    except:
+        st.write("") # error log
+        return False
 
 
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
