@@ -110,13 +110,15 @@ def Save_as_CSV_Onedrive(df,path,filename):
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
 def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # replace original data
     #original_file =Read_CSV_From_Onedrive(path,file_name)
-    try:
+    #try:
+    if True:
         original_data =Read_CSV_From_Onedrive(path,file_name)
         original_data=original_data.loc[new_data.columns,:]
         empty_file=False
-    except:
-        original_data=pd.DataFrame()
-        empty_file=True
+
+    #except:
+        #original_data=pd.DataFrame()
+        #empty_file=True
     if not empty_file:	    
         if "TIME" in original_data.columns and "TIME" in new_data.columns:
             original_data.TIME = original_data.TIME.astype(str)
