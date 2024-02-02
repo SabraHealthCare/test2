@@ -214,7 +214,7 @@ def Initial_Paramaters(operator):
 def Initial_Mapping(operator):
     # read account mapping
     account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename)
-    st.write(account_mapping)
+    st.write(account_mapping_all)
     st.write(operator)
     account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]==operator]
     st.write(account_mapping)
