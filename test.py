@@ -330,8 +330,9 @@ def filters_widgets(df, columns,location="Vertical"):
 
 @st.cache_data
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
-    #search tenant account column in P&L, return col number of tenant account
+    #search tenant account column in P&L, return col number of tenant account	
     account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	       
+    st.write(account_mapping,account_pool)
     if sheet_type=="Sheet_Name_Finance":
         account_pool=account_pool.loc[account_pool["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Formated_Account"]
     elif sheet_type=="Sheet_Name_Occupancy": 
@@ -1036,8 +1037,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
 def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
     global latest_month,account_mapping
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
-    st.write("sheet_name",sheet_name)
-    PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None,engine='openpyxl') 
+    
     # read data from uploaded file
     count=0
     while(True):
