@@ -1040,8 +1040,9 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     # read data from uploaded file
     count=0
     while(True):
-        try:
+        try:		
             PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
+            st.write("PL",PL)		
             break
         except:
             col1,col2=st.columns(2) 
