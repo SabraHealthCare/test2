@@ -2,9 +2,9 @@ pandas
 numpy
 xlwt
 pyodbc
+xlrd>=2.0.1
 datetime
 openpyxl
-#xlrd
 streamlit
 #gcsfs
 #pyodbc
