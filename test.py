@@ -1126,6 +1126,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                         st.warning("Warning: There are more than one '{}' accounts in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
         
         # Map PL accounts and Sabra account
+        st.write(7,"PL",PL)
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
         st.write(2,"PL",PL)
     return PL,PL_with_detail
