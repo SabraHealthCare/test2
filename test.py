@@ -1291,6 +1291,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
+            st.write(2,Total_PL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
         
         with st.spinner('Wait for data checking'):    
