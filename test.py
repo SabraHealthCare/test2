@@ -1091,16 +1091,17 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
 
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)
-	
+        st.write(3,"PL",PL)	
         #remove row above date row and remove column without date col name
         PL=PL.iloc[date_header[1]+1:,PL.columns!='0']
-    
+        st.write(4,"PL",PL)    
         #remove rows with nan tenant account
         nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
         PL.drop(nan_index, inplace=True)
         #set index as str ,strip
         PL.index=map(lambda x:str(x).strip(),PL.index)
         PL=PL.map(lambda x: 0 if (x!=x) or (type(x)==str) or x==" " else x)
+        st.write(5,"PL",PL)	    
         # remove columns with all nan/0
         PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
