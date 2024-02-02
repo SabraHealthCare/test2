@@ -1090,11 +1090,9 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         PL.columns=date_header[0]
 
         #set tenant_account as index of PL
-        PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)
-        st.write(3,"PL",PL)	
+        PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         #remove row above date row and remove column without date col name
-        PL=PL.iloc[date_header[1]+1:,PL.columns!='0']
-        st.write(4,"PL",PL)    
+        PL=PL.iloc[date_header[1]+1:,PL.columns!='0']    
         #remove rows with nan tenant account
         nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
         PL.drop(nan_index, inplace=True)
@@ -1106,6 +1104,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
         PL=PL.loc[(PL!= 0).any(axis=1),:]
+        st.write(6,"PL",PL)	
 
         # mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
