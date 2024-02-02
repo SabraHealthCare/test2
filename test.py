@@ -1251,12 +1251,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             col1,col2=st.columns(2)
             with col1:
                 st.subheader("Upload P&L:")
-                uploaded_finance=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False,key="Finance_upload")
+                uploaded_finance=st.file_uploader(":star: :red[Only XLSX allowed] :star:",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
                 
             with col2:
                 if BS_separate_excel=="Y":
                     st.subheader("Upload Balance Sheet:")
-                    uploaded_BS=st.file_uploader("",type={"xlsx","xlsm","xls"},accept_multiple_files=False,key="BS_upload")
+                    uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
             submitted = st.form_submit_button("Upload")
         if submitted:
 	    # clear cache for every upload
