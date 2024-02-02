@@ -1037,7 +1037,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     global latest_month,account_mapping
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     st.write("sheet_name",sheet_name)
-    PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None) 
+    PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None,engine='openpyxl') 
     # read data from uploaded file
     count=0
     while(True):
