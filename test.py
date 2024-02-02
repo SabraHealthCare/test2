@@ -701,7 +701,9 @@ def Map_PL_Sabra(PL,entity):
                                             [["Sabra_Account","Tenant_Formated_Account","Tenant_Account","Conversion"]],on="Tenant_Formated_Account",how='right')])
 
     # remove blank sabra_account ( corresponds to "no need to map")	
+    st.write("Before",PL)	
     PL = PL.dropna(subset=['Sabra_Account'])
+    st.write("after",PL)
     PL=PL.reset_index(drop=True)
     month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
     for i in range(len(PL.index)):
