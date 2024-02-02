@@ -214,10 +214,7 @@ def Initial_Paramaters(operator):
 def Initial_Mapping(operator):
     # read account mapping
     account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename)
-    st.write(account_mapping_all)
-    st.write(operator)
     account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]==operator]
-    st.write(account_mapping)
     account_mapping.loc["Tenant_Formated_Account":]=list(map(lambda x:x.upper().strip(),account_mapping.loc["Tenant_Account":]))
     account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
     # read property mapping
@@ -335,7 +332,6 @@ def filters_widgets(df, columns,location="Vertical"):
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
     #search tenant account column in P&L, return col number of tenant account	
     account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	       
-    st.write(account_mapping,account_pool)
     if sheet_type=="Sheet_Name_Finance":
         account_pool=account_pool.loc[account_pool["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Formated_Account"]
     elif sheet_type=="Sheet_Name_Occupancy": 
@@ -831,7 +827,7 @@ def View_Summary():
         		    
         if not st.session_state.clicked["continue_button"]:
             st.stop()
-		
+    st.write(latest_month_data)		
     latest_month_data = latest_month_data.pivot(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month)
     latest_month_data.reset_index(drop=False,inplace=True)
 
