@@ -1286,6 +1286,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             # process Finance 
             with st.spinner('Wait for P&L process'):
                 Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
+                st.write(3,Total_PL)
 		# process BS 
                 Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
             
