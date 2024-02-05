@@ -703,7 +703,6 @@ def Map_PL_Sabra(PL,entity):
     # remove blank sabra_account ( corresponds to "no need to map")	
     PL=PL[PL['Sabra_Account']!=" "]
     PL.dropna(subset=['Sabra_Account'], inplace=True)
-	
     PL=PL.reset_index(drop=True)
     month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
     for i in range(len(PL.index)):
@@ -732,6 +731,7 @@ def Map_PL_Sabra(PL,entity):
     # group by Sabra_Account
     PL=PL.groupby(by=PL.index).sum().replace(0,None)
     PL.index=[[entity]*len(PL.index),list(PL.index)]
+    st.write(1,PL)
     return PL,PL_with_detail
     
 @st.cache_data
@@ -830,7 +830,8 @@ def View_Summary():
             st.write("")#-----------------------write to error log-----------------------
         		    
         if not st.session_state.clicked["continue_button"]:
-            st.stop()		
+            st.stop()	
+    st.write(2,latest_month_data)
     latest_month_data = latest_month_data.pivot(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month)
     latest_month_data.reset_index(drop=False,inplace=True)
 
