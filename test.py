@@ -701,11 +701,9 @@ def Map_PL_Sabra(PL,entity):
                                             [["Sabra_Account","Tenant_Formated_Account","Tenant_Account","Conversion"]],on="Tenant_Formated_Account",how='right')])
 
     # remove blank sabra_account ( corresponds to "no need to map")	
-    st.write("Before",PL)	
-    #PL.dropna(subset=['Sabra_Account'],inplace=True)
-    st.write("??",PL[PL['Sabra_Account']==" "])
+    PL=PL[PL['Sabra_Account']!=" "]
+    PL.dropna(subset=['Sabra_Account'], inplace=True)
 	
-    st.write("after",PL)
     PL=PL.reset_index(drop=True)
     month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
     for i in range(len(PL.index)):
@@ -725,17 +723,15 @@ def Map_PL_Sabra(PL,entity):
 
 
     PL=PL.drop(["Tenant_Formated_Account","Conversion"], axis=1)
-    st.write(8,PL)
     PL_with_detail=copy.copy(PL)
     PL_with_detail["Entity"]=entity
     PL_with_detail=PL_with_detail.set_index(['Entity', 'Sabra_Account',"Tenant_Account"])
     PL=PL.set_index("Sabra_Account",drop=True)
     PL=PL.drop(["Tenant_Account"], axis=1)
-    st.write(9,PL)
+
     # group by Sabra_Account
     PL=PL.groupby(by=PL.index).sum().replace(0,None)
     PL.index=[[entity]*len(PL.index),list(PL.index)]
-    st.write(10,PL)
     return PL,PL_with_detail
     
 @st.cache_data
@@ -810,13 +806,10 @@ def View_Summary():
     
     Total_PL.index=Total_PL.index.set_names(["ENTITY", "Sabra_Account"]) 
     Total_PL=Total_PL.fillna(0)
-    st.write(1,Total_PL)
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
-    st.write(1,latest_month_data)
-    latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
-    st.write(2,latest_month_data)	
+    latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-    st.write(3,latest_month_data)	
+	
     missing_check=latest_month_data[["Property_Name","Category","ENTITY",latest_month]][latest_month_data["Category"].\
 	    isin(['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"])].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
     missing_check=missing_check[missing_check[latest_month]==0]
@@ -837,8 +830,7 @@ def View_Summary():
             st.write("")#-----------------------write to error log-----------------------
         		    
         if not st.session_state.clicked["continue_button"]:
-            st.stop()
-    st.write(4,latest_month_data)		
+            st.stop()		
     latest_month_data = latest_month_data.pivot(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month)
     latest_month_data.reset_index(drop=False,inplace=True)
 
@@ -1106,13 +1098,11 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         PL.drop(nan_index, inplace=True)
         #set index as str ,strip
         PL.index=map(lambda x:str(x).strip(),PL.index)
-        PL=PL.map(lambda x: 0 if (x!=x) or (type(x)==str) or x==" " else x)
-        st.write(5,"PL",PL)	    
+        PL=PL.map(lambda x: 0 if (x!=x) or (type(x)==str) or x==" " else x)	    
         # remove columns with all nan/0
         PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
         PL=PL.loc[(PL!= 0).any(axis=1),:]
-        st.write(6,"PL",PL)	
 
         # mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
@@ -1134,9 +1124,8 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                         st.warning("Warning: There are more than one '{}' accounts in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
         
         # Map PL accounts and Sabra account
-        st.write(7,"PL",PL)
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
-        st.write(2,"PL",PL)
+
     return PL,PL_with_detail
 	
 @st.cache_data(experimental_allow_widgets=True) 
@@ -1195,7 +1184,7 @@ def Upload_And_Process(uploaded_file,file_type):
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
-                    st.write(1,"PL",PL)
+
                     # check if census data in another sheet
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
@@ -1292,7 +1281,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             with st.spinner('Wait for P&L process'):
                 Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
-                st.write(2,Total_PL)
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             # process Finance 
             with st.spinner('Wait for P&L process'):
