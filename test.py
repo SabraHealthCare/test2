@@ -38,6 +38,7 @@ discrepancy_filename="Total_Diecrepancy_Review.csv"
 monthly_reporting_filename="Total monthly reporting.csv"
 operator_list_filename="Operator_list.csv"
 BPC_account_filename="Sabra_account_list.csv"
+previous_monthes_comparison=1
 
 #One drive authority. Set application details
 client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
@@ -741,7 +742,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)","Diff_Percent"])
     diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","Sabra","P&L Value","Diff (Sabra-P&L)",""])
     
-    if len(month_list)>2:  # only compare 2 months
+    if len(month_list)>previous_monthes_comparison:  # only compare 1 months
         month_list=month_list[-2:]
 	    
     for entity in entity_mapping.index:
