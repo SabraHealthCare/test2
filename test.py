@@ -731,7 +731,6 @@ def Map_PL_Sabra(PL,entity):
     # group by Sabra_Account
     PL=PL.groupby(by=PL.index).sum().replace(0,None)
     PL.index=[[entity]*len(PL.index),list(PL.index)]
-    st.write(1,PL)
     return PL,PL_with_detail
     
 @st.cache_data
@@ -831,7 +830,6 @@ def View_Summary():
         		    
         if not st.session_state.clicked["continue_button"]:
             st.stop()	
-    st.write(2,latest_month_data)
     latest_month_data = latest_month_data.pivot(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month)
     latest_month_data.reset_index(drop=False,inplace=True)
 
