@@ -66,7 +66,7 @@ def Upload_to_Onedrive(uploaded_file,path,file_name):
     api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
     # Make the request to upload the file
     response = requests.put(api_url, headers=headers, data=BytesIO(uploaded_file.read()))
-    if response.status_code==200:
+    if response.status_code==200 or response.status_code==201:
         return True
     else:
         return False
