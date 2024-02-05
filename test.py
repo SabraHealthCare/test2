@@ -704,6 +704,7 @@ def Map_PL_Sabra(PL,entity):
     st.write("Before",PL)	
     #PL.dropna(subset=['Sabra_Account'],inplace=True)
     st.write("??",PL['Sabra_Account'])
+	
     st.write("after",PL)
     PL=PL.reset_index(drop=True)
     month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
