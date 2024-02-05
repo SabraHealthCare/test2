@@ -703,7 +703,7 @@ def Map_PL_Sabra(PL,entity):
     # remove blank sabra_account ( corresponds to "no need to map")	
     st.write("Before",PL)	
     #PL.dropna(subset=['Sabra_Account'],inplace=True)
-    st.write("??",PL['Sabra_Account'])
+    st.write("??",PL[PL['Sabra_Account']==" ")
 	
     st.write("after",PL)
     PL=PL.reset_index(drop=True)
