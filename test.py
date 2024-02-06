@@ -812,20 +812,20 @@ def View_Summary():
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
+
+    # check missing category ( ex: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
     property_list=list(latest_month_data["Property_Name"].unique())
-    reported_cagegory=latest_month_data[["Property_Name","Category","ENTITY",latest_month]][latest_month_data["Category"].\
+    current_cagegory=latest_month_data[["Property_Name","Category","ENTITY",latest_month]][latest_month_data["Category"].\
 	    isin(category_list)].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
-    category_property_full_combination = pd.DataFrame(list(product(property_list,category_list)), columns=['Property_Name', 'Category'])
-    missing_category=category_property_full_combination.merge(reported_cagegory,on=['Property_Name', 'Category'],how="left")
-    st.write("missing_category",missing_category)
+    full_category = pd.DataFrame(list(product(property_list,category_list)), columns=['Property_Name', 'Category'])
+    missing_category=full_category.merge(current_cagegory,on=['Property_Name', 'Category'],how="left")
     missing_category=missing_category[(missing_category[latest_month]==0) | (missing_category[latest_month].isnull())]
-    st.write("missing_category",missing_category)
-    if missing_check.shape[0]>0:
+    if missing_category.shape[0]>0:
         st.error("No data detected for below properties on specific accounts: ")
         col1,col2=st.columns([2,1])
         with col1:
-            st.dataframe(missing_check[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
+            st.dataframe(missing_category[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
 		    column_config={
 			        "Property_Name": "Property",
 			        "Category":"Sabra account-Total",
