@@ -811,11 +811,14 @@ def View_Summary():
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-	
+    category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
+    property_list=list(latest_month_data["Property_Name"].unique())
     missing_check=latest_month_data[["Property_Name","Category","ENTITY",latest_month]][latest_month_data["Category"].\
-	    isin(['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"])].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
+	    isin(category_list)].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
+    df_full_combination = pd.DataFrame(list(product(property_list,category_list)), columns=['Property_Name', 'Category'])
     missing_check=missing_check[missing_check[latest_month]==0]
-    st.write("missing_check",missing_check)
+    missing_items=df_full_combination.merge(missing_check,on=['Property_Name', 'Category'],how="left")
+    st.write("missing_items",missing_items)
     if missing_check.shape[0]>0:
         st.error("No data detected for below properties on specific accounts: ")
         col1,col2=st.columns([2,1])
@@ -833,7 +836,7 @@ def View_Summary():
         		    
         if not st.session_state.clicked["continue_button"]:
             st.stop()	
-    st.write(latest_month_data)
+
     latest_month_data = latest_month_data.pivot(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month)
     latest_month_data.reset_index(drop=False,inplace=True)
 
