@@ -814,7 +814,6 @@ def View_Summary():
 	
     missing_check=latest_month_data[["Property_Name","Category","ENTITY",latest_month]][latest_month_data["Category"].\
 	    isin(['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"])].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
-    st.write("missing_check",missing_check)
     missing_check=missing_check[missing_check[latest_month]==0]
     st.write("missing_check",missing_check)
     if missing_check.shape[0]>0:
