@@ -820,7 +820,7 @@ def View_Summary():
     st.write(category_property_full_combination)
     missing_category=category_property_full_combination.merge(reported_cagegory,on=['Property_Name', 'Category'],how="left")
     st.write("missing_category",missing_category)
-    missing_category=missing_category[(missing_category[latest_month]==0) | (missing_category[latest_month]="")]
+    missing_category=missing_category[(missing_category[latest_month]==0) | (missing_category[latest_month]=="")]
     st.write("missing_category",missing_category)
     if missing_check.shape[0]>0:
         st.error("No data detected for below properties on specific accounts: ")
