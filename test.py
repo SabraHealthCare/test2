@@ -817,7 +817,8 @@ def View_Summary():
     missing_check=latest_month_data[["Property_Name","Category","ENTITY",latest_month]][latest_month_data["Category"].\
 	    isin(category_list)].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
     df_full_combination = pd.DataFrame(list(product(property_list,category_list)), columns=['Property_Name', 'Category'])
-    missing_check=missing_check[missing_check[latest_month]==0]
+    st.write(df_full_combination)
+    #missing_check=missing_check[missing_check[latest_month]==0]
     missing_items=df_full_combination.merge(missing_check,on=['Property_Name', 'Category'],how="left")
     st.write("missing_items",missing_items)
     if missing_check.shape[0]>0:
