@@ -211,7 +211,6 @@ def Initial_Paramaters(operator):
         st.stop()
     return BPC_pull,month_dic,year_dic
 
-
 #@st.cache_resource
 def Initial_Mapping(operator):
     # read account mapping
