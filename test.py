@@ -216,9 +216,9 @@ def Initial_Mapping(operator):
     # read account mapping
     account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename)
     account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]==operator]
-    account_mapping.loc['Sabra_Account'] = account_mapping['Sabra_Account'].apply(lambda x: x.upper() if (x is not None) and pd.notna(x) else x)
-    account_mapping.loc['Sabra_Second_Account'] = account_mapping['Sabra_Second_Account'].apply(lambda x:  x.upper() if (x is not None) and pd.notna(x) else x)
-    account_mapping.loc["Tenant_Formated_Account":]=list(map(lambda x:x.upper().strip(),account_mapping.loc["Tenant_Account":]))
+    account_mapping.loc['Sabra_Account'] = account_mapping['Sabra_Account'].apply(lambda x: x.upper().strip() if (x is not None) and pd.notna(x) else x)
+    account_mapping.loc['Sabra_Second_Account'] = account_mapping['Sabra_Second_Account'].apply(lambda x:  x.upper().strip() if (x is not None) and pd.notna(x) else x)
+    account_mapping.loc["Tenant_Formated_Account"]=account_mapping["Tenant_Account"].apply(lambda x:x.upper().strip())
     account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
     # read property mapping
     entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename)
