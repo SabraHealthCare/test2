@@ -689,6 +689,7 @@ def Manage_Account_Mapping(new_tenant_account):
 
 @st.cache_data
 def Map_PL_Sabra(PL,entity):
+    st.write("1PL",PL)
     # remove no need to map from account_mapping
     main_account_mapping=account_mapping.loc[list(map(lambda x:x==x and x.upper()!='NO NEED TO MAP',account_mapping["Sabra_Account"])),:]
 
