@@ -703,9 +703,11 @@ def Map_PL_Sabra(PL,entity):
                                             [["Sabra_Account","Tenant_Formated_Account","Tenant_Account","Conversion"]],on="Tenant_Formated_Account",how='right')])
 
     # remove blank sabra_account ( corresponds to "no need to map")	
+    st.write("1PL",PL)
     PL=PL[PL['Sabra_Account']!=" "]
     PL.dropna(subset=['Sabra_Account'], inplace=True)
     PL=PL.reset_index(drop=True)
+    st.write("2PL",PL)
     month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
     for i in range(len(PL.index)):
         conversion=PL.loc[i,"Conversion"]
