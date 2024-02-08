@@ -692,32 +692,21 @@ def Map_PL_Sabra(PL,entity):
     # remove no need to map from account_mapping
     main_account_mapping=account_mapping.loc[list(map(lambda x:x==x and x.upper()!='NO NEED TO MAP',account_mapping["Sabra_Account"])),:]
 
-    #concat main accounts with second accounts
-    #second_account_mapping=account_mapping[account_mapping["Sabra_Second_Account"] is not None]
-    #st.write("second_account_mapping--1",second_account_mapping)
-
-    #second_account_mapping["Sabra_Second_Account"]=second_account_mapping["Sabra_Second_Account"].apply(lambda x:len(x))
-    #st.write("second_account_mapping--2",second_account_mapping)
-	
-    #st.write("second_account_mapping--0",second_account_mapping)	
+    #concat main accounts with second accounts	
     second_account_mapping=account_mapping.loc[(account_mapping["Sabra_Second_Account"]==account_mapping["Sabra_Second_Account"])&(account_mapping["Sabra_Second_Account"]!="NO NEED TO MAP")& (pd.notna(account_mapping["Sabra_Second_Account"]))][["Sabra_Second_Account","Tenant_Formated_Account","Tenant_Account","Conversion"]].\
                            rename(columns={"Sabra_Second_Account": "Sabra_Account"})
     second_account_mapping=second_account_mapping.dropna(subset="Sabra_Account")
     second_account_mapping=second_account_mapping[second_account_mapping["Sabra_Account"]!=" "]
-    st.write("second_account_mapping--1",second_account_mapping)
-
+    
     PL.index.name="Tenant_Account"
     PL["Tenant_Formated_Account"]=list(map(lambda x:x.upper() if type(x)==str else x,PL.index))
-
     PL=pd.concat([PL.merge(second_account_mapping,on="Tenant_Formated_Account",how='right'),PL.merge(main_account_mapping[main_account_mapping["Sabra_Account"]==main_account_mapping["Sabra_Account"]]\
                                             [["Sabra_Account","Tenant_Formated_Account","Tenant_Account","Conversion"]],on="Tenant_Formated_Account",how='right')])
-    st.write("Second mapping",PL.merge(second_account_mapping,on="Tenant_Formated_Account",how='right'))
     # remove blank sabra_account ( corresponds to "no need to map")	
-
     PL=PL[PL['Sabra_Account']!=" "]
     PL.dropna(subset=['Sabra_Account'], inplace=True)
     PL=PL.reset_index(drop=True)
-    st.write("2PL",PL)
+
     month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
     for i in range(len(PL.index)):
         conversion=PL.loc[i,"Conversion"]
