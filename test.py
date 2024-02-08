@@ -807,6 +807,7 @@ def View_Summary():
     
     Total_PL.index=Total_PL.index.set_names(["ENTITY", "Sabra_Account"]) 
     Total_PL=Total_PL.fillna(0)
+    st.write("Total_PL",Total_PL,latest_month_data)
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
@@ -1109,7 +1110,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
         PL=PL.loc[(PL!= 0).any(axis=1),:]
-        st.write(1,PL)
+
         # mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
             
@@ -1173,8 +1174,6 @@ def Upload_And_Process(uploaded_file,file_type):
     if True:
         if uploaded_file.name[-5:]=='.xlsx':
             PL_sheet_list=load_workbook(uploaded_file).sheetnames
-
-	    
         else:
             PL_sheet_list=[]
 		
