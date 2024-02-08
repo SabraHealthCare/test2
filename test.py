@@ -697,6 +697,7 @@ def Map_PL_Sabra(PL,entity):
     #concat main accounts with second accounts
     second_account_mapping=account_mapping.loc[(account_mapping["Sabra_Second_Account"]==account_mapping["Sabra_Second_Account"])&(account_mapping["Sabra_Second_Account"]!="NO NEED TO MAP")& (pd.notna(account_mapping["Sabra_Second_Account"]))][["Sabra_Second_Account","Tenant_Formated_Account","Tenant_Account","Conversion"]].\
                            rename(columns={"Sabra_Second_Account": "Sabra_Account"})
+    second_account_mapping=second_account_mapping.dropna(subset="Sabra_Account")
     st.write("second_account_mapping",second_account_mapping)
     st.write("main_account_mapping",main_account_mapping) 
     PL.index.name="Tenant_Account"
