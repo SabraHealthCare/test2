@@ -690,13 +690,14 @@ def Manage_Account_Mapping(new_tenant_account):
 @st.cache_data
 def Map_PL_Sabra(PL,entity):
     st.write("1PL",PL)
+    st.write("account_mapping",account_mapping)
     # remove no need to map from account_mapping
     main_account_mapping=account_mapping.loc[list(map(lambda x:x==x and x.upper()!='NO NEED TO MAP',account_mapping["Sabra_Account"])),:]
 
     #concat main accounts with second accounts
     second_account_mapping=account_mapping.loc[(account_mapping["Sabra_Second_Account"]==account_mapping["Sabra_Second_Account"])&(account_mapping["Sabra_Second_Account"]!="NO NEED TO MAP")][["Sabra_Second_Account","Tenant_Formated_Account","Tenant_Account","Conversion"]].\
                            rename(columns={"Sabra_Second_Account": "Sabra_Account"})
-    
+    st.write("main_account_mapping",main_account_mapping) 
     PL.index.name="Tenant_Account"
     PL["Tenant_Formated_Account"]=list(map(lambda x:x.upper() if type(x)==str else x,PL.index))
  
