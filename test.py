@@ -694,9 +694,10 @@ def Map_PL_Sabra(PL,entity):
 
     #concat main accounts with second accounts
     second_account_mapping=account_mapping[account_mapping["Sabra_Second_Account"]!=" " ]
-    second_account_mapping=second_account_mapping["Sabra_Second_Account"].apply(lambda x:x.strip() if (x is not None) & ( pd.notna(x)) else x)
+    st.write("second_account_mapping--0",second_account_mapping)
+    second_account_mapping["Sabra_Second_Account"]=second_account_mapping["Sabra_Second_Account"].apply(lambda x:x.strip() if (x is not None) & ( pd.notna(x)) else x)
 
-    st.write("second_account_mapping--2",second_account_mapping)
+    st.write("second_account_mapping--1",second_account_mapping)
 
     second_account_mapping["Sabra_Second_Account"]=second_account_mapping["Sabra_Second_Account"].apply(lambda x:len(x))
     st.write("second_account_mapping--3",second_account_mapping)
