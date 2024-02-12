@@ -1241,12 +1241,13 @@ if st.session_state["authentication_status"] is False:
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
     operator=st.session_state["operator"]
     st.title(operator)
-    BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
-    entity_mapping,account_mapping=Initial_Mapping(operator)
+
   
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
     if choice=="Upload P&L":
+        BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
+        entity_mapping,account_mapping=Initial_Mapping(operator)
         global latest_month
         latest_month='2023'
         if all(entity_mapping["BS_separate_excel"]=="Y"):
@@ -1319,6 +1320,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             else:
                 st.write("There is no previous month data in tenant P&L")
     elif choice=="Manage Mapping":
+        BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
+        entity_mapping,account_mapping=Initial_Mapping(operator)
         with st.expander("Manage Property Mapping" ,expanded=True):
             ChangeWidgetFontSize('Manage Property Mapping', '25px')
             entity_mapping=Manage_Entity_Mapping(operator)
