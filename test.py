@@ -380,7 +380,7 @@ def Get_Month_Year(single_string):
 
     single_string=str(single_string).lower()
     Year,Year_keyword=Get_Year(single_string)
-    st.write("Year",Year,Year_keyword)
+
     
     # remove year from string, remove days from string
     single_string=single_string.replace(Year_keyword,"").replace("30","").replace("31","").replace("28","").replace("29","")
@@ -394,6 +394,7 @@ def Get_Month_Year(single_string):
                 if len(remaining)>=3:
                     return 0,0
                 else:   
+                    st.write("Year,month",Month,Year)
                     return Month,Year
             # string doesn't contain month keyword, continue to next month keyword
             else:
