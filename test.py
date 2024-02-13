@@ -369,6 +369,7 @@ def Get_Year(single_string):
         for Year in year_dic.keys():
             for Year_keyword in year_dic[Year]:
                 if Year_keyword in single_string:
+                    st.write("Year_keyword,single_string",Year_keyword,single_string)
                     return Year,Year_keyword
         return 0,""
 
