@@ -376,8 +376,8 @@ def Get_Year(single_string):
 def Get_Month_Year(single_string):
     if single_string!=single_string or single_string==None or type(single_string)==float:
         return 0,0
-    if type(single_string)==datetime:
-        return int(single_string.month),int(single_string.year)
+    #if type(single_string)==datetime:
+        #return int(single_string.month),int(single_string.year)
 
     single_string=str(single_string).lower()
     Year,Year_keyword=Get_Year(single_string)
