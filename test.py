@@ -492,7 +492,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
 
     for row_i in range(search_row_size):
         for col_i in range(PL_col_size):
-            if PL.iloc[row_i,col_i][0:2]="23"		
+            if PL.iloc[row_i,col_i][0:2]=="23":	
                 st.write(PL.iloc[row_i,col_i])
                 x,y=Get_Month_Year(PL.iloc[row_i,col_i])  
                 st.write("x","y",x,y)
