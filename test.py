@@ -377,11 +377,11 @@ def Get_Month_Year(single_string):
     if single_string!=single_string or single_string==None or type(single_string)==float:
         return 0,0
     if type(single_string)==datetime:
-        st.write("single_string",int(single_string.month),int(single_string.year),single_string)
         return int(single_string.month),int(single_string.year)
 
     single_string=str(single_string).lower()
     Year,Year_keyword=Get_Year(single_string)
+    st.write("Year",Year,Year_keyword)
 
     
     # remove year from string, remove days from string
@@ -492,6 +492,10 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
 
     for row_i in range(search_row_size):
         for col_i in range(PL_col_size):
+            if PL.iloc[row_i,col_i][0:2]="23"		
+                st.write(PL.iloc[row_i,col_i])
+                x,y=Get_Month_Year(PL.iloc[row_i,col_i])  
+                st.write("x","y",x,y)
             month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i])       
     year_count=[]        
     month_count=[]
