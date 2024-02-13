@@ -380,6 +380,7 @@ def Get_Month_Year(single_string):
 
     single_string=str(single_string).lower()
     Year,Year_keyword=Get_Year(single_string)
+    st.write("Year",Year,Year_keyword)
     
     # remove year from string, remove days from string
     single_string=single_string.replace(Year_keyword,"").replace("30","").replace("31","").replace("28","").replace("29","")
