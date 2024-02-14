@@ -1139,6 +1139,14 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
 	
 @st.cache_data(experimental_allow_widgets=True) 
 def Check_Reporting_Month(PL):	
+    today=date.today()
+    current_year= today.year
+    current_month= today.month
+    if current_month<10:
+        current_date=str(current_year)+"0"+str(current_month)
+    else:
+        current_date=str(current_year)+str(current_month)
+	
     latest_month=str(max(list(PL.columns)))
     col4,col5,col6=st.columns([5,1,8])
     with col4:  
@@ -1148,22 +1156,28 @@ def Check_Reporting_Month(PL):
     with col6:
         st.button("No", on_click=clicked, args=["no_button"])       
     if st.session_state.clicked["yes_button"]:
+        if latest_month>=current_date
+            st.error("The reporting month is supposed to be smaller than {}/{} ".format(latest_month[4:6],latest_month[0:4]))
+            st.stop()
         return latest_month
     elif st.session_state.clicked["no_button"]:
         with st.form("latest_month"):
             st.write("Please select reporting month:" )  
             col3,col4=st.columns(2)
             with col3:
-                year = st.selectbox('Year', range(2023, date.today().year+1))
+                year = st.selectbox('Year', range(current_year-1, current_year+1))
             with col4:
-                
-                month = st.selectbox('Month', range(1, 13),index=date.today().month)
+                month = st.selectbox('Month', range(1, 13),index=current_month)
             confirm_month=st.form_submit_button("Submit")
         if confirm_month:
             if month<10:
                 latest_month=str(year)+"0"+str(month)
             else:
                 latest_month=str(year)+str(month)
+            if latest_month>=current_date
+                st.error("The reporting month is supposed to be smaller than {}/{} ".format(latest_month[4:6],latest_month[0:4]))
+                st.stop()
+		
             return latest_month
         else:
             st.stop()
