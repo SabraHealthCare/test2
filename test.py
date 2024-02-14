@@ -1162,19 +1162,13 @@ def Check_Reporting_Month(PL):
         return latest_month
     elif st.session_state.clicked["no_button"]:
         with st.form("latest_month"):
-            st.write("Please select reporting month:" )  
             col3,col4=st.columns(2)
             with col3:
-                latest_month = st.selectbox('Select reporting months from your P&L', reporting_month_list)
-            #with col4:
-                #month = st.selectbox('Month', range(1, 13),index=current_month)
+                latest_month = st.selectbox('Select reporting month from P&L', list(map(lambda x:x[0:4]+"/"+x[4:6],reporting_month_list)))
+                latest_month=latest_month[0:4]+latest_month[5:7]
             confirm_select=st.form_submit_button("Submit")
         if confirm_select:
-            #if month<10:
-                #latest_month=str(year)+"0"+str(month)
-            #else:
-                #latest_month=str(year)+str(month)
-            if latest_month>=current_date:
+            if latest_month[]>=current_date:
                 st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
                 st.stop()
             return latest_month
