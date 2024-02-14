@@ -1225,7 +1225,6 @@ def Upload_And_Process(uploaded_file,file_type):
                     PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
-            st.write("Total_PL_detail",Total_PL_detail)
             #st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
     return Total_PL,Total_PL_detail
 
