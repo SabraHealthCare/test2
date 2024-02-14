@@ -369,7 +369,6 @@ def Get_Year(single_string):
         for Year in year_dic.keys():
             for Year_keyword in year_dic[Year]:
                 if Year_keyword in single_string:
-                    st.write("Year_keyword,single_string",Year_keyword,single_string)
                     return Year,Year_keyword
         return 0,""
 
@@ -381,7 +380,6 @@ def Get_Month_Year(single_string):
 
     single_string=str(single_string).lower()
     Year,Year_keyword=Get_Year(single_string)
-    st.write("Year",Year,Year_keyword)
 
     
     # remove year from string, remove days from string
@@ -496,7 +494,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
     year_count=[]        
     month_count=[]
     max_len=0
-    st.write("year_table,month_table",year_table,month_table)
+
     for row_i in range(search_row_size):
         # save the number of valid months of each row to month_count
         valid_month=list(filter(lambda x:x!=0,month_table.iloc[row_i,]))
