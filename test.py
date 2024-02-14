@@ -1146,8 +1146,8 @@ def Check_Reporting_Month(PL):
         current_date=str(current_year)+"0"+str(current_month)
     else:
         current_date=str(current_year)+str(current_month)
-	
-    latest_month=str(max(list(PL.columns)))
+    reporting_month_list=list(map(lambda x:str(x),PL.columns))	
+    latest_month=max(reporting_month_list)
     col4,col5,col6=st.columns([5,1,8])
     with col4:  
         st.warning("The reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
@@ -1165,19 +1165,18 @@ def Check_Reporting_Month(PL):
             st.write("Please select reporting month:" )  
             col3,col4=st.columns(2)
             with col3:
-                year = st.selectbox('Year', range(current_year-1, current_year+1))
-            with col4:
-                month = st.selectbox('Month', range(1, 13),index=current_month)
-            confirm_month=st.form_submit_button("Submit")
-        if confirm_month:
-            if month<10:
-                latest_month=str(year)+"0"+str(month)
-            else:
-                latest_month=str(year)+str(month)
+                latest_month = st.selectbox('Select reporting months from your P&L', reporting_month_list)
+            #with col4:
+                #month = st.selectbox('Month', range(1, 13),index=current_month)
+            confirm_select=st.form_submit_button("Submit")
+        if confirm_select:
+            #if month<10:
+                #latest_month=str(year)+"0"+str(month)
+            #else:
+                #latest_month=str(year)+str(month)
             if latest_month>=current_date:
                 st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
                 st.stop()
-		
             return latest_month
         else:
             st.stop()
