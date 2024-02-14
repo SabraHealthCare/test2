@@ -1168,7 +1168,7 @@ def Check_Reporting_Month(PL):
                 latest_month=latest_month[0:4]+latest_month[5:7]
             confirm_select=st.form_submit_button("Submit")
         if confirm_select:
-            if latest_month[]>=current_date:
+            if latest_month>=current_date:
                 st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
                 st.stop()
             return latest_month
