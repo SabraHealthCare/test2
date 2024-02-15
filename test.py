@@ -813,7 +813,7 @@ def View_Summary():
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-
+    st.write("latest_month_data",latest_month_data)
     # check missing category ( ex: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
     property_list=list(latest_month_data["Property_Name"].unique())
@@ -822,7 +822,13 @@ def View_Summary():
     full_category = pd.DataFrame(list(product(property_list,category_list)), columns=['Property_Name', 'Category'])
     missing_category=full_category.merge(current_cagegory,on=['Property_Name', 'Category'],how="left")
     missing_category=missing_category[(missing_category[latest_month]==0) | (missing_category[latest_month].isnull())]
-    st.write("missing_category",missing_category)
+
+    # fill the facility info with historic data
+    properties_missing_facility=list(missing_category[missing_category"Category"]=="Facility Information":]["Property_Name"])
+    onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:7]!=str(latest_month),BPC_pull.columns)))
+    previous_facility_data=BPC_pull[BPC_pull["ENTITY"] in properties_missing_facility][onemonth_before_latest_month][]
+    
+        
     if missing_category.shape[0]>0:
         st.error("No data detected for below properties on specific accounts: ")
         col1,col2=st.columns([2,1])
