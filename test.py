@@ -816,21 +816,21 @@ def View_Summary():
     st.write("latest_month_data",latest_month_data)
     # check missing category ( ex: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
-    property_list=list(latest_month_data["Property_Name"].unique())
+    entity_list=list(latest_month_data["ENTITY"].unique())
     current_cagegory=latest_month_data[["Property_Name","Category","ENTITY",latest_month]][latest_month_data["Category"].\
 	    isin(category_list)].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
-    full_category = pd.DataFrame(list(product(property_list,category_list)), columns=['Property_Name', 'Category'])
-    missing_category=full_category.merge(current_cagegory,on=['Property_Name', 'Category'],how="left")
+    full_category = pd.DataFrame(list(product(entity_list,category_list)), columns=['ENTITY', 'Category'])
+    missing_category=full_category.merge(current_cagegory,on=['ENTITY', 'Category'],how="left")
     missing_category=missing_category[(missing_category[latest_month]==0) | (missing_category[latest_month].isnull())]
 
 	
     # fill the facility info with historic data
-    properties_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["Property_Name"])
+    entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
     onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]!=str(latest_month),BPC_pull.columns)))
     st.write(BPC_pull)
-    BPC_pull=BPC_pull.reset_index(drop=False)
+   
     facility_account_list=list(BPC_Account[BPC_Account["Category"]=="Facility Information"]["BPC_Account_Name"])
-    previous_facility_data=BPC_pull[BPC_pull["Property_Name"].isin(properties_missing_facility)][BPC_pull["ACCOUNT"].isin(facility_account_list)]
+    previous_facility_data=BPC_pull.loc[BPC_pull["ENTITY"].isin(entities_missing_facility) & (BPC_pull["ACCOUNT"].isin(facility_account_list)]
     #previous_facility_data2=BPC_pull[BPC_pull["ACCOUNT"].isin(facility_account_list)]  #[onemonth_before_latest_month]
 	
     st.write(previous_facility_data)
