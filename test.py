@@ -822,6 +822,7 @@ def View_Summary():
     full_category = pd.DataFrame(list(product(property_list,category_list)), columns=['Property_Name', 'Category'])
     missing_category=full_category.merge(current_cagegory,on=['Property_Name', 'Category'],how="left")
     missing_category=missing_category[(missing_category[latest_month]==0) | (missing_category[latest_month].isnull())]
+    st.write("missing_category",missing_category)
     if missing_category.shape[0]>0:
         st.error("No data detected for below properties on specific accounts: ")
         col1,col2=st.columns([2,1])
