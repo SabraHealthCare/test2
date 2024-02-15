@@ -1,4 +1,4 @@
-#missing_category=full_category.merge(current_cagegory,on=import pandas as pd
+import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta,date
 from openpyxl import load_workbook
