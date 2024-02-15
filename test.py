@@ -829,7 +829,7 @@ def View_Summary():
     onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]!=str(latest_month),BPC_pull.columns)))
     st.write(onemonth_before_latest_month)
     facility_account_list=list(BPC_Account[BPC_Account["Category"]=="Facility Information"][["BPC_Account_Name"]])
-    previous_facility_data=BPC_pull.loc[entities_missing_facility, :].loc(axis=0)[:, facility_account_list][onemonth_before_latest_month]	
+    previous_facility_data=BPC_pull.loc[entities_missing_facility, :].loc(axis=0)[:, facility_account_list]#[onemonth_before_latest_month]	
      	
     st.write(previous_facility_data)
         
