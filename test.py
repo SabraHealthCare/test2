@@ -826,7 +826,7 @@ def View_Summary():
     # fill the facility info with historic data
     properties_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information":]["Property_Name"])
     onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:7]!=str(latest_month),BPC_pull.columns)))
-    previous_facility_data=BPC_pull[BPC_pull["ENTITY"].isin(properties_missing_facility)][onemonth_before_latest_month][]
+    previous_facility_data=BPC_pull[BPC_pull["ENTITY"].isin(properties_missing_facility)][onemonth_before_latest_month]
     st.write(previous_facility_data)
         
     if missing_category.shape[0]>0:
