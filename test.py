@@ -820,8 +820,8 @@ def View_Summary():
     current_cagegory=latest_month_data[["Property_Name","Category","ENTITY",latest_month]][latest_month_data["Category"].\
 	    isin(category_list)].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
     full_category = pd.DataFrame(list(product(property_list,category_list)), columns=['Property_Name', 'Category'])
-    missing_category=full_category.merge(current_cagegory,on=['Property_Name', 'Category'],how="left")
-    missing_category=missing_category[(missing_category[latest_month]==0) | (missing_category[latest_month].isnull())]
+    #missing_category=full_category.merge(current_cagegory,on=['Property_Name', 'Category'],how="left")
+    #missing_category=missing_category[(missing_category[latest_month]==0) | (missing_category[latest_month].isnull())]
 
     # fill the facility info with historic data
     properties_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information":]["Property_Name"])
