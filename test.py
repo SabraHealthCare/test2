@@ -830,7 +830,7 @@ def View_Summary():
     st.write(BPC_pull)
    
     facility_account_list=list(BPC_Account[BPC_Account["Category"]=="Facility Information"]["BPC_Account_Name"])
-    previous_facility_data=BPC_pull.loc[BPC_pull["ENTITY"].isin(entities_missing_facility) & (BPC_pull["ACCOUNT"].isin(facility_account_list)]
+    previous_facility_data=BPC_pull.loc[(BPC_pull["ENTITY"].isin(entities_missing_facility) )& (BPC_pull["ACCOUNT"].isin(facility_account_list))]
     #previous_facility_data2=BPC_pull[BPC_pull["ACCOUNT"].isin(facility_account_list)]  #[onemonth_before_latest_month]
 	
     st.write(previous_facility_data)
