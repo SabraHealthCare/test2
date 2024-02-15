@@ -823,6 +823,7 @@ def View_Summary():
     missing_category=full_category.merge(current_cagegory,on=['Property_Name', 'Category'],how="left")
     missing_category=missing_category[(missing_category[latest_month]==0) | (missing_category[latest_month].isnull())]
 
+	
     # fill the facility info with historic data
     properties_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["Property_Name"])
     onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]!=str(latest_month),BPC_pull.columns)))
