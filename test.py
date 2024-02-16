@@ -813,7 +813,6 @@ def View_Summary():
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-    st.write("latest_month_data",latest_month_data)
     # check missing category ( ex: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
     entity_list=list(latest_month_data["ENTITY"].unique())
@@ -827,10 +826,9 @@ def View_Summary():
     # fill the facility info with historic data
     entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
     onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]!=str(latest_month),BPC_pull.columns)))
-    st.write(onemonth_before_latest_month)
     facility_account_list=list(BPC_Account[BPC_Account["Category"]=="Facility Information"]["BPC_Account_Name"])
-    previous_facility_data=BPC_pull.loc[entities_missing_facility, :].loc(axis=0)[:, facility_account_list][onemonth_before_latest_month]	
-     	
+    previous_facility_data=BPC_pull.loc[entities_missing_facility, :].loc(axis=0)[:, facility_account_list][["Property_Name",onemonth_before_latest_month]]	
+    
     st.write(previous_facility_data)
         
     if missing_category.shape[0]>0:
