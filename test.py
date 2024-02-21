@@ -819,7 +819,7 @@ def View_Summary():
     full_category = pd.DataFrame(list(product(entity_list,category_list)), columns=['ENTITY', 'Category'])
     missing_category=full_category.merge(current_cagegory,on=['ENTITY', 'Category'],how="left")
     missing_category=missing_category[(missing_category[latest_month]==0)|(missing_category[latest_month].isnull())]
-    st.write("missing_category",missing_category)
+   
     if "Facility Information" in list(missing_category["Category"]):
         # fill the facility info with historical data
         entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
@@ -837,7 +837,6 @@ def View_Summary():
     if missing_category.shape[0]>0:
         st.error("No data detected for below properties on specific accounts: ")
         missing_category=missing_category[["ENTITY",latest_month,"Category"]].merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-        st.write(missing_category)
         col1,col2=st.columns([2,1])
         with col1:
             st.dataframe(missing_category[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
