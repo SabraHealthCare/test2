@@ -827,7 +827,7 @@ def View_Summary():
         onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]!=str(latest_month),BPC_pull.columns)))
         facility_account_list=list(BPC_Account[BPC_Account["Category"]=="Facility Information"]["BPC_Account_Name"])
         previous_facility_data=BPC_pull.loc[entities_missing_facility, :].loc(axis=0)[:, facility_account_list][["Property_Name",onemonth_before_latest_month]]	
-        st.write("The facility information of below properties are missing in P&L. They will be filled by the historical data.")
+        st.error("Below properties miss facility information in P&L. It has been filled by its historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
         st.write(previous_facility_data)
         previous_facility_data=previous_facility_data.reset_index(drop=False)
         previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_latest_month:latest_month})
@@ -882,45 +882,46 @@ def View_Summary():
     else:
         latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]
 
-	
-    st.write("Reporting months detected in P&L : "+m_str[1:])   
-    st.write("The reporting month is {}/{}. Reporting data is as below:".format(latest_month[4:6],latest_month[0:4]))
+    with st.expander("Summary of P&L" ,expanded=True):
+        ChangeWidgetFontSize('Summary of P&L', '25px')
+        st.write("Reporting months detected in P&L : "+m_str[1:])   
+        st.write("The reporting month is {}/{}. Reporting data is as below:".format(latest_month[4:6],latest_month[0:4]))
    
-    styled_table = (latest_month_data.fillna('').style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
-    # Display the HTML using st.markdown
-    st.markdown(styled_table, unsafe_allow_html=True)
-    st.write("")
+        styled_table = (latest_month_data.fillna('').style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
+        # Display the HTML using st.markdown
+        st.markdown(styled_table, unsafe_allow_html=True)
+        st.write("")
   	
-    # upload latest month data to AWS
-    col1,col2=st.columns([2,3])
-    with col1:
-        download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
-    with col2:	
-        submit_latest_month=st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]),key='latest_month')
-    upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
-    upload_latest_month["TIME"]=latest_month
-    upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
-    upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
-    upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
-    upload_latest_month["Operator"]=operator
-    if submit_latest_month:
-        # save tenant P&L to OneDrive
+        # upload latest month data to AWS
+        col1,col2=st.columns([2,3])
+        with col1:
+            download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
+        with col2:	
+            submit_latest_month=st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]),key='latest_month')
+        upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
+        upload_latest_month["TIME"]=latest_month
+        upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
+        upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
+        upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
+        upload_latest_month["Operator"]=operator
+        if submit_latest_month:
+            # save tenant P&L to OneDrive
 
-        if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
-            st.write("unsuccess ")  #----------record into error report------------------------	
+            if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
+                st.write("unsuccess ")  #----------record into error report------------------------	
 
-        if BS_separate_excel=="Y":
-            # save tenant BS to OneDrive
-            if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
-                st.write(" unsuccess")  #----------record into error report------------------------	
+            if BS_separate_excel=="Y":
+                # save tenant BS to OneDrive
+                if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
+                    st.write(" unsuccess")  #----------record into error report------------------------	
             
-        if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_latest_month,operator):
-            st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
+            if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_latest_month,operator):
+                st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
             
+            else:
+                st.write(" ")  #----------record into error report------------------------	
         else:
-            st.write(" ")  #----------record into error report------------------------	
-    else:
-        st.stop()
+            st.stop()
        
 # create EPM formula for download data
 def EPM_Formula(data,value_name): # make sure there is no col on index for data
@@ -1330,9 +1331,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month,previous_month_list)
 
 	# 1 Summary
-        with st.expander("Summary of P&L" ,expanded=True):
-            ChangeWidgetFontSize('Summary of P&L', '25px')
-            View_Summary()
+        View_Summary()
       
         # 2 Discrepancy of Historic Data
         with st.expander("Discrepancy for Historic Data",expanded=True):
