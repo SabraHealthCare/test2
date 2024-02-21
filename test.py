@@ -821,9 +821,9 @@ def View_Summary():
     full_category = pd.DataFrame(list(product(entity_list,category_list)), columns=['ENTITY', 'Category'])
     missing_category=full_category.merge(current_cagegory,on=['ENTITY', 'Category'],how="left")
     missing_category=missing_category[(missing_category[latest_month]==0) | (missing_category[latest_month].isnull())]
-
+    st.write("missing_category",missing_category)
 	
-    # fill the facility info with historic data
+    # fill the facility info with historical data
     entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
     onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]!=str(latest_month),BPC_pull.columns)))
     facility_account_list=list(BPC_Account[BPC_Account["Category"]=="Facility Information"]["BPC_Account_Name"])
