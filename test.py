@@ -827,7 +827,7 @@ def View_Summary():
         onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]!=str(latest_month),BPC_pull.columns)))
         facility_account_list=list(BPC_Account[BPC_Account["Category"]=="Facility Information"]["BPC_Account_Name"])
         previous_facility_data=BPC_pull.loc[entities_missing_facility, :].loc(axis=0)[:, facility_account_list][["Property_Name",onemonth_before_latest_month]]	
-        st.error("Below properties miss facility information in P&L. It has been filled by its historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
+        st.error("Below properties miss facility information in P&L. It has been filled by historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
         st.write(previous_facility_data)
         previous_facility_data=previous_facility_data.reset_index(drop=False)
         previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_latest_month:latest_month})
