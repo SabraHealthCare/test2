@@ -832,6 +832,8 @@ def View_Summary():
         st.write(previous_facility_data)
         previous_facility_data=previous_facility_data.reset_index(drop=False)
         previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_latest_month:latest_month})
+        previous_facility_data=previous_facility_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
+	    
         latest_month_data=pd.concat([latest_month_data,previous_facility_data])
         st.write("latest_month_data",latest_month_data)
 	    
