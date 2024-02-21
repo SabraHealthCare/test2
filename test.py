@@ -835,7 +835,7 @@ def View_Summary():
         st.error("Below properties miss facility information in P&L. It has been filled by historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
 
 
-        previous_facility_data_display = previous_facility_data.pivot(index=["Sabra_Account_Full_Name"], columns="Property_Name", values=onemonth_before_latest_month)
+        previous_facility_data_display = previous_facility_data.pivot(index=["Sabra_Account_Full_Name"], columns="Property_Name", values=latest_month)
         #latest_month_data.reset_index(drop=False,inplace=True)
 
         st.write(previous_facility_data_display)	    
