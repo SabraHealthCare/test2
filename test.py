@@ -821,7 +821,7 @@ def View_Summary():
     full_category = pd.DataFrame(list(product(entity_list,category_list)), columns=['ENTITY', 'Category'])
     missing_category=full_category.merge(current_cagegory,on=['ENTITY', 'Category'],how="left")
     missing_category=missing_category[(missing_category[latest_month]==0)|(missing_category[latest_month].isnull())]
-    st.write("missing_category",missing_category)
+
     if "Facility Information" in list(missing_category["Category"]):
         # fill the facility info with historical data
         entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
@@ -835,7 +835,6 @@ def View_Summary():
         previous_facility_data=previous_facility_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
 	    
         latest_month_data=pd.concat([latest_month_data,previous_facility_data])
-        st.write("latest_month_data",latest_month_data)
 	    
     if missing_category.shape[0]>0:
         st.error("No data detected for below properties on specific accounts: ")
