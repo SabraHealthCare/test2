@@ -805,8 +805,7 @@ def View_Summary():
     m_str = ''
     for month in months:
         m_str += ", " + month
-    st.write("Reporting months detected in P&L : "+m_str[1:])   
-    st.write("The reporting month is "+latest_month[4:6]+"/"+latest_month[0:4])
+    
     
     Total_PL.index=Total_PL.index.set_names(["ENTITY", "Sabra_Account"]) 
     Total_PL=Total_PL.fillna(0)
@@ -882,8 +881,10 @@ def View_Summary():
         latest_month_data=latest_month_data[["Sabra_Account","Total"]+list(entity_columns)]
     else:
         latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]
-    
-    st.markdown("{} {}/{} reporting data:".format(operator,latest_month[4:6],latest_month[0:4]))      
+
+	
+    st.write("Reporting months detected in P&L : "+m_str[1:])   
+    st.write("The reporting month is {}/{}. Reporting data is as below:".format(latest_month[4:6],latest_month[0:4])
    
     styled_table = (latest_month_data.fillna('').style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
     # Display the HTML using st.markdown
