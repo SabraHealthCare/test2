@@ -828,11 +828,17 @@ def View_Summary():
         facility_account_list=list(BPC_Account[BPC_Account["Category"]=="Facility Information"]["BPC_Account_Name"])
         previous_facility_data=BPC_pull.loc[entities_missing_facility, :].loc(axis=0)[:, facility_account_list][["Property_Name",onemonth_before_latest_month]]	
         st.error("Below properties miss facility information in P&L. It has been filled by historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
-        st.write(previous_facility_data)
+
         previous_facility_data=previous_facility_data.reset_index(drop=False)
         previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_latest_month:latest_month})
-        previous_facility_data=previous_facility_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
-	    
+        previous_facility_data=previous_facility_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
+        st.error("Below properties miss facility information in P&L. It has been filled by historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
+
+
+        previous_facility_data_display = previous_facility_data.pivot(index=["Sabra_Account_Full_Name"], columns="Property_Name", values=onemonth_before_latest_month)
+        #latest_month_data.reset_index(drop=False,inplace=True)
+
+        st.write(previous_facility_data_display)	    
         latest_month_data=pd.concat([latest_month_data,previous_facility_data])
 	    
     if missing_category.shape[0]>0:
