@@ -806,13 +806,12 @@ def View_Summary():
     for month in months:
         m_str += ", " + month
     
-    
     Total_PL.index=Total_PL.index.set_names(["ENTITY", "Sabra_Account"]) 
     Total_PL=Total_PL.fillna(0)
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-    # check missing category ( ex: total revenue= 0, total Opex=0...)	
+    # check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
     entity_list=list(latest_month_data["ENTITY"].unique())
     current_cagegory=latest_month_data[["Property_Name","Category","ENTITY",latest_month]][latest_month_data["Category"].\
@@ -837,12 +836,13 @@ def View_Summary():
     missing_category=missing_category[missing_category["Category"]!="Facility Information"]	    
     if missing_category.shape[0]>0:
         st.error("No data detected for below properties on specific accounts: ")
+        missing_category=missing_category["ENTITY",latest_month].merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")	    
         col1,col2=st.columns([2,1])
         with col1:
             st.dataframe(missing_category[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
 		    column_config={
 			        "Property_Name": "Property",
-			        "Category":"Sabra account-Total",
+			        "Category":"Account category",
 		                 latest_month:latest_month[4:6]+"/"+latest_month[0:4]},
 			    hide_index=True)
         with col2:
