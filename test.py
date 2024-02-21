@@ -820,16 +820,17 @@ def View_Summary():
 	    isin(category_list)].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
     full_category = pd.DataFrame(list(product(entity_list,category_list)), columns=['ENTITY', 'Category'])
     missing_category=full_category.merge(current_cagegory,on=['ENTITY', 'Category'],how="left")
-    missing_category=missing_category[(missing_category[latest_month]==0) | (missing_category[latest_month].isnull())]
+    missing_category=missing_category[(missing_category[latest_month]==0)|(missing_category[latest_month].isnull())]
     st.write("missing_category",missing_category)
-	
-    # fill the facility info with historical data
-    entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
-    onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]!=str(latest_month),BPC_pull.columns)))
-    facility_account_list=list(BPC_Account[BPC_Account["Category"]=="Facility Information"]["BPC_Account_Name"])
-    previous_facility_data=BPC_pull.loc[entities_missing_facility, :].loc(axis=0)[:, facility_account_list][["Property_Name",onemonth_before_latest_month]]	
-    
-    st.write(previous_facility_data)
+    if "Facility Information" in list(missing_category["Category"]):
+        # fill the facility info with historical data
+        entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
+        onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]!=str(latest_month),BPC_pull.columns)))
+        facility_account_list=list(BPC_Account[BPC_Account["Category"]=="Facility Information"]["BPC_Account_Name"])
+        previous_facility_data=BPC_pull.loc[entities_missing_facility, :].loc(axis=0)[:, facility_account_list][["Property_Name",onemonth_before_latest_month]]	
+        st.write("The facility information of below properties are missing in P&L. They will be filled by the historical data.")
+        st.write(previous_facility_data)
+        st.write(latest_month_data)
         
     if missing_category.shape[0]>0:
         st.error("No data detected for below properties on specific accounts: ")
