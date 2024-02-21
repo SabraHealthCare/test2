@@ -831,6 +831,7 @@ def View_Summary():
         st.write("The facility information of below properties are missing in P&L. They will be filled by the historical data.")
         st.write(previous_facility_data)
         st.write(latest_month_data)
+        previous_facility_data=previous_facility_data.reset_index(drop=False)
         previous_facility_data=previous_facility_data.rename(columns={"BPC_Account_Name":"Sabra_Accoun",onemonth_before_latest_month:latest_month})
         latest_month_data=pd.concat([latest_month_data,previous_facility_data])
         st.write(latest_month_data)
