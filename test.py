@@ -830,11 +830,10 @@ def View_Summary():
         previous_facility_data=BPC_pull.loc[entities_missing_facility, :].loc(axis=0)[:, facility_account_list][["Property_Name",onemonth_before_latest_month]]	
         st.write("The facility information of below properties are missing in P&L. They will be filled by the historical data.")
         st.write(previous_facility_data)
-        st.write(latest_month_data)
         previous_facility_data=previous_facility_data.reset_index(drop=False)
         previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_latest_month:latest_month})
         latest_month_data=pd.concat([latest_month_data,previous_facility_data])
-        st.write(latest_month_data)
+
 	    
     if missing_category.shape[0]>0:
         st.error("No data detected for below properties on specific accounts: ")
