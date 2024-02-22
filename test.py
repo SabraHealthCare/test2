@@ -335,7 +335,8 @@ def filters_widgets(df, columns,location="Vertical"):
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
     st.write("account_mapping",account_mapping) 
     #search tenant account column in P&L, return col number of tenant account	
-    account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	       
+    account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
+    st.write("account_pool",account_pool)
     if sheet_type=="Sheet_Name_Finance":
         account_pool=account_pool.loc[account_pool["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Formated_Account"]
     elif sheet_type=="Sheet_Name_Occupancy": 
@@ -346,12 +347,12 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
     for tenantAccount_col_no in range(0,PL.shape[1]):
         #trim and upper case 
         candidate_col=list(map(lambda x: str(x).strip().upper() if x==x else x,PL.iloc[:,tenantAccount_col_no]))
-        st.write("candidate_col",candidate_col)   
-        st.write("account_pool",account_pool)    
+        #st.write("candidate_col",candidate_col)   
+        #st.write("account_pool",account_pool)    
    
         #find out how many tenant accounts match with account_pool
         match=[x in candidate_col for x in account_pool]
-        st.write(match) 
+        #st.write(match) 
         #If 10% of accounts match with account_mapping list, identify this col as tenant account.
         if len(match)>0 and sum(x for x in match)/len(match)>0.1:
             return tenantAccount_col_no  
