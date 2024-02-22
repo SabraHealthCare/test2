@@ -345,15 +345,18 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
     for tenantAccount_col_no in range(0,PL.shape[1]):
         #trim and upper case 
         candidate_col=list(map(lambda x: str(x).strip().upper() if x==x else x,PL.iloc[:,tenantAccount_col_no]))
+        st.write(candidate_col)   
+        st.write(account_pool)    
         #find out how many tenant accounts match with account_pool
         match=[x in candidate_col for x in account_pool]
+        st.write(match) 
         #If 10% of accounts match with account_mapping list, identify this col as tenant account.
         if len(match)>0 and sum(x for x in match)/len(match)>0.1:
             return tenantAccount_col_no  
         else:
             # it is the wrong account column, continue to check next column
             continue
-            
+         
     st.error("Fail to identify tenant accounts column in sheet—— '"+sheet_name+"'")
     st.stop()
 
