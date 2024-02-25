@@ -831,7 +831,7 @@ def View_Summary():
         onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]<str(latest_month),BPC_pull.columns)))
      
         previous_facility_data=BPC_pull.merge(BPC_Account,left_on="ACCOUNT",right_on="BPC_Account_Name")
-        previous_facility_data=previous_facility_data[previous_facility_data["Category"]=="Facility Information"][["Property_Name",onemonth_before_latest_month,"Sabra_Account_Full_Name"]	
+        previous_facility_data=previous_facility_data[previous_facility_data["Category"]=="Facility Information"][["Property_Name",onemonth_before_latest_month,"Sabra_Account_Full_Name"]]	
         previous_facility_data=previous_facility_data.reset_index(drop=False)
         previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_latest_month:latest_month})
 	previous_facility_data=previous_facility_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
