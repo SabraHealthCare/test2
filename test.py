@@ -757,7 +757,8 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
 	    # if this entity don't have data for this timeid(new/transferred property), skip to next month
             if all(list(map(lambda x:x!=x,Total_PL.loc[entity,][timeid]))):
                 break
-            for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
+            #for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
+            for matrix in BPC_Account["BPC_Account_Name"]: 
                 try:
                     BPC_value=int(BPC_pull.loc[entity,matrix][timeid+'00'])
                 except:
@@ -834,7 +835,6 @@ def View_Summary():
         previous_facility_data=previous_facility_data[previous_facility_data["Category"]=="Facility Information"][["Property_Name",onemonth_before_latest_month,"Sabra_Account_Full_Name"]]	
         previous_facility_data=previous_facility_data.reset_index(drop=False)
         previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_latest_month:latest_month})
-        #previous_facility_data=previous_facility_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
         st.error("Below properties miss facility information in P&L. It has been filled by historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
         previous_facility_data_display = previous_facility_data.pivot(index=["Sabra_Account_Full_Name"], columns="Property_Name", values=latest_month)
         st.write(previous_facility_data_display.rename(columns={"Sabra_Account_Full_Name":"Facility information"}))
