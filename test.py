@@ -351,13 +351,12 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
         #find out how many tenant accounts match with account_pool
         match=[x in candidate_col for x in account_pool]
         #If 10% of accounts match with account_mapping list, identify this col as a candidate tenant account col.
-        if len(match)>0 and sum(x for x in match)/len(match)>0.1:
-            if len(match)>max_match:
-                max_match_col=tenantAccount_col_no
-                max_match=len(match)
+        if len(match)>0 and sum(x for x in match)/len(match)>0.1 and len(match)>max_match:
+            max_match_col=tenantAccount_col_no
+            max_match=len(match)
     if max_match>0:
-        st.write("tenantAccount_col_no",tenantAccount_col_no,PL.iloc[:,tenantAccount_col_no])
-        return tenantAccount_col_no
+        st.write("tenantAccount_col_no",tenantAccount_col_no,PL.iloc[:,max_match_col])
+        return max_match_col
          
     st.error("Fail to identify tenant accounts column in sheet—— '"+sheet_name+"'")
     st.stop()
