@@ -355,7 +355,7 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
             max_match_col=tenantAccount_col_no
             max_match=len(match)
     if max_match>0:
-        st.write("tenantAccount_col_no",tenantAccount_col_no,PL.iloc[:,max_match_col])
+        st.write("tenantAccount_col_no",sheet_name,max_match_col,PL.iloc[:,max_match_col])
         return max_match_col
          
     st.error("Fail to identify tenant accounts column in sheet—— '"+sheet_name+"'")
