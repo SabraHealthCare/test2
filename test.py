@@ -343,21 +343,20 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
         account_pool=account_pool.loc[account_pool["Category"]=="Patient Days"]["Tenant_Formated_Account"]	       
     elif sheet_type=="Sheet_Name_Balance_Sheet":
         account_pool=account_pool.loc[account_pool["Category"]=="Balance Sheet"]["Tenant_Formated_Account"]
-    #if  sheet_name=='K26 Malley':
-        #st.write("account_mapping",account_mapping) 
-        #st.write("account_pool",account_pool)
+   
+    max_match=0
     for tenantAccount_col_no in range(0,PL.shape[1]):
-        #trim and upper case 
         candidate_col=list(map(lambda x: str(x).strip().upper() if x==x else x,PL.iloc[:,tenantAccount_col_no]))
        
         #find out how many tenant accounts match with account_pool
         match=[x in candidate_col for x in account_pool]
-        #If 10% of accounts match with account_mapping list, identify this col as tenant account.
+        #If 10% of accounts match with account_mapping list, identify this col as a candidate tenant account col.
         if len(match)>0 and sum(x for x in match)/len(match)>0.1:
-            return tenantAccount_col_no  
-        else:
-            # it is the wrong account column, continue to check next column
-            continue
+            if len(match)>max_match:
+                max_match_col=tenantAccount_col_no
+                max_match=len(match)
+    if max_match>0:
+        return tenantAccount_col_no
          
     st.error("Fail to identify tenant accounts column in sheet—— '"+sheet_name+"'")
     st.stop()
