@@ -343,14 +343,13 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
         account_pool=account_pool.loc[account_pool["Category"]=="Patient Days"]["Tenant_Formated_Account"]	       
     elif sheet_type=="Sheet_Name_Balance_Sheet":
         account_pool=account_pool.loc[account_pool["Category"]=="Balance Sheet"]["Tenant_Formated_Account"] 
-    st.write("account_pool",account_pool)
+
     max_match=0
     for tenantAccount_col_no in range(0,max(15,PL.shape[1])):
         candidate_col=list(map(lambda x: str(x).strip().upper() if x==x else x,PL.iloc[:,tenantAccount_col_no]))
 
         #find out how many tenant accounts match with account_pool
         match=[x in candidate_col for x in account_pool]
-        st.write("len match",match,len(account_pool))
         #If 10% of accounts match with account_mapping list, identify this col as a candidate tenant account col.
         if len(match)>0 and sum(x for x in match)/len(match)>0.1 and sum(x for x in match)>max_match:
             
