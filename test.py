@@ -1218,10 +1218,9 @@ def Upload_And_Process(uploaded_file,file_type):
                 sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
                 sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
                 property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
-
+                st.write("file_type",file_type,"BS_separate_excel",BS_separate_excel)
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
-
                     # check if census data in another sheet
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
@@ -1243,7 +1242,7 @@ def Upload_And_Process(uploaded_file,file_type):
 
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
-            #st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
+           
     return Total_PL,Total_PL_detail
 
 #----------------------------------website widges------------------------------------
