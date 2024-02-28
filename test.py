@@ -1221,9 +1221,11 @@ def Upload_And_Process(uploaded_file,file_type):
                 st.write("file_type",file_type,"BS_separate_excel",BS_separate_excel)
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
+                    st.write("1")
                     # check if census data in another sheet
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
+	                  
                         PL_occ,PL_with_detail_occ=Read_Clean_PL(entity_i,"Sheet_Name_Occupancy",PL_sheet_list,uploaded_file) 
                         st.write("PL_occ",PL_occ) 
                         PL=PL.combine_first(PL_occ)
@@ -1234,10 +1236,13 @@ def Upload_And_Process(uploaded_file,file_type):
                         PL_BS,PL_with_detail_BS=Read_Clean_PL(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
                         PL=PL.combine_first(PL_BS)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
+                        st.write("2")
                 elif file_type=="Finance" and BS_separate_excel=="Y": 
+                    st.write("3")
                     PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
 
                 elif file_type=="BS" and BS_separate_excel=="Y": 
+                    st.write("4")
                     PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
 
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
