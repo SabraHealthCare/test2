@@ -1225,9 +1225,10 @@ def Upload_And_Process(uploaded_file,file_type):
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
                         PL_occ,PL_with_detail_occ=Read_Clean_PL(entity_i,"Sheet_Name_Occupancy",PL_sheet_list,uploaded_file) 
+			st.write("PL_occ",PL_occ) 
                         PL=PL.combine_first(PL_occ)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
-		
+		        st.write("PL",PL) 
 		    # check if balance sheet data existed   
                     if sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
                         PL_BS,PL_with_detail_BS=Read_Clean_PL(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
@@ -1235,9 +1236,10 @@ def Upload_And_Process(uploaded_file,file_type):
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
                 elif file_type=="Finance" and BS_separate_excel=="Y": 
                     PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
+
                 elif file_type=="BS" and BS_separate_excel=="Y": 
                     PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
-            st.write("PL",PL) 
+
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
             #st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
