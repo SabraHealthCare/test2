@@ -1221,7 +1221,7 @@ def Upload_And_Process(uploaded_file,file_type):
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
-
+                    st.write("PL",PL)
                     # check if census data in another sheet
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
