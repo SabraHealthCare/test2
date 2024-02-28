@@ -220,7 +220,8 @@ def Initial_Mapping(operator):
     account_mapping.loc['Sabra_Second_Account'] = account_mapping['Sabra_Second_Account'].apply(lambda x:  x.upper().strip() if (x is not None) and pd.notna(x) else x)
     account_mapping.loc["Tenant_Formated_Account"]=account_mapping["Tenant_Account"].apply(lambda x:x.upper().strip() if (x is not None) and pd.notna(x) else x)
     account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
-    # read property mapping
+    st.write(account_mapping)
+	# read property mapping
     entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename)
     entity_mapping=entity_mapping.reset_index(drop=True)
     entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
