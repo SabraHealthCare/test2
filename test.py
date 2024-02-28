@@ -220,8 +220,8 @@ def Initial_Mapping(operator):
     account_mapping.loc['Sabra_Second_Account'] = account_mapping['Sabra_Second_Account'].apply(lambda x:  x.upper().strip() if (x is not None) and pd.notna(x) else x)
     account_mapping.loc["Tenant_Formated_Account"]=account_mapping["Tenant_Account"].apply(lambda x:x.upper().strip() if (x is not None) and pd.notna(x) else x)
     account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
-    st.write(account_mapping)
-	# read property mapping
+
+    # read property mapping
     entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename)
     entity_mapping=entity_mapping.reset_index(drop=True)
     entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
@@ -345,9 +345,9 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
         account_pool=account_pool.loc[account_pool["Category"]=="Balance Sheet"]["Tenant_Formated_Account"] 
     st.write("account_pool",account_pool)
     max_match=0
-    for tenantAccount_col_no in range(0,max(15,range(0,PL.shape[1])):
+    for tenantAccount_col_no in range(0,max(15,PL.shape[1])):
         candidate_col=list(map(lambda x: str(x).strip().upper() if x==x else x,PL.iloc[:,tenantAccount_col_no]))
-        st.write("candidate_col",candidate_col)
+
         #find out how many tenant accounts match with account_pool
         match=[x in candidate_col for x in account_pool]
         st.write("len match",match,len(account_pool))
@@ -1076,7 +1076,6 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     while(True):
         try:		
             PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
-            st.write("PL",sheet_name,PL)
             break
         except:
             col1,col2=st.columns(2) 
@@ -1221,8 +1220,7 @@ def Upload_And_Process(uploaded_file,file_type):
 
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
-                    PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
-                    st.write("PL",PL)
+
                     # check if census data in another sheet
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
