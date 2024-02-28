@@ -1076,6 +1076,7 @@ def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     while(True):
         try:		
             PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
+            st.write("PL",sheet_name,PL)
             break
         except:
             col1,col2=st.columns(2) 
