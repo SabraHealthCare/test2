@@ -1211,7 +1211,6 @@ def Upload_And_Process(uploaded_file,file_type):
         Total_PL_detail=pd.DataFrame()
  
         for entity_i in entity_mapping.index:   # entity_i is the entity code for each property
-           
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
                 sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
                 sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
@@ -1238,6 +1237,7 @@ def Upload_And_Process(uploaded_file,file_type):
                     PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
                 elif file_type=="BS" and BS_separate_excel=="Y": 
                     PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
+            st.write("PL",PL) 
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
             #st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
