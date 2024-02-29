@@ -670,6 +670,7 @@ def Manage_Account_Mapping(new_tenant_account):
         if len(Sabra_main_account['checked'])==1:
             Sabra_main_account_value=Sabra_main_account['checked'][0].upper()          
         elif len(Sabra_main_account['checked'])>1:
+	    st.write(Sabra_main_account['checked'])
             st.warning("Only one to one mapping is allowed.")
             st.stop()
         elif Sabra_main_account['checked']==[] and Sabra_second_account['checked']==[]:
