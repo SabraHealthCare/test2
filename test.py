@@ -290,7 +290,7 @@ def Create_Tree_Hierarchy(bucket_mapping):
     BPC_Account=BPC_Account[["BPC_Account_Name","Sabra_Account_Full_Name","Category"]]
     return parent_hierarchy_main,parent_hierarchy_second,BPC_Account
 parent_hierarchy_main,parent_hierarchy_second,BPC_Account=Create_Tree_Hierarchy(bucket_mapping)
-
+st.write(parent_hierarchy_main)
 #-----------------------------------------------functions---------------------------------------------
 # setting for page
 @st.cache_data
