@@ -673,7 +673,7 @@ def Manage_Account_Mapping(new_tenant_account):
         elif len(Sabra_main_account['checked'])>1:
             if len(Sabra_main_account['checked'])==2 and Sabra_main_account['checked'][0]=="Management Fee":
                 Sabra_main_account_value="T_MGMT_FEE"  
-	    else:
+            else:
                 st.write(Sabra_main_account['checked'])
                 st.warning("Only one to one mapping is allowed.")
                 st.stop()
