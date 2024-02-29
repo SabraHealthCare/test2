@@ -345,7 +345,7 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
         account_pool=account_pool.loc[account_pool["Category"]=="Balance Sheet"]["Tenant_Formated_Account"] 
 
     max_match=0
-    for tenantAccount_col_no in range(0,max(15,PL.shape[1])):
+    for tenantAccount_col_no in range(0,min(15,PL.shape[1])):
         st.write("PL",tenantAccount_col_no,PL.shape[1],PL)
         candidate_col=list(map(lambda x: str(x).strip().upper() if x==x else x,PL.iloc[:,tenantAccount_col_no]))
 
