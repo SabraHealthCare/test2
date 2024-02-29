@@ -668,6 +668,7 @@ def Manage_Account_Mapping(new_tenant_account):
         submitted = st.form_submit_button("Submit")  
     if submitted:
         if len(Sabra_main_account['checked'])==1:
+            st.write(Sabra_main_account['checked'])
             Sabra_main_account_value=Sabra_main_account['checked'][0].upper()          
         elif len(Sabra_main_account['checked'])>1:
             st.write(Sabra_main_account['checked'])
