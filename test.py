@@ -1070,9 +1070,104 @@ def View_Discrepancy(percent_discrepancy_accounts):
             st.success("All previous data in P&L ties with Sabra data")
     else:
             st.success("All previous data in P&L ties with Sabra data")
-   
+
 @st.cache_data(experimental_allow_widgets=True)        
-def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
+def Read_Clean_PL_Multiple(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
+    global latest_month,account_mapping
+    sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
+    
+    # read data from uploaded file
+    count=0
+    while(True):
+        try:		
+            PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
+            break
+        except:
+            col1,col2=st.columns(2) 
+            with col1: 
+                if sheet_type=="Sheet_Name_Finance":  
+                    st.warning("Please provide sheet name of P&L data for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                elif sheet_type=="Sheet_Name_Occupancy":
+                    st.warning("Please provide sheet name of Occupancy data for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                elif sheet_type=="Sheet_Name_Balance_Sheet":
+                    st.warning("Please provide sheet name of Balance Sheet data in for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
+		    
+            if len(PL_sheet_list)>0:
+                with st.form(key=str(count)):                
+                    sheet_name=st.selectbox(entity_mapping.loc[entity_i,"Property_Name"],[""]+PL_sheet_list)
+                    submitted = st.form_submit_button("Submit")
+                    count+=1
+            else:
+                with st.form(key=str(count)):     
+                    sheet_name = st.text_input(entity_mapping.loc[entity_i,"Property_Name"])
+                    submitted = st.form_submit_button("Submit")
+                    count+=1
+            if submitted:   
+                continue
+            else:
+                st.stop()
+		    
+    if count>0:
+        # update sheet name in entity_mapping
+        entity_mapping.loc[entity_i,sheet_type]=sheet_name  
+        # update entity_mapping in onedrive  
+        Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
+    # Start checking process
+    with st.spinner("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********"):
+        tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
+        st.write("Identify_Tenant_Account_Col",Identify_Tenant_Account_Col)
+        if tenantAccount_col_no==None:
+            st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
+            st.stop()    
+        date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
+  
+        if len(date_header[0])==1 and date_header[0]==[0]:
+            st.error("Fail to identify month/year header in sheet '{}', please add it and re-upload.".format(sheet_name))
+            st.stop()     
+        PL.columns=date_header[0]
+
+        #set tenant_account as index of PL
+        PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
+        #remove row above date row and remove column without date col name
+        PL=PL.iloc[date_header[1]+1:,PL.columns!='0']    
+        #remove rows with nan tenant account
+        nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
+        PL.drop(nan_index, inplace=True)
+        #set index as str ,strip
+        PL.index=map(lambda x:str(x).strip(),PL.index)
+        PL=PL.map(lambda x: 0 if (x!=x) or (type(x)==str) or x==" " else x)	    
+        # remove columns with all nan/0
+        PL=PL.loc[:,(PL!= 0).any(axis=0)]
+        # remove rows with all nan/0 value
+        PL=PL.loc[(PL!= 0).any(axis=1),:]
+        st.write("PL",PL)
+        # mapping new tenant accounts
+        new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
+            
+        if len(new_tenant_account_list)>0:
+            st.warning("Please complete mapping for below P&L accounts:")
+            for i in range(len(new_tenant_account_list)):
+                st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
+                Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
+                #insert new record to the bottom line of account_mapping
+                new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
+                account_mapping=pd.concat([account_mapping, pd.DataFrame([new_mapping_row],columns=account_mapping.columns)],ignore_index=True)
+            Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
+            #if there are duplicated accounts in P&L, ask for confirming
+            dup_tenant_account=set([x for x in PL.index if list(PL.index).count(x) > 1])
+            if len(dup_tenant_account)>0:
+                for dup in dup_tenant_account:
+                    if dup.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"]):
+                        st.warning("Warning: There are more than one '{}' accounts in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
+        
+        # Map PL accounts and Sabra account
+        PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
+
+    return PL,PL_with_detail
+
+
+@st.cache_data(experimental_allow_widgets=True)        
+def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
     global latest_month,account_mapping
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     
@@ -1223,29 +1318,60 @@ def Upload_And_Process(uploaded_file,file_type):
                 sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
                 sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
                 property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
-                st.write("file_type",file_type,"BS_separate_excel",BS_separate_excel)
+
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
-                    PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
+                    PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
 
                     # check if census data in another sheet
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
-                        PL_occ,PL_with_detail_occ=Read_Clean_PL(entity_i,"Sheet_Name_Occupancy",PL_sheet_list,uploaded_file) 
+                        PL_occ,PL_with_detail_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",PL_sheet_list,uploaded_file) 
                         PL=PL.combine_first(PL_occ)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
         
 		    # check if balance sheet data existed   
                     if sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
-                        PL_BS,PL_with_detail_BS=Read_Clean_PL(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
+                        PL_BS,PL_with_detail_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
                         PL=PL.combine_first(PL_BS)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
                 elif file_type=="Finance" and BS_separate_excel=="Y": 
-                    PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
+                    PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
 
                 elif file_type=="BS" and BS_separate_excel=="Y": 
-                    PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
+                    PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
+    
+            #All the properties are in one sheet		
+	    elif entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="N":
+                property_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
+                property_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
+                property_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
+                property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
 
+		# ****Finance and BS in one excel****
+                if file_type=="Finance" and BS_separate_excel=="N": 
+                    PL,PL_with_detail=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
+
+                    # check if census data in another sheet
+                    if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
+                    and sheet_name_occupancy!=sheet_name_finance:
+                        PL_occ,PL_with_detail_occ=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Occupancy",PL_sheet_list,uploaded_file) 
+                        PL=PL.combine_first(PL_occ)
+                        PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
+        
+		    # check if balance sheet data existed   
+                    if sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
+                        PL_BS,PL_with_detail_BS=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
+                        PL=PL.combine_first(PL_BS)
+                        PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
+                elif file_type=="Finance" and BS_separate_excel=="Y": 
+                    PL,PL_with_detail=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
+
+                elif file_type=="BS" and BS_separate_excel=="Y": 
+                    PL,PL_with_detail=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
+		    
+
+		    
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
     return Total_PL,Total_PL_detail
