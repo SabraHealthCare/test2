@@ -736,18 +736,19 @@ def Map_PL_Sabra(PL,entity):
                 elif conversion[0]=="*":
                     PL.loc[i,month]= before_conversion*float(conversion.split("*")[1])
 
-
     PL=PL.drop(["Tenant_Formated_Account","Conversion"], axis=1)
     PL_with_detail=copy.copy(PL)
-    PL_with_detail["Entity"]=entity
-    PL_with_detail=PL_with_detail.set_index(['Entity', 'Sabra_Account',"Tenant_Account"])
-    PL=PL.set_index("Sabra_Account",drop=True)
-    PL=PL.drop(["Tenant_Account"], axis=1)
-
-    # group by Sabra_Account
-    PL=PL.groupby(by=PL.index).sum().replace(0,None)
-    PL.index=[[entity]*len(PL.index),list(PL.index)]
-    return PL,PL_with_detail
+    if isinstance(entity, str):
+        PL_with_detail["Entity"]=entity
+        PL_with_detail=PL_with_detail.set_index(['Entity', 'Sabra_Account',"Tenant_Account"])
+        PL=PL.set_index("Sabra_Account",drop=True)
+        PL=PL.drop(["Tenant_Account"], axis=1)
+	
+        # group by Sabra_Account
+        PL=PL.groupby(by=PL.index).sum().replace(0,None)
+        PL.index=[[entity]*len(PL.index),list(PL.index)]
+        return PL,PL_with_detail
+    if isinstance(entity, list):
     
 @st.cache_data
 def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
@@ -1072,10 +1073,21 @@ def View_Discrepancy(percent_discrepancy_accounts):
             st.success("All previous data in P&L ties with Sabra data")
 
 @st.cache_data(experimental_allow_widgets=True)        
-def Read_Clean_PL_Multiple(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
+def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file):  
     global latest_month,account_mapping
-    sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
-    
+    property_name_list_infinance =entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name_Finance"].tolist()
+    st.write(property_name_list_infinance)
+    property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["ENTITY"].tolist()
+    sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if not isinstance(x, float) or not pd.isna(x)]
+    sheet_name_list = list(set(sheet_name_list))
+    #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
+    if len(sheet_name_list)!=1:
+        st.warring("P&L of properties {} is in one sheet. Please select sheet name :".format(",".join(property_name_list)))
+      
+	#............
+    else:
+        sheet_name=sheet_name_list[0]
+
     # read data from uploaded file
     count=0
     while(True):
@@ -1086,20 +1098,20 @@ def Read_Clean_PL_Multiple(entity_i,sheet_type,PL_sheet_list,uploaded_file):
             col1,col2=st.columns(2) 
             with col1: 
                 if sheet_type=="Sheet_Name_Finance":  
-                    st.warning("Please provide sheet name of P&L data for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                    st.warning("Please provide sheet name of P&L data for properties {}. ".format(",".join(property_name_list)))
                 elif sheet_type=="Sheet_Name_Occupancy":
-                    st.warning("Please provide sheet name of Occupancy data for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                    st.warning("Please provide sheet name of Occupancy data for properties {}. ".format(",".join(property_name_list))
                 elif sheet_type=="Sheet_Name_Balance_Sheet":
-                    st.warning("Please provide sheet name of Balance Sheet data in for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                    st.warning("Please provide sheet name of Balance Sheet data in for properties {}. ".format(",".join(property_name_list))
 		    
             if len(PL_sheet_list)>0:
                 with st.form(key=str(count)):                
-                    sheet_name=st.selectbox(entity_mapping.loc[entity_i,"Property_Name"],[""]+PL_sheet_list)
+                    sheet_name=st.selectbox(" ",[""]+PL_sheet_list)
                     submitted = st.form_submit_button("Submit")
                     count+=1
             else:
                 with st.form(key=str(count)):     
-                    sheet_name = st.text_input(entity_mapping.loc[entity_i,"Property_Name"])
+                    sheet_name = st.text_input("")
                     submitted = st.form_submit_button("Submit")
                     count+=1
             if submitted:   
@@ -1109,27 +1121,27 @@ def Read_Clean_PL_Multiple(entity_i,sheet_type,PL_sheet_list,uploaded_file):
 		    
     if count>0:
         # update sheet name in entity_mapping
-        entity_mapping.loc[entity_i,sheet_type]=sheet_name  
+        entity_mapping.loc[entity_list,sheet_type]=sheet_name  
         # update entity_mapping in onedrive  
         Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
     # Start checking process
-    with st.spinner("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********"):
+    if True:   
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
         st.write("Identify_Tenant_Account_Col",Identify_Tenant_Account_Col)
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
-        date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
-  
-        if len(date_header[0])==1 and date_header[0]==[0]:
-            st.error("Fail to identify month/year header in sheet '{}', please add it and re-upload.".format(sheet_name))
+        #date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
+        property_name_header=Identify_Property_Name_Header(PL,tenantAccount_col_no,property_name_list_infinance)
+        if len(property_name_header[0])==1 and property_name_header[0]==[0]:
+            st.error("Fail to identify property header in sheet '{}', please add it and re-upload. The header is supposed to be: {}".format(sheet_name,",".join(property_name_list_infinance)))
             st.stop()     
-        PL.columns=date_header[0]
+        PL.columns=property_name_header[0]
 
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
-        #remove row above date row and remove column without date col name
-        PL=PL.iloc[date_header[1]+1:,PL.columns!='0']    
+        #remove row above header row and remove column without property name
+        PL=PL.iloc[property_name_header[1]+1:,PL.columns!='0']    
         #remove rows with nan tenant account
         nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
         PL.drop(nan_index, inplace=True)
@@ -1145,7 +1157,7 @@ def Read_Clean_PL_Multiple(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
             
         if len(new_tenant_account_list)>0:
-            st.warning("Please complete mapping for below P&L accounts:")
+            st.warning("Please complete mapping for below account:")
             for i in range(len(new_tenant_account_list)):
                 st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
                 Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
@@ -1153,15 +1165,19 @@ def Read_Clean_PL_Multiple(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                 new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
                 account_mapping=pd.concat([account_mapping, pd.DataFrame([new_mapping_row],columns=account_mapping.columns)],ignore_index=True)
             Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
-            #if there are duplicated accounts in P&L, ask for confirming
+            #if there are duplicated accounts, ask for confirming
             dup_tenant_account=set([x for x in PL.index if list(PL.index).count(x) > 1])
             if len(dup_tenant_account)>0:
+                count=0		    
                 for dup in dup_tenant_account:
                     if dup.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"]):
-                        st.warning("Warning: There are more than one '{}' accounts in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
-        
+                        count+=1
+                        st.warning("Warning: There are more than one ''{}'' account in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
+                if count>5:
+                    st.error("There are too many duplicated accounts. Please fix them in sheet {} and re_upload".format(sheet_name))
+                    st.stop()
         # Map PL accounts and Sabra account
-        PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
+        PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
 
     return PL,PL_with_detail
 
@@ -1170,7 +1186,7 @@ def Read_Clean_PL_Multiple(entity_i,sheet_type,PL_sheet_list,uploaded_file):
 def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
     global latest_month,account_mapping
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
-    
+    property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
     # read data from uploaded file
     count=0
     while(True):
@@ -1181,20 +1197,20 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
             col1,col2=st.columns(2) 
             with col1: 
                 if sheet_type=="Sheet_Name_Finance":  
-                    st.warning("Please provide sheet name of P&L data for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                    st.warning("Please provide sheet name of P&L data for property {}. ".format(property_name))
                 elif sheet_type=="Sheet_Name_Occupancy":
-                    st.warning("Please provide sheet name of Occupancy data for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                    st.warning("Please provide sheet name of Occupancy data for property {}. ".format(property_name))
                 elif sheet_type=="Sheet_Name_Balance_Sheet":
-                    st.warning("Please provide sheet name of Balance Sheet data in for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                    st.warning("Please provide sheet name of Balance Sheet data in for property {}. ".format(property_name))
 		    
             if len(PL_sheet_list)>0:
                 with st.form(key=str(count)):                
-                    sheet_name=st.selectbox(entity_mapping.loc[entity_i,"Property_Name"],[""]+PL_sheet_list)
+                    sheet_name=st.selectbox(property_name,[""]+PL_sheet_list)
                     submitted = st.form_submit_button("Submit")
                     count+=1
             else:
                 with st.form(key=str(count)):     
-                    sheet_name = st.text_input(entity_mapping.loc[entity_i,"Property_Name"])
+                    sheet_name = st.text_input(property_name)
                     submitted = st.form_submit_button("Submit")
                     count+=1
             if submitted:   
@@ -1240,7 +1256,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
             
         if len(new_tenant_account_list)>0:
-            st.warning("Please complete mapping for below P&L accounts:")
+            st.warning("Please complete mapping for below new account:")
             for i in range(len(new_tenant_account_list)):
                 st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
                 Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
@@ -1311,8 +1327,11 @@ def Upload_And_Process(uploaded_file,file_type):
 		
         Total_PL=pd.DataFrame()
         Total_PL_detail=pd.DataFrame()
- 
-        for entity_i in entity_mapping.index:   # entity_i is the entity code for each property
+        entity_list=list(entity_mapping.index)
+        while(entity_list):   # entity_i is the entity code for each property
+            entity_i=entity_list[0]  
+
+	    # properties in seperate sheet 
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
                 sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
                 sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
@@ -1340,18 +1359,15 @@ def Upload_And_Process(uploaded_file,file_type):
 
                 elif file_type=="BS" and BS_separate_excel=="Y": 
                     PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
-    
-            #All the properties are in one sheet		
+                entity_list.remove(entity_i) 
+            # All the properties are in one sheet		
 	    elif entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="N":
-                property_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
-                property_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
-                property_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
-                property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
-
+                entity_list=entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N","ENTITY"].tolist()	
+		    
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
-                    PL,PL_with_detail=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
-
+                    PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file)
+                     
                     # check if census data in another sheet
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
@@ -1374,6 +1390,7 @@ def Upload_And_Process(uploaded_file,file_type):
 		    
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
+            
     return Total_PL,Total_PL_detail
 
 #----------------------------------website widges------------------------------------
