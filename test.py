@@ -1381,7 +1381,7 @@ def Upload_And_Process(uploaded_file,file_type):
                     PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
                 entity_list.remove(entity_i) 
             # All the properties are in one sheet		
-	    elif entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="N":
+            elif entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="N":
                 entity_list=entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N","ENTITY"].tolist()	
 		    
 		# ****Finance and BS in one excel****
