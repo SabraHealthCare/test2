@@ -1075,6 +1075,26 @@ def View_Discrepancy(percent_discrepancy_accounts):
     else:
             st.success("All previous data in P&L ties with Sabra data")
 
+@st.cache_data(experimental_allow_widgets=True)      
+def Identify_Property_Name_Header(PL,property_name_list_infinance,sheet_name)
+    max_match=0
+    for row_i in range(PL.shape[0]):
+        canditate_row=list(PL.iloc[row_i,:])
+        property_name_list_infinance_upper=property_name_list_infinance.apply(labmda x: x.upper().strip())
+        canditate_row_upper=canditate_row.apply(labmda x: x.upper().strip())
+        match_names = [item for item in canditate_row_upper if item in property_name_list_infinance_upper]	
+	max_match=match_names 
+        if len(match_names)==len(property_name_list_infinance_upper):
+            return row_i
+	elif len(match_names)>len(max_match):
+            max_match=match_names
+    if len(max_match)==0:
+        st.error("Can't identify any property name in sheet {}. The property name are supposed to be:{}. Please add them and re_upload.".format(sheet_name,",".join(property_name_list_infinance)))
+        st.stop()
+    elif len(max_match)>=1:
+        not_match_names = [item for item in max_match if item not in property_name_list_infinance_upper]	         
+        st.error("Missing property name: {} in sheet {}. Please add them and re_upload.".format(",".join(not_match_names),sheet_name)
+        st.stop()
 @st.cache_data(experimental_allow_widgets=True)        
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file):  
     global latest_month,account_mapping
@@ -1086,10 +1106,9 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file):
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
     if len(sheet_name_list)!=1:
         st.warring("P&L of properties {} is in one sheet. Please select sheet name :".format(",".join(property_name_list)))
-        with st.form(key=111111111):                
+        with st.form(key="Sheet name"):                
             sheet_name=st.selectbox(" ",[""]+PL_sheet_list)
             submitted = st.form_submit_button("Submit")      
-
     else:
         sheet_name=sheet_name_list[0]
 
@@ -1136,17 +1155,14 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file):
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
-        #date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
-        property_name_header=Identify_Property_Name_Header(PL,tenantAccount_col_no,property_name_list_infinance)
-        if len(property_name_header[0])==1 and property_name_header[0]==[0]:
-            st.error("Fail to identify property header in sheet '{}', please add it and re-upload. The header is supposed to be: {}".format(sheet_name,",".join(property_name_list_infinance)))
-            st.stop()     
-        PL.columns=property_name_header[0]
+
+        property_name_header_row_number=Identify_Property_Name_Header(PL,tenantAccount_col_no,property_name_list_infinance)
+        PL.columns= PL.iloc[property_name_header_row_number]
 
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         #remove row above header row and remove column without property name
-        PL=PL.iloc[property_name_header[1]+1:,PL.columns!='0']    
+        PL=PL.loc[property_name_header_row_number+1:,property_name_list_infinance]    
         #remove rows with nan tenant account
         nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
         PL.drop(nan_index, inplace=True)
