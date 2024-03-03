@@ -1092,7 +1092,7 @@ def Identify_Property_Name_Header(PL,property_name_list_infinance,sheet_name):
         st.stop()
     elif len(max_match)>=1:
         not_match_names = [item for item in max_match if item not in property_name_list_infinance_upper]	         
-        st.error("Missing property name: {} in sheet {}. Please add them and re_upload.".format(",".join(not_match_names),sheet_name)
+        st.error("Missing property name: {} in sheet {}. Please add them and re_upload.".format(",".join(not_match_names),sheet_name))
         st.stop()
 @st.cache_data(experimental_allow_widgets=True)        
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file):  
