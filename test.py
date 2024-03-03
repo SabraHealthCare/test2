@@ -1086,8 +1086,10 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file):
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
     if len(sheet_name_list)!=1:
         st.warring("P&L of properties {} is in one sheet. Please select sheet name :".format(",".join(property_name_list)))
-      
-	#............
+        with st.form(key=111111111):                
+            sheet_name=st.selectbox(" ",[""]+PL_sheet_list)
+            submitted = st.form_submit_button("Submit")      
+
     else:
         sheet_name=sheet_name_list[0]
 
