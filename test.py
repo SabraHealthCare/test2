@@ -1080,7 +1080,7 @@ def Identify_Property_Name_Header(PL,property_name_list_infinance,sheet_name):
     max_match=0
     for row_i in range(PL.shape[0]):
         canditate_row=list(PL.iloc[row_i,:])
-        property_name_list_infinance_upper=property_name_list_infinance.apply(labmda x: x.upper().strip())
+        property_name_list_infinance_upper=property_name_list_infinance.apply(lambda x: x.upper().strip())
         canditate_row_upper=canditate_row.apply(labmda x: x.upper().strip())
         match_names = [item for item in canditate_row_upper if item in property_name_list_infinance_upper]	
 	max_match=match_names 
