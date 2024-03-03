@@ -1077,13 +1077,12 @@ def View_Discrepancy(percent_discrepancy_accounts):
 
 @st.cache_data(experimental_allow_widgets=True)      
 def Identify_Property_Name_Header(PL,property_name_list_infinance,sheet_name):
-    max_match=0
+    max_match=[]
     for row_i in range(PL.shape[0]):
         canditate_row=list(PL.iloc[row_i,:])
         property_name_list_infinance_upper=property_name_list_infinance.apply(lambda x: x.upper().strip())
         canditate_row_upper=canditate_row.apply(lambda x: x.upper().strip())
         match_names = [item for item in canditate_row_upper if item in property_name_list_infinance_upper]	
-	max_match=match_names 
         if len(match_names)==len(property_name_list_infinance_upper):
             return row_i
 	elif len(match_names)>len(max_match):
