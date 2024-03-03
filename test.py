@@ -737,18 +737,21 @@ def Map_PL_Sabra(PL,entity):
                     PL.loc[i,month]= before_conversion*float(conversion.split("*")[1])
 
     PL=PL.drop(["Tenant_Formated_Account","Conversion"], axis=1)
+    if isinstance(entity, str):# properties are in separate sheet
+        PL["Entity"]=entity	    
+         
+    elif isinstance(entity, list):  # multiple properties are in one sheet
+        PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='Entity')
+        PL.rename(columns={'value': latest_month}, inplace=True)
+       
     PL_with_detail=copy.copy(PL)
-    if isinstance(entity, str):
-        PL_with_detail["Entity"]=entity
-        PL_with_detail=PL_with_detail.set_index(['Entity', 'Sabra_Account',"Tenant_Account"])
-        PL=PL.set_index("Sabra_Account",drop=True)
-        PL=PL.drop(["Tenant_Account"], axis=1)
-	
-        # group by Sabra_Account
-        PL=PL.groupby(by=PL.index).sum().replace(0,None)
-        PL.index=[[entity]*len(PL.index),list(PL.index)]
-        return PL,PL_with_detail
-    if isinstance(entity, list):
+    PL_with_detail=PL_with_detail.set_index(['Entity', 'Sabra_Account',"Tenant_Account"])
+    PL=PL.set_index(['Entity',"Sabra_Account"],drop=True)
+	    
+    PL=PL.drop(["Tenant_Account"], axis=1)
+    # group by Sabra_Account
+    PL=PL.groupby(by=PL.index).sum().replace(0,None)
+    return PL,PL_with_detail        
     
 @st.cache_data
 def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
