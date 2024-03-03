@@ -1076,7 +1076,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
             st.success("All previous data in P&L ties with Sabra data")
 
 @st.cache_data(experimental_allow_widgets=True)      
-def Identify_Property_Name_Header(PL,property_name_list_infinance,sheet_name)
+def Identify_Property_Name_Header(PL,property_name_list_infinance,sheet_name):
     max_match=0
     for row_i in range(PL.shape[0]):
         canditate_row=list(PL.iloc[row_i,:])
