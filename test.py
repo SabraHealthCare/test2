@@ -740,9 +740,9 @@ def Map_PL_Sabra(PL,entity):
     if isinstance(entity, str):# properties are in separate sheet
         PL["Entity"]=entity	    
          
-    elif isinstance(entity, list):  # multiple properties are in one sheet
+    elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value"
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='Entity')
-        PL.rename(columns={'value': latest_month}, inplace=True)
+
        
     PL_with_detail=copy.copy(PL)
     PL_with_detail=PL_with_detail.set_index(['Entity', 'Sabra_Account',"Tenant_Account"])
@@ -1094,8 +1094,21 @@ def Identify_Property_Name_Header(PL,property_name_list_infinance,sheet_name):
         not_match_names = [item for item in max_match if item not in property_name_list_infinance_upper]	         
         st.error("Missing property name: {} in sheet {}. Please add them and re_upload.".format(",".join(not_match_names),sheet_name))
         st.stop()
+
+@st.cache_data
+def Identify_Reporting_Month(PL,property_name_header_row_number,sheet_name):
+    month_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
+    year_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
+
+    for row_i in range(property_name_header_row_number):
+        for col_i in range(PL.shape[1]):
+            month,year=Get_Month_Year(PL.iloc[row_i,col_i])   
+            if month>0 and year>0:
+                return "{}{}".format(year,month)
+    return "reporting_month_TBD"
+
 @st.cache_data(experimental_allow_widgets=True)        
-def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file):  
+def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):  
     global latest_month,account_mapping
     property_name_list_infinance =entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name_Finance"].tolist()
     st.write(property_name_list_infinance)
@@ -1155,7 +1168,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file):
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
 
-        property_name_header_row_number=Identify_Property_Name_Header(PL,tenantAccount_col_no,property_name_list_infinance)
+        property_name_header_row_number=Identify_Property_Name_Header(PL,property_name_list_infinance,sheet_name)
+        reporting_month=Identify_Reporting_Month(PL,property_name_header_row_number,sheet_name)  
         PL.columns= PL.iloc[property_name_header_row_number]
 
         #set tenant_account as index of PL
@@ -1197,8 +1211,9 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file):
                     st.error("There are too many duplicated accounts. Please fix them in sheet {} and re_upload".format(sheet_name))
                     st.stop()
         # Map PL accounts and Sabra account
-        PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
-
+        PL,PL_with_detail=Map_PL_Sabra(PL,entity_list,sheet_name) 
+        PL.rename(columns={"values":reporting_month},inplace=True))
+        PL_with_detail.rename(columns={"values":reporting_month},inplace=True))
     return PL,PL_with_detail
 
 
@@ -1307,35 +1322,52 @@ def Check_Reporting_Month(PL):
         current_date=str(current_year)+str(current_month)
     reporting_month_list=list(map(lambda x:str(x),PL.columns))	
     latest_month=max(reporting_month_list)
-    col4,col5,col6=st.columns([5,1,8])
-    with col4:  
-        st.warning("The reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
-    with col5:		
-        st.button('Yes', on_click=clicked, args=["yes_button"])         
-    with col6:
-        st.button("No", on_click=clicked, args=["no_button"])       
-    if st.session_state.clicked["yes_button"]:
-        if latest_month>=current_date:
-            st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
-            st.stop()
-        return latest_month
-    elif st.session_state.clicked["no_button"]:
-        with st.form("latest_month"):
-            col3,col4=st.columns(2)
-            with col3:
-                latest_month = st.selectbox('Select reporting month from P&L', list(map(lambda x:x[0:4]+"/"+x[4:6],reporting_month_list)))
-                latest_month=latest_month[0:4]+latest_month[5:7]
-            confirm_select=st.form_submit_button("Submit")
-        if confirm_select:
+    if latest_month!="reporting_month_TBD":
+        col4,col5,col6=st.columns([5,1,8])
+        with col4:  
+            st.warning("The reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
+        with col5:		
+            st.button('Yes', on_click=clicked, args=["yes_button"])         
+        with col6:
+            st.button("No", on_click=clicked, args=["no_button"])       
+        if st.session_state.clicked["yes_button"]:
             if latest_month>=current_date:
                 st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
                 st.stop()
             return latest_month
+        elif st.session_state.clicked["no_button"]:
+            with st.form("latest_month"):
+                col3,col4=st.columns(2)
+                with col3:
+                    latest_month = st.selectbox('Select reporting month from P&L:', list(map(lambda x:x[0:4]+"/"+x[4:6],reporting_month_list)))
+                    latest_month=latest_month[0:4]+latest_month[5:7]
+                confirm_select=st.form_submit_button("Submit")
+            if confirm_select:
+                if latest_month>=current_date:
+                    st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
+                    st.stop()
+                return latest_month
+            else:
+                st.stop()
         else:
             st.stop()
-    else:
-        st.stop()
-
+    elif  latest_month!=="reporting_month_TBD":
+        with st.form("latest_month_TBD"):
+                col3,col4=st.columns(2)
+                with col3:
+                    selected_year = st.selectbox("Select Year", range(current_year - 1, current_year + 1))
+                    # Month selection
+                    selected_month = st.selectbox("Select Month", [str(month).zfill(2) for month in range(1, 13)])
+                    latest_month=str(selected_year)+str(selected_month)
+                confirm_select=st.form_submit_button("Submit")
+            if confirm_select:
+                if latest_month>=current_date:
+                    st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
+                    st.stop()
+                return latest_month
+            else:
+                st.stop()
+        
 @st.cache_data(experimental_allow_widgets=True)  
 def Upload_And_Process(uploaded_file,file_type):
     global latest_month,property_name  # property_name is currently processed entity
@@ -1347,10 +1379,9 @@ def Upload_And_Process(uploaded_file,file_type):
 		
         Total_PL=pd.DataFrame()
         Total_PL_detail=pd.DataFrame()
-        entity_list=list(entity_mapping.index)
-        while(entity_list):   # entity_i is the entity code for each property
-            entity_i=entity_list[0]  
-
+        total_entity_list=list(entity_mapping.index)
+        while(total_entity_list):   # entity_i is the entity code for each property
+            entity_i=total_entity_list[0]  
 	    # properties in seperate sheet 
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
                 sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
@@ -1379,14 +1410,14 @@ def Upload_And_Process(uploaded_file,file_type):
 
                 elif file_type=="BS" and BS_separate_excel=="Y": 
                     PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
-                entity_list.remove(entity_i) 
+                total_entity_list.remove(entity_i) 
             # All the properties are in one sheet		
             elif entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="N":
                 entity_list=entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N","ENTITY"].tolist()	
-		    
+
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
-                    PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file)
+                    PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
                      
                     # check if census data in another sheet
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
@@ -1405,7 +1436,7 @@ def Upload_And_Process(uploaded_file,file_type):
 
                 elif file_type=="BS" and BS_separate_excel=="Y": 
                     PL,PL_with_detail=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
-		    
+                total_entity_list=[x for x in total_entity_list if x not in entity_list) 
 
 		    
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
@@ -1487,8 +1518,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.write("Balance sheet wasn't upload.")
             st.stop()
         if BS_separate_excel=="N":  # Finance/BS are in one excel
-            with st.spinner('Wait for P&L process'):
-                Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
+            Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             # process Finance 
             with st.spinner('Wait for P&L process'):
