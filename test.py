@@ -1114,7 +1114,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
     property_name_list_infinance =entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name_Finance"].tolist()
     st.write(property_name_list_infinance)
     
-    property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Nmae"].tolist()
+    property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
     sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if not isinstance(x, float) or not pd.isna(x)]
     sheet_name_list = list(set(sheet_name_list))
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
