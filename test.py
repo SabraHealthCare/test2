@@ -1081,7 +1081,7 @@ def Identify_Property_Name_Header(PL,property_name_list_infinance,sheet_name):
     for row_i in range(PL.shape[0]):
         canditate_row=list(PL.iloc[row_i,:])
         property_name_list_infinance_upper=list(map(lambda x: x.upper().strip(),property_name_list_infinance))
-        canditate_row_upper=list(map(lambda x: x.upper().strip() if x==x else x,canditate_row))
+        canditate_row_upper=list(map(lambda x: x.upper().strip() if not pd.isna(x) else x,canditate_row))
         match_names = [item for item in canditate_row_upper if item in property_name_list_infinance_upper]	
         if len(match_names)==len(property_name_list_infinance_upper):
             return row_i
@@ -1115,7 +1115,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
     st.write(property_name_list_infinance)
     
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
-    sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if not isinstance(x, float) or not pd.isna(x)]
+    sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if not pd.isna(x)]
     sheet_name_list = list(set(sheet_name_list))
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
     if len(sheet_name_list)!=1:
