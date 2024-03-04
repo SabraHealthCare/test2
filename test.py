@@ -612,7 +612,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
 def Manage_Entity_Mapping(operator):
     global entity_mapping
     #all the properties are supposed to be in entity_mapping. 
-    entity_mapping_updation=pd.DataFrame(columns=["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"])
+    entity_mapping_updation=pd.DataFrame(columns=["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Property_Name_Finance"])
     number_of_property=entity_mapping.shape[0]
     with st.form(key="Mapping Properties"):
         col1,col2,col3,col4=st.columns([4,3,3,3])
@@ -1113,7 +1113,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
     st.write("entity_mapping",entity_mapping)
     property_name_list_infinance =entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name_Finance"].tolist()
     st.write(property_name_list_infinance)
-    property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["ENTITY"].tolist()
+    
+    property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Nmae"].tolist()
     sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if not isinstance(x, float) or not pd.isna(x)]
     sheet_name_list = list(set(sheet_name_list))
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
