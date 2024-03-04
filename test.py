@@ -1345,7 +1345,7 @@ def Check_Reporting_Month(PL):
             if confirm_select:
                 if latest_month>=current_date:
                     st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
-                        st.stop()
+                    st.stop()
                 return latest_month
             else:
                 st.stop()
