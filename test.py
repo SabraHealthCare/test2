@@ -1414,9 +1414,8 @@ def Upload_And_Process(uploaded_file,file_type):
                 total_entity_list.remove(entity_i) 
             # All the properties are in one sheet		
             elif entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="N":
-                st.write("entity_mapping",entity_mapping)
-                entity_list=entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N","ENTITY"].tolist()	
-
+                entity_list=entity_mapping.index[entity_mapping["Property_in_separate_sheets"]=="N"].tolist()	
+                st.write("entity_list",entity_list)
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
