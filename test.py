@@ -1074,14 +1074,11 @@ def View_Discrepancy(percent_discrepancy_accounts):
             st.success("All previous data in P&L ties with Sabra data")
 
 @st.cache_data(experimental_allow_widgets=True)      
-def Identify_Property_Name_Header(PL,property_name_list_infinance,sheet_name):
+def Identify_Property_Name_Header(PL,property_name_list_infinance_upper,sheet_name):
     max_match=[]
     for row_i in range(PL.shape[0]):
         canditate_row=list(PL.iloc[row_i,:])
-        property_name_list_infinance_upper=list(map(lambda x: x.upper().strip() if not pd.isna(x) and isinstance(x, str)  else x,property_name_list_infinance))
-        st.write("canditate_row",canditate_row)
-        canditate_row_upper=list(map(lambda x: x.upper().strip() if not pd.isna(x) and isinstance(x, str)  else x,canditate_row))
-        st.write("canditate_row_upper",canditate_row_upper)        
+        canditate_row_upper=list(map(lambda x: x.upper().strip() if not pd.isna(x) and isinstance(x, str)  else x,canditate_row))        
         match_names = [item for item in canditate_row_upper if item in property_name_list_infinance_upper]	
         if len(match_names)==len(property_name_list_infinance_upper):
             return row_i
@@ -1110,8 +1107,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
     global latest_month,account_mapping
     st.write("entity_mapping",entity_mapping)
     property_name_list_infinance =entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name_Finance"].tolist()
-    st.write(property_name_list_infinance)
-    
+    property_name_list_infinance_upper=list(map(lambda x: x.upper().strip() if not pd.isna(x) and isinstance(x, str)  else x,property_name_list_infinance))
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
     sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if not pd.isna(x)]
     sheet_name_list = list(set(sheet_name_list))
@@ -1168,15 +1164,19 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
 
-        property_name_header_row_number=Identify_Property_Name_Header(PL,property_name_list_infinance,sheet_name)
+        property_name_header_row_number=Identify_Property_Name_Header(PL,property_name_list_infinance_upper,sheet_name)
         reporting_month=Identify_Reporting_Month(PL,property_name_header_row_number,sheet_name)  
-        PL.columns= PL.iloc[property_name_header_row_number]
 
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
-        #remove row above header row and remove column without property name
-        st.write("PL",PL,property_name_header_row_number,property_name_list_infinance)
-        PL=PL.loc[property_name_header_row_number+1:,property_name_list_infinance]    
+
+        #remove column without property names
+        header_of_PL_upper = df.iloc[property_name_header_row_number].apply(lambda x: str(x).upper().strip() if not pd.isna(x) and isinstance(x, str) else x )
+        PL = PL[header_of_PL_upper.isin(property_name_list_infinance_upper)]
+        PL.columns= PL.iloc[property_name_header_row_number]  
+	    
+	#remove row above header row     
+        PL=PL.loc[property_name_header_row_number+1:,:]    
         #remove rows with nan tenant account
         nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
         PL.drop(nan_index, inplace=True)
@@ -1287,7 +1287,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
         PL=PL.loc[(PL!= 0).any(axis=1),:]
-        st.write("PL",PL)
         # mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
             
