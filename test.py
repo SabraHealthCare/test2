@@ -1437,7 +1437,7 @@ def Upload_And_Process(uploaded_file,file_type):
 
                 elif file_type=="BS" and BS_separate_excel=="Y": 
                     PL,PL_with_detail=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
-                total_entity_list=[x for x in total_entity_list if x not in entity_list) 
+                total_entity_list=[x for x in total_entity_list if x not in entity_list]
 
 		    
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
