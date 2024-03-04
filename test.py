@@ -1337,11 +1337,12 @@ def Check_Reporting_Month(PL):
             return latest_month
         elif st.session_state.clicked["no_button"]:
             with st.form("latest_month"):
-                col3,col4=st.columns(2)
-                with col3:
+                col1,col2=st.columns(2)
+                with col1:
                     latest_month = st.selectbox('Select reporting month from P&L:', list(map(lambda x:x[0:4]+"/"+x[4:6],reporting_month_list)))
                     latest_month=latest_month[0:4]+latest_month[5:7]
-                confirm_select=st.form_submit_button("Submit")
+                with col2:
+                    confirm_select=st.form_submit_button("Submit")
             if confirm_select:
                 if latest_month>=current_date:
                     st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
@@ -1353,20 +1354,20 @@ def Check_Reporting_Month(PL):
             st.stop()
     elif  latest_month!="reporting_month_TBD":
         with st.form("latest_month_TBD"):
-                col3,col4=st.columns(2)
-                with col3:
-                    selected_year = st.selectbox("Select Year", range(current_year - 1, current_year + 1))
-                    # Month selection
-                    selected_month = st.selectbox("Select Month", [str(month).zfill(2) for month in range(1, 13)])
-                    latest_month=str(selected_year)+str(selected_month)
+            col7,col8=st.columns(1,3)
+            with col7:
+                selected_year = st.selectbox("Select Year", range(current_year - 1, current_year + 1))
+            with col8:
+                selected_month = st.selectbox("Select Month", [str(month).zfill(2) for month in range(1, 13)])
+                latest_month=str(selected_year)+str(selected_month)
                 confirm_select=st.form_submit_button("Submit")
-            if confirm_select:
-                if latest_month>=current_date:
-                    st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
-                    st.stop()
-                return latest_month
-            else:
+        if confirm_select:
+            if latest_month>=current_date:
+                st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
                 st.stop()
+            return latest_month
+        else:
+            st.stop()
         
 @st.cache_data(experimental_allow_widgets=True)  
 def Upload_And_Process(uploaded_file,file_type):
