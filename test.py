@@ -1351,7 +1351,7 @@ def Check_Reporting_Month(PL):
                 st.stop()
         else:
             st.stop()
-    elif  latest_month!=="reporting_month_TBD":
+    elif  latest_month!="reporting_month_TBD":
         with st.form("latest_month_TBD"):
                 col3,col4=st.columns(2)
                 with col3:
