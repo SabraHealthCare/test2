@@ -346,8 +346,7 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
 
     max_match=0
     for tenantAccount_col_no in range(0,min(15,PL.shape[1])):
-        st.write("PL",tenantAccount_col_no,PL.shape[1],PL)
-        candidate_col=list(map(lambda x: str(x).strip().upper() if x==x else x,PL.iloc[:,tenantAccount_col_no]))
+        candidate_col=list(map(lambda x: str(x).strip().upper() if not pd.isna(x) and isinstance(x, str) else x,PL.iloc[:,tenantAccount_col_no]))
 
         #find out how many tenant accounts match with account_pool
         match=[x in candidate_col for x in account_pool]
@@ -357,7 +356,6 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
             max_match_col=tenantAccount_col_no
             max_match=sum(x for x in match)
     if max_match>0:
-        st.write("tenantAccount_col_no",sheet_name,max_match_col,PL.iloc[:,max_match_col])
         return max_match_col
          
     st.error("Fail to identify tenant accounts column in sheet—— '"+sheet_name+"'")
@@ -1099,9 +1097,7 @@ def Identify_Property_Name_Header(PL,property_name_list_infinance,sheet_name):
 
 @st.cache_data
 def Identify_Reporting_Month(PL,property_name_header_row_number,sheet_name):
-    month_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
-    year_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
-
+    
     for row_i in range(property_name_header_row_number):
         for col_i in range(PL.shape[1]):
             month,year=Get_Month_Year(PL.iloc[row_i,col_i])   
