@@ -1213,7 +1213,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         # Map PL accounts and Sabra account
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_list,sheet_name) 
         PL.rename(columns={"values":reporting_month},inplace=True)
-        PL_with_detail.rename(columns={"values":reporting_month},inplace=True))
+        PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
     return PL,PL_with_detail
 
 
