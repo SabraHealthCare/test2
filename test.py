@@ -1110,6 +1110,7 @@ def Identify_Reporting_Month(PL,property_name_header_row_number,sheet_name):
 @st.cache_data(experimental_allow_widgets=True)        
 def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):  
     global latest_month,account_mapping
+    st.write("entity_mapping",entity_mapping)
     property_name_list_infinance =entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name_Finance"].tolist()
     st.write(property_name_list_infinance)
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["ENTITY"].tolist()
