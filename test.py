@@ -1083,6 +1083,7 @@ def Identify_Property_Name_Header(PL,property_name_list_infinance,sheet_name):
         property_name_list_infinance_upper=list(map(lambda x: x.upper().strip(),property_name_list_infinance))
         st.write("canditate_row",canditate_row)
         canditate_row_upper=list(map(lambda x: x.upper().strip() if not pd.isna(x) or not isinstance(x, float) else x,canditate_row))
+        st.write("canditate_row_upper",canditate_row_upper)        
         match_names = [item for item in canditate_row_upper if item in property_name_list_infinance_upper]	
         if len(match_names)==len(property_name_list_infinance_upper):
             return row_i
