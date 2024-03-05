@@ -838,7 +838,7 @@ def View_Summary():
         st.write("entities_missing_facility",entities_missing_facility)     
         previous_facility_data=BPC_pull.merge(BPC_Account,left_on="ACCOUNT",right_on="BPC_Account_Name")
         st.write("previous_facility_data1",previous_facility_data)    
-        previous_facility_data=previous_facility_data[previous_facility_data["Category"]=="Facility Information"][["Property_Name",onemonth_before_latest_month,"Sabra_Account_Full_Name"]]	
+        previous_facility_data=previous_facility_data[previous_facility_data["Category"]=="Facility Information"]#[["Property_Name",onemonth_before_latest_month,"Sabra_Account_Full_Name"]]	
         st.write("previous_facility_data2",previous_facility_data)   
         previous_facility_data=previous_facility_data.reset_index(drop=False)
         st.write("previous_facility_data3",previous_facility_data)  
