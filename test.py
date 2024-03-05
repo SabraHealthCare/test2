@@ -753,7 +753,6 @@ def Map_PL_Sabra(PL,entity):
     PL=PL.drop(["Tenant_Account"], axis=1)
     # group by Sabra_Account
     PL=PL.groupby(by=PL.index).sum().replace(0,None)
-    st.write("PL_INDEX",PL.index)
     return PL,PL_with_detail        
     
 @st.cache_data
