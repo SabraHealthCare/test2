@@ -708,7 +708,7 @@ def Map_PL_Sabra(PL,entity):
                            rename(columns={"Sabra_Second_Account": "Sabra_Account"})
     second_account_mapping=second_account_mapping.dropna(subset="Sabra_Account")
     second_account_mapping=second_account_mapping[second_account_mapping["Sabra_Account"]!=" "]
-    
+    st.write("3",PL)
     PL.index.name="Tenant_Account"
     PL["Tenant_Formated_Account"]=list(map(lambda x:x.upper() if type(x)==str else x,PL.index))
     PL=pd.concat([PL.merge(second_account_mapping,on="Tenant_Formated_Account",how='right'),PL.merge(main_account_mapping[main_account_mapping["Sabra_Account"]==main_account_mapping["Sabra_Account"]]\
@@ -717,7 +717,7 @@ def Map_PL_Sabra(PL,entity):
     PL=PL[PL['Sabra_Account']!=" "]
     PL.dropna(subset=['Sabra_Account'], inplace=True)
     PL=PL.reset_index(drop=True)
-
+    st.write("2",PL)
     month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
     for i in range(len(PL.index)):
         conversion=PL.loc[i,"Conversion"]
@@ -739,7 +739,7 @@ def Map_PL_Sabra(PL,entity):
         PL["Entity"]=entity	    
          
     elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value"
-        st.write(PL)
+        st.write("1",PL)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='Entity')
 
        
@@ -1167,23 +1167,18 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 
         property_name_header_row_number=Identify_Property_Name_Header(PL,property_name_list_infinance_upper,sheet_name)
         reporting_month=Identify_Reporting_Month(PL,property_name_header_row_number,sheet_name)  
-        st.write("1PL",PL)
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
-        st.write("2PL",PL)
         #remove column without property names
 
         header_of_PL_upper = PL.iloc[property_name_header_row_number].apply(lambda x: str(x).upper().strip() if not pd.isna(x) and isinstance(x, str) else x )
         st.write("header_of_PL_upper",header_of_PL_upper)
         st.write("is in",header_of_PL_upper.isin(property_name_list_infinance_upper))
         PL = PL.loc[:,header_of_PL_upper.isin(property_name_list_infinance_upper)]
-        st.write("3PL",PL)
         
         st.write("PL.iloc[property_name_header_row_number] ",PL.iloc[property_name_header_row_number,:]  )
         PL.columns=list( PL.iloc[property_name_header_row_number,:])  
-        st.write("4PL",PL)
 	#remove row above header row   
-        st.write("PL",PL)
         #PL=PL.loc[property_name_header_row_number+1:,]    
         #remove rows with nan tenant account
         nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
