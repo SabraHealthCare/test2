@@ -1172,11 +1172,9 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         #remove column without property names
 
         header_of_PL_upper = PL.iloc[property_name_header_row_number].apply(lambda x: str(x).upper().strip() if not pd.isna(x) and isinstance(x, str) else x )
-        st.write("header_of_PL_upper",header_of_PL_upper)
-        st.write("is in",header_of_PL_upper.isin(property_name_list_infinance_upper))
+
         PL = PL.loc[:,header_of_PL_upper.isin(property_name_list_infinance_upper)]
         
-        st.write("PL.iloc[property_name_header_row_number] ",PL.iloc[property_name_header_row_number,:]  )
         PL.columns=list( PL.iloc[property_name_header_row_number,:])  
 	#remove row above header row   
         #PL=PL.loc[property_name_header_row_number+1:,]    
@@ -1190,7 +1188,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
         PL=PL.loc[(PL!= 0).any(axis=1),:]
-        st.write("PL",PL)
         # mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
             
@@ -1217,7 +1214,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         # Map PL accounts and Sabra account
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
         PL.rename(columns={"values":reporting_month},inplace=True)
-        st.write("3PL",PL)
         PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
     return PL,PL_with_detail
 
