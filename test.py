@@ -1097,7 +1097,7 @@ def Identify_Reporting_Month(PL,property_name_header_row_number):
     for row_i in range(property_name_header_row_number):
         for col_i in range(PL.shape[1]):
             month,year=Get_Month_Year(PL.iloc[row_i,col_i])   
-            if month>0 and month>0:
+            if month>0 and year>0:
                 st.write("month",month,year)	
                 return "{}{}".format(year,month)
     return "reporting_month_TBD"
