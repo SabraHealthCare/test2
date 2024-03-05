@@ -1159,22 +1159,22 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
     # Start checking process
     if True:   
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
-        st.write("Identify_Tenant_Account_Col",Identify_Tenant_Account_Col)
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
 
         property_name_header_row_number=Identify_Property_Name_Header(PL,property_name_list_infinance_upper,sheet_name)
         reporting_month=Identify_Reporting_Month(PL,property_name_header_row_number,sheet_name)  
-
+        st.write("1PL",PL)
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
-
+        st.write("2PL",PL)
         #remove column without property names
         header_of_PL_upper = PL.iloc[property_name_header_row_number].apply(lambda x: str(x).upper().strip() if not pd.isna(x) and isinstance(x, str) else x )
         PL = PL.loc[:,header_of_PL_upper.isin(property_name_list_infinance_upper)]
+        st.write("3PL",PL)
         PL.columns= PL.iloc[property_name_header_row_number]  
-	    
+        st.write("4PL",PL)
 	#remove row above header row   
         st.write("PL",PL)
         #PL=PL.loc[property_name_header_row_number+1:,]    
