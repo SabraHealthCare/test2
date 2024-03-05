@@ -739,10 +739,8 @@ def Map_PL_Sabra(PL,entity):
     elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value" 
         property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=property_header, var_name='Entity')
-        st.write("PLmeltl",PL)
-        st.write("PL_index",PL.index, PL.index.names)
-        
-       
+
+            
     PL_with_detail=copy.copy(PL)
     PL_with_detail=PL_with_detail.set_index(['Entity', 'Sabra_Account',"Tenant_Account"])
     PL=PL.set_index(['Entity',"Sabra_Account"],drop=True)
@@ -750,6 +748,7 @@ def Map_PL_Sabra(PL,entity):
     PL=PL.drop(["Tenant_Account"], axis=1)
     # group by Sabra_Account
     PL=PL.groupby(by=PL.index).sum().replace(0,None)
+    st.write("PL_INDEX",PL.index)
     return PL,PL_with_detail        
     
 @st.cache_data
@@ -1537,7 +1536,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             previous_month_list=[month for month in Total_PL.columns.sort_values() if month<latest_month]
             if len(previous_month_list)>0:   # there are previous months in P&L
                 diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month,previous_month_list)
-
+        st.write(9,Total_PL.index)
 	# 1 Summary
         View_Summary()
       
