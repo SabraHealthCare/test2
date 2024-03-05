@@ -749,8 +749,9 @@ def Map_PL_Sabra(PL,entity):
     st.write("PL1",PL.index.names)
     #PL=PL.groupby(by=PL.index).sum().replace(0,None)
    
-    PL = PL.groupby(by=[PL.index1, PL.index2], as_index=False).sum().replace(0,None)
-    #PL.index.names = ['ENTITY',"Sabra_Account"]
+    PL = PL.groupby(by=['Entity',"Sabra_Account"], as_index=False).sum().replace(0,None)
+    st.write("PL2",PL,PL.index,PL.index.names)
+    PL.index.names = ['ENTITY',"Sabra_Account"]
     st.write("PL2",PL,PL.index,PL.index.names)
     return PL,PL_with_detail        
     
