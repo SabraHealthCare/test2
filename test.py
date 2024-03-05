@@ -698,7 +698,7 @@ def Manage_Account_Mapping(new_tenant_account):
     return Sabra_main_account_value,Sabra_second_account_value     
 
 
-@st.cache_data
+@st.cache_data 
 def Map_PL_Sabra(PL,entity):
     # remove no need to map from account_mapping
     main_account_mapping=account_mapping.loc[list(map(lambda x:x==x and x.upper()!='NO NEED TO MAP',account_mapping["Sabra_Account"])),:]
