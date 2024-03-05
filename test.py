@@ -1177,7 +1177,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 	    
 	#remove row above header row   
         st.write("PL",PL)
-        PL=PL.loc[property_name_header_row_number+1:,]    
+        #PL=PL.loc[property_name_header_row_number+1:,]    
         #remove rows with nan tenant account
         nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
         PL.drop(nan_index, inplace=True)
