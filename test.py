@@ -1093,12 +1093,12 @@ def Identify_Property_Name_Header(PL,property_name_list_infinance_upper,sheet_na
         st.stop()
 
 @st.cache_data
-def Identify_Reporting_Month(PL,property_name_header_row_number,sheet_name):
-    
+def Identify_Reporting_Month(PL,property_name_header_row_number):
     for row_i in range(property_name_header_row_number):
         for col_i in range(PL.shape[1]):
             month,year=Get_Month_Year(PL.iloc[row_i,col_i])   
-            if month>0 and year>0:
+            if month>0 and month>0:
+                st.write("month",month,year)	
                 return "{}{}".format(year,month)
     return "reporting_month_TBD"
 
@@ -1165,7 +1165,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
             st.stop()    
 
         property_name_header_row_number=Identify_Property_Name_Header(PL,property_name_list_infinance_upper,sheet_name)
-        reporting_month=Identify_Reporting_Month(PL,property_name_header_row_number,sheet_name) 
+        reporting_month=Identify_Reporting_Month(PL,property_name_header_row_number) 
         st.write("reporting_month",reporting_month)
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
