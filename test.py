@@ -736,8 +736,7 @@ def Map_PL_Sabra(PL,entity):
     if isinstance(entity, str):# properties are in separate sheet
         PL["Entity"]=entity	    
          
-    elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value"
-        st.write("1",PL)   
+    elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value" 
         property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=property_header, var_name='Entity')
 
@@ -1165,7 +1164,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 
         property_name_header_row_number=Identify_Property_Name_Header(PL,property_name_list_infinance_upper,sheet_name)
         reporting_month=Identify_Reporting_Month(PL,property_name_header_row_number) 
-        st.write("reporting_month",reporting_month)
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         #remove column without property names
@@ -1213,6 +1211,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         # Map PL accounts and Sabra account
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
         PL.rename(columns={"values":reporting_month},inplace=True)
+        st.write("PL",PL)
         PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
     return PL,PL_with_detail
 
