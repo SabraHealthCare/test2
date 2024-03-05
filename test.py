@@ -739,6 +739,7 @@ def Map_PL_Sabra(PL,entity):
         PL["Entity"]=entity	    
          
     elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value"
+        st.write(PL)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='Entity')
 
        
