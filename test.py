@@ -743,15 +743,11 @@ def Map_PL_Sabra(PL,entity):
     PL_with_detail=copy.copy(PL)
     PL_with_detail=PL_with_detail.set_index(['Entity', 'Sabra_Account',"Tenant_Account"])
     PL.set_index(['Entity',"Sabra_Account"],drop=True, inplace=True)
-    st.write("why",PL.index,PL.index.names)
     PL.index.names = ['ENTITY',"Sabra_Account"]
-    st.write("PL.index.names1",PL.index.names)
-    PL.reset_index(inplace=True, drop=False)
-    st.write("PL",PL)
-    st.write("PL.index.names2",PL.index.names)
     PL=PL.drop(["Tenant_Account"], axis=1)
     # group by Sabra_Account
     PL=PL.groupby(by=PL.index).sum().replace(0,None)
+    st.write("PL",PL,PL.index,PL.index.names)
     return PL,PL_with_detail        
     
 @st.cache_data
