@@ -1178,6 +1178,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         PL = PL.loc[:,header_of_PL_upper.isin(property_name_list_infinance_upper)]
         st.write("3PL",PL)
         PL.columns= PL.iloc[property_name_header_row_number]  
+        st.write("PL.iloc[property_name_header_row_number] ",PL.iloc[property_name_header_row_number]  )
         st.write("4PL",PL)
 	#remove row above header row   
         st.write("PL",PL)
