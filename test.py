@@ -722,8 +722,8 @@ def Map_PL_Sabra(PL,entity):
         if conversion!=conversion or pd.isna(conversion):
             continue
         else:
-            for month in header:
-                before_conversion=PL.loc[i,header_i]
+            for month in month_cols:
+                before_conversion=PL.loc[i,month]
                
                 if before_conversion!=before_conversion:
                     continue
