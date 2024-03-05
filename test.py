@@ -823,8 +823,8 @@ def View_Summary():
 
     #Total_PL.index=Total_PL.index.set_names(["ENTITY", "Sabra_Account"]) 
     #Total_PL.index.set_names(["ENTITY", "Sabra_Account"], inplace=True)
-    Total_PL.index.set_names('ENTITY', level=0, inplace=True)
-    Total_PL.index.set_names('Sabra_Account', level=1, inplace=True)
+    Total_PL.index=Total_PL.index.set_names("ENTITY")
+    st.write("Total_PL.index",Total_PL.index)
     Total_PL=Total_PL.fillna(0)
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
