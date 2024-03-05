@@ -739,7 +739,9 @@ def Map_PL_Sabra(PL,entity):
     elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value" 
         property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=property_header, var_name='Entity')
-
+        st.write("PLmeltl",PL)
+        st.write("PL_index",PL.index, PL.index.names)
+        
        
     PL_with_detail=copy.copy(PL)
     PL_with_detail=PL_with_detail.set_index(['Entity', 'Sabra_Account',"Tenant_Account"])
