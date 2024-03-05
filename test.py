@@ -746,7 +746,10 @@ def Map_PL_Sabra(PL,entity):
     PL.set_index(['Entity',"Sabra_Account"],drop=True, inplace=True)
     st.write("why",PL.index,PL.index.names)
     PL.index.names = ['ENTITY',"Sabra_Account"]
-    st.write("PL.index.names",PL.index.names)
+    st.write("PL.index.names1",PL.index.names)
+    PL.reset_index(inplace=True, drop=False)
+    st.write("PL",PL)
+    st.write("PL.index.names2",PL.index.names)
     PL=PL.drop(["Tenant_Account"], axis=1)
     # group by Sabra_Account
     PL=PL.groupby(by=PL.index).sum().replace(0,None)
@@ -828,7 +831,7 @@ def View_Summary():
     #Total_PL.index=Total_PL.index.set_names("ENTITY")
     st.write("Total_PL.index",Total_PL.index)
     Total_PL=Total_PL.fillna(0)
-    latest_month_data=Total_PL[latest_month].reset_index(inplace=True,drop=False)
+    latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     st.write("latest_month_data",latest_month_data)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
