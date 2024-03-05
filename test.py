@@ -1170,6 +1170,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         st.write("2PL",PL)
         #remove column without property names
+        st.write("header_of_PL_upper",header_of_PL_upper)
+        st.write(header_of_PL_upper.isin(property_name_list_infinance_upper))
         header_of_PL_upper = PL.iloc[property_name_header_row_number].apply(lambda x: str(x).upper().strip() if not pd.isna(x) and isinstance(x, str) else x )
         PL = PL.loc[:,header_of_PL_upper.isin(property_name_list_infinance_upper)]
         st.write("3PL",PL)
