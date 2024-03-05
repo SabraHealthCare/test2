@@ -1385,12 +1385,12 @@ def Upload_And_Process(uploaded_file,file_type):
         total_entity_list=list(entity_mapping.index)
         while(total_entity_list):   # entity_i is the entity code for each property
             entity_i=total_entity_list[0]  
+            sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
+            sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
+            sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
+            property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
 	    # properties in seperate sheet 
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
-                sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
-                sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
-                sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
-                property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
 
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
@@ -1417,11 +1417,9 @@ def Upload_And_Process(uploaded_file,file_type):
             # All the properties are in one sheet		
             elif entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="N":
                 entity_list=entity_mapping.index[entity_mapping["Property_in_separate_sheets"]=="N"].tolist()	
-                st.write("entity_list",entity_list)
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
-                     
                     # check if census data in another sheet
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
