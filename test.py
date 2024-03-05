@@ -821,7 +821,7 @@ def View_Summary():
     for month in months:
         m_str += ", " + month
 
-    st.write("Total_PL.index",Total_PL.index)
+
     #Total_PL.index=Total_PL.index.set_names(["ENTITY", "Sabra_Account"]) 
     #Total_PL.index.set_names(["ENTITY", "Sabra_Account"], inplace=True)
     Total_PL.index.set_names('ENTITY', level=0, inplace=True)
@@ -1216,7 +1216,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         # Map PL accounts and Sabra account
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
         PL.rename(columns={"value":reporting_month},inplace=True)
-        st.write("PL-rename",PL)
+
         PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
     return PL,PL_with_detail
 
