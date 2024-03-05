@@ -738,7 +738,7 @@ def Map_PL_Sabra(PL,entity):
     elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value" 
         property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=property_header, var_name='Entity')
-
+        st.write("entity",entity)
             
     PL_with_detail=copy.copy(PL)
     PL_with_detail=PL_with_detail.set_index(['Entity', 'Sabra_Account',"Tenant_Account"])
@@ -747,6 +747,7 @@ def Map_PL_Sabra(PL,entity):
     PL=PL.drop(["Tenant_Account"], axis=1)
     PL = PL.groupby(by=['Entity',"Sabra_Account"], as_index=True).sum().replace(0,None)
     PL.index.names = ['ENTITY',"Sabra_Account"]
+    st.write("PL",PL)
     return PL,PL_with_detail        
     
 @st.cache_data
@@ -819,6 +820,7 @@ def View_Summary():
         m_str += ", " + month
 
     Total_PL=Total_PL.fillna(0)
+    
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
