@@ -1172,7 +1172,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 
         #remove column without property names
         header_of_PL_upper = PL.iloc[property_name_header_row_number].apply(lambda x: str(x).upper().strip() if not pd.isna(x) and isinstance(x, str) else x )
-        PL = PL[header_of_PL_upper.isin(property_name_list_infinance_upper)]
+        PL = PL.loc[:,header_of_PL_upper.isin(property_name_list_infinance_upper)]
         PL.columns= PL.iloc[property_name_header_row_number]  
 	    
 	#remove row above header row     
