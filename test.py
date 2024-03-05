@@ -742,17 +742,11 @@ def Map_PL_Sabra(PL,entity):
             
     PL_with_detail=copy.copy(PL)
     PL_with_detail=PL_with_detail.set_index(['Entity', 'Sabra_Account',"Tenant_Account"])
-    #PL.set_index(['Entity',"Sabra_Account"],drop=True, inplace=True)
     
-    PL=PL.drop(["Tenant_Account"], axis=1)
     # group by Sabra_Account
-    st.write("PL1",PL.index.names)
-    #PL=PL.groupby(by=PL.index).sum().replace(0,None)
-   
+    PL=PL.drop(["Tenant_Account"], axis=1)
     PL = PL.groupby(by=['Entity',"Sabra_Account"], as_index=True).sum().replace(0,None)
-    st.write("PL2",PL,PL.index,PL.index.names)
     PL.index.names = ['ENTITY',"Sabra_Account"]
-    st.write("PL2",PL,PL.index,PL.index.names)
     return PL,PL_with_detail        
     
 @st.cache_data
@@ -824,14 +818,8 @@ def View_Summary():
     for month in months:
         m_str += ", " + month
 
-
-    #Total_PL.index=Total_PL.index.set_names(["ENTITY", "Sabra_Account"]) 
-    #Total_PL.index.set_names(["ENTITY", "Sabra_Account"], inplace=True)
-    #Total_PL.index=Total_PL.index.set_names("ENTITY")
-    st.write("Total_PL.index",Total_PL.index)
     Total_PL=Total_PL.fillna(0)
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
-    st.write("latest_month_data",latest_month_data)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     # check missing category ( example: total revenue= 0, total Opex=0...)	
@@ -847,11 +835,15 @@ def View_Summary():
         # fill the facility info with historical data
         entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
         onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]<str(latest_month),BPC_pull.columns)))
-     
+        st.write("entities_missing_facility",entities_missing_facility)     
         previous_facility_data=BPC_pull.merge(BPC_Account,left_on="ACCOUNT",right_on="BPC_Account_Name")
+        st.write("previous_facility_data1",previous_facility_data)    
         previous_facility_data=previous_facility_data[previous_facility_data["Category"]=="Facility Information"][["Property_Name",onemonth_before_latest_month,"Sabra_Account_Full_Name"]]	
+        st.write("previous_facility_data2",previous_facility_data)   
         previous_facility_data=previous_facility_data.reset_index(drop=False)
+        st.write("previous_facility_data3",previous_facility_data)  
         previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_latest_month:latest_month})
+        st.write("previous_facility_data3",previous_facility_data)  	    
         st.error("Below properties miss facility information in P&L. It has been filled by historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
         previous_facility_data_display = previous_facility_data.pivot(index=["Sabra_Account_Full_Name"], columns="Property_Name", values=latest_month)
         st.write(previous_facility_data_display.rename(columns={"Sabra_Account_Full_Name":"Facility information"}))
