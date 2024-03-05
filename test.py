@@ -1078,7 +1078,9 @@ def View_Discrepancy(percent_discrepancy_accounts):
             st.success("All previous data in P&L ties with Sabra data")
 
 @st.cache_data(experimental_allow_widgets=True)      
-def Identify_Property_Name_Header(PL,property_name_list_infinance_upper,sheet_name):
+def Identify_Property_Name_Header(PL,entity_list,sheet_name):
+    property_name_list_inmapping =entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name_Finance"].tolist()     
+    property_name_list_inmapping=list(map(lambda x: x.upper().strip() if not pd.isna(x) and isinstance(x, str)  else x,property_name_list_infinance))     
     max_match=[]
     for row_i in range(PL.shape[0]):
         canditate_row=list(PL.iloc[row_i,:])
@@ -1108,9 +1110,6 @@ def Identify_Reporting_Month(PL,property_name_header_row_number):
 @st.cache_data(experimental_allow_widgets=True)        
 def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):  
     global latest_month,account_mapping
-	
-    property_name_list_infinance =entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name_Finance"].tolist()
-    property_name_list_infinance_upper=list(map(lambda x: x.upper().strip() if not pd.isna(x) and isinstance(x, str)  else x,property_name_list_infinance))
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
     sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if not pd.isna(x)]
     sheet_name_list = list(set(sheet_name_list))
@@ -1166,7 +1165,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
 
-        property_name_header_row_number=Identify_Property_Name_Header(PL,property_name_list_infinance_upper,sheet_name)
+        property_name_header_row_number=Identify_Property_Name_Header(PL,entity_list,sheet_name)
         reporting_month=Identify_Reporting_Month(PL,property_name_header_row_number)
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
@@ -1384,7 +1383,9 @@ def Upload_And_Process(uploaded_file,file_type):
         Total_PL_detail=pd.DataFrame()
         total_entity_list=list(entity_mapping.index)
         while(total_entity_list):   # entity_i is the entity code for each property
+            st.write("total_entity_list",total_entity_list)
             entity_i=total_entity_list[0]  
+            st.write("entity_i",entity_i)
             sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
             sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
             sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
