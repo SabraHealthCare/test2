@@ -708,7 +708,6 @@ def Map_PL_Sabra(PL,entity):
                            rename(columns={"Sabra_Second_Account": "Sabra_Account"})
     second_account_mapping=second_account_mapping.dropna(subset="Sabra_Account")
     second_account_mapping=second_account_mapping[second_account_mapping["Sabra_Account"]!=" "]
-    st.write("3",PL)
     PL.index.name="Tenant_Account"
     PL["Tenant_Formated_Account"]=list(map(lambda x:x.upper() if type(x)==str else x,PL.index))
     PL=pd.concat([PL.merge(second_account_mapping,on="Tenant_Formated_Account",how='right'),PL.merge(main_account_mapping[main_account_mapping["Sabra_Account"]==main_account_mapping["Sabra_Account"]]\
@@ -717,15 +716,14 @@ def Map_PL_Sabra(PL,entity):
     PL=PL[PL['Sabra_Account']!=" "]
     PL.dropna(subset=['Sabra_Account'], inplace=True)
     PL=PL.reset_index(drop=True)
-    st.write("2",PL)
     month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
     for i in range(len(PL.index)):
         conversion=PL.loc[i,"Conversion"]
-        if conversion!=conversion:
+        if conversion!=conversion or pd.isna(conversion):
             continue
         else:
-            for month in month_cols:
-                before_conversion=PL.loc[i,month]
+            for month in header:
+                before_conversion=PL.loc[i,header_i]
                
                 if before_conversion!=before_conversion:
                     continue
@@ -739,8 +737,9 @@ def Map_PL_Sabra(PL,entity):
         PL["Entity"]=entity	    
          
     elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value"
-        st.write("1",PL)
-        PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='Entity')
+        st.write("1",PL)   
+        property_header = [x for x in PL.columns() if x not in ["Sabra_Account","Tenant_Account"]]
+        PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=property_header, var_name='Entity')
 
        
     PL_with_detail=copy.copy(PL)
