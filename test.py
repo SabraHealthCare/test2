@@ -822,6 +822,7 @@ def View_Summary():
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
+    st.write("latest_month_data",latest_month_data)
     # check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
     entity_list=list(latest_month_data["ENTITY"].unique())
@@ -1533,7 +1534,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             previous_month_list=[month for month in Total_PL.columns.sort_values() if month<latest_month]
             if len(previous_month_list)>0:   # there are previous months in P&L
                 diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month,previous_month_list)
-        st.write(9,Total_PL.index)
 	# 1 Summary
         View_Summary()
       
