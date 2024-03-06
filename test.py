@@ -498,16 +498,17 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
     month_count=[]
     max_len=0
     if sheet_name=='134 WL-F':
-        st.write(month_table)
+        st.write(month_table,year_table)
     for row_i in range(search_row_size):
         # save the number of valid months of each row to month_count
         valid_month=list(filter(lambda x:x!=0,month_table.iloc[row_i,]))
         valid_year=list(filter(lambda x:x!=0,year_table.iloc[row_i,]))
-        if sheet_name=='134 WL-F':
-            st.write(valid_month,valid_year)
+
         month_count.append(len(valid_month))
         year_count.append(len(valid_year))
-        
+        if sheet_name=='134 WL-F':
+            st.write("valid_month",valid_month,valid_year)
+            st.write("count",month_count,year_count)
     # can't find month keyword in any rows
     if all(map(lambda x:x==0,month_count)):
         st.error("Can't identify month/year columns in sheet——'"+sheet_name+"'")   
