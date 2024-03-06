@@ -574,9 +574,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
            
             col_month=0
             #col_month is the col number of month
-            st.write("month_count",month_count)
-            st.write("month_sort_index  month_index_i",month_table.iloc[month_sort_index[month_index_i]])
-            st.write("month_table",month_table,year_table)
             while(month_table.iloc[month_row_index,col_month]==0):
                 col_month+=1
                 
@@ -587,7 +584,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                 if month_row_index>0 and month_row_index<PL_row_size and year_table.iloc[month_row_index-1,col_month]!=0 and year_table.iloc[month_row_index+1,col_month]==0:
                     year_table.iloc[month_row_index,col_month]=year_table.iloc[month_row_index-1,col_month]	
                     st.write("2",year_table.iloc[month_row_index,col_month])
-                elif month_row_index<PL_row_size and year_table.iloc[month_row_index+1,col_month]==0 :
+                elif month_row_index<PL_row_size and year_table.iloc[month_row_index+1,col_month]!=0 :
                     year_table.iloc[month_row_index,col_month]=year_table.iloc[month_row_index+1,col_month]
                     st.write("3",year_table.iloc[month_row_index,col_month])
                 else:			
