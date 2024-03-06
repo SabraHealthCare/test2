@@ -880,7 +880,7 @@ def View_Summary():
     st.write(latest_month_data)
     duplicates = latest_month_data[latest_month_data.duplicated(subset=["Sabra_Account_Full_Name", "Category"], keep=False)]
     st.write(duplicates)
-    latest_month_data =latest_month_data.pivot(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month,aggfunc='last')
+    latest_month_data =latest_month_data..pivot_table(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month,aggfunc='last')
     latest_month_data.reset_index(drop=False,inplace=True)
     st.write(latest_month_data) 
     latest_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
