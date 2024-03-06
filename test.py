@@ -582,11 +582,14 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                 
             #if there is no year in month header 
             if  year_table.iloc[month_row_index,col_month]==0:
+                st.write("1",year_table.iloc[month_row_index,col_month])
                 #check the next row
                 if month_row_index>0 and month_row_index<PL_row_size and year_table.iloc[month_row_index-1,col_month]!=0 and year_table.iloc[month_row_index+1,col_month]==0:
                     year_table.iloc[month_row_index,col_month]=year_table.iloc[month_row_index-1,col_month]	
+                    st.write("2",year_table.iloc[month_row_index,col_month])
                 elif month_row_index<PL_row_size and year_table.iloc[month_row_index+1,col_month]==0 :
                     year_table.iloc[month_row_index,col_month]=year_table.iloc[month_row_index+1,col_month]
+                    st.write("3",year_table.iloc[month_row_index,col_month])
                 else:			
                     continue
            
@@ -611,7 +614,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                         month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                         
                 return PL_date_header,month_row_index
-    st.error("Can't identify date row in P&L for sheet: '"+sheet_name+"'")
+    st.error("Can't identify date row in for sheet: '"+sheet_name+"'")
     st.stop()
 
 #@st.cache_data(experimental_allow_widgets=True)
