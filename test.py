@@ -562,34 +562,38 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                 
                 st.warning("Warning: Fail to identify 'year' in the month header of sheet '"+sheet_name+"'. Filled year as:")
                 st.markdown(d_str[1:])
-                return PL_date_header,month_sort_index[month_index_i]
+                return PL_date_header,month_row_index
                         
             # month is not continuous, check next
             else:
                 continue
                 
         # only one month in header:month and year must exist for one month header
-        elif month_count[month_sort_index[month_index_i]]==1:
+        elif month_count[month_row_index]==1:
             # month and year must match 
-            #st.write("There is only one month in sheet——'"+sheet_name+"'")
+           
             col_month=0
             #col_month is the col number of month
             st.write("month_count",month_count)
             st.write("month_sort_index  month_index_i",month_table.iloc[month_sort_index[month_index_i]])
             st.write("month_table",month_table,year_table)
-            while(month_table.iloc[month_sort_index[month_index_i],col_month]==0):
+            while(month_table.iloc[month_row_index,col_month]==0):
                 col_month+=1
                 
             #if there is no year in month header 
-            if  year_table.iloc[month_sort_index[month_index_i],col_month]==0:
+            if  year_table.iloc[month_row_index,col_month]==0:
                 #check the next row
-                #if year_table.iloc[month_sort_index[month_index_i]+1,col_month]==0 and :
-                continue
+                if month_row_index>0 and month_row_index<PL_row_size and year_table.iloc[month_row_index-1,col_month]!=0 and year_table.iloc[month_row_index+1,col_month]==0:
+                    year_table.iloc[month_row_index,col_month]=year_table.iloc[month_row_index-1,col_month]	
+                elif month_row_index<PL_row_size and year_table.iloc[month_row_index+1,col_month]==0 :
+                    year_table.iloc[month_row_index,col_month]=year_table.iloc[month_row_index+1,col_month]
+		else:
+                    continue
            
             count_num=0
             count_str=0
             count_non=0
-            for row_month in range(month_sort_index[month_index_i],PL.shape[0]):
+            for row_month in range(month_row_index,PL.shape[0]):
                 if PL.iloc[row_month,col_month]==None or pd.isna(PL.iloc[row_month,col_month]) or PL.iloc[row_month,col_month]=="":
                     count_non+=1
                     continue
@@ -603,10 +607,10 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                 continue
                 
             else:
-                PL_date_header=year_table.iloc[month_sort_index[month_index_i],].apply(lambda x:str(int(x)))+\
-                        month_table.iloc[month_sort_index[month_index_i],].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
+                PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
+                        month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                         
-                return PL_date_header,month_sort_index[month_index_i]
+                return PL_date_header,month_row_index
     st.error("Can't identify date row in P&L for sheet: '"+sheet_name+"'")
     st.stop()
 
