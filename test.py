@@ -748,7 +748,6 @@ def Map_PL_Sabra(PL,entity):
     PL=PL.drop(["Tenant_Account"], axis=1)
     PL = PL.groupby(by=['Entity',"Sabra_Account"], as_index=True).sum().replace(0,None)
     PL.index.names = ['ENTITY',"Sabra_Account"]
-    st.write("PL",PL)
     return PL,PL_with_detail        
     
 @st.cache_data
@@ -1264,7 +1263,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     # Start checking process
     with st.spinner("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
-        st.write("Identify_Tenant_Account_Col",Identify_Tenant_Account_Col)
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
@@ -1385,9 +1383,7 @@ def Upload_And_Process(uploaded_file,file_type):
         total_entity_list=list(entity_mapping.index)
         st.write("entity_mapping",entity_mapping,"2222",entity_mapping.index)
         while(total_entity_list):   # entity_i is the entity code for each property
-            st.write("total_entity_list",total_entity_list)
             entity_i=total_entity_list[0]  
-            st.write("entity_i",entity_i)
             sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
             sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
             sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
