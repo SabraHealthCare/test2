@@ -223,7 +223,6 @@ def Initial_Mapping(operator):
     # read property mapping
     entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename)
     entity_mapping=entity_mapping.reset_index(drop=True)
-    st.write(entity_mapping)
     entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
     entity_mapping=entity_mapping.set_index("ENTITY")
     return entity_mapping,account_mapping
@@ -1481,7 +1480,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         entity_mapping,account_mapping=Initial_Mapping(operator)
         global latest_month
         latest_month='2023'
-        st.write(1,entity_mapping["BS_separate_excel"])
         if all(entity_mapping["BS_separate_excel"]=="Y"):
 	
             BS_separate_excel="Y"
