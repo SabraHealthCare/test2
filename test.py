@@ -1380,7 +1380,6 @@ def Upload_And_Process(uploaded_file,file_type):
         Total_PL=pd.DataFrame()
         Total_PL_detail=pd.DataFrame()
         total_entity_list=list(entity_mapping.index)
-        st.write("entity_mapping",entity_mapping,"2222",entity_mapping.index)
         while(total_entity_list):   # entity_i is the entity code for each property
             entity_i=total_entity_list[0]  
             sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
