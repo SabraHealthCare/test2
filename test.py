@@ -587,7 +587,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                     year_table.iloc[month_row_index,col_month]=year_table.iloc[month_row_index-1,col_month]	
                 elif month_row_index<PL_row_size and year_table.iloc[month_row_index+1,col_month]==0 :
                     year_table.iloc[month_row_index,col_month]=year_table.iloc[month_row_index+1,col_month]
-		else:
+                else:			
                     continue
            
             count_num=0
