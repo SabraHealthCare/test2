@@ -877,7 +877,9 @@ def View_Summary():
         		    
         if not st.session_state.clicked["continue_button"]:
             st.stop()	
- 
+    st.write(latest_month_data)
+    duplicates = latest_month_data[latest_month_data.duplicated(subset=["Sabra_Account_Full_Name", "Category"], keep=False)]
+    st.write(duplicates)
     latest_month_data = latest_month_data.pivot(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month)
     latest_month_data.reset_index(drop=False,inplace=True)
 
