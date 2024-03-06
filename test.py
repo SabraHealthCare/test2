@@ -497,8 +497,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
     year_count=[]        
     month_count=[]
     max_len=0
-    if sheet_name=='134 WL-F':
-        st.write(month_table,year_table)
+
     for row_i in range(search_row_size):
         # save the number of valid months of each row to month_count
         valid_month=list(filter(lambda x:x!=0,month_table.iloc[row_i,]))
@@ -506,9 +505,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
 
         month_count.append(len(valid_month))
         year_count.append(len(valid_year))
-        if sheet_name=='134 WL-F':
-            st.write("valid_month",valid_month,valid_year)
-            st.write("count",month_count,year_count)
     # can't find month keyword in any rows
     if all(map(lambda x:x==0,month_count)):
         st.error("Can't identify month/year columns in sheet——'"+sheet_name+"'")   
@@ -578,11 +574,16 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
             #st.write("There is only one month in sheet——'"+sheet_name+"'")
             col_month=0
             #col_month is the col number of month
+            st.write("month_count",month_count)
+            st.write("month_table.iloc[month_sort_index[month_index_i]",month_table.iloc[month_sort_index[month_index_i])
+            st.write("month_table",month_table,year_table)
             while(month_table.iloc[month_sort_index[month_index_i],col_month]==0):
                 col_month+=1
                 
-            #if there is no year in month header, continue 
+            #if there is no year in month header 
             if  year_table.iloc[month_sort_index[month_index_i],col_month]==0:
+                #check the next row
+                #if year_table.iloc[month_sort_index[month_index_i]+1,col_month]==0 and :
                 continue
            
             count_num=0
