@@ -127,7 +127,8 @@ def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # 
             st.write(original_data)		
     # append new data to original data
     new_data=new_data.reset_index(drop=False)
-    original_data=original_data[new_data.columns]	
+    new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns)
+    original_data=original_data[new_columns_name]	
     updated_data = pd.concat([original_data,new_data])
     if value_name is not False: # set formula 
         updated_data=EPM_Formula(updated_data,value_name)
