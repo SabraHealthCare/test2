@@ -1086,14 +1086,14 @@ def View_Discrepancy(percent_discrepancy_accounts):
 def Identify_Property_Name_Header(PL,entity_list,sheet_name):
     #	Property_Name_Finance and entity_list has same order
     property_name_list_in_mapping = entity_mapping.loc[entity_list]["Property_Name_Finance"].tolist()    
-    property_name_list_inmapping=list(map(lambda x: x.upper().strip() if not pd.isna(x) and isinstance(x, str)  else x,property_name_list_inmapping))     
+    property_name_list_in_mapping=list(map(lambda x: x.upper().strip() if not pd.isna(x) and isinstance(x, str)  else x,property_name_list_in_mapping))     
     max_match=[]
     for row_i in range(PL.shape[0]):
 
         canditate_row=list(map(lambda x: x.upper().strip() if not pd.isna(x) and isinstance(x, str)  else x,list(PL.iloc[row_i,:])))        
-        match_names = [item for item in canditate_row if item in property_name_list_inmapping]	
-        if len(match_names)==len(property_name_list_inmapping): # find the property name header row, transfer them into entity id
-            mapping_dict = {property_name_list_inmapping[i]: entity_list[i] for i in range(len(property_name_list_inmapping))}
+        match_names = [item for item in canditate_row if item in property_name_list_in_mapping]	
+        if len(match_names)==len(property_name_list_in_mapping): # find the property name header row, transfer them into entity id
+            mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
             mapped_entity = [mapping_dict[property] if property in mapping_dict else 0 for property in canditate_row]
             return row_i,mapped_entity
         elif len(match_names)>len(max_match):
