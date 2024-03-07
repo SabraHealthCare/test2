@@ -859,7 +859,7 @@ def View_Summary():
 		                 latest_month:latest_month[4:6]+"/"+latest_month[0:4]},
 			    hide_index=True)
 	     
-        col1,col2,col3=st.columns([4,1,20])
+        col1,col2,col3=st.columns([4,1,25])
         with col1:
             st.button("I'll fix and re-upload P&L")
         with col2:
