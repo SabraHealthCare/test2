@@ -904,7 +904,7 @@ def View_Summary():
         st.write("Reporting months detected in P&L : "+m_str[1:])   
         st.write("The reporting month is {}/{}. Reporting data is as below:".format(latest_month[4:6],latest_month[0:4]))
    
-        styled_table = (latest_month_data.fillna('').style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
+        styled_table = (latest_month_data.replace(0,'').fillna('').style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
