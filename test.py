@@ -1085,7 +1085,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
 @st.cache_data(experimental_allow_widgets=True)      
 def Identify_Property_Name_Header(PL,entity_list,sheet_name):
     property_name_list_inmapping =entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name_Finance"].tolist()     
-    property_name_list_inmapping=list(map(lambda x: x.upper().strip() if not pd.isna(x) and isinstance(x, str)  else x,property_name_list_infinance))     
+    property_name_list_inmapping=list(map(lambda x: x.upper().strip() if not pd.isna(x) and isinstance(x, str)  else x,property_name_list_inmapping))     
     max_match=[]
     for row_i in range(PL.shape[0]):
         canditate_row=list(PL.iloc[row_i,:])
