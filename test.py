@@ -221,6 +221,7 @@ def Initial_Mapping(operator):
     entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename)
     entity_mapping=entity_mapping.reset_index(drop=True)
     entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
+    entity_mapping = entity_mapping.dropna(subset=['Property_in_separate_sheets'])	
     entity_mapping=entity_mapping.set_index("ENTITY")
     return entity_mapping,account_mapping
 
@@ -1440,11 +1441,9 @@ def Upload_And_Process(uploaded_file,file_type):
                 elif file_type=="BS" and BS_separate_excel=="Y": 
                     PL,PL_with_detail=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
                 total_entity_list=[x for x in total_entity_list if x not in entity_list]
-
-		    
+    
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
-            
     return Total_PL,Total_PL_detail
 
 #----------------------------------website widges------------------------------------
