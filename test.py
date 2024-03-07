@@ -848,16 +848,16 @@ def View_Summary():
         onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]<str(latest_month),BPC_pull.columns)))
         st.write("entities_missing_facility",entities_missing_facility)     
         previous_facility_data=BPC_pull.merge(BPC_Account,left_on="ACCOUNT",right_on="BPC_Account_Name")
-        st.write("previous_facility_data1",previous_facility_data)    
+        #st.write("previous_facility_data1",previous_facility_data)    
         previous_facility_data=previous_facility_data[previous_facility_data["Category"]=="Facility Information"]#[["Property_Name",onemonth_before_latest_month,"Sabra_Account_Full_Name"]]	
-        st.write("previous_facility_data2",previous_facility_data)   
+        #st.write("previous_facility_data2",previous_facility_data)   
         previous_facility_data=previous_facility_data.reset_index(drop=False)
-        st.write("previous_facility_data3",previous_facility_data)  
+        #st.write("previous_facility_data3",previous_facility_data)  
         previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_latest_month:latest_month})
-        st.write("previous_facility_data3",previous_facility_data)  	    
+        #st.write("previous_facility_data3",previous_facility_data)  	    
         st.error("Below properties miss facility information in P&L. It has been filled by historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
         previous_facility_data_display = previous_facility_data.pivot(index=["Sabra_Account_Full_Name"], columns="Property_Name", values=latest_month)
-        st.write(previous_facility_data_display.rename(columns={"Sabra_Account_Full_Name":"Facility information"}))
+        #st.write(previous_facility_data_display.rename(columns={"Sabra_Account_Full_Name":"Facility information"}))
     missing_category=missing_category[missing_category["Category"]!="Facility Information"]	    
     if missing_category.shape[0]>0:
         st.error("No data detected for below properties on specific accounts: ")
