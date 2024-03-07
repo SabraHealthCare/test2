@@ -850,7 +850,7 @@ def View_Summary():
        
     missing_category=missing_category[missing_category["Category"]!="Facility Information"]	    
     if missing_category.shape[0]>0:
-        st.error("No data detected for below properties on specific accounts: ")
+        st.write("No data detected for below properties on specific accounts: ")
         missing_category=missing_category[["ENTITY",latest_month,"Category"]].merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
         st.dataframe(missing_category[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
 		    column_config={
@@ -1329,11 +1329,13 @@ def Check_Reporting_Month(PL):
     reporting_month_list=list(map(lambda x:str(x),PL.columns))	
     latest_month=max(reporting_month_list)
     if latest_month!="reporting_month_TBD":
-        st.warning("The reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
-        col4,col5=st.columns([1,5])
+        st.write("The reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
+        col4,col5,col6=st.columns([3,1,15])
         with col4:  	
-            st.button('Yes', on_click=clicked, args=["yes_button"])         
+            st.button('Yes', on_click=clicked, args=["yes_button"])    
         with col5:
+            st.write("or")
+        with col6:
             st.button("No", on_click=clicked, args=["no_button"])       
         if st.session_state.clicked["yes_button"]:
             if latest_month>=current_date:
