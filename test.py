@@ -674,13 +674,11 @@ def Manage_Account_Mapping(new_tenant_account):
         submitted = st.form_submit_button("Submit")  
     if submitted:
         if len(Sabra_main_account['checked'])==1:
-            st.write(Sabra_main_account['checked'])
             Sabra_main_account_value=Sabra_main_account['checked'][0].upper()          
         elif len(Sabra_main_account['checked'])>1:
             if len(Sabra_main_account['checked'])==2 and Sabra_main_account['checked'][0]=="Management Fee":
                 Sabra_main_account_value="T_MGMT_FEE"  
             else:
-                st.write(Sabra_main_account['checked'])
                 st.warning("Only one to one mapping is allowed.")
                 st.stop()
         elif Sabra_main_account['checked']==[] and Sabra_second_account['checked']==[]:
@@ -1204,7 +1202,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         if len(new_tenant_account_list)>0:
             st.warning("Please complete mapping for below account:")
             for i in range(len(new_tenant_account_list)):
-                st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
+                st.markdown("## Map **'{}'** in sheet {} to Sabra account".format(new_tenant_account_list[i],sheet_name)) 
                 Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
                 #insert new record to the bottom line of account_mapping
                 new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
