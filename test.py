@@ -112,15 +112,12 @@ def Save_as_CSV_Onedrive(df,path,file_name):
 
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
 def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # replace original data
-    #original_file =Read_CSV_From_Onedrive(path,file_name)
-    #try:
+
     if True:
         original_data =Read_CSV_From_Onedrive(path,file_name)
         original_data=original_data[new_data.columns]
         empty_file=False
-    #except:
-        #original_data=pd.DataFrame()
-        #empty_file=True
+
     if not empty_file:	    
         if "TIME" in original_data.columns and "TIME" in new_data.columns:
             original_data.TIME = original_data.TIME.astype(str)
@@ -740,27 +737,26 @@ def Map_PL_Sabra(PL,entity):
 
     PL=PL.drop(["Tenant_Formated_Account","Conversion"], axis=1)
     if isinstance(entity, str):# properties are in separate sheet
-        PL["Entity"]=entity	    
+        PL["ENTITY"]=entity	    
          
     elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value" 
         property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
-        PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=property_header, var_name='Entity')
-        st.write("entity",entity)
+        PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=property_header, var_name='ENTITY')
             
     PL_with_detail=copy.copy(PL)
-    PL_with_detail=PL_with_detail.set_index(['Entity', 'Sabra_Account',"Tenant_Account"])
+    PL_with_detail=PL_with_detail.set_index(['ENTITY', 'Sabra_Account',"Tenant_Account"])
     
     # group by Sabra_Account
     PL=PL.drop(["Tenant_Account"], axis=1)
-    PL = PL.groupby(by=['Entity',"Sabra_Account"], as_index=True).sum().replace(0,None)
-    PL.index.names = ['ENTITY',"Sabra_Account"]
+    PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum().replace(0,None)
+
     return PL,PL_with_detail        
     
 @st.cache_data
 def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
     PL_with_detail=PL_with_detail.reset_index(drop=False)
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)","Diff_Percent"])
-    diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","Sabra","P&L Value","Diff (Sabra-P&L)",""])
+    diff_BPC_PL_detail=pd.DataFrame(columns=["ENTITY","Sabra_Account","Tenant_Account","Month","Sabra","P&L Value","Diff (Sabra-P&L)",""])
     
     if len(month_list)>previous_monthes_comparison:  # only compare 1 months
         month_list=month_list[-2:]
@@ -791,11 +787,11 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
                     diff_BPC_PL=pd.concat([diff_BPC_PL,diff_single_record],ignore_index=True)
                     
 		    # for diff_detail_records
-                    diff_detail_records=PL_with_detail.loc[(PL_with_detail["Sabra_Account"]==matrix)&(PL_with_detail["Entity"]==entity)]\
-			                [["Entity","Sabra_Account","Tenant_Account",timeid]].rename(columns={timeid:"P&L Value"})
+                    diff_detail_records=PL_with_detail.loc[(PL_with_detail["Sabra_Account"]==matrix)&(PL_with_detail["ENTITY"]==entity)]\
+			                [["ENTITY","Sabra_Account","Tenant_Account",timeid]].rename(columns={timeid:"P&L Value"})
                     #if there is no record in diff_detail_records, means there is no mapping
                     if diff_detail_records.shape[0]==0:
-                        diff_detail_records=pd.DataFrame({"Entity":entity,"Sabra_Account":matrix,"Tenant_Account":"Miss mapping accounts","Month":timeid,\
+                        diff_detail_records=pd.DataFrame({"ENTITY":entity,"Sabra_Account":matrix,"Tenant_Account":"Miss mapping accounts","Month":timeid,\
 							"Sabra":BPC_value,"P&L Value":0,"Diff (Sabra-P&L)":diff},index=[0]) 
                     else:
                         diff_detail_records["Month"]=timeid
@@ -984,10 +980,10 @@ def View_Discrepancy_Detail():
     def Diff_Detail_Process(diff_BPC_PL_detail):	    
         st.markdown("---")
         st.markdown("P&L—Sabra detail accounts mapping (for discrepancy data)") 
-        diff_BPC_PL_detail = (pd.concat([diff_BPC_PL_detail.groupby(["Entity","Sabra_Account","Month","Sabra","Diff (Sabra-P&L)"], as_index=False).sum()
-                      .assign(Tenant_Account=" Total"),diff_BPC_PL_detail]).sort_values(by=["Entity","Sabra_Account","Month","Sabra","Diff (Sabra-P&L)"], kind='stable', ignore_index=True)[diff_BPC_PL_detail.columns])
+        diff_BPC_PL_detail = (pd.concat([diff_BPC_PL_detail.groupby(["ENTITY","Sabra_Account","Month","Sabra","Diff (Sabra-P&L)"], as_index=False).sum()
+                      .assign(Tenant_Account=" Total"),diff_BPC_PL_detail]).sort_values(by=["ENTITY","Sabra_Account","Month","Sabra","Diff (Sabra-P&L)"], kind='stable', ignore_index=True)[diff_BPC_PL_detail.columns])
         diff_BPC_PL_detail=diff_BPC_PL_detail.merge(BPC_Account[["BPC_Account_Name","Sabra_Account_Full_Name"]],left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
-        diff_BPC_PL_detail=diff_BPC_PL_detail.merge(entity_mapping[["Property_Name"]],left_on="Entity", right_on="ENTITY",how="left")
+        diff_BPC_PL_detail=diff_BPC_PL_detail.merge(entity_mapping[["Property_Name"]],left_on="ENTITY", right_on="ENTITY",how="left")
         diff_BPC_PL_detail=diff_BPC_PL_detail[["Property_Name","Month","Sabra_Account_Full_Name","Tenant_Account","Sabra","P&L Value","Diff (Sabra-P&L)"]].\
 			rename(columns={"Property_Name":"Property","Sabra_Account_Full_Name":"Sabra Account"})
         return diff_BPC_PL_detail
