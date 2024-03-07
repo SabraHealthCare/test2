@@ -1548,8 +1548,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         
         with st.spinner('Wait for data checking'):    
             latest_month=Check_Reporting_Month(Total_PL)  
-            previous_month_list=[month for month in Total_PL.columns.sort_values() if month<latest_month]
-            if len(previous_month_list)>0:   # there are previous months in P&L
+            if len(Total_PL.columns)==1:
+                Total_PL.columns=[latest_month]
+            elif len(Total_PL.columns)>1:  # there are previous months in P&L
+                previous_month_list=[month for month in Total_PL.columns.sort_values() if month<latest_month]
                 diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month,previous_month_list)
 	# 1 Summary
         View_Summary()
@@ -1557,10 +1559,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         # 2 Discrepancy of Historic Data
         with st.expander("Discrepancy for Historic Data",expanded=True):
             ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-            if len(previous_month_list)>0:		
+            if len(Total_PL.columns)>1:		
                 View_Discrepancy(percent_discrepancy_accounts)
-                
-            else:
+	    elif len(Total_PL.columns)==1:
                 st.write("There is no previous month data in tenant P&L")
     elif choice=="Manage Mapping":
         BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
