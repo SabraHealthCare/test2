@@ -1107,8 +1107,8 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):
         st.stop()
 
 @st.cache_data
-def Identify_Reporting_Month(PL,property_name_header_row_number):
-    for row_i in range(property_name_header_row_number):
+def Identify_Reporting_Month(PL,entity_header_row_number):
+    for row_i in range(entity_header_row_number):
         for col_i in range(PL.shape[1]):
             month,year=Get_Month_Year(PL.iloc[row_i,col_i])   
             if month>0 and year>0:
@@ -1173,17 +1173,16 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
 
-        property_name_header_row_number=Identify_Property_Name_Header(PL,entity_list,sheet_name)
-        reporting_month=Identify_Reporting_Month(PL,property_name_header_row_number)
+        entity_header_row_number,new_entity_header=Identify_Property_Name_Header(PL,entity_list,sheet_name)
+        reporting_month=Identify_Reporting_Month(PL,entity_header_row_number)
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
-        #remove column without property names
-
-        header_of_PL_upper = PL.iloc[property_name_header_row_number].apply(lambda x: str(x).upper().strip() if not pd.isna(x) and isinstance(x, str) else x )
-
-        PL = PL.loc[:,header_of_PL_upper.isin(property_name_list_infinance_upper)]
+        #remove column without entity
+        #header_of_PL_upper = PL.iloc[property_name_header_row_number].apply(lambda x: str(x).upper().strip() if not pd.isna(x) and isinstance(x, str) else x )
         
-        PL.columns=list( PL.iloc[property_name_header_row_number,:])  
+        PL.columns=entity_header
+        PL = PL.loc[:,entity_list]
+
 	#remove row above header row   
         #PL=PL.loc[property_name_header_row_number+1:,]    
         #remove rows with nan tenant account
