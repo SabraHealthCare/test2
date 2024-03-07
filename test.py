@@ -1163,8 +1163,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
     if count>0:
         # update sheet name in entity_mapping
          
-        entity_mapping.loc[entity_list,sheet_type]=sheet_name  
-        st.write("updated entity_mapping",entity_mapping)	   
+        entity_mapping.loc[entity_list,sheet_type]=sheet_name  	   
         # update entity_mapping in onedrive  
         Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
     # Start checking process
