@@ -132,6 +132,7 @@ def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # 
     updated_data = pd.concat([original_data,new_data])
     if value_name is not False: # set formula 
         updated_data=EPM_Formula(updated_data,value_name)
+    st.write("updated_data",updated_data)
     return Save_as_CSV_Onedrive(updated_data,path,file_name)
 
 
@@ -1163,7 +1164,9 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 		    
     if count>0:
         # update sheet name in entity_mapping
-        entity_mapping.loc[entity_list,sheet_type]=sheet_name  
+         
+        entity_mapping.loc[entity_list,sheet_type]=sheetf_name  
+        st.write("updated entity_mapping",entity_mapping)	   
         # update entity_mapping in onedrive  
         Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
     # Start checking process
