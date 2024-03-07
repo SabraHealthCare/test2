@@ -815,7 +815,7 @@ def View_Summary():
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     def color_missing(data):
-        return f'background-color: red'
+        return f'background-color: rgb(255, 204, 204);'
 
     months=map(lambda x:x[4:6]+"/"+x[0:4],Total_PL.columns)
     m_str = ''
@@ -836,7 +836,7 @@ def View_Summary():
     full_category = pd.DataFrame(list(product(entity_list,category_list)), columns=['ENTITY', 'Category'])
     missing_category=full_category.merge(current_cagegory,on=['ENTITY', 'Category'],how="left")
     missing_category=missing_category[(missing_category[latest_month]==0)|(missing_category[latest_month].isnull())]
-    missing_category[latest_month]=""   
+    missing_category[latest_month]="NA"   
     if "Facility Information" in list(missing_category["Category"]):
         # fill the facility info with historical data
         entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
