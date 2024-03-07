@@ -862,7 +862,7 @@ def View_Summary():
         col1,col2,col3=st.columns([2,1,6])
         with col1:
             st.button("I'll fix and re-upload P&L")
-	with col2:
+        with col2:
             st.write("or")
         with col3:
             continue_run=st.button("Confirm and continue to run", on_click=clicked, args=["continue_button"]) 
