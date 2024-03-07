@@ -1345,10 +1345,21 @@ def Check_Reporting_Month(PL):
         elif st.session_state.clicked["no_button"]:
             with st.form("latest_month"):
                 col1,col2=st.columns(2)
-                with col1:
-                    latest_month = st.selectbox('Select reporting month from P&L:', list(map(lambda x:x[0:4]+"/"+x[4:6],reporting_month_list)))
-                    latest_month=latest_month[0:4]+latest_month[5:7]
-                with col2:
+                with col1:		    
+                    if len(reporting_month_list)>1:		    
+                        latest_month = st.selectbox('Select reporting month from P&L:', list(map(lambda x:x[0:4]+"/"+x[4:6],reporting_month_list)))
+                        latest_month=latest_month[0:4]+latest_month[5:7]
+
+	
+                    elif len(reporting_month_list)==1:	
+                        col3,col4=st.columns(2)
+                        with col3:
+                            selected_year = st.selectbox("Select Year", range(current_year - 1, current_year + 1))
+                        with col4:    
+                            selected_month = st.selectbox("Select Month", [str(month).zfill(2) for month in range(1, 13)])
+                        latest_month=str(selected_year)+str(selected_month)
+
+                with col2:    
                     confirm_select=st.form_submit_button("Submit")
             if confirm_select:
                 if latest_month>=current_date:
@@ -1359,7 +1370,7 @@ def Check_Reporting_Month(PL):
                 st.stop()
         else:
             st.stop()
-    elif  latest_month!="reporting_month_TBD":
+    elif  latest_month!="reporting_month_TBD" :
         with st.form("latest_month_TBD"):
             col7,col8=st.columns(1,3)
             with col7:
