@@ -851,17 +851,20 @@ def View_Summary():
     missing_category=missing_category[missing_category["Category"]!="Facility Information"]	    
     if missing_category.shape[0]>0:
         st.error("No data detected for below properties on specific accounts: ")
-        missing_category=missing_category[["ENTITY",latest_month,"Category"]].merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-        col1,col2=st.columns([2,1])
-        with col1:
-            st.dataframe(missing_category[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
+        missing_category=missing_category[["ENTITY",latest_month,"Category"]].merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left"):
+        st.dataframe(missing_category[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
 		    column_config={
 			        "Property_Name": "Property",
 			        "Category":"Account category",
 		                 latest_month:latest_month[4:6]+"/"+latest_month[0:4]},
 			    hide_index=True)
-        with col2:
+	    
+        col1,col2,col3=st.columns([2,1,6])
+        with col1:
             st.button("I'll fix and re-upload P&L")
+	with col2:
+            st.write("or")
+        with col3:
             continue_run=st.button("Confirm and continue to run", on_click=clicked, args=["continue_button"]) 
             st.write("")#-----------------------write to error log-----------------------
         		    
