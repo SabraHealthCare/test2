@@ -1180,7 +1180,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         #remove column without entity
         #header_of_PL_upper = PL.iloc[property_name_header_row_number].apply(lambda x: str(x).upper().strip() if not pd.isna(x) and isinstance(x, str) else x )
         
-        PL.columns=entity_header
+        PL.columns=new_entity_header
         PL = PL.loc[:,entity_list]
 
 	#remove row above header row   
