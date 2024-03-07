@@ -112,11 +112,8 @@ def Save_as_CSV_Onedrive(df,path,file_name):
 
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
 def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # replace original data
-
     if True:
         original_data =Read_CSV_From_Onedrive(path,file_name)
-        original_data=original_data[new_data.columns]
-        st.write("new_data.columns",new_data.columns)
         empty_file=False
 
     if not empty_file:	    
@@ -130,10 +127,10 @@ def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # 
             st.write(original_data)		
     # append new data to original data
     new_data=new_data.reset_index(drop=False)
+    original_data=original_data[new_data.columns]	
     updated_data = pd.concat([original_data,new_data])
     if value_name is not False: # set formula 
         updated_data=EPM_Formula(updated_data,value_name)
-    st.write("updated_data",updated_data)
     return Save_as_CSV_Onedrive(updated_data,path,file_name)
 
 
