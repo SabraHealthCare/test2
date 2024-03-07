@@ -1329,12 +1329,11 @@ def Check_Reporting_Month(PL):
     reporting_month_list=list(map(lambda x:str(x),PL.columns))	
     latest_month=max(reporting_month_list)
     if latest_month!="reporting_month_TBD":
-        col4,col5,col6=st.columns([5,1,8])
-        with col4:  
-            st.warning("The reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
-        with col5:		
+        st.warning("The reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
+        col4,col5=st.columns([1,5])
+        with col4:  	
             st.button('Yes', on_click=clicked, args=["yes_button"])         
-        with col6:
+        with col5:
             st.button("No", on_click=clicked, args=["no_button"])       
         if st.session_state.clicked["yes_button"]:
             if latest_month>=current_date:
