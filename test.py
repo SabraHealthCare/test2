@@ -1405,8 +1405,7 @@ def Upload_And_Process(uploaded_file,file_type):
             sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
             sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
             property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
-	    # properties in seperate sheet 
-            st.write(entity_mapping,entity_i) 	
+	    # properties in seperate sheet 	
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
