@@ -653,7 +653,7 @@ def Manage_Entity_Mapping(operator):
             if  entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"]:
                 entity_mapping.loc[entity,"Sheet_Name_Balance_Sheet"]=entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"] 
             i+=1
-        st.write(entity_mapping)
+
         download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
         # update entity_mapping in Onedrive    
         Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
@@ -850,7 +850,7 @@ def View_Summary():
        
     missing_category=missing_category[missing_category["Category"]!="Facility Information"]	    
     if missing_category.shape[0]>0:
-        st.write("No data detected for below properties on specific accounts: ")
+        st.write("No data detected for below properties and accounts: ")
         missing_category=missing_category[["ENTITY",latest_month,"Category"]].merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
         st.dataframe(missing_category[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
 		    column_config={
@@ -861,7 +861,7 @@ def View_Summary():
 	     
         col1,col2,col3=st.columns([4,1,25])
         with col1:
-            st.button("I'll fix and re-upload P&L")
+            st.button("Fix and re-upload P&L")
         with col2:
             st.write("or")
         with col3:
@@ -908,7 +908,7 @@ def View_Summary():
     with st.expander("Summary of P&L" ,expanded=True):
         ChangeWidgetFontSize('Summary of P&L', '25px')
         st.write("Reporting months detected in P&L : "+m_str[1:])   
-        st.write("The reporting month is {}/{}. Reporting data is as below:".format(latest_month[4:6],latest_month[0:4]))
+        st.write("The reporting month is <span style='font-size: 25px;'color: blue; font-weight: bold;'>{}/{}</span>. Reporting data is as below:".format(latest_month[4:6],latest_month[0:4]))
    
         styled_table = (latest_month_data.replace(0,'').fillna('').style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
         # Display the HTML using st.markdown
