@@ -1337,7 +1337,7 @@ def Check_Latest_Month_Data(latest_month_data):
         return f'color: {color}'
 
     # Create a copy of the DataFrame to preserve the original data
-   highlighted_df = df.copy()
+    highlighted_df = df.copy()
 
     # Apply styling to highlight unsatisfied cells in red
     for col in df.columns:
