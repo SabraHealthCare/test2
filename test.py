@@ -903,7 +903,7 @@ def View_Summary():
         latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]
 
     st.write("latest_month_data",latest_month_data)
-    #Check_Latest_Month_Data(latest_month_data)
+    Check_Latest_Month_Data(latest_month_data)
 	
     with st.expander("Summary of P&L" ,expanded=True):
         ChangeWidgetFontSize('Summary of P&L', '25px')
@@ -1322,8 +1322,35 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     return PL,PL_with_detail
 @st.cache_data(experimental_allow_widgets=True) 
 def Check_Latest_Month_Data(latest_month_data):
-    subset_df = latest_month_data[latest_month_data['A'] == 'Small']  # Select rows where column A is 'Small'
-    subset_df = subset_df[(subset_df[['B', 'C', 'D', 'E']].values < df[df['A'] == 'Big'][['B', 'C', 'D', 'E']].values).all(axis=1)]
+    # Example DataFrame
+    data = {
+    'soap': [10, 15, 5, 12, 8, 10],
+    'shampoo': [20, 25, 15, 18, 22, 20],
+    'face cream': [8, 10, 6, 7, 9, 8],
+    }
+    index = ['price', 'price1', 'tax', 'tax1', 'discount', 'discount1']
+    df = pd.DataFrame(data, index=index)
+
+    # Function to highlight unsatisfied cells in red
+    def highlight_unsatisfied_cells(val):
+        color = 'red' if float(val[0]) >= float(val[1]) else 'black'
+        return f'color: {color}'
+
+    # Create a copy of the DataFrame to preserve the original data
+   highlighted_df = df.copy()
+
+    # Apply styling to highlight unsatisfied cells in red
+    for col in df.columns:
+        pairs = [(index[i], index[i+1]) for i in range(0, len(index), 2)]
+        for pair in pairs:
+            highlighted_df.loc[pair[0]:pair[1], col] = highlighted_df.loc[pair[0]:pair[1], col].apply(
+                lambda x: f'{x:.2f}' if isinstance(x, (float, int)) else x).apply(
+                lambda x: x if float(x.split('.')[0]) < float(x.split('.')[1]) else f'<span style="color:red">{x}</span>')
+
+    st.markdown(highlighted_df)
+    Display the DataFrame with styled unsatisfied cells in red
+    styled_highlighted_df = highlighted_df.style.applymap(highlight_unsatisfied_cells)
+    st.markdown(styled_highlighted_df)
 	
     st.write("")
 
