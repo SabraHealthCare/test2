@@ -1342,12 +1342,13 @@ def Check_Latest_Month_Data(latest_month_data):
     # Apply styling to highlight unsatisfied cells in red
     for col in df.columns:
         pairs = [(index[i], index[i+1]) for i in range(0, len(index), 2)]
-        for pair in pairs:
-            st.write(pair)
-            st.write(highlighted_df.loc[pair[0]:pair[1], col])
-            st.write(highlighted_df.loc[pair[0]:pair[1], col].apply(lambda x: f'{x:.2f}' if isinstance(x, (float, int)) else x))
-            highlighted_df.loc[pair[0]:pair[1], col] = highlighted_df.loc[pair[0]:pair[1], col].apply(
-            lambda x: f'{x:.2f}' if isinstance(x, (float, int)) else x).apply(lambda x: x if float(x.split('.')[0]) < float(x.split('.')[1]) else "issue cell")
+       for pair in pairs:
+            val_0 = highlighted_df.loc[pair[0], col]
+            val_1 = highlighted_df.loc[pair[1], col]
+            if float(val_0) >= float(val_1):
+                highlighted_df.loc[pair[0]:pair[1], col] = highlighted_df.loc[pair[0]:pair[1], col].apply( lambda x: f'<span style="color:red">{x}</span>')
+            else:
+                highlighted_df.loc[pair[0]:pair[1], col] = highlighted_df.loc[pair[0]:pair[1], col].apply( lambda x: f'{x:.2f}' if isinstance(x, (float, int)) else x)
 
     st.write("highlighted_df",highlighted_df)
     #Display the DataFrame with styled unsatisfied cells in red
