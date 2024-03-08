@@ -909,8 +909,7 @@ def View_Summary():
         ChangeWidgetFontSize('Summary of P&L', '25px')
         st.write("Reporting months detected in P&L : "+m_str[1:])   
         st.write("The reporting month is <span style='font-size: 25px;'color: blue; font-weight: bold;'>{}/{}</span>. Reporting data is as below:".format(latest_month[4:6],latest_month[0:4]))
-        st.write("The reporting month is <span style='font-size: 25px;'color: blue; font-weight: bold;'>12/23</span>. Reporting data is as below:".format(latest_month[4:6],latest_month[0:4]))
-      
+        st.write("The reporting month is <span style='font-size: 25px; color: blue; font-weight: bold;'>12/23</span>. Reporting data is as below")
         styled_table = (latest_month_data.replace(0,'').fillna('').style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
@@ -1356,7 +1355,6 @@ def Check_Reporting_Month(PL):
                     if len(reporting_month_list)>1:		    
                         latest_month = st.selectbox('Select reporting month from P&L:', list(map(lambda x:x[0:4]+"/"+x[4:6],reporting_month_list)))
                         latest_month=latest_month[0:4]+latest_month[5:7]
-
 	
                     elif len(reporting_month_list)==1:	
                         col3,col4=st.columns(2)
@@ -1364,10 +1362,9 @@ def Check_Reporting_Month(PL):
                             selected_year = st.selectbox("Select Year", range(current_year - 1, current_year + 1))
                         with col4:    
                             selected_month = st.selectbox("Select Month", [str(month).zfill(2) for month in range(1, 13)])
-                        latest_month=str(selected_year)+str(selected_month)
-
-                with col2:    
-                    confirm_select=st.form_submit_button("Submit")
+                            latest_month=str(selected_year)+str(selected_month)
+ 
+                confirm_select=st.form_submit_button("Submit")
             if confirm_select:
                 if latest_month>=current_date:
                     st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
