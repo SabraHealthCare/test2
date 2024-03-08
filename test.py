@@ -908,7 +908,7 @@ def View_Summary():
     with st.expander("Summary of P&L" ,expanded=True):
         ChangeWidgetFontSize('Summary of P&L', '25px')
         st.write("Reporting months detected in P&L : "+m_str[1:])   
-        st.markdown("The reporting month is <span style='font-size: 25px;'color: blue; font-weight: bold;'>{}/{}</span>. Reporting data is as below:".format(latest_month[4:6],latest_month[0:4]),unsafe_allow_html=True))
+        st.markdown("The reporting month is <span style='font-size: 25px;'color: blue; font-weight: bold;'>{}/{}</span>. Reporting data is as below:".format(latest_month[4:6],latest_month[0:4]),unsafe_allow_html=True)
 
         styled_table = (latest_month_data.replace(0,'').fillna('').style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
         # Display the HTML using st.markdown
