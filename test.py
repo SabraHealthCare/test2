@@ -902,8 +902,8 @@ def View_Summary():
     else:
         latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]
 
-    st.write("check latest month",latest_month_data)
-    Latest_Month_Data_Check(latest_month_data)
+    
+    #Latest_Month_Data_Check(latest_month_data)
 	
     with st.expander("Summary of P&L" ,expanded=True):
         ChangeWidgetFontSize('Summary of P&L', '25px')
