@@ -1321,7 +1321,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     return PL,PL_with_detail
 @st.cache_data(experimental_allow_widgets=True) 
 def Check_Latest_Month_Data(latest_month_data):
-    
+    st.write("")
 
 @st.cache_data(experimental_allow_widgets=True) 
 def Check_Reporting_Month(PL):	
