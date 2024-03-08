@@ -1342,7 +1342,7 @@ def Check_Latest_Month_Data(latest_month_data):
     # Apply styling to highlight unsatisfied cells in red
     for col in df.columns:
         pairs = [(index[i], index[i+1]) for i in range(0, len(index), 2)]
-       for pair in pairs:
+        for pair in pairs:
             val_0 = highlighted_df.loc[pair[0], col]
             val_1 = highlighted_df.loc[pair[1], col]
             if float(val_0) >= float(val_1):
