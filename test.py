@@ -1330,7 +1330,7 @@ def Check_Latest_Month_Data(latest_month_data):
     }
     index = ['price', 'price1', 'tax', 'tax1', 'discount', 'discount1']
     df = pd.DataFrame(data, index=index)
-
+    st.write("df",df)
     # Function to highlight unsatisfied cells in red
     def highlight_unsatisfied_cells(val):
         color = 'red' if float(val[0]) >= float(val[1]) else 'black'
@@ -1522,7 +1522,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     operator=st.session_state["operator"]
     st.title(operator)
 
-  
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
     if choice=="Upload P&L":
