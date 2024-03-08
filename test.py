@@ -1343,14 +1343,14 @@ def Check_Latest_Month_Data(latest_month_data):
     for col in df.columns:
         pairs = [(index[i], index[i+1]) for i in range(0, len(index), 2)]
         for pair in pairs:
-            highlighted_df.loc[pair[0]:pair[1], col] = highlighted_df.loc[pair[0]:pair[1], col].apply(
-                lambda x: f'{x:.2f}' if isinstance(x, (float, int)) else x).apply(
-                lambda x: x if float(x.split('.')[0]) < float(x.split('.')[1]) else f'<span style="color:red">{x}</span>')
+            st.write(pair)
+            st.write(highlighted_df.loc[pair[0]:pair[1], col])
+            highlighted_df.loc[pair[0]:pair[1], col] = highlighted_df.loc[pair[0]:pair[1], col].apply(lambda x: x if float(x.split('.')[0]) < float(x.split('.')[1]) else "issue cell")
 
-    st.markdown(highlighted_df)
+    st.write("highlighted_df",highlighted_df)
     #Display the DataFrame with styled unsatisfied cells in red
     styled_highlighted_df = highlighted_df.style.applymap(highlight_unsatisfied_cells)
-    st.markdown(styled_highlighted_df)
+    st.write(styled_highlighted_df)
 	
     st.write("")
 
