@@ -1348,7 +1348,7 @@ def Check_Latest_Month_Data(latest_month_data):
                 lambda x: x if float(x.split('.')[0]) < float(x.split('.')[1]) else f'<span style="color:red">{x}</span>')
 
     st.markdown(highlighted_df)
-    Display the DataFrame with styled unsatisfied cells in red
+    #Display the DataFrame with styled unsatisfied cells in red
     styled_highlighted_df = highlighted_df.style.applymap(highlight_unsatisfied_cells)
     st.markdown(styled_highlighted_df)
 	
