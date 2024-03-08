@@ -902,8 +902,8 @@ def View_Summary():
     else:
         latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]
 
-    
-    #Latest_Month_Data_Check(latest_month_data)
+    st.write("latest_month_data",latest_month_data)
+    #Check_Latest_Month_Data(latest_month_data)
 	
     with st.expander("Summary of P&L" ,expanded=True):
         ChangeWidgetFontSize('Summary of P&L', '25px')
@@ -1322,6 +1322,9 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     return PL,PL_with_detail
 @st.cache_data(experimental_allow_widgets=True) 
 def Check_Latest_Month_Data(latest_month_data):
+    subset_df = latest_month_data[latest_month_data['A'] == 'Small']  # Select rows where column A is 'Small'
+    subset_df = subset_df[(subset_df[['B', 'C', 'D', 'E']].values < df[df['A'] == 'Big'][['B', 'C', 'D', 'E']].values).all(axis=1)]
+	
     st.write("")
 
 @st.cache_data(experimental_allow_widgets=True) 
