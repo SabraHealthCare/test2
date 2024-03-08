@@ -877,8 +877,7 @@ def View_Summary():
     latest_month_data.reset_index(drop=False,inplace=True)
 
     latest_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
-    latest_month_data=latest_month_data[latest_month_data["Sabra_Account"]==latest_month_data["Sabra_Account"]]	
-	
+    latest_month_data=latest_month_data.dropna(subset=["Sabra_Account"])
     sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet","Additional Statistical Information","Government Funds"]
     sorter=list(filter(lambda x:x in latest_month_data["Category"].unique(),sorter))
     latest_month_data.Category = latest_month_data.Category.astype("category")
@@ -889,21 +888,20 @@ def View_Summary():
     set_empty=list(latest_month_data.columns)
     set_empty.remove("Category")
     set_empty.remove("Sabra_Account")
-   
+    st.write("0",latest_month_data)	
     for i in range(latest_month_data.shape[0]):
         if latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra":
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
             if latest_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 latest_month_data.loc[i,set_empty]=np.nan
+    st.write("1",latest_month_data)		    
     entity_columns=latest_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
         latest_month_data["Total"] = latest_month_data[entity_columns].sum(axis=1)
         latest_month_data=latest_month_data[["Sabra_Account","Total"]+list(entity_columns)]
     else:
         latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]
-
-    st.write("latest_month_data",latest_month_data)
-    Check_Latest_Month_Data(latest_month_data)
+   
 	
     with st.expander("Summary of P&L" ,expanded=True):
         ChangeWidgetFontSize('Summary of P&L', '25px')
@@ -1322,6 +1320,13 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     return PL,PL_with_detail
 @st.cache_data(experimental_allow_widgets=True) 
 def Check_Latest_Month_Data(latest_month_data):
+    latest_month_data
+A_IL
+A_ALF
+A_ALZ
+A_SNF
+A_ACH
+	
     # Example DataFrame
     data = {
     'soap': [10, 15, 5, 12, 8, 10],
@@ -1332,13 +1337,7 @@ def Check_Latest_Month_Data(latest_month_data):
     df = pd.DataFrame(data, index=index)
     st.write("df",df)
     # Function to highlight unsatisfied cells in red
-    def highlight_unsatisfied_cells(val):
-        color = 'red' if float(val[0]) >= float(val[1]) else 'black'
-        return f'color: {color}'
-
-    # Create a copy of the DataFrame to preserve the original data
-    highlighted_df = df.copy()
-
+   
     # Apply styling to highlight unsatisfied cells in red
     for col in df.columns:
         pairs = [(index[i], index[i+1]) for i in range(0, len(index), 2)]
