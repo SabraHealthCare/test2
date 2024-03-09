@@ -844,7 +844,8 @@ def View_Summary():
         previous_facility_data=BPC_pull.merge(BPC_Account,left_on="ACCOUNT",right_on="BPC_Account_Name")
         previous_facility_data=previous_facility_data[previous_facility_data["Category"]=="Facility Information"]#[["Property_Name",onemonth_before_latest_month,"Sabra_Account_Full_Name"]]	  
         previous_facility_data=previous_facility_data.reset_index(drop=False)
-        previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_latest_month:latest_month})	    
+        previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_latest_month:latest_month})	
+        st.write("previous_facility_data",previous_facility_data)
         st.error("Below properties miss facility information in P&L. It has been filled by historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
         previous_facility_data_display = previous_facility_data.pivot(index=["Sabra_Account_Full_Name"], columns="Property_Name", values=latest_month)
        
@@ -887,14 +888,13 @@ def View_Summary():
     latest_month_data = pd.concat([latest_month_data.groupby(by='Category',as_index=False).sum().assign(Sabra_Account="Total_Sabra"),latest_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns]     
     set_empty=list(latest_month_data.columns)
     set_empty.remove("Category")
-    set_empty.remove("Sabra_Account")
-    st.write("0",latest_month_data)	
+    set_empty.remove("Sabra_Account")	
     for i in range(latest_month_data.shape[0]):
         if latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra":
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
             if latest_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 latest_month_data.loc[i,set_empty]=np.nan
-    st.write("1",latest_month_data)		    
+		    
     entity_columns=latest_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
         latest_month_data["Total"] = latest_month_data[entity_columns].sum(axis=1)
