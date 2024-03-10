@@ -823,11 +823,10 @@ def View_Summary():
         m_str += ", " + month
 
     Total_PL=Total_PL.fillna(0)
-    
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-
+    st.write(latest_month_data)
     # check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
     entity_list=list(latest_month_data["ENTITY"].unique())
@@ -845,10 +844,10 @@ def View_Summary():
         previous_facility_data=previous_facility_data[previous_facility_data["Category"]=="Facility Information"]#[["Property_Name",onemonth_before_latest_month,"Sabra_Account_Full_Name"]]	  
         previous_facility_data=previous_facility_data.reset_index(drop=False)
         previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_latest_month:latest_month})	
-        st.write("previous_facility_data",previous_facility_data)
         st.error("Below properties miss facility information in P&L. It has been filled by historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
         previous_facility_data_display = previous_facility_data.pivot(index=["Sabra_Account_Full_Name"], columns="Property_Name", values=latest_month)
-       
+        st.write(previous_facility_data_display)      
+	    
     missing_category=missing_category[missing_category["Category"]!="Facility Information"]	    
     if missing_category.shape[0]>0:
         st.write("No data detected for below properties and accounts: ")
@@ -888,7 +887,7 @@ def View_Summary():
     latest_month_data = pd.concat([latest_month_data.groupby(by='Category',as_index=False).sum().assign(Sabra_Account="Total_Sabra"),latest_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns]     
     set_empty=list(latest_month_data.columns)
     set_empty.remove("Category")
-    set_empty.remove("Sabra_Account")	
+    set_empty.remove("Sabra_Account")
     for i in range(latest_month_data.shape[0]):
         if latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra":
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
