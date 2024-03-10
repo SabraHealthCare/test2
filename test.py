@@ -828,7 +828,7 @@ def View_Summary():
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     st.write(latest_month_data)
     check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(["A_ACH","A_IL","A_ALZ","A_SNF"])) | (latest_month_data["Category"]=='Patient Days')]
-    check_patient_days=check_patient_days.groupby(["Category","ENTITY"]).sum()
+    check_patient_days=check_patient_days["Category","ENTITY",latest_month].groupby(["Category","ENTITY"]).sum()
     st.write(check_patient_days)
     # check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
