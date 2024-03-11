@@ -828,8 +828,28 @@ def View_Summary():
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     st.write(latest_month_data)
     check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(["A_ACH","A_IL","A_ALZ","A_SNF"])) | (latest_month_data["Category"]=='Patient Days')]
-    check_patient_days=check_patient_days[["Category","ENTITY",latest_month]].groupby(["Category","ENTITY"]).sum().reset_index(drop=True)
-
+    check_patient_days=check_patient_days[["Category","ENTITY",latest_month]].groupby(["Category","Property_Name"]).sum().fillna(0, inplace=True)
+    problem_properties=[]
+    zero_patient_days=[]
+    for property_i in entity_mapping["Property_Name"]:
+        if check_patient_days[("Patient Days",Property_Name),latest_month]>0 and check_patient_days[("Facility Information",Property_Name),latest_month]*month_days>check_patient_days[("Patient Days",Property_Name),latest_month]:
+            continue
+	elif check_patient_days[("Facility Information",Property_Name),latest_month]>0 and check_patient_days[("Patient Days",Property_Name),latest_month]>check_patient_days[("Facility Information",Property_Name),latest_month]:
+            st.error("Error：The patient days of {} is greater than its available days".format(property_i))
+            problem_properties.append(Property_Name)
+	elif check_patient_days[("Facility Information",Property_Name),latest_month]==0 and check_patient_days[("Patient Days",Property_Name),latest_month]==0:
+            zero_patient_days.append(property_i)
+	elif check_patient_days[("Patient Days",Property_Name),latest_month]==0 and check_patient_days[("Facility Information",Property_Name),latest_month]>0:
+            st.error("Error：The patient days of {} is 0 while its available days is {}".format(property_i,check_patient_days[("Facility Information",Property_Name),latest_month]>0))
+            problem_properties.append(Property_Name)     
+	elif check_patient_days[("Patient Days",Property_Name),latest_month]>0 and check_patient_days[("Facility Information",Property_Name),latest_month]==0:
+            st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,check_patient_days[("Facility Information",Property_Name),latest_month]>0))
+            problem_properties.append(Property_Name) 
+    if len(problem_properties)>0:
+        st.write()
+    st.write(problem_properties)
+    latest_month_data
+    	
     st.write(check_patient_days.index)
     # check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
@@ -850,7 +870,7 @@ def View_Summary():
         previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_latest_month:latest_month})	
         st.error("Below properties miss facility information in P&L. It has been filled by historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
         previous_facility_data_display = previous_facility_data.pivot(index=["Sabra_Account_Full_Name"], columns="Property_Name", values=latest_month)
-        st.write(previous_facility_data_display)      
+        st.write(previous_facility_data_display)
 	    
     missing_category=missing_category[missing_category["Category"]!="Facility Information"]	    
     if missing_category.shape[0]>0:
