@@ -1309,7 +1309,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         #remove row above date row and remove column without date col name
-        PL=PL.iloc[date_header[1]+1:,date_header[0]!='0']  
+        PL=PL.loc[date_header[1]+1:,date_header[0]!='0']  
         PL.columns= [value for value in date_header[0] if value != "0"]
         #remove rows with nan tenant account
         nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
