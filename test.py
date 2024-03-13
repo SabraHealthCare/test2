@@ -837,12 +837,12 @@ def View_Summary():
         elif check_patient_days[("Facility Information",Property_Name),latest_month]>0 and check_patient_days[("Patient Days",Property_Name),latest_month]>check_patient_days[("Facility Information",Property_Name),latest_month]:
             st.error("Error：The patient days of {} is greater than its available days".format(property_i))
             problem_properties.append(Property_Name)
-	elif check_patient_days[("Facility Information",Property_Name),latest_month]==0 and check_patient_days[("Patient Days",Property_Name),latest_month]==0:
+        elif check_patient_days[("Facility Information",Property_Name),latest_month]==0 and check_patient_days[("Patient Days",Property_Name),latest_month]==0:
             zero_patient_days.append(property_i)
-	elif check_patient_days[("Patient Days",Property_Name),latest_month]==0 and check_patient_days[("Facility Information",Property_Name),latest_month]>0:
+        elif check_patient_days[("Patient Days",Property_Name),latest_month]==0 and check_patient_days[("Facility Information",Property_Name),latest_month]>0:
             st.error("Error：The patient days of {} is 0 while its available days is {}".format(property_i,check_patient_days[("Facility Information",Property_Name),latest_month]>0))
             problem_properties.append(Property_Name)     
-	elif check_patient_days[("Patient Days",Property_Name),latest_month]>0 and check_patient_days[("Facility Information",Property_Name),latest_month]==0:
+        elif check_patient_days[("Patient Days",Property_Name),latest_month]>0 and check_patient_days[("Facility Information",Property_Name),latest_month]==0:
             st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,check_patient_days[("Facility Information",Property_Name),latest_month]>0))
             problem_properties.append(Property_Name) 
     if len(problem_properties)>0:
