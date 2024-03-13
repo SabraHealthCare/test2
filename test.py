@@ -1306,6 +1306,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
             st.stop()     
         #PL.columns=date_header[0]
         header_row = PL.iloc[date_header[1]]
+        st.write("date_header[1]","header_row",date_header[1],header_row)
         # Filter out the columns where the ith row is not equal to 0
         non_zero_columns = header_row[header_row != "0"].index
         st.write("non_zero_columns",non_zero_columns)
