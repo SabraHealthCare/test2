@@ -3,7 +3,7 @@ import numpy as np
 from datetime import datetime, timedelta,date
 from openpyxl import load_workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
-import streamlit as st                
+import streamlit as st                Read_Clean_PL_Single
 import boto3
 from io import BytesIO
 from io import StringIO
@@ -1459,10 +1459,12 @@ def Upload_And_Process(uploaded_file,file_type):
         total_entity_list=list(entity_mapping.index)
         while(total_entity_list):   # entity_i is the entity code for each property
             entity_i=total_entity_list[0]  
+            st.write("entity_i",entity_i)
             sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
             sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
             sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
             property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
+            st.write("sheet_name_finance",sheet_name_finance)
 	    # properties in seperate sheet 	
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
 		# ****Finance and BS in one excel****
