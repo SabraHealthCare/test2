@@ -1375,7 +1375,8 @@ def Check_Latest_Month_Data(latest_month_data):
     st.write("")
 
 @st.cache_data(experimental_allow_widgets=True) 
-def Check_Reporting_Month(PL):	
+def Check_Reporting_Month(PL):
+    st.write("PL",PL)
     today=date.today()
     current_year= today.year
     current_month= today.month
