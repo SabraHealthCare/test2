@@ -1294,16 +1294,17 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     # Start checking process
     with st.spinner("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
+        st.write("tenantAccount_col_no",tenantAccount_col_no)
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
         date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
-  
+        st.write("date_header",date_header)
         if len(date_header[0])==1 and date_header[0]==[0]:
             st.error("Fail to identify month/year header in sheet '{}', please add it and re-upload.".format(sheet_name))
             st.stop()     
         PL.columns=date_header[0]
-
+        st.write("2PL",PL)
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         #remove row above date row and remove column without date col name
@@ -1339,7 +1340,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         
         # Map PL accounts and Sabra account
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
-
+        st.write("3PL",PL)
     return PL,PL_with_detail
 @st.cache_data(experimental_allow_widgets=True) 
 def Check_Latest_Month_Data(latest_month_data):
