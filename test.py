@@ -1308,7 +1308,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         header_row = PL.iloc[date_header[1]]
         # Filter out the columns where the ith row is not equal to 0
         non_zero_columns = header_row[header_row != "0"].index
-
+        st.write("non_zero_columns",non_zero_columns)
+        st.write("1PL",PL)
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         #remove row above date row and remove column without date col name
