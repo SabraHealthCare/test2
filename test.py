@@ -1311,8 +1311,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         non_zero_columns = date_header[0][date_header[0] != "0"].index
         PL = PL[non_zero_columns]
         st.write("1PL",PL)
-        PL=PL.loc[date_header[1]+1:,] 
-        st.write("2PL",PL)
+        #PL=PL.loc[date_header[1]+1:,] 
+
         #remove row above date row and remove column without date col name
 
         PL.columns= [value for value in date_header[0] if value != "0"]
