@@ -1301,15 +1301,13 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
         date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
-        st.write("date_header",date_header)
+        st.write("date_header",date_header[0],)
         if len(date_header[0])==1 and date_header[0]==[0]:
             st.error("Fail to identify month/year header in sheet '{}', please add it and re-upload.".format(sheet_name))
             st.stop()     
         #PL.columns=date_header[0]
-        header_row = PL.iloc[date_header[1]]
-        st.write("date_header[1]","header_row",date_header[1],header_row)
         # Filter out the columns where the ith row is not equal to 0
-        non_zero_columns = header_row[header_row != "0"].index
+        non_zero_columns = date_header[0][date_header[0] != "0"].index
         st.write("non_zero_columns",non_zero_columns)
         st.write("1PL",PL)
         #set tenant_account as index of PL
