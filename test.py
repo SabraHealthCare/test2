@@ -1304,12 +1304,13 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         if len(date_header[0])==1 and date_header[0]==[0]:
             st.error("Fail to identify month/year header in sheet '{}', please add it and re-upload.".format(sheet_name))
             st.stop()     
-        PL.columns=date_header[0]
+        #PL.columns=date_header[0]
         st.write("2PL",PL)
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         #remove row above date row and remove column without date col name
-        PL=PL.iloc[date_header[1]+1:,PL.columns!='0']    
+        PL=PL.iloc[date_header[1]+1:,date_header[0]!='0']  
+        PL.columns= [value for value in date_header[0] if value != "0"]
         #remove rows with nan tenant account
         nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
         PL.drop(nan_index, inplace=True)
