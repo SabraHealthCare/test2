@@ -834,7 +834,7 @@ def View_Summary():
     for property_i in entity_mapping["Property_Name"]:
         if check_patient_days[("Patient Days",Property_Name),latest_month]>0 and check_patient_days[("Facility Information",Property_Name),latest_month]*month_days>check_patient_days[("Patient Days",Property_Name),latest_month]:
             continue
-	elif check_patient_days[("Facility Information",Property_Name),latest_month]>0 and check_patient_days[("Patient Days",Property_Name),latest_month]>check_patient_days[("Facility Information",Property_Name),latest_month]:
+        elif check_patient_days[("Facility Information",Property_Name),latest_month]>0 and check_patient_days[("Patient Days",Property_Name),latest_month]>check_patient_days[("Facility Information",Property_Name),latest_month]:
             st.error("Error：The patient days of {} is greater than its available days".format(property_i))
             problem_properties.append(Property_Name)
 	elif check_patient_days[("Facility Information",Property_Name),latest_month]==0 and check_patient_days[("Patient Days",Property_Name),latest_month]==0:
