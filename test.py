@@ -1301,23 +1301,22 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
         date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
-        st.write("date_header",date_header[0],)
         if len(date_header[0])==1 and date_header[0]==[0]:
             st.error("Fail to identify month/year header in sheet '{}', please add it and re-upload.".format(sheet_name))
             st.stop()     
-        #PL.columns=date_header[0]
+
+        #set tenant_account as index of PL
+        PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         # Filter out the columns where the ith row is not equal to 0
         non_zero_columns = date_header[0][date_header[0] != "0"].index
         PL = PL[non_zero_columns]
-        st.write("non_zero_columns",non_zero_columns)
         st.write("1PL",PL)
-        PL=PL.loc[date_header[1]+1:,non_zero_columns] 
-        #set tenant_account as index of PL
-        PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
-        #remove row above date row and remove column without date col name
-        PL=PL.loc[date_header[1]+1:,non_zero_columns]  
+        PL=PL.loc[date_header[1]+1:,] 
         st.write("2PL",PL)
+        #remove row above date row and remove column without date col name
+
         PL.columns= [value for value in date_header[0] if value != "0"]
+        st.write("3PL",PL)
         #remove rows with nan tenant account
         nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
         PL.drop(nan_index, inplace=True)
