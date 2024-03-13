@@ -1252,6 +1252,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 
 @st.cache_data(experimental_allow_widgets=True)        
 def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
+    st.write("Read_Clean_PL_Single")
     global latest_month,account_mapping
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
