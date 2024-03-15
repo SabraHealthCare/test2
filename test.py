@@ -833,7 +833,7 @@ def View_Summary():
     problem_properties=[]
     zero_patient_days=[]
     month_days=30
-    st.write("check_patient_days.index",check_patient_days,check_patient_days.index)
+    st.write("check_patient_days.index",check_patient_days,check_patient_days.index[0])
 	
     for property_i in entity_mapping["Property_Name"]:
         st.write("check_patient_days[]",check_patient_days[("Patient Days",property_i),latest_month])
