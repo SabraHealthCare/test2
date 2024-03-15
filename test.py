@@ -332,8 +332,10 @@ def filters_widgets(df, columns,location="Vertical"):
 @st.cache_data
 #search tenant account column in P&L, return col number of tenant account	
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
-    account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
+    st.write("PL",PL)
 
+    account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
+    st.write("account_pool",account_pool) 
     if sheet_type=="Sheet_Name_Finance":
         account_pool=account_pool.loc[account_pool["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Formated_Account"]
     elif sheet_type=="Sheet_Name_Occupancy": 
@@ -342,13 +344,16 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
         account_pool=account_pool.loc[account_pool["Category"]=="Balance Sheet"]["Tenant_Formated_Account"] 
 
     max_match=0
-    for tenantAccount_col_no in range(0,min(15,PL.shape[1])):
-        candidate_col=list(map(lambda x: str(x).strip().upper() if not pd.isna(x) and isinstance(x, str) else x,PL.iloc[:,tenantAccount_col_no]))
+    for tenantAccount_col_no in range(0,min(20,PL.shape[1])):
 
+        candidate_col=list(map(lambda x: str(x).strip().upper() if not pd.isna(x) and isinstance(x, str) else x,PL.iloc[:,tenantAccount_col_no]))
+        st.write("candidate_col",candidate_col)
         #find out how many tenant accounts match with account_pool
         match=[x in candidate_col for x in account_pool]
+        st.write("match",match)
         #If 10% of accounts match with account_mapping list, identify this col as a candidate tenant account col.
-        if len(match)>0 and sum(x for x in match)/len(match)>0.1 and sum(x for x in match)>max_match:
+	#and sum(x for x in match)/len(match)>0.1
+        if len(match)>0 and sum(x for x in match)>max_match:
             
             max_match_col=tenantAccount_col_no
             max_match=sum(x for x in match)
