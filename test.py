@@ -828,11 +828,13 @@ def View_Summary():
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     st.write(latest_month_data)
     check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(["A_ACH","A_IL","A_ALZ","A_SNF"])) | (latest_month_data["Category"]=='Patient Days')]
-    check_patient_days=check_patient_days[["Category","Property_Name",latest_month]].groupby(["Category","Property_Name"]).sum()#.fillna(0, inplace=True)
+    check_patient_days=check_patient_days[["Category","Property_Name",latest_month]].groupby(["Category","Property_Name"]).sum()
+    check_patient_days.fillna(0, inplace=True)
     problem_properties=[]
     zero_patient_days=[]
     month_days=30
-    st.write("check_patient_days",check_patient_days)
+    st.write("check_patient_days.index",check_patient_days.index)
+    st.write("check_patient_days[]",check_patient_days[("Patient Days",property_i),latest_month])	
     for property_i in entity_mapping["Property_Name"]:
         if check_patient_days[("Patient Days",property_i),latest_month]>0 and check_patient_days[("Facility Information",property_i),latest_month]*month_days>check_patient_days[("Patient Days",property_i),latest_month]:
             continue
