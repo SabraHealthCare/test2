@@ -833,9 +833,10 @@ def View_Summary():
     problem_properties=[]
     zero_patient_days=[]
     month_days=30
-    st.write("check_patient_days.index",check_patient_days.index)
-    st.write("check_patient_days[]",check_patient_days[("Patient Days",property_i),latest_month])	
+    st.write("check_patient_days.index",check_patient_days,check_patient_days.index)
+	
     for property_i in entity_mapping["Property_Name"]:
+        st.write("check_patient_days[]",check_patient_days[("Patient Days",property_i),latest_month])
         if check_patient_days[("Patient Days",property_i),latest_month]>0 and check_patient_days[("Facility Information",property_i),latest_month]*month_days>check_patient_days[("Patient Days",property_i),latest_month]:
             continue
         elif check_patient_days[("Facility Information",property_i),latest_month]>0 and check_patient_days[("Patient Days",property_i),latest_month]>check_patient_days[("Facility Information",property_i),latest_month]*month_days:
