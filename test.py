@@ -332,8 +332,6 @@ def filters_widgets(df, columns,location="Vertical"):
 @st.cache_data
 #search tenant account column in P&L, return col number of tenant account	
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
-    st.write("PL",PL)
-
     account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
     st.write("account_pool",account_pool) 
     if sheet_type=="Sheet_Name_Finance":
@@ -350,11 +348,10 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
         st.write("candidate_col",candidate_col)
         #find out how many tenant accounts match with account_pool
         match=[x in candidate_col for x in account_pool]
-        st.write("match",match)
+
         #If 10% of accounts match with account_mapping list, identify this col as a candidate tenant account col.
 	#and sum(x for x in match)/len(match)>0.1
         if len(match)>0 and sum(x for x in match)>max_match:
-            
             max_match_col=tenantAccount_col_no
             max_match=sum(x for x in match)
     if max_match>0:
@@ -544,7 +541,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                     if Year_continuity_check(year_row) and year_count[year_row_index]==month_count[month_row_index]:
                         PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
                         month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                        st.write("1PL_date_header",PL_date_header,year_table,month_table)
                         return PL_date_header,month_row_index
                     
                     # all the year rows are not valid, add year to month
@@ -612,8 +608,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                 
             else:
                 PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
-                        month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                st.write("PL_date_header",PL_date_header)  
+                        month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x))) 
                 return PL_date_header,month_row_index
     st.error("Can't identify date row in for sheet: '"+sheet_name+"'")
     st.stop()
@@ -1301,7 +1296,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     # Start checking process
     with st.spinner("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
-        st.write("tenantAccount_col_no",tenantAccount_col_no)
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
@@ -1315,13 +1309,11 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         # Filter out the columns where the ith row is not equal to 0
         non_zero_columns = date_header[0][date_header[0] != "0"].index
         PL = PL[non_zero_columns]
-        st.write("1PL",PL)
         #PL=PL.loc[date_header[1]+1:,] 
 
         #remove row above date row and remove column without date col name
 
         PL.columns= [value for value in date_header[0] if value != "0"]
-        st.write("3PL",PL)
         #remove rows with nan tenant account
         nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
         PL.drop(nan_index, inplace=True)
@@ -1353,7 +1345,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         
         # Map PL accounts and Sabra account
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
-        st.write("3PL",PL)
     return PL,PL_with_detail
 @st.cache_data(experimental_allow_widgets=True) 
 def Check_Latest_Month_Data(latest_month_data):
@@ -1390,7 +1381,6 @@ def Check_Latest_Month_Data(latest_month_data):
 
 @st.cache_data(experimental_allow_widgets=True) 
 def Check_Reporting_Month(PL):
-    st.write("PL",PL)
     today=date.today()
     current_year= today.year
     current_month= today.month
@@ -1471,18 +1461,15 @@ def Upload_And_Process(uploaded_file,file_type):
         total_entity_list=list(entity_mapping.index)
         while(total_entity_list):   # entity_i is the entity code for each property
             entity_i=total_entity_list[0]  
-            st.write("entity_i",entity_i)
             sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
             sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
             sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
             property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
-            st.write("sheet_name_finance",sheet_name_finance)
 	    # properties in seperate sheet 	
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
-                    st.write("1PL",PL)
                     # check if census data in another sheet
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
@@ -1605,7 +1592,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.stop()
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
-            st.write("Total_PL",Total_PL)
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             # process Finance 
             with st.spinner('Wait for P&L process'):
