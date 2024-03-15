@@ -828,7 +828,7 @@ def View_Summary():
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     st.write(latest_month_data)
     check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(["A_ACH","A_IL","A_ALZ","A_SNF"])) | (latest_month_data["Category"]=='Patient Days')]
-    check_patient_days=check_patient_days[["Category","Property_Name",latest_month]].groupby(["Category","Property_Name"]).sum().fillna(0, inplace=True)
+    check_patient_days=check_patient_days[["Category","Property_Name",latest_month]].groupby(["Category","Property_Name"]).sum()#.fillna(0, inplace=True)
     problem_properties=[]
     zero_patient_days=[]
     month_days=30
