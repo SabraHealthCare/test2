@@ -333,7 +333,7 @@ def filters_widgets(df, columns,location="Vertical"):
 #search tenant account column in P&L, return col number of tenant account	
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
     account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
-    st.write("account_pool",account_pool) 
+
     if sheet_type=="Sheet_Name_Finance":
         account_pool=account_pool.loc[account_pool["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Formated_Account"]
     elif sheet_type=="Sheet_Name_Occupancy": 
@@ -345,7 +345,6 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
     for tenantAccount_col_no in range(0,min(20,PL.shape[1])):
 
         candidate_col=list(map(lambda x: str(x).strip().upper() if not pd.isna(x) and isinstance(x, str) else x,PL.iloc[:,tenantAccount_col_no]))
-        st.write("candidate_col",candidate_col)
         #find out how many tenant accounts match with account_pool
         match=[x in candidate_col for x in account_pool]
 
@@ -1253,7 +1252,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 
 @st.cache_data(experimental_allow_widgets=True)        
 def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
-    st.write("Read_Clean_PL_Single")
     global latest_month,account_mapping
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
