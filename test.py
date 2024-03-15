@@ -826,31 +826,30 @@ def View_Summary():
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-    #check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(["A_ACH","A_IL","A_ALZ","A_SNF"])) | (latest_month_data["Category"]=='Patient Days')]
-    #check_patient_days=check_patient_days[["Category","ENTITY",latest_month]].groupby(["Category","Property_Name"]).sum().fillna(0, inplace=True)
-    #problem_properties=[]
-    #zero_patient_days=[]
-    #for property_i in entity_mapping["Property_Name"]:
-    #    if check_patient_days[("Patient Days",Property_Name),latest_month]>0 and check_patient_days[("Facility Information",Property_Name),latest_month]*month_days>check_patient_days[("Patient Days",Property_Name),latest_month]:
-    #        continue
-     #   elif check_patient_days[("Facility Information",Property_Name),latest_month]>0 and check_patient_days[("Patient Days",Property_Name),latest_month]>check_patient_days[("Facility Information",Property_Name),latest_month]:
-    #        st.error("Error：The patient days of {} is greater than its available days".format(property_i))
-    #        problem_properties.append(Property_Name)
-    #    elif check_patient_days[("Facility Information",Property_Name),latest_month]==0 and check_patient_days[("Patient Days",Property_Name),latest_month]==0:
-    #        zero_patient_days.append(property_i)
-   #     elif check_patient_days[("Patient Days",Property_Name),latest_month]==0 and check_patient_days[("Facility Information",Property_Name),latest_month]>0:
-   #         st.error("Error：The patient days of {} is 0 while its available days is {}".format(property_i,check_patient_days[("Facility Information",Property_Name),latest_month]>0))
-    #        problem_properties.append(Property_Name)     
-   #     elif check_patient_days[("Patient Days",Property_Name),latest_month]>0 and check_patient_days[("Facility Information",Property_Name),latest_month]==0:
-    #        st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,check_patient_days[("Facility Information",Property_Name),latest_month]>0))
-   #         problem_properties.append(Property_Name) 
-    #if len(problem_properties)>0:
-   #     st.write()
-   # st.write(problem_properties)
-   # latest_month_data
-    	
-   # st.write(check_patient_days.index)
-    # check missing category ( example: total revenue= 0, total Opex=0...)	
+    check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(["A_ACH","A_IL","A_ALZ","A_SNF"])) | (latest_month_data["Category"]=='Patient Days')]
+    check_patient_days=check_patient_days[["Category","ENTITY",latest_month]].groupby(["Category","Property_Name"]).sum().fillna(0, inplace=True)
+    problem_properties=[]
+    zero_patient_days=[]
+    month_days=30
+    st.write("check_patient_days",check_patient_days)
+    for property_i in entity_mapping["Property_Name"]:
+        if check_patient_days[("Patient Days",property_i),latest_month]>0 and check_patient_days[("Facility Information",property_i),latest_month]*month_days>check_patient_days[("Patient Days",property_i),latest_month]:
+            continue
+        elif check_patient_days[("Facility Information",property_i),latest_month]>0 and check_patient_days[("Patient Days",property_i),latest_month]>check_patient_days[("Facility Information",property_i),latest_month]*month_days:
+            st.error("Error：The patient days of {} is greater than its available days".format(property_i))
+            problem_properties.append(property_i)
+        elif check_patient_days[("Facility Information",property_i),latest_month]==0 and check_patient_days[("Patient Days",property_i),latest_month]==0:
+            zero_patient_days.append(property_i)
+        elif check_patient_days[("Patient Days",property_i),latest_month]==0 and check_patient_days[("Facility Information",property_i),latest_month]>0:
+            st.error("Error：The patient days of {} is 0 while its available days is {}".format(property_i,check_patient_days[("Facility Information",property_i),latest_month]>0))
+            problem_properties.append(property_i)     
+        elif check_patient_days[("Patient Days",property_i),latest_month]>0 and check_patient_days[("Facility Information",property_i),latest_month]==0:
+            st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,check_patient_days[("Facility Information",property_i),latest_month]>0))
+            problem_properties.append(property_i) 
+    if len(problem_properties)>0:
+        st.write(problem_properties)
+    st.write(check_patient_days.index)
+    #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
     entity_list=list(latest_month_data["ENTITY"].unique())
     current_cagegory=latest_month_data[["Property_Name","Category","ENTITY",latest_month]][latest_month_data["Category"].\
