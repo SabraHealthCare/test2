@@ -828,6 +828,7 @@ def View_Summary():
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     st.write(latest_month_data)
     check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(["A_ACH","A_IL","A_ALZ","A_SNF"])) | (latest_month_data["Category"]=='Patient Days')]
+    check_patient_days['Category'] = check_patient_days['Category'].replace('Facility Information', 'License Beds')
     check_patient_days=check_patient_days[["Category","Property_Name",latest_month]].groupby(["Category","Property_Name"]).sum()
     check_patient_days.fillna(0, inplace=True)
     problem_properties=[]
@@ -836,22 +837,23 @@ def View_Summary():
 	
     for property_i in entity_mapping["Property_Name"]:
 
-        if check_patient_days.loc[("Patient Days",property_i),latest_month]>0 and check_patient_days.loc[("Facility Information",property_i),latest_month]*month_days>check_patient_days.loc[("Patient Days",property_i),latest_month]:
+        if check_patient_days.loc[("Patient Days",property_i),latest_month]>0 and check_patient_days.loc[("License Beds",property_i),latest_month]*month_days>check_patient_days.loc[("Patient Days",property_i),latest_month]:
             continue
-        elif check_patient_days.loc[("Facility Information",property_i),latest_month]>0 and check_patient_days.loc[("Patient Days",property_i),latest_month]>check_patient_days.loc[("Facility Information",property_i),latest_month]*month_days:
+        elif check_patient_days.loc[("License Beds",property_i),latest_month]>0 and check_patient_days.loc[("Patient Days",property_i),latest_month]>check_patient_days.loc[("License Beds",property_i),latest_month]*month_days:
             st.error("Error：The patient days of {} is greater than its available days".format(property_i))
             problem_properties.append(property_i)
-        elif check_patient_days.loc[("Facility Information",property_i),latest_month]==0 and check_patient_days.loc[("Patient Days",property_i),latest_month]==0:
+        elif check_patient_days.loc[("License Beds",property_i),latest_month]==0 and check_patient_days.loc[("Patient Days",property_i),latest_month]==0:
             zero_patient_days.append(property_i)
-        elif check_patient_days.loc[("Patient Days",property_i),latest_month]==0 and check_patient_days.loc[("Facility Information",property_i),latest_month]>0:
-            st.error("Error：The patient days of {} is 0 while its available days is {}".format(property_i,check_patient_days.loc[("Facility Information",property_i),latest_month]))
+        elif check_patient_days.loc[("Patient Days",property_i),latest_month]==0 and check_patient_days.loc[("License Beds",property_i),latest_month]>0:
+            st.error("Error：The patient days of {} is 0 while its available days is {}".format(property_i,check_patient_days.loc[("License Beds",property_i),latest_month]))
             problem_properties.append(property_i)     
-        elif check_patient_days.loc[("Patient Days",property_i),latest_month]>0 and check_patient_days.loc[("Facility Information",property_i),latest_month]==0:
-            st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,check_patient_days.loc[("Facility Information",property_i),latest_month]))
+        elif check_patient_days.loc[("Patient Days",property_i),latest_month]>0 and check_patient_days.loc[("License Beds",property_i),latest_month]==0:
+            st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,check_patient_days.loc[("License Beds",property_i),latest_month]))
             problem_properties.append(property_i) 
     if len(problem_properties)>0:
         st.write("problem_properties",problem_properties)
-    st.write(check_patient_days.index)
+        st.write(check_patient_days.loc[(slice(None),problem_properties),latest_month]
+
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
     entity_list=list(latest_month_data["ENTITY"].unique())
