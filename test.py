@@ -844,13 +844,13 @@ def View_Summary():
         elif check_patient_days.loc[("Facility Information",property_i),latest_month]==0 and check_patient_days.loc[("Patient Days",property_i),latest_month]==0:
             zero_patient_days.append(property_i)
         elif check_patient_days.loc[("Patient Days",property_i),latest_month]==0 and check_patient_days.loc[("Facility Information",property_i),latest_month]>0:
-            st.error("Error：The patient days of {} is 0 while its available days is {}".format(property_i,check_patient_days.loc[("Facility Information",property_i),latest_month]>0))
+            st.error("Error：The patient days of {} is 0 while its available days is {}".format(property_i,check_patient_days.loc[("Facility Information",property_i),latest_month]))
             problem_properties.append(property_i)     
         elif check_patient_days.loc[("Patient Days",property_i),latest_month]>0 and check_patient_days.loc[("Facility Information",property_i),latest_month]==0:
-            st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,check_patient_days.loc[("Facility Information",property_i),latest_month]>0))
+            st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,check_patient_days.loc[("Facility Information",property_i),latest_month]))
             problem_properties.append(property_i) 
     if len(problem_properties)>0:
-        st.write(problem_properties)
+        st.write("problem_properties",problem_properties)
     st.write(check_patient_days.index)
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
