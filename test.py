@@ -852,7 +852,7 @@ def View_Summary():
             problem_properties.append(property_i) 
     if len(problem_properties)>0:
         st.write("problem_properties",problem_properties)
-        st.write(check_patient_days.loc[(slice(None),problem_properties),latest_month]
+        st.write(check_patient_days.loc[(slice(None),problem_properties),latest_month])
 
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
