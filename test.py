@@ -860,7 +860,7 @@ def View_Summary():
             problem_properties.append(property_i) 
     if len(problem_properties)>0:
         #st.write(check_patient_days.loc[(slice(None),problem_properties),latest_month])
-        st.dataframe(check_patient_days.loc[(slice(None),problem_properties),latest_month].style.applymap(color_missing, subset=[latest_month]),
+        st.dataframe(check_patient_days.loc[(slice(None),problem_properties),latest_month],
 		    column_config={
 			        "Property_Name": "Property",
 			        "Category":"Account Total",
