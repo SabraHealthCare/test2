@@ -859,7 +859,14 @@ def View_Summary():
             st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,check_patient_days.loc[("Operating Beds",property_i),latest_month]))
             problem_properties.append(property_i) 
     if len(problem_properties)>0:
-        st.write(check_patient_days.loc[(slice(None),problem_properties),latest_month])
+        #st.write(check_patient_days.loc[(slice(None),problem_properties),latest_month])
+        st.dataframe(check_patient_days.loc[(slice(None),problem_properties),latest_month].style.applymap(color_missing, subset=[latest_month]),
+		    column_config={
+			        "Property_Name": "Property",
+			        "Category":"Account Total",
+		                 latest_month:latest_month[4:6]+"/"+latest_month[0:4]},
+			    hide_index=True)
+	     
         st.stop()
 
     #check missing category ( example: total revenue= 0, total Opex=0...)	
