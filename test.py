@@ -844,7 +844,7 @@ def View_Summary():
     problem_properties=[]
     zero_patient_days=[]
 
-    month_days=calendar.monthrange(int(latest_month[:4]), int(latest_month[4:]))[1]
+    month_days=monthrange(int(latest_month[:4]), int(latest_month[4:]))[1]
     for property_i in entity_mapping["Property_Name"]:
         st.write("111111",check_patient_days.loc[("Operating Beds",property_i),latest_month],month_days)	    
         if check_patient_days.loc[("Patient Days",property_i),latest_month]>0 and check_patient_days.loc[("Operating Beds",property_i),latest_month]*month_days>check_patient_days.loc[("Patient Days",property_i),latest_month]:
