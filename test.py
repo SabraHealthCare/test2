@@ -480,8 +480,19 @@ def Add_year_to_header(month_list):
             j+=1
     return month_list  
 
+@st.cache_data
+def Fill_Facility_Info(missing_category,latest_month):
 # search for the Month/year row and return row number
-
+        entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
+        onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]<str(latest_month),BPC_pull.columns)))
+        previous_facility_data=BPC_pull.merge(BPC_Account,left_on="ACCOUNT",right_on="BPC_Account_Name")
+        previous_facility_data=previous_facility_data[previous_facility_data["Category"]=="Facility Information"]#[["Property_Name",onemonth_before_latest_month,"Sabra_Account_Full_Name"]]	  
+        previous_facility_data=previous_facility_data.reset_index(drop=False)
+        previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_latest_month:latest_month})	
+        st.error("Below properties miss facility information in P&L. It has been filled by historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
+        previous_facility_data_display = previous_facility_data.pivot(index=["Sabra_Account_Full_Name"], columns="Property_Name", values=latest_month)
+        st.write(previous_facility_data_display)
+	
 @st.cache_data
 def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
     PL_row_size=PL.shape[0]
@@ -828,7 +839,7 @@ def View_Summary():
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     st.write(latest_month_data)
     check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(["A_ACH","A_IL","A_ALZ","A_SNF"])) | (latest_month_data["Category"]=='Patient Days')]
-    check_patient_days['Category'] = check_patient_days['Category'].replace('Facility Information', 'License Beds')
+    check_patient_days['Category'] = check_patient_days['Category'].replace('Facility Information', 'Operating Beds')
     check_patient_days=check_patient_days[["Category","Property_Name",latest_month]].groupby(["Category","Property_Name"]).sum()
     check_patient_days.fillna(0, inplace=True)
     problem_properties=[]
@@ -837,22 +848,22 @@ def View_Summary():
 	
     for property_i in entity_mapping["Property_Name"]:
 
-        if check_patient_days.loc[("Patient Days",property_i),latest_month]>0 and check_patient_days.loc[("License Beds",property_i),latest_month]*month_days>check_patient_days.loc[("Patient Days",property_i),latest_month]:
+        if check_patient_days.loc[("Patient Days",property_i),latest_month]>0 and check_patient_days.loc[("Operating Beds",property_i),latest_month]*month_days>check_patient_days.loc[("Patient Days",property_i),latest_month]:
             continue
-        elif check_patient_days.loc[("License Beds",property_i),latest_month]>0 and check_patient_days.loc[("Patient Days",property_i),latest_month]>check_patient_days.loc[("License Beds",property_i),latest_month]*month_days:
+        elif check_patient_days.loc[("Operating Beds",property_i),latest_month]>0 and check_patient_days.loc[("Patient Days",property_i),latest_month]>check_patient_days.loc[("Operating Beds",property_i),latest_month]*month_days:
             st.error("Error：The patient days of {} is greater than its available days".format(property_i))
             problem_properties.append(property_i)
-        elif check_patient_days.loc[("License Beds",property_i),latest_month]==0 and check_patient_days.loc[("Patient Days",property_i),latest_month]==0:
+        elif check_patient_days.loc[("Operating Beds",property_i),latest_month]==0 and check_patient_days.loc[("Patient Days",property_i),latest_month]==0:
             zero_patient_days.append(property_i)
-        elif check_patient_days.loc[("Patient Days",property_i),latest_month]==0 and check_patient_days.loc[("License Beds",property_i),latest_month]>0:
-            st.error("Error：The patient days of {} is 0 while its available days is {}".format(property_i,check_patient_days.loc[("License Beds",property_i),latest_month]))
+        elif check_patient_days.loc[("Patient Days",property_i),latest_month]==0 and check_patient_days.loc[("Operating Beds",property_i),latest_month]>0:
+            st.error("Error：The patient days of {} is 0 while its available days is {}".format(property_i,check_patient_days.loc[("Operating Beds",property_i),latest_month]))
             problem_properties.append(property_i)     
-        elif check_patient_days.loc[("Patient Days",property_i),latest_month]>0 and check_patient_days.loc[("License Beds",property_i),latest_month]==0:
-            st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,check_patient_days.loc[("License Beds",property_i),latest_month]))
+        elif check_patient_days.loc[("Patient Days",property_i),latest_month]>0 and check_patient_days.loc[("Operating Beds",property_i),latest_month]==0:
+            st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,check_patient_days.loc[("Operating Beds",property_i),latest_month]))
             problem_properties.append(property_i) 
     if len(problem_properties)>0:
-        st.write("problem_properties",problem_properties)
         st.write(check_patient_days.loc[(slice(None),problem_properties),latest_month])
+        st.stop()
 
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
@@ -862,20 +873,13 @@ def View_Summary():
     full_category = pd.DataFrame(list(product(entity_list,category_list)), columns=['ENTITY', 'Category'])
     missing_category=full_category.merge(current_cagegory,on=['ENTITY', 'Category'],how="left")
     missing_category=missing_category[(missing_category[latest_month]==0)|(missing_category[latest_month].isnull())]
-    missing_category[latest_month]="NA"   
-    if "Facility Information" in list(missing_category["Category"]):
+    missing_category[latest_month]="NA" 
+	
+    #if "Facility Information" in list(missing_category["Category"]):
         # fill the facility info with historical data
-        entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
-        onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]<str(latest_month),BPC_pull.columns)))
-        previous_facility_data=BPC_pull.merge(BPC_Account,left_on="ACCOUNT",right_on="BPC_Account_Name")
-        previous_facility_data=previous_facility_data[previous_facility_data["Category"]=="Facility Information"]#[["Property_Name",onemonth_before_latest_month,"Sabra_Account_Full_Name"]]	  
-        previous_facility_data=previous_facility_data.reset_index(drop=False)
-        previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_latest_month:latest_month})	
-        st.error("Below properties miss facility information in P&L. It has been filled by historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
-        previous_facility_data_display = previous_facility_data.pivot(index=["Sabra_Account_Full_Name"], columns="Property_Name", values=latest_month)
+        #Fill_Facility_Info(missing_category,latest_month)
+        #missing_category=missing_category[missing_category["Category"]!="Facility Information"]
 
-	    
-    missing_category=missing_category[missing_category["Category"]!="Facility Information"]	    
     if missing_category.shape[0]>0:
         st.write("No data detected for below properties and accounts: ")
         missing_category=missing_category[["ENTITY",latest_month,"Category"]].merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
