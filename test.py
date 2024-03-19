@@ -845,7 +845,7 @@ def View_Summary():
     zero_patient_days=[]
     month_days=datetime.strptime(latest_month, '%Y%m').day
     for property_i in entity_mapping["Property_Name"]:
-        st.write(c"111111",heck_patient_days.loc[("Operating Beds",property_i),latest_month],month_days:)	    
+        st.write("111111",heck_patient_days.loc[("Operating Beds",property_i),latest_month],month_days:)	    
         if check_patient_days.loc[("Patient Days",property_i),latest_month]>0 and check_patient_days.loc[("Operating Beds",property_i),latest_month]*month_days>check_patient_days.loc[("Patient Days",property_i),latest_month]:
             continue
         elif check_patient_days.loc[("Operating Beds",property_i),latest_month]>0 and check_patient_days.loc[("Patient Days",property_i),latest_month]>check_patient_days.loc[("Operating Beds",property_i),latest_month]*month_days:
