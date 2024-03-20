@@ -522,7 +522,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
         
     month_sort_index = np.argsort(np.array(month_count))
     year_sort_index = np.argsort(np.array(year_count))
-    for month_index_i in range(-1,-4,-1): # only check three of the most possible rows
+    for month_index_i in range(-1,-10,-1): # only check three of the most possible rows
         #month_sort_index[-1] is the index number of month_count in which has max month count
         #month_row_index is also the index/row number of PL
         month_row_index=month_sort_index[month_index_i]
