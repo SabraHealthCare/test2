@@ -1813,7 +1813,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 # add average column for each line , average is from BPC_pull
                 BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename)
                 BPC_pull.columns=list(map(lambda x :str(x) if x!="ACCOUNT" else "Sabra_Account", BPC_pull.columns))
-                data=data.merge(BPC_pull[["ENTITY","Sabra_Account","mean"]], on=["ENTITY","Sabra_Account"],how="left")	
+                data=data.merge(BPC_pull[["ENTITY","Sabra_Account","Mean"]], on=["ENTITY","Sabra_Account"],how="left")	
 		# add "GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE" from entity_mapping
                 entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename)
                 data=data.merge(entity_mapping[["ENTITY","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
