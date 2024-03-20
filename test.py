@@ -613,9 +613,9 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                     count_str+=1
                 # count_num is count of numous row under month header. count_str is the count of character data under month header
                 # for a real month column, numous data is supposed to be more than character data
-            if count_str>0 and (count_num+count_non)/count_str<0.8:
+            if count_str>0 and (count_num)/count_str<0.8:
                 continue
-                
+		    
             else:
                 PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
                         month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x))) 
