@@ -597,8 +597,8 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                 elif month_row_index<PL_row_size and year_table.iloc[month_row_index+1,col_month]!=0 :
                     year_table.iloc[month_row_index,col_month]=year_table.iloc[month_row_index+1,col_month]
        
-                else:			
-                    continue
+                #else:			
+                    #continue
            
             count_num=0
             count_str=0
@@ -1306,7 +1306,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     # Start checking process
     with st.spinner("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
-        st.write("tenantAccount_col_no",tenantAccount_col_no)
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
@@ -1400,7 +1399,6 @@ def Check_Reporting_Month(PL):
         current_date=str(current_year)+"0"+str(current_month)
     else:
         current_date=str(current_year)+str(current_month)
-    st.write("PL.columns",PL.columns,PL)
     reporting_month_list=list(map(lambda x:str(x),PL.columns))	
     latest_month=max(reporting_month_list)
     if latest_month!="reporting_month_TBD":
@@ -1528,7 +1526,6 @@ def Upload_And_Process(uploaded_file,file_type):
     
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
-            st.write("Total_PL",Total_PL)
     return Total_PL,Total_PL_detail
 
 #----------------------------------website widges------------------------------------
