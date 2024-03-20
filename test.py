@@ -1398,6 +1398,7 @@ def Check_Reporting_Month(PL):
         current_date=str(current_year)+"0"+str(current_month)
     else:
         current_date=str(current_year)+str(current_month)
+    st.write("PL.columns",PL.columns,PL)
     reporting_month_list=list(map(lambda x:str(x),PL.columns))	
     latest_month=max(reporting_month_list)
     if latest_month!="reporting_month_TBD":
