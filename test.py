@@ -1306,10 +1306,12 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
     # Start checking process
     with st.spinner("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
+        st.write("tenantAccount_col_no",tenantAccount_col_no)
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
         date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
+        st.write("date_header",date_header)
         if len(date_header[0])==1 and date_header[0]==[0]:
             st.error("Fail to identify month/year header in sheet '{}', please add it and re-upload.".format(sheet_name))
             st.stop()     
@@ -1526,6 +1528,7 @@ def Upload_And_Process(uploaded_file,file_type):
     
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
+            st.write("Total_PL",Total_PL)
     return Total_PL,Total_PL_detail
 
 #----------------------------------website widges------------------------------------
