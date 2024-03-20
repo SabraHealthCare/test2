@@ -597,8 +597,10 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                 elif month_row_index<PL_row_size and year_table.iloc[month_row_index+1,col_month]!=0 :
                     year_table.iloc[month_row_index,col_month]=year_table.iloc[month_row_index+1,col_month]
        
-                #else:			
-                    #continue
+		elif PL.iloc[month_row_index,col_month] in ["Nov","November"]:	
+                    year_table.iloc[month_row_index,col_month]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
+		else:
+                    continue
            
             count_num=0
             count_str=0
