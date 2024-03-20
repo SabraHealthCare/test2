@@ -497,7 +497,7 @@ def Fill_Facility_Info(missing_category,latest_month):
 def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
     PL_row_size=PL.shape[0]
     PL_col_size=PL.shape[1]
-    search_row_size=min(15,PL_row_size)
+    search_row_size=min(30,PL_row_size)
     month_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
     year_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
 
@@ -589,7 +589,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                 
             #if there is no year in month header 
             if  year_table.iloc[month_row_index,col_month]==0:
-  
+                st.write(1)
                 #check the next row
                 if month_row_index>0 and month_row_index<PL_row_size and year_table.iloc[month_row_index-1,col_month]!=0 and year_table.iloc[month_row_index+1,col_month]==0:
                     year_table.iloc[month_row_index,col_month]=year_table.iloc[month_row_index-1,col_month]	
