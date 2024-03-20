@@ -438,7 +438,7 @@ def Add_year_to_header(month_list):
     last_year=current_year-1
     if len(available_month)==1:
         
-        if datetime.strptime(available_month[0]+"/01/"+current_year,'%m/%d/%Y').date()<today:
+        if datetime.strptime(str(available_month[0])+"/01/"+str(current_year),'%m/%d/%Y').date()<today:
             year=current_year
         else:
             year=today.year-1
