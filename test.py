@@ -1346,7 +1346,10 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
             st.warning("Please complete mapping for below new account:")
             for i in range(len(new_tenant_account_list)):
                 st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
-                Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
+                
+                test=Manage_Account_Mapping(new_tenant_account_list[i])
+                Sabra_main_account_value=test[0]
+                Sabra_second_account_value=test[1]		  
                 #insert new record to the bottom line of account_mapping
                 new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
                 account_mapping=pd.concat([account_mapping, pd.DataFrame([new_mapping_row],columns=account_mapping.columns)],ignore_index=True)
