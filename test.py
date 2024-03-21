@@ -712,6 +712,7 @@ def Manage_Account_Mapping(new_tenant_account):
         st.success("{} was successfully saved to 'No need to map' list.".format(new_tenant_account))
     elif Sabra_main_account_value:
         st.success("Successfully mapped '{}' to '{}'".format(new_tenant_account,Sabra_main_account_value))
+    st.write("Sabra_main_account_value,Sabra_second_account_value ",Sabra_main_account_value,Sabra_second_account_value )
     return Sabra_main_account_value,Sabra_second_account_value     
 
 
