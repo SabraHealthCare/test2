@@ -672,7 +672,7 @@ def Manage_Entity_Mapping(operator):
         Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
         return entity_mapping
 
-@st.cache_data
+#@st.cache_data
 def Manage_Account_Mapping(new_tenant_account):
     with st.form(key=new_tenant_account):
         col1,col2=st.columns(2) 
@@ -1350,7 +1350,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                 #insert new record to the bottom line of account_mapping
                 new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
                 account_mapping=pd.concat([account_mapping, pd.DataFrame([new_mapping_row],columns=account_mapping.columns)],ignore_index=True)
-            Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
+                Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
             #if there are duplicated accounts in P&L, ask for confirming
             dup_tenant_account=set([x for x in PL.index if list(PL.index).count(x) > 1])
             if len(dup_tenant_account)>0:
