@@ -672,7 +672,7 @@ def Manage_Entity_Mapping(operator):
         Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
         return entity_mapping
 
-#@st.cache_data(experimental_allow_widgets=True)
+@st.cache_data(experimental_allow_widgets=True)
 def Manage_Account_Mapping(new_tenant_account):
     with st.form(key=new_tenant_account):
         col1,col2=st.columns(2) 
@@ -712,7 +712,6 @@ def Manage_Account_Mapping(new_tenant_account):
         st.success("{} was successfully saved to 'No need to map' list.".format(new_tenant_account))
     elif Sabra_main_account_value:
         st.success("Successfully mapped '{}' to '{}'".format(new_tenant_account,Sabra_main_account_value))
-    st.write("Sabra_main_account_value,Sabra_second_account_value ",Sabra_main_account_value,Sabra_second_account_value )
     return Sabra_main_account_value,Sabra_second_account_value
 
 
