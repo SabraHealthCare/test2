@@ -124,7 +124,7 @@ def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # 
             original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))].index)
         elif "TIME" not in original_data.columns and "TIME" not in new_data.columns:
             original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
-            st.write(original_data)		
+		
     # append new data to original data
     new_data=new_data.reset_index(drop=False)
     new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns))
