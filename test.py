@@ -672,7 +672,7 @@ def Manage_Entity_Mapping(operator):
         Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
         return entity_mapping
 
-@st.cache_data(experimental_allow_widgets=True)
+#@st.cache_data(experimental_allow_widgets=True)
 def Manage_Account_Mapping(new_tenant_account):
     with st.form(key=new_tenant_account):
         col1,col2=st.columns(2) 
