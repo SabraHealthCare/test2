@@ -672,7 +672,7 @@ def Manage_Entity_Mapping(operator):
         Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
         return entity_mapping
 
-@st.cache_data(experimental_allow_widgets=True)
+#@st.cache_data(experimental_allow_widgets=True)
 def Manage_Account_Mapping(new_tenant_account):
     with st.form(key=new_tenant_account):
         col1,col2=st.columns(2) 
@@ -713,7 +713,7 @@ def Manage_Account_Mapping(new_tenant_account):
     elif Sabra_main_account_value:
         st.success("Successfully mapped '{}' to '{}'".format(new_tenant_account,Sabra_main_account_value))
     st.write("Sabra_main_account_value,Sabra_second_account_value ",Sabra_main_account_value,Sabra_second_account_value )
-    return [Sabra_main_account_value,Sabra_second_account_value]     
+    return Sabra_main_account_value,Sabra_second_account_value
 
 
 @st.cache_data 
@@ -1241,9 +1241,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
             st.warning("Please complete mapping for below account:")
             for i in range(len(new_tenant_account_list)):
                 st.markdown("## Map **'{}'** in sheet {} to Sabra account".format(new_tenant_account_list[i],sheet_name)) 
-                test=Manage_Account_Mapping(new_tenant_account_list[i])
-                Sabra_main_account_value=test[0]
-                Sabra_second_account_value=test[1]		    
+                Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
+		    
                 #insert new record to the bottom line of account_mapping
                 new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
                 account_mapping=pd.concat([account_mapping, pd.DataFrame([new_mapping_row],columns=account_mapping.columns)],ignore_index=True)
@@ -1347,9 +1346,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
             for i in range(len(new_tenant_account_list)):
                 st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
                 
-                test=Manage_Account_Mapping(new_tenant_account_list[i])
-                Sabra_main_account_value=test[0]
-                Sabra_second_account_value=test[1]		  
+                Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
+               	  
                 #insert new record to the bottom line of account_mapping
                 new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
                 account_mapping=pd.concat([account_mapping, pd.DataFrame([new_mapping_row],columns=account_mapping.columns)],ignore_index=True)
