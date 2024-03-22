@@ -1361,38 +1361,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         # Map PL accounts and Sabra account
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
     return PL,PL_with_detail
-@st.cache_data(experimental_allow_widgets=True) 
-def Check_Latest_Month_Data(latest_month_data):
-   
-	
-    # Example DataFrame
-    data = {
-    'soap': [10, 15, 5, 12, 8, 10],
-    'shampoo': [20, 25, 15, 18, 22, 20],
-    'face cream': [8, 10, 6, 7, 9, 8],
-    }
-    index = ['price', 'price1', 'tax', 'tax1', 'discount', 'discount1']
-    df = pd.DataFrame(data, index=index)
-    st.write("df",df)
-    # Function to highlight unsatisfied cells in red
-   
-    # Apply styling to highlight unsatisfied cells in red
-    for col in df.columns:
-        pairs = [(index[i], index[i+1]) for i in range(0, len(index), 2)]
-        for pair in pairs:
-            val_0 = highlighted_df.loc[pair[0], col]
-            val_1 = highlighted_df.loc[pair[1], col]
-            if float(val_0) >= float(val_1):
-                highlighted_df.loc[pair[0]:pair[1], col] = highlighted_df.loc[pair[0]:pair[1], col].apply( lambda x: f'<span style="color:red">{x}</span>')
-            else:
-                highlighted_df.loc[pair[0]:pair[1], col] = highlighted_df.loc[pair[0]:pair[1], col].apply( lambda x: f'{x:.2f}' if isinstance(x, (float, int)) else x)
-
-    st.write("highlighted_df",highlighted_df)
-    #Display the DataFrame with styled unsatisfied cells in red
-    styled_highlighted_df = highlighted_df.style.applymap(highlight_unsatisfied_cells)
-    st.write(styled_highlighted_df)
-	
-    st.write("")
 
 @st.cache_data(experimental_allow_widgets=True) 
 def Check_Reporting_Month(PL):
@@ -1631,8 +1599,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         # 2 Discrepancy of Historic Data
         with st.expander("Discrepancy for Historic Data",expanded=True):
             ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-            if len(Total_PL.columns)>1:		
-                View_Discrepancy(percent_discrepancy_accounts)
+            if len(Total_PL.columns)>1:	
+                with st.spinner("********Checking discrepancy********"): 
+                    View_Discrepancy(percent_discrepancy_accounts)
             elif len(Total_PL.columns)==1:
                 st.write("There is no previous month data in tenant P&L")
     elif choice=="Manage Mapping":
