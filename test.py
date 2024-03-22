@@ -1008,28 +1008,28 @@ def EPM_Formula(data,value_name): # make sure there is no col on index for data
     data["""="Consistence check:"&AND({}2:{}{})""".format(upload_Check_col_letter,upload_Check_col_letter,row_size+1)]=""
     return data
 
+@st.cache_data	    
+def Diff_Detail_Process(diff_BPC_PL_detail):	    
+    st.markdown("---")
+    st.markdown("P&L—Sabra detail accounts mapping (for discrepancy data)") 
+    diff_BPC_PL_detail = (pd.concat([diff_BPC_PL_detail.groupby(["ENTITY","Sabra_Account","Month","Sabra","Diff (Sabra-P&L)"], as_index=False).sum()
+                      .assign(Tenant_Account=" Total"),diff_BPC_PL_detail]).sort_values(by=["ENTITY","Sabra_Account","Month","Sabra","Diff (Sabra-P&L)"], kind='stable', ignore_index=True)[diff_BPC_PL_detail.columns])
+    diff_BPC_PL_detail=diff_BPC_PL_detail.merge(BPC_Account[["BPC_Account_Name","Sabra_Account_Full_Name"]],left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
+    diff_BPC_PL_detail=diff_BPC_PL_detail.merge(entity_mapping[["Property_Name"]],left_on="ENTITY", right_on="ENTITY",how="left")
+    diff_BPC_PL_detail=diff_BPC_PL_detail[["Property_Name","Month","Sabra_Account_Full_Name","Tenant_Account","Sabra","P&L Value","Diff (Sabra-P&L)"]].\
+			rename(columns={"Property_Name":"Property","Sabra_Account_Full_Name":"Sabra Account"})
+    return diff_BPC_PL_detail
 def View_Discrepancy_Detail():
     global diff_BPC_PL,diff_BPC_PL_detail,Total_PL_detail,Total_PL
     # Sabra detail accounts mapping table
     def color_coding(row):
     	return ['color: blue'] * len(row) if row.Tenant_Account == " Total" else ['color: black'] * len(row)
     
-    @st.cache_data	    
-    def Diff_Detail_Process(diff_BPC_PL_detail):	    
-        st.markdown("---")
-        st.markdown("P&L—Sabra detail accounts mapping (for discrepancy data)") 
-        diff_BPC_PL_detail = (pd.concat([diff_BPC_PL_detail.groupby(["ENTITY","Sabra_Account","Month","Sabra","Diff (Sabra-P&L)"], as_index=False).sum()
-                      .assign(Tenant_Account=" Total"),diff_BPC_PL_detail]).sort_values(by=["ENTITY","Sabra_Account","Month","Sabra","Diff (Sabra-P&L)"], kind='stable', ignore_index=True)[diff_BPC_PL_detail.columns])
-        diff_BPC_PL_detail=diff_BPC_PL_detail.merge(BPC_Account[["BPC_Account_Name","Sabra_Account_Full_Name"]],left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
-        diff_BPC_PL_detail=diff_BPC_PL_detail.merge(entity_mapping[["Property_Name"]],left_on="ENTITY", right_on="ENTITY",how="left")
-        diff_BPC_PL_detail=diff_BPC_PL_detail[["Property_Name","Month","Sabra_Account_Full_Name","Tenant_Account","Sabra","P&L Value","Diff (Sabra-P&L)"]].\
-			rename(columns={"Property_Name":"Property","Sabra_Account_Full_Name":"Sabra Account"})
-        return diff_BPC_PL_detail
     if diff_BPC_PL.shape[0]>0:      
         diff_BPC_PL_detail=Diff_Detail_Process(diff_BPC_PL_detail)    # format it to display
         diff_BPC_PL_detail_for_download=diff_BPC_PL_detail.copy()
         
-        diff_BPC_PL_detail=filters_widgets(diff_BPC_PL_detail,["Property","Month","Sabra Account"],"Horizontal")
+        #diff_BPC_PL_detail=filters_widgets(diff_BPC_PL_detail,["Property","Month","Sabra Account"],"Horizontal")
         diff_BPC_PL_detail=diff_BPC_PL_detail.reset_index(drop=True)
         for i in range(diff_BPC_PL_detail.shape[0]):
             if  diff_BPC_PL_detail.loc[i,"Tenant_Account"]!=" Total":
@@ -1060,9 +1060,7 @@ def View_Discrepancy_Detail():
 
 # don't use cache
 def View_Discrepancy(percent_discrepancy_accounts): 
-    global diff_BPC_PL
-    edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>10] 
-	
+    global diff_BPC_PL	 
     if percent_discrepancy_accounts>0:
         # save all the discrepancy 
         diff_BPC_PL["Operator"]=operator
@@ -1119,8 +1117,8 @@ def View_Discrepancy(percent_discrepancy_accounts):
     else:
             st.success("All previous data in P&L ties with Sabra data")
 
-@st.cache_data(experimental_allow_widgets=True)      
-def Identify_Property_Name_Header(PL,entity_list,sheet_name):
+@st.cache_data
+def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties are in one sheet
     #	Property_Name_Finance and entity_list has same order
     property_name_list_in_mapping = entity_mapping.loc[entity_list]["Property_Name_Finance"].tolist()    
     property_name_list_in_mapping=list(map(lambda x: x.upper().strip() if not pd.isna(x) and isinstance(x, str)  else x,property_name_list_in_mapping))     
@@ -1152,7 +1150,7 @@ def Identify_Reporting_Month(PL,entity_header_row_number):
                 return "{}{}".format(year,month)
     return "reporting_month_TBD"
 
-@st.cache_data(experimental_allow_widgets=True)        
+#@st.cache_data(experimental_allow_widgets=True)        
 def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):  
     global latest_month,account_mapping
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
