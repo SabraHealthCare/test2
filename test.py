@@ -1111,7 +1111,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
                     # insert comments to diff_BPC_PL
                     diff_BPC_PL=pd.merge(diff_BPC_PL,edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Type comments below"]],on=["Property_Name","TIME","Sabra_Account_Full_Name"],how="left")
                     Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,"P&L")
-            View_Discrepancy_Detail()
+            #View_Discrepancy_Detail()
         else:
             st.success("All previous data in P&L ties with Sabra data")
     else:
@@ -1598,7 +1598,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         with st.expander("Discrepancy for Historic Data",expanded=True):
             ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
             if len(Total_PL.columns)>1:	
-                with st.spinner("********Checking discrepancy********"): 
+                with st.spinner("********Running discrepancy check********"): 
                     View_Discrepancy(percent_discrepancy_accounts)
             elif len(Total_PL.columns)==1:
                 st.write("There is no previous month data in tenant P&L")
