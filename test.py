@@ -1104,10 +1104,9 @@ def View_Discrepancy(percent_discrepancy_accounts):
                 download_report(edited_diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)","Type comments below"]],"discrepancy_{}".format(operator))
         
             with col2:
-
                 submit_com=st.button("Submit comments")
             if submit_com:
-                with st.empty():
+                #with st.empty():
                     with col3:
                         st.markdown("✔️ :green[Comments uploaded]")
                         st.write(" ")
