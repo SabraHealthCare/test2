@@ -111,7 +111,7 @@ def Save_as_CSV_Onedrive(df,path,file_name):
 
 
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
-
+@st.cache_data
 def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # replace original data
     if True:
         original_data =Read_CSV_From_Onedrive(path,file_name)
