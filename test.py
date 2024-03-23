@@ -673,7 +673,7 @@ def Manage_Entity_Mapping(operator):
         Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
         return entity_mapping
 
-#@st.cache_data
+@st.cache_data(experimental_allow_widgets=True)
 def Manage_Account_Mapping(new_tenant_account):
     with st.form(key=new_tenant_account):
         col1,col2=st.columns(2) 
@@ -1312,22 +1312,42 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
-            st.stop()    
+            st.stop()   
+
         date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
         if len(date_header[0])==1 and date_header[0]==[0]:
             st.error("Fail to identify month/year header in sheet '{}', please add it and re-upload.".format(sheet_name))
             st.stop()     
-
+	    
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
-        # Filter out the columns where the ith row is not equal to 0
+        #remove row above date
+        PL=PL.iloc[date_header[1]+1:,:]
+        # mapping new tenant accounts
+        new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
+            
+        if len(new_tenant_account_list)>0:
+            st.warning("Please complete mapping for below new account:")
+		
+            while(new_tenant_account_list):
+                st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[0])) 
+                Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
+                #insert new record to the bottom line of account_mapping
+                new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
+                account_mapping=pd.concat([account_mapping, pd.DataFrame([new_mapping_row],columns=account_mapping.columns)],ignore_index=True)
+                new_tenant_account_list.remove(new_tenant_account_list[0])
+		
+            Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)           
+
+
+	    
+        #set tenant_account as index of PL
+        PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
+        # remove column without date col name, (the date row is not equal to 0)
         non_zero_columns = date_header[0][date_header[0] != "0"].index
-        PL = PL[non_zero_columns]
-        #PL=PL.loc[date_header[1]+1:,] 
-
-        #remove row above date row and remove column without date col name
-
+        PL = PL[non_zero_columns]    
         PL.columns= [value for value in date_header[0] if value != "0"]
+	    
         #remove rows with nan tenant account
         nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
         PL.drop(nan_index, inplace=True)
@@ -1338,26 +1358,15 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
         PL=PL.loc[(PL!= 0).any(axis=1),:]
-        # mapping new tenant accounts
-        new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
-            
-        if len(new_tenant_account_list)>0:
-            st.warning("Please complete mapping for below new account:")
-            for i in range(len(new_tenant_account_list)):
-                st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
-                
-                Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
-               	  
-                #insert new record to the bottom line of account_mapping
-                new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
-                account_mapping=pd.concat([account_mapping, pd.DataFrame([new_mapping_row],columns=account_mapping.columns)],ignore_index=True)
-                Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
-            #if there are duplicated accounts in P&L, ask for confirming
-            dup_tenant_account=set([x for x in PL.index if list(PL.index).count(x) > 1])
-            if len(dup_tenant_account)>0:
-                for dup in dup_tenant_account:
-                    if dup.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"]):
-                        st.warning("Warning: There are more than one '{}' accounts in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
+	    
+        
+     
+        #if there are duplicated accounts in P&L, ask for confirming
+        dup_tenant_account=set([x for x in PL.index if list(PL.index).count(x) > 1])
+        if len(dup_tenant_account)>0:
+            for dup in dup_tenant_account:
+                if dup.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"]):
+                    st.warning("Warning: There are more than one '{}' accounts in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
         
         # Map PL accounts and Sabra account
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
