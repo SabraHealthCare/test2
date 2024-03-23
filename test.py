@@ -863,7 +863,6 @@ def View_Summary():
             st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,check_patient_days.loc[("Operating Beds",property_i),latest_month]))
             problem_properties.append(property_i) 
     if len(problem_properties)>0:
-        #st.write(check_patient_days.loc[(slice(None),problem_properties),latest_month])
         st.dataframe(check_patient_days.loc[(slice(None),problem_properties),latest_month],
 		    column_config={
 			        "Property_Name": "Property",
@@ -966,7 +965,6 @@ def View_Summary():
         upload_latest_month["Operator"]=operator
         if submit_latest_month:
             # save tenant P&L to OneDrive
-
             if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
                 st.write("unsuccess ")  #----------record into error report------------------------	
 
@@ -981,7 +979,7 @@ def View_Summary():
             else:
                 st.write(" ")  #----------record into error report------------------------	
         else:
-            st.stop()
+            st.error("Click button to upload")
        
 # create EPM formula for download data
 def EPM_Formula(data,value_name): # make sure there is no col on index for data
@@ -1020,6 +1018,7 @@ def Diff_Detail_Process(diff_BPC_PL_detail):
     diff_BPC_PL_detail=diff_BPC_PL_detail[["Property_Name","Month","Sabra_Account_Full_Name","Tenant_Account","Sabra","P&L Value","Diff (Sabra-P&L)"]].\
 			rename(columns={"Property_Name":"Property","Sabra_Account_Full_Name":"Sabra Account"})
     return diff_BPC_PL_detail
+
 def View_Discrepancy_Detail():
     global diff_BPC_PL,diff_BPC_PL_detail,Total_PL_detail,Total_PL
     # Sabra detail accounts mapping table
