@@ -1551,6 +1551,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 
             with col2:
                 if BS_separate_excel=="Y":
+			
                     st.subheader("Upload Balance Sheet:")
                     uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
             submitted = st.form_submit_button("Upload")
