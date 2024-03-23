@@ -1113,7 +1113,8 @@ def View_Discrepancy(percent_discrepancy_accounts):
                     # insert comments to diff_BPC_PL
                     diff_BPC_PL=pd.merge(diff_BPC_PL,edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Type comments below"]],on=["Property_Name","TIME","Sabra_Account_Full_Name"],how="left")
                 View_Discrepancy_Detail()
-	    else:
+                submit_com=st.button("Submit comments")
+            else:
                 st.stop()
         else:
             st.success("All previous data in P&L ties with Sabra data")
