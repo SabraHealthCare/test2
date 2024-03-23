@@ -1603,7 +1603,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             if len(Total_PL.columns)>1:	
                 with st.spinner("********Running discrepancy check********"): 
                     View_Discrepancy(percent_discrepancy_accounts)
-                    Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,"P&L")
+                Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,"P&L")
             elif len(Total_PL.columns)==1:
                 st.write("There is no previous month data in tenant P&L")
     elif choice=="Manage Mapping":
