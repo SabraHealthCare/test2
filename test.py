@@ -904,8 +904,7 @@ def View_Summary():
             st.write("or")
         with col3:
             continue_run=st.button("Ignore and Continue", on_click=clicked, args=["continue_button"]) 
-            st.write("")#-----------------------write to error log-----------------------
-        		    
+            st.write("")#-----------------------write to error log-----------------------   
         if not st.session_state.clicked["continue_button"]:
             st.stop()	
 
@@ -955,15 +954,19 @@ def View_Summary():
         col1,col2=st.columns([2,3])
         with col1:
             download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
-        with col2:	
-            submit_latest_month=st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]),key='latest_month')
+        with col2:
+            st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]), on_click=clicked, args=["submit_report"],,key='latest_month')  
+        
+            
         upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
         upload_latest_month["TIME"]=latest_month
         upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
         upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
         upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
         upload_latest_month["Operator"]=operator
-        if submit_latest_month:
+        if not st.session_state.clicked["submit_report"]:
+            st.stop()
+	else:
             # save tenant P&L to OneDrive
             if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
                 st.write("unsuccess ")  #----------record into error report------------------------	
@@ -978,8 +981,6 @@ def View_Summary():
             
             else:
                 st.write(" ")  #----------record into error report------------------------	
-        else:
-            st.error("Click button to upload")
        
 # create EPM formula for download data
 def EPM_Formula(data,value_name): # make sure there is no col on index for data
@@ -1513,7 +1514,7 @@ authenticator = Authenticate(
     )
 # set button status
 if 'clicked' not in st.session_state:
-    st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False,"continue_button":False}
+    st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False,"continue_button":False,"submit_report":False}
 
 # login widget
 col1,col2=st.columns(2)
@@ -1557,7 +1558,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	    # clear cache for every upload
             st.cache_data.clear()
             st.cache_resource.clear()
-            st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False,"continue_button":False}
+            st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False,"continue_button":False,"submit_report":False}
         if uploaded_finance:
             with col1:
                 st.markdown("✔️ :green[P&L selected]")
