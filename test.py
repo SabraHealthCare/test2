@@ -1061,16 +1061,14 @@ def View_Discrepancy_Detail():
 # don't use cache
 def View_Discrepancy(percent_discrepancy_accounts): 
     global diff_BPC_PL	
-    st.write(1)
+
     if percent_discrepancy_accounts>0:
         # save all the discrepancy 
         diff_BPC_PL["Operator"]=operator
         diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
 	# insert dims to diff_BPC_PL
         diff_BPC_PL["TIME"]=diff_BPC_PL["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
-        st.write(2)
-        Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,"P&L")
-        st.write(3)
+
 	    
 	# only display the big discrepancy
         edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>10] 
@@ -1099,14 +1097,13 @@ def View_Discrepancy(percent_discrepancy_accounts):
 			disabled =False,
             		required =False)
 		}) 
-            st.write(4)
+
             col1,col2,col3=st.columns([2,2,4]) 
             with col1:  
-                st.write(5)
                 download_report(edited_diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)","Type comments below"]],"discrepancy_{}".format(operator))
         
             with col2:
-                st.write(6)
+
                 submit_com=st.button("Submit comments")
             if submit_com:
                 with st.empty():
@@ -1116,7 +1113,8 @@ def View_Discrepancy(percent_discrepancy_accounts):
                     # insert comments to diff_BPC_PL
                     diff_BPC_PL=pd.merge(diff_BPC_PL,edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Type comments below"]],on=["Property_Name","TIME","Sabra_Account_Full_Name"],how="left")
                     #Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,"P&L")
-            #View_Discrepancy_Detail()
+            View_Discrepancy_Detail()
+            Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,"P&L")
         else:
             st.success("All previous data in P&L ties with Sabra data")
     else:
