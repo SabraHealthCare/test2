@@ -190,7 +190,7 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
 def clicked(button_name):
     st.session_state.clicked[button_name] = True
 
-#@st.cache_data
+@st.cache_data
 def Initial_Paramaters(operator):
     # drop down list of operator
     if operator!="Sabra":
@@ -209,7 +209,7 @@ def Initial_Paramaters(operator):
         st.stop()
     return BPC_pull,month_dic,year_dic
 
-#@st.cache_resource
+@st.cache_resource
 def Initial_Mapping(operator):
     # read account mapping
     account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename)
@@ -262,6 +262,7 @@ def colnum_letter(col_number):
         col_number, remainder = divmod(col_number - 1, 26)
         letter = chr(65 + remainder) + letter
     return letter 
+	
 @st.cache_data
 def Create_Tree_Hierarchy(bucket_mapping):
     #Create Tree select hierarchy
@@ -331,8 +332,8 @@ def filters_widgets(df, columns,location="Vertical"):
 
 
 @st.cache_data
-#search tenant account column in P&L, return col number of tenant account	
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
+    #search tenant account column in P&L, return col number of tenant account	
     account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
 
     if sheet_type=="Sheet_Name_Finance":
@@ -355,8 +356,7 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
             max_match_col=tenantAccount_col_no
             max_match=sum(x for x in match)
     if max_match>0:
-        return max_match_col
-         
+        return max_match_col     
     st.error("Fail to identify tenant accounts column in sheet—— '"+sheet_name+"'")
     st.stop()
 
@@ -374,7 +374,7 @@ def Get_Year(single_string):
                 if Year_keyword in single_string:
                     return Year,Year_keyword
         return 0,""
-
+@st.cache_data
 def Get_Month_Year(single_string):
     if single_string!=single_string or single_string==None or type(single_string)==float:
         return 0,0
