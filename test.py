@@ -209,7 +209,7 @@ def Initial_Paramaters(operator):
         st.stop()
     return BPC_pull,month_dic,year_dic
 
-@st.cache_resource
+#@st.cache_resource
 def Initial_Mapping(operator):
     # read account mapping
     account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename)
