@@ -675,7 +675,7 @@ def Manage_Entity_Mapping(operator):
 
 @st.cache_data(experimental_allow_widgets=True)
 def Manage_Account_Mapping(new_tenant_account):
-    with st.form(key=new_tenant_account):
+    with st.form(key=str(new_tenant_account)):
         col1,col2=st.columns(2) 
         with col1:
             st.write("Sabra main account")
