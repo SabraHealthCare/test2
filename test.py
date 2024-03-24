@@ -679,10 +679,10 @@ def Manage_Account_Mapping(new_tenant_account):
         col1,col2=st.columns(2) 
         with col1:
             st.write("Sabra main account")
-            Sabra_main_account=streamlit_tree_select.tree_select(parent_hierarchy_main,only_leaf_checkboxes=True,key=new_tenant_account) 
+            Sabra_main_account=streamlit_tree_select.tree_select(parent_hierarchy_main,only_leaf_checkboxes=True,key=str(new_tenant_account)) 
         with col2:
             st.write("Sabra second account")
-            Sabra_second_account= streamlit_tree_select.tree_select(parent_hierarchy_second,only_leaf_checkboxes=True,key=new_tenant_account+"1")
+            Sabra_second_account= streamlit_tree_select.tree_select(parent_hierarchy_second,only_leaf_checkboxes=True,key=str(new_tenant_account)+"1")
         submitted = st.form_submit_button("Submit")  
     if submitted:
         if len(Sabra_main_account['checked'])==1:
