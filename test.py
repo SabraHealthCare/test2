@@ -726,7 +726,7 @@ def Manage_Account_Mapping(new_tenant_account_list):
             st.stop()
                 
         #insert new record to the bottom line of account_mapping
-        new_accounts_df = pd.DataFrame({'Sabra_Account': Sabra_main_account_value, 'Sabra_Second_Account': Sabra_second_account_value, 'Tenant_Account': new_tenant_account_list,'Tenant_Formated_Account':list(map(lambda x:x.upper().strip() new_tenant_account_list))})
+        new_accounts_df = pd.DataFrame({'Sabra_Account': Sabra_main_account_value, 'Sabra_Second_Account': Sabra_second_account_value, 'Tenant_Account': new_tenant_account_list,'Tenant_Formated_Account':list(map(lambda x:x.upper().strip(), new_tenant_account_list))})
         new_accounts_df["Operator"]=operator
 	
         #new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[0],new_tenant_account_list[0].upper(),"N"]            
