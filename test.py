@@ -698,29 +698,29 @@ def Manage_Account_Mapping(new_tenant_account_list):
             for i in range(count):
                 if len(Sabra_main_account_list[i]['checked'])==1:
                     Sabra_main_account_value[i]=Sabra_main_account_list[i]['checked'][0].upper()          
-            elif len(Sabra_main_account_list[i]['checked'])>1:
-                if len(Sabra_main_account_list[i]['checked'])==2 and Sabra_main_account_list[i]['checked'][0]=="Management Fee":
-                    Sabra_main_account_value[i]="T_MGMT_FEE"  
-                else:
+                elif len(Sabra_main_account_list[i]['checked'])>1:
+                    if len(Sabra_main_account_list[i]['checked'])==2 and Sabra_main_account_list[i]['checked'][0]=="Management Fee":
+                        Sabra_main_account_value[i]="T_MGMT_FEE"  
+                    else:
+                        st.warning("Only one to one mapping is allowed, but {} has more than one mappings.".format(new_tenant_account_list[i]))
+                        st.stop()
+                elif Sabra_main_account_list[i]['checked']==[] and Sabra_second_account_list[i]['checked']==[]:
+                    st.warning("Please select Sabra account for '{}'".format(new_tenant_account_list[i]))
+                    st.stop()
+                elif Sabra_main_account_list[i]['checked']==[]:
+                    Sabra_main_account_value[i]=''
+            
+                if Sabra_second_account_list[i]['checked']==[]:
+                    Sabra_second_account_value[i]=''
+                elif len(Sabra_second_account_list[i]['checked'])==1:
+                    Sabra_second_account_value[i]=Sabra_second_account_list[i]['checked'][0].upper()
+                elif len(Sabra_second_account_list[i]['checked'])>1:
                     st.warning("Only one to one mapping is allowed, but {} has more than one mappings.".format(new_tenant_account_list[i]))
                     st.stop()
-            elif Sabra_main_account_list[i]['checked']==[] and Sabra_second_account_list[i]['checked']==[]:
-                st.warning("Please select Sabra account for '{}'".format(new_tenant_account_list[i]))
-                st.stop()
-            elif Sabra_main_account_list[i]['checked']==[]:
-                Sabra_main_account_value[i]=''
-            
-            if Sabra_second_account_list[i]['checked']==[]:
-                Sabra_second_account_value[i]=''
-            elif len(Sabra_second_account_list[i]['checked'])==1:
-                Sabra_second_account_value[i]=Sabra_second_account_list[i]['checked'][0].upper()
-            elif len(Sabra_second_account_list[i]['checked'])>1:
-                st.warning("Only one to one mapping is allowed, but {} has more than one mappings.".format(new_tenant_account_list[i]))
-                st.stop()
-            if Sabra_main_account_value[i]=="NO NEED TO MAP":
-                st.success("{} was successfully saved to 'No need to map' list.".format(new_tenant_account_list[i]))
-            elif Sabra_main_account_value[i]:
-                st.success("Successfully mapped '{}' to '{}'".format(new_tenant_account_list,Sabra_main_account_value[i]))
+                if Sabra_main_account_value[i]=="NO NEED TO MAP":
+                    st.success("{} was successfully saved to 'No need to map' list.".format(new_tenant_account_list[i]))
+                elif Sabra_main_account_value[i]:
+                    st.success("Successfully mapped '{}' to '{}'".format(new_tenant_account_list,Sabra_main_account_value[i]))
 		
         else:
             st.stop()
