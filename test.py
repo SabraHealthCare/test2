@@ -1336,8 +1336,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                 new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[0],new_tenant_account_list[0].upper(),"N"]            
                 account_mapping=pd.concat([account_mapping, pd.DataFrame([new_mapping_row],columns=account_mapping.columns)],ignore_index=True)
                 new_tenant_account_list.remove(new_tenant_account_list[0])
-                if len(new_tenant_account_list)==0:
-                    Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
+                #if len(new_tenant_account_list)==0:
+                Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
        	    
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
