@@ -1325,7 +1325,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         PL=PL.iloc[date_header[1]+1:,:]
         # mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),[value for value in PL.index if value !=" " and value==value and  value is not None and value != '' and not pd.isna(value)]))
-            
+        new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
             st.warning("Please complete mapping for below new account:")
 		
