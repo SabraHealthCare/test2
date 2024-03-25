@@ -697,7 +697,7 @@ def Manage_Account_Mapping(new_tenant_account_list):
         if submitted:
             for i in range(count):
                 if len(Sabra_main_account_list[i]['checked'])==1:
-                Sabra_main_account_value[i]=Sabra_main_account_list[i]['checked'][0].upper()          
+                    Sabra_main_account_value[i]=Sabra_main_account_list[i]['checked'][0].upper()          
             elif len(Sabra_main_account_list[i]['checked'])>1:
                 if len(Sabra_main_account_list[i]['checked'])==2 and Sabra_main_account_list[i]['checked'][0]=="Management Fee":
                     Sabra_main_account_value[i]="T_MGMT_FEE"  
