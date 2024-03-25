@@ -674,46 +674,66 @@ def Manage_Entity_Mapping(operator):
         return entity_mapping
 
 #@st.cache_data(experimental_allow_widgets=True)
-def Manage_Account_Mapping(new_tenant_account):
-    with st.form(key=str(new_tenant_account)):
-        col1,col2=st.columns(2) 
-        with col1:
-            st.write("Sabra main account")
-            Sabra_main_account=streamlit_tree_select.tree_select(parent_hierarchy_main,only_leaf_checkboxes=True,key=str(new_tenant_account)) 
-        with col2:
-            st.write("Sabra second account")
-            Sabra_second_account= streamlit_tree_select.tree_select(parent_hierarchy_second,only_leaf_checkboxes=True,key=str(new_tenant_account)+"1")
-        submitted = st.form_submit_button("Submit")  
-    if submitted:
-        if len(Sabra_main_account['checked'])==1:
-            Sabra_main_account_value=Sabra_main_account['checked'][0].upper()          
-        elif len(Sabra_main_account['checked'])>1:
-            if len(Sabra_main_account['checked'])==2 and Sabra_main_account['checked'][0]=="Management Fee":
-                Sabra_main_account_value="T_MGMT_FEE"  
-            else:
-                st.warning("Only one to one mapping is allowed.")
+def Manage_Account_Mapping(new_tenant_account_list):
+    global account_mapping
+    st.warning("Please complete mapping for below new account:")
+    i=0
+    count=len(new_tenant_account_list)
+    Sabra_main_account_list=[np.nan] * count
+    Sabra_second_account_list=[np.nan] * count
+    Sabra_main_account_value=[np.nan] * count
+    Sabra_second_account_value=[np.nan] * count
+    with st.form(key="Mapping_new_accounts"):
+        for i in range(count):
+            st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
+            col1,col2=st.columns(2) 
+            with col1:
+                st.write("Sabra main account")
+                Sabra_main_account_list[i]=streamlit_tree_select.tree_select(parent_hierarchy_main,only_leaf_checkboxes=True,key=str(new_tenant_account)) 
+            with col2:
+                st.write("Sabra second account")
+                Sabra_second_account_list[i]= streamlit_tree_select.tree_select(parent_hierarchy_second,only_leaf_checkboxes=True,key=str(new_tenant_account)+"1")
+        submitted = st.form_submit_button("Submit")          
+        if submitted:
+            for i in range(count):
+                if len(Sabra_main_account_list[i]['checked'])==1:
+                Sabra_main_account_value[i]=Sabra_main_account_list[i]['checked'][0].upper()          
+            elif len(Sabra_main_account_list[i]['checked'])>1:
+                if len(Sabra_main_account_list[i]['checked'])==2 and Sabra_main_account_list[i]['checked'][0]=="Management Fee":
+                    Sabra_main_account_value[i]="T_MGMT_FEE"  
+                else:
+                    st.warning("Only one to one mapping is allowed, but {} has more than one mappings.".format(new_tenant_account_list[i]))
+                    st.stop()
+            elif Sabra_main_account_list[i]['checked']==[] and Sabra_second_account_list[i]['checked']==[]:
+                st.warning("Please select Sabra account for '{}'".format(new_tenant_account_list[i]))
                 st.stop()
-        elif Sabra_main_account['checked']==[] and Sabra_second_account['checked']==[]:
-            st.warning("Please select Sabra account for '{}'".format(new_tenant_account))
-            st.stop()
-        elif Sabra_main_account['checked']==[]:
-            Sabra_main_account_value=''
+            elif Sabra_main_account_list[i]['checked']==[]:
+                Sabra_main_account_value[i]=''
             
-        if Sabra_second_account['checked']==[]:
-            Sabra_second_account_value=''
-        elif len(Sabra_second_account['checked'])==1:
-            Sabra_second_account_value=Sabra_second_account['checked'][0].upper()
-        elif len(Sabra_second_account['checked'])>1:
-            st.warning("Only one to one mapping is allowed.")
+            if Sabra_second_account_list[i]['checked']==[]:
+                Sabra_second_account_value[i]=''
+            elif len(Sabra_second_account_list[i]['checked'])==1:
+                Sabra_second_account_value[i]=Sabra_second_account_list[i]['checked'][0].upper()
+            elif len(Sabra_second_account_list[i]['checked'])>1:
+                st.warning("Only one to one mapping is allowed, but {} has more than one mappings.".format(new_tenant_account_list[i]))
+                st.stop()
+            if Sabra_main_account_value[i]=="NO NEED TO MAP":
+                st.success("{} was successfully saved to 'No need to map' list.".format(new_tenant_account_list[i]))
+            elif Sabra_main_account_value[i]:
+                st.success("Successfully mapped '{}' to '{}'".format(new_tenant_account_list,Sabra_main_account_value[i]))
+		
+        else:
             st.stop()
-    else:
-        st.stop()
                 
-    if Sabra_main_account_value=="NO NEED TO MAP":
-        st.success("{} was successfully saved to 'No need to map' list.".format(new_tenant_account))
-    elif Sabra_main_account_value:
-        st.success("Successfully mapped '{}' to '{}'".format(new_tenant_account,Sabra_main_account_value))
-    return Sabra_main_account_value,Sabra_second_account_value
+        #insert new record to the bottom line of account_mapping
+        new_accounts_df = pd.DataFrame({'Sabra_Account': Sabra_main_account_value, 'Sabra_Second_Account': Sabra_second_account_value, 'Tenant_Account': new_tenant_account_list,'Tenant_Formated_Account':list(map(lambda x:x.upper().strip() new_tenant_account_list))})
+        new_accounts_df["Operator"]=operator
+	
+        #new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[0],new_tenant_account_list[0].upper(),"N"]            
+        account_mapping=pd.concat([account_mapping, new_accounts_df],ignore_index=True)
+        Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
+    
+    return account_mapping
 
 
 @st.cache_data 
@@ -1327,18 +1347,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),[value for value in PL.index if value !=" " and value==value and  value is not None and value != '' and not pd.isna(value)]))
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
-            st.warning("Please complete mapping for below new account:")
-		
-            while(new_tenant_account_list):
-                st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[0])) 
-                Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[0])
-                #insert new record to the bottom line of account_mapping
-                new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[0],new_tenant_account_list[0].upper(),"N"]            
-                account_mapping=pd.concat([account_mapping, pd.DataFrame([new_mapping_row],columns=account_mapping.columns)],ignore_index=True)
-                new_tenant_account_list.remove(new_tenant_account_list[0])
-                #if len(new_tenant_account_list)==0:
-                Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
-       	    
+            account_mapping=Manage_Account_Mapping(new_tenant_account_list)
+
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         # remove column without date col name, (the date row is not equal to 0)
