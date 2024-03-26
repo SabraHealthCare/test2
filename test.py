@@ -717,11 +717,7 @@ def Manage_Account_Mapping(new_tenant_account_list):
                 elif len(Sabra_second_account_list[i]['checked'])>1:
                     st.warning("Only one to one mapping is allowed, but {} has more than one mappings.".format(new_tenant_account_list[i]))
                     st.stop()
-                if Sabra_main_account_value[i]=="NO NEED TO MAP":
-                    st.success("{} was successfully saved to 'No need to map' list.".format(new_tenant_account_list[i]))
-                elif Sabra_main_account_value[i]:
-                    st.success("Successfully mapped '{}' to '{}'".format(new_tenant_account_list,Sabra_main_account_value[i]))
-		
+	
         else:
             st.stop()
                 
@@ -732,7 +728,7 @@ def Manage_Account_Mapping(new_tenant_account_list):
         #new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[0],new_tenant_account_list[0].upper(),"N"]            
         account_mapping=pd.concat([account_mapping, new_accounts_df],ignore_index=True)
         Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
-    
+        st.success("New accounts mapping were successfully saved.")    
     return account_mapping
 
 
