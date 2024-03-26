@@ -1251,6 +1251,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
        
 
 	# find the reporting month from 0th row to property header row    
+        st.write("PL",PL)
         reporting_month=Identify_Reporting_Month(PL,entity_header_row_number)  
 	#remove row above property header
         PL=PL.iloc[entity_header_row_number+1:,:]
