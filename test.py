@@ -87,7 +87,7 @@ def Read_CSV_From_Onedrive(path,file_name):
             df = pd.read_csv(BytesIO(response.content),encoding='windows-1254')
         elif file_name[-4:].lower()=="xlsx":
             df = pd.read_excel(BytesIO(response.content))
-	if df.empty:
+        if df.empty:
             st.write("The file is empty.")
             return None
         else:
@@ -120,7 +120,9 @@ def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # 
     original_data =Read_CSV_From_Onedrive(path,file_name)
     if original_data is None:
         st.write("Update_File_Onedrive, original vile is empty")
-
+        updated_data=new_data.reset_index(drop=False)
+        new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns))
+        updated_data=updated_data[new_columns_name]	
     else:	    
         if "TIME" in original_data.columns and "TIME" in new_data.columns:
             original_data.TIME = original_data.TIME.astype(str)
@@ -130,11 +132,11 @@ def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # 
         elif "TIME" not in original_data.columns and "TIME" not in new_data.columns:
             original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
 		
-    # append new data to original data
-    new_data=new_data.reset_index(drop=False)
-    new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns))
-    original_data=original_data[new_columns_name]	
-    updated_data = pd.concat([original_data,new_data])
+        # append new data to original data
+        new_data=new_data.reset_index(drop=False)
+        new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns))
+        original_data=original_data[new_columns_name]	
+        updated_data = pd.concat([original_data,new_data])
     if value_name is not False: # set formula 
         updated_data=EPM_Formula(updated_data,value_name)
     return Save_as_CSV_Onedrive(updated_data,path,file_name)
