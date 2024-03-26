@@ -1142,17 +1142,17 @@ def View_Discrepancy(percent_discrepancy_accounts):
 
 @st.cache_data
 def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties are in one sheet
+    # return the row number of property header and mapped_entity, for example: ["0","0",Sxxxx,Sxxxx,"0",Sxxxx,"0"...]
     #	Property_Name_Finance and entity_list has same order
     property_name_list_in_mapping = entity_mapping.loc[entity_list]["Property_Name_Finance"].tolist()    
     property_name_list_in_mapping=list(map(lambda x: x.upper().strip() if not pd.isna(x) and isinstance(x, str)  else x,property_name_list_in_mapping))     
     max_match=[]
     for row_i in range(PL.shape[0]):
-
         canditate_row=list(map(lambda x: x.upper().strip() if not pd.isna(x) and isinstance(x, str)  else x,list(PL.iloc[row_i,:])))        
         match_names = [item for item in canditate_row if item in property_name_list_in_mapping]	
         if len(match_names)==len(property_name_list_in_mapping): # find the property name header row, transfer them into entity id
             mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
-            mapped_entity = [mapping_dict[property] if property in mapping_dict else 0 for property in canditate_row]
+            mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in canditate_row]
             return row_i,mapped_entity
         elif len(match_names)>len(max_match):
             max_match=match_names
@@ -1233,17 +1233,30 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
             st.stop()    
 
         entity_header_row_number,new_entity_header=Identify_Property_Name_Header(PL,entity_list,sheet_name)
-        reporting_month=Identify_Reporting_Month(PL,entity_header_row_number)
-        #set tenant_account as index of PL
-        PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
-        #remove column without entity
-        #header_of_PL_upper = PL.iloc[property_name_header_row_number].apply(lambda x: str(x).upper().strip() if not pd.isna(x) and isinstance(x, str) else x )
         
-        PL.columns=new_entity_header
-        PL = PL.loc[:,entity_list]
+	#set tenant_account as index of PL
+        PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
+        #remove row above property header
+        PL=PL.iloc[entity_header_row_number+1:,:]
+	    
+        # mapping new tenant accounts
+        new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),[value for value in PL.index if value !=" " and value==value and  value is not None and value != '' and not pd.isna(value)]))
+        # remove duplicate new account
+        new_tenant_account_list=list(set(new_tenant_account_list))    
+        if len(new_tenant_account_list)>0:
+            account_mapping=Manage_Account_Mapping(new_tenant_account_list)
 
-	#remove row above header row   
-        #PL=PL.loc[property_name_header_row_number+1:,]    
+	# find the reporting month from 0th row to property header row    
+        reporting_month=Identify_Reporting_Month(PL,entity_header_row_number)
+	    
+        # remove column without property name, (value in property header that equal to 0)
+        non_zero_columns = new_entity_header[new_entity_header!= "0"].index
+        PL = PL[non_zero_columns]    
+        PL.columns= [value for value in new_entity_header if value != "0"]
+	      
+
+
+	    
         #remove rows with nan tenant account
         nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
         PL.drop(nan_index, inplace=True)
@@ -1254,34 +1267,21 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
         PL=PL.loc[(PL!= 0).any(axis=1),:]
-        # mapping new tenant accounts
-        new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
-            
-        if len(new_tenant_account_list)>0:
-            st.warning("Please complete mapping for below account:")
-            for i in range(len(new_tenant_account_list)):
-                st.markdown("## Map **'{}'** in sheet {} to Sabra account".format(new_tenant_account_list[i],sheet_name)) 
-                Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
-		    
-                #insert new record to the bottom line of account_mapping
-                new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]            
-                account_mapping=pd.concat([account_mapping, pd.DataFrame([new_mapping_row],columns=account_mapping.columns)],ignore_index=True)
-                Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
-            #if there are duplicated accounts, ask for confirming
-            dup_tenant_account=set([x for x in PL.index if list(PL.index).count(x) > 1])
-            if len(dup_tenant_account)>0:
-                count=0		    
-                for dup in dup_tenant_account:
-                    if dup.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"]):
-                        count+=1
-                        st.warning("Warning: There are more than one ''{}'' account in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
-                if count>5:
-                    st.error("There are too many duplicated accounts. Please fix them in sheet {} and re_upload".format(sheet_name))
-                    st.stop()
+
+        #if there are duplicated accounts, ask for confirming
+        dup_tenant_account=set([x for x in PL.index if list(PL.index).count(x) > 1])
+        if len(dup_tenant_account)>0:
+            count=0		    
+            for dup in dup_tenant_account:
+                if dup.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"]):
+                    count+=1
+                    st.warning("Warning: There are more than one ''{}'' account in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
+            if count>5:
+                st.error("There are too many duplicated accounts. Please fix them in sheet {} and re_upload".format(sheet_name))
+                st.stop()
         # Map PL accounts and Sabra account
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
         PL.rename(columns={"value":reporting_month},inplace=True)
-
         PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
     return PL,PL_with_detail
 
