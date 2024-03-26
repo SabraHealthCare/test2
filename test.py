@@ -999,8 +999,8 @@ def View_Summary():
                 if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
                     st.write(" unsuccess")  #----------record into error report------------------------	
             
-            if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_latest_month,operator):
-                st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
+            st.write("tttttttttttttttttttttt", Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_latest_month,operator))
+            st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
             
             else:
                 st.write(" ")  #----------record into error report------------------------	
