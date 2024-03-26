@@ -87,7 +87,11 @@ def Read_CSV_From_Onedrive(path,file_name):
             df = pd.read_csv(BytesIO(response.content),encoding='windows-1254')
         elif file_name[-4:].lower()=="xlsx":
             df = pd.read_excel(BytesIO(response.content))
-        return df
+	if df.empty:
+            st.write("The file is empty.")
+            return None
+        else:
+            return df
     else:
         return False
 
@@ -113,11 +117,11 @@ def Save_as_CSV_Onedrive(df,path,file_name):
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
 @st.cache_data
 def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # replace original data
-    if True:
-        original_data =Read_CSV_From_Onedrive(path,file_name)
-        empty_file=False
+    original_data =Read_CSV_From_Onedrive(path,file_name)
+    if original_data is None:
+        st.write("Update_File_Onedrive, original vile is empty")
 
-    if not empty_file:	    
+    else:	    
         if "TIME" in original_data.columns and "TIME" in new_data.columns:
             original_data.TIME = original_data.TIME.astype(str)
 	    # remove original data by operator and month 
@@ -673,7 +677,7 @@ def Manage_Entity_Mapping(operator):
         Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
         return entity_mapping
 
-#@st.cache_data(experimental_allow_widgets=True)
+# no cache @st.cache_data(experimental_allow_widgets=True)
 def Manage_Account_Mapping(new_tenant_account_list):
     global account_mapping
     st.warning("Please complete mapping for below new account:")
@@ -1249,9 +1253,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         non_zero_columns = new_entity_header[new_entity_header!= "0"].index
         PL = PL[non_zero_columns]    
         PL.columns= [value for value in new_entity_header if value != "0"]
-	      
-
-
 	    
         #remove rows with nan tenant account
         nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
