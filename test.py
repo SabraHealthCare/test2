@@ -1002,8 +1002,8 @@ def View_Summary():
             st.write("tttttttttttttttttttttt", Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_latest_month,operator))
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
             
-            else:
-                st.write(" ")  #----------record into error report------------------------	
+            #else:
+             #   st.write(" ")  #----------record into error report------------------------	
        
 # create EPM formula for download data
 def EPM_Formula(data,value_name): # make sure there is no col on index for data
