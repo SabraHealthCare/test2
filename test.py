@@ -91,7 +91,6 @@ def Read_CSV_From_Onedrive(path,file_name):
                 df = pd.read_excel(BytesIO(response.content))
             return df
         except EmptyDataError:
-            st.write("The CSV file is empty or contains no data.")
             return None
 
     else:
@@ -121,11 +120,10 @@ def Save_as_CSV_Onedrive(df,path,file_name):
 def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # replace original data
     original_data =Read_CSV_From_Onedrive(path,file_name)
     if original_data is None:
-        st.write("Update_File_Onedrive, original vile is empty")
         updated_data=new_data.reset_index(drop=False)
         new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns))
         updated_data=updated_data[new_columns_name]	
-    else:	    
+    elif original_data:	    
         if "TIME" in original_data.columns and "TIME" in new_data.columns:
             original_data.TIME = original_data.TIME.astype(str)
 	    # remove original data by operator and month 
@@ -139,6 +137,7 @@ def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # 
         new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns))
         original_data=original_data[new_columns_name]	
         updated_data = pd.concat([original_data,new_data])
+
     if value_name is not False: # set formula 
         updated_data=EPM_Formula(updated_data,value_name)
     return Save_as_CSV_Onedrive(updated_data,path,file_name)
@@ -1781,11 +1780,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     elif choice=="Review Monthly reporting":
             st.subheader("Summary")
             data=Read_CSV_From_Onedrive(master_template_path,monthly_reporting_filename)
-            #if int(data_obj["ContentLength"])<=2:  # empty file
-            #   st.success("there is no un-uploaded data")
-            #else:
+            #if data is None:  # empty file
+     
             if True:
-                #data=pd.read_csv(BytesIO(data_obj['Body'].read()),header=0)
                 data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
                 data["Upload_Check"]=""
                 # summary for operator upload
