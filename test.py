@@ -119,11 +119,8 @@ def Save_as_CSV_Onedrive(df,path,file_name):
 @st.cache_data
 def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # replace original data
     original_data =Read_CSV_From_Onedrive(path,file_name)
-    if original_data is None:
-        updated_data=new_data.reset_index(drop=False)
-        new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns))
-        updated_data=updated_data[new_columns_name]	
-    elif original_data:	    
+   
+    if  isinstance(original_data, pd.DataFrame):
         if "TIME" in original_data.columns and "TIME" in new_data.columns:
             original_data.TIME = original_data.TIME.astype(str)
 	    # remove original data by operator and month 
@@ -131,12 +128,16 @@ def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # 
             original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))].index)
         elif "TIME" not in original_data.columns and "TIME" not in new_data.columns:
             original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
-		
+	    		
         # append new data to original data
         new_data=new_data.reset_index(drop=False)
         new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns))
         original_data=original_data[new_columns_name]	
         updated_data = pd.concat([original_data,new_data])
+    elif original_data is None:
+        updated_data=new_data.reset_index(drop=False)
+        new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns))
+        updated_data=updated_data[new_columns_name]	
 
     if value_name is not False: # set formula 
         updated_data=EPM_Formula(updated_data,value_name)
@@ -998,12 +999,12 @@ def View_Summary():
                 # save tenant BS to OneDrive
                 if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
                     st.write(" unsuccess")  #----------record into error report------------------------	
+
+            if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_latest_month,operator,False):
+                st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
             
-            Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_latest_month,operator)
-            st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
-            
-            #else:
-             #   st.write(" ")  #----------record into error report------------------------	
+            else:
+                st.write(" ")  #----------record into error report------------------------	
        
 # create EPM formula for download data
 def EPM_Formula(data,value_name): # make sure there is no col on index for data
