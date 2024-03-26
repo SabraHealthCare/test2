@@ -1241,17 +1241,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 	#set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
 
-	    
-        # mapping new tenant accounts
-        new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),[value for value in PL.index[entity_header_row_number+1:] if value !=" " and value==value and  value is not None and value != '' and not pd.isna(value)]))
-        # remove duplicate new account
-        new_tenant_account_list=list(set(new_tenant_account_list))    
-        if len(new_tenant_account_list)>0:
-            account_mapping=Manage_Account_Mapping(new_tenant_account_list)
-       
-
 	# find the reporting month from 0th row to property header row    
-        st.write("PL",PL)
+
         reporting_month=Identify_Reporting_Month(PL,entity_header_row_number)  
 	#remove row above property header
         PL=PL.iloc[entity_header_row_number+1:,:]
@@ -1272,6 +1263,14 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         # remove rows with all nan/0 value
         PL=PL.loc[(PL!= 0).any(axis=1),:]
 
+
+        # mapping new tenant accounts
+        new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
+        # remove duplicate new account
+        new_tenant_account_list=list(set(new_tenant_account_list))    
+        if len(new_tenant_account_list)>0:
+            account_mapping=Manage_Account_Mapping(new_tenant_account_list)
+		
         #if there are duplicated accounts, ask for confirming
         dup_tenant_account=set([x for x in PL.index if list(PL.index).count(x) > 1])
         if len(dup_tenant_account)>0:
@@ -1347,14 +1346,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         #remove row above date
         PL=PL.iloc[date_header[1]+1:,:]
-        # mapping new tenant accounts
-        new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),[value for value in PL.index if value !=" " and value==value and  value is not None and value != '' and not pd.isna(value)]))
-        new_tenant_account_list=list(set(new_tenant_account_list))    
-        if len(new_tenant_account_list)>0:
-            account_mapping=Manage_Account_Mapping(new_tenant_account_list)
 
-        #set tenant_account as index of PL
-        PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         # remove column without date col name, (the date row is not equal to 0)
         non_zero_columns = date_header[0][date_header[0] != "0"].index
         PL = PL[non_zero_columns]    
@@ -1371,7 +1363,11 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         # remove rows with all nan/0 value
         PL=PL.loc[(PL!= 0).any(axis=1),:]
 	    
-        
+        # mapping new tenant accounts
+        new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
+        new_tenant_account_list=list(set(new_tenant_account_list))    
+        if len(new_tenant_account_list)>0:
+            account_mapping=Manage_Account_Mapping(new_tenant_account_list)        
      
         #if there are duplicated accounts in P&L, ask for confirming
         dup_tenant_account=set([x for x in PL.index if list(PL.index).count(x) > 1])
