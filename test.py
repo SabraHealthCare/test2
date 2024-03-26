@@ -21,6 +21,7 @@ from st_aggrid.grid_options_builder import GridOptionsBuilder
 from msal import ConfidentialClientApplication
 import requests
 from itertools import product
+from pandas.errors import EmptyDataError
 s3 = boto3.client('s3')
 
 #---------------------------define parameters--------------------------
