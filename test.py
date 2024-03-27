@@ -1248,9 +1248,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         PL=PL.iloc[entity_header_row_number+1:,:]
 	    
         # remove column without property name, (value in property header that equal to 0)
-        st.write("new_entity_header",new_entity_header)
-        non_zero_columns = new_entity_header[new_entity_header!= "0"].index
-        st.write("PL",PL)
+        non_zero_columns = [val !="0" for val in new_entity_header]
         PL = PL.loc[:,non_zero_columns]    
         PL.columns= [value for value in new_entity_header if value != "0"]
 	    
