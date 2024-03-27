@@ -957,7 +957,7 @@ def View_Summary():
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
             if latest_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 latest_month_data.loc[i,set_empty]=np.nan
-    st.write(2,latest_month_data)		    
+		    
     entity_columns=latest_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
         latest_month_data["Total"] = latest_month_data[entity_columns].sum(axis=1)
@@ -970,7 +970,7 @@ def View_Summary():
         st.write("Reporting months detected in P&L : "+m_str[1:])   
         st.markdown("The reporting month is {}/{}. Reporting data is as below:".format(latest_month[4:6],latest_month[0:4]),unsafe_allow_html=True)
       
-        st.write(3,latest_month_data)
+
         styled_table = (latest_month_data.replace(0,'').fillna('').style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
@@ -1248,7 +1248,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 
 	# find the reporting month from 0th row to property header row    
         reporting_month=Identify_Reporting_Month(PL,entity_header_row_number)  
-        st.write("1",entity_header_row_number,new_entity_header)
 	#remove row above property header
         PL=PL.iloc[entity_header_row_number+1:,:]
 
@@ -1267,7 +1266,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
         PL=PL.loc[(PL!= 0).any(axis=1),:]
-        st.write(3,"PL",PL)   
 
         # mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
