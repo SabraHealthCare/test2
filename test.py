@@ -221,7 +221,7 @@ def Initial_Paramaters(operator):
 def Initial_Mapping(operator):
     # read account mapping
     account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename)
-
+    st.write(5,account_mapping_all)
     account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]==operator]
     st.write(0,account_mapping)
     if account_mapping.shape[0]==1 and account_mapping.loc[0,"Sabra_Account"]=='Template':
