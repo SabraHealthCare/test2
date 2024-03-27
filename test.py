@@ -1160,13 +1160,16 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
             return row_i,mapped_entity
         elif len(match_names)>len(max_match):
             max_match=match_names
+            header_row=canditate_row
     if len(max_match)==0:
         st.error("Can't identify any property name in sheet {}. The property name are supposed to be:{}. Please add and re-upload.".format(sheet_name,",".join(property_name_list_inmapping)))
         st.stop()
     elif len(max_match)>=1:
         not_match_names = [item for item in property_name_list_in_mapping  if item not in max_match]	         
         st.error("Missing property name: {} in sheet {}. Please add and re-upload.".format(",".join(not_match_names),sheet_name))
-        st.stop()
+        mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
+        mapped_entity = [mapping_dict[property] if property in match_names else "0" for property in header_row]
+        return row_i,mapped_entity
 
 @st.cache_data
 def Identify_Reporting_Month(PL,entity_header_row_number):
@@ -1348,9 +1351,10 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         PL=PL.iloc[date_header[1]+1:,:]
 
         # remove column without date col name, (the date row is not equal to 0)
-        non_zero_columns = date_header[0][date_header[0] != "0"].index
-        PL = PL[non_zero_columns]    
+        non_zero_columns = [val !="0" for val in date_header[0]]
+        PL = PL.loc[:,non_zero_columns]   
         PL.columns= [value for value in date_header[0] if value != "0"]
+
 	    
         #remove rows with nan tenant account
         nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
