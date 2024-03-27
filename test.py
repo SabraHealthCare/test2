@@ -1171,7 +1171,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         not_match_names = [item for item in property_name_list_in_mapping  if item not in max_match]	         
         st.error("Missing property: {} in sheet {}. Please add and re-upload.".format(",".join(not_match_names),sheet_name))
         mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
-        mapped_entity = [mapping_dict[property] if property in match_names else "0" for property in header_row]
+        mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
         return max_match_row,mapped_entity
 
 @st.cache_data
@@ -1251,7 +1251,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         st.write("1",entity_header_row_number,new_entity_header)
 	#remove row above property header
         PL=PL.iloc[entity_header_row_number+1:,:]
-        st.write(2,"PL",PL)   
+
         # remove column without property name, (value in property header that equal to 0)
         non_zero_columns = [val !="0" for val in new_entity_header]
         PL = PL.loc[:,non_zero_columns]    
