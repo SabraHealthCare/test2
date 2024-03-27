@@ -1168,7 +1168,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         st.stop()
     elif len(max_match)>=1:
         not_match_names = [item for item in property_name_list_in_mapping  if item not in max_match]	         
-        st.error("Missing property name: {} in sheet {}. Please add and re-upload.".format(",".join(not_match_names),sheet_name))
+        st.error("Missing property: {} in sheet {}. Please add and re-upload.".format(",".join(not_match_names),sheet_name))
         mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
         mapped_entity = [mapping_dict[property] if property in match_names else "0" for property in header_row]
         return row_i,mapped_entity
@@ -1242,7 +1242,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
             st.stop()    
 
         entity_header_row_number,new_entity_header=Identify_Property_Name_Header(PL,entity_list,sheet_name)
-	    
+
 	#set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
 
@@ -1251,7 +1251,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         reporting_month=Identify_Reporting_Month(PL,entity_header_row_number)  
 	#remove row above property header
         PL=PL.iloc[entity_header_row_number+1:,:]
-	    
+        st.write(2,"PL",PL)   
         # remove column without property name, (value in property header that equal to 0)
         non_zero_columns = [val !="0" for val in new_entity_header]
         PL = PL.loc[:,non_zero_columns]    
@@ -1267,7 +1267,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
         PL=PL.loc[(PL!= 0).any(axis=1),:]
-
+        st.write(3,"PL",PL)   
 
         # mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
@@ -1291,6 +1291,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
         PL.rename(columns={"value":reporting_month},inplace=True)
         PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
+        st.write(1,"PL",PL)
     return PL,PL_with_detail
 
 
