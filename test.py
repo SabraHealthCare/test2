@@ -947,7 +947,7 @@ def View_Summary():
     latest_month_data.Category = latest_month_data.Category.astype("category")
     latest_month_data.Category = latest_month_data.Category.cat.set_categories(sorter)
     latest_month_data=latest_month_data.sort_values(["Category"]) 
-    
+    st.write(1,latest_month_data)
     latest_month_data = pd.concat([latest_month_data.groupby(by='Category',as_index=False).sum().assign(Sabra_Account="Total_Sabra"),latest_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns]     
     set_empty=list(latest_month_data.columns)
     set_empty.remove("Category")
@@ -957,21 +957,20 @@ def View_Summary():
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
             if latest_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 latest_month_data.loc[i,set_empty]=np.nan
-		    
+    st.write(2,latest_month_data)		    
     entity_columns=latest_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
         latest_month_data["Total"] = latest_month_data[entity_columns].sum(axis=1)
         latest_month_data=latest_month_data[["Sabra_Account","Total"]+list(entity_columns)]
     else:
-        latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]
-   
+        latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]   
 	
     with st.expander("Summary of P&L" ,expanded=True):
         ChangeWidgetFontSize('Summary of P&L', '25px')
         st.write("Reporting months detected in P&L : "+m_str[1:])   
         st.markdown("The reporting month is {}/{}. Reporting data is as below:".format(latest_month[4:6],latest_month[0:4]),unsafe_allow_html=True)
       
-
+        st.write(3,latest_month_data)
         styled_table = (latest_month_data.replace(0,'').fillna('').style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
