@@ -1399,6 +1399,7 @@ def Check_Reporting_Month(PL):
         current_date=str(current_year)+str(current_month)
     reporting_month_list=list(map(lambda x:str(x),PL.columns))	
     latest_month=max(reporting_month_list)
+    st.write("1",latest_month)
     if latest_month!="reporting_month_TBD":
         st.write("The reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
         col4,col5,col6=st.columns([3,2,22])
