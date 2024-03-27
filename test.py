@@ -947,7 +947,7 @@ def View_Summary():
     latest_month_data.Category = latest_month_data.Category.astype("category")
     latest_month_data.Category = latest_month_data.Category.cat.set_categories(sorter)
     latest_month_data=latest_month_data.sort_values(["Category"]) 
-    st.write(1,latest_month_data)
+
     latest_month_data = pd.concat([latest_month_data.groupby(by='Category',as_index=False).sum().assign(Sabra_Account="Total_Sabra"),latest_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns]     
     set_empty=list(latest_month_data.columns)
     set_empty.remove("Category")
@@ -1247,7 +1247,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 
 	# find the reporting month from 0th row to property header row    
         reporting_month=Identify_Reporting_Month(PL,entity_header_row_number)  
-        st.write("1",entity_header_row_number,PL)
+        st.write("1",entity_header_row_number,new_entity_header)
 	#remove row above property header
         PL=PL.iloc[entity_header_row_number+1:,:]
         st.write(2,"PL",PL)   
@@ -1290,7 +1290,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
         PL.rename(columns={"value":reporting_month},inplace=True)
         PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
-        st.write(1,"PL",PL)
+
     return PL,PL_with_detail
 
 
