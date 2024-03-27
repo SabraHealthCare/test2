@@ -1242,10 +1242,10 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
             st.stop()    
 
         entity_header_row_number,new_entity_header=Identify_Property_Name_Header(PL,entity_list,sheet_name)
-
+        st.write(4,"PL",PL)   
 	#set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
-
+        st.write(5,"PL",PL)   
 	# find the reporting month from 0th row to property header row    
 
         reporting_month=Identify_Reporting_Month(PL,entity_header_row_number)  
