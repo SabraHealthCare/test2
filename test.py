@@ -1295,7 +1295,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
         PL.rename(columns={"value":reporting_month},inplace=True)
         PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
-        st.write("PL",PL)
     return PL,PL_with_detail
 
 
@@ -1509,6 +1508,7 @@ def Upload_And_Process(uploaded_file,file_type):
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
+                    st.write("PL1,",PL)
                     # check if census data in another sheet
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
