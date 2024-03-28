@@ -1307,7 +1307,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         try:		
             PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
             break
-        except:
+        except: 
             col1,col2=st.columns(2) 
             with col1: 
                 if sheet_type=="Sheet_Name_Finance":  
