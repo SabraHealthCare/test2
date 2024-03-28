@@ -1529,8 +1529,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 total_entity_list=[x for x in total_entity_list if x not in entity_list]
                 
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
-            Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
-            st.write("Total_PL0,",Total_PL)    
+            Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)    
     return Total_PL,Total_PL_detail
 
 #----------------------------------website widges------------------------------------
