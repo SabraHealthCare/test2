@@ -1183,7 +1183,7 @@ def Identify_Reporting_Month(PL,entity_header_row_number):
             if month>0 and year>0:
                 if month<10:
                     return "{}0{}".format(year,month)      
-		else:
+                else:
                     return "{}{}".format(year,month)
     return "reporting_month_TBD"
 
