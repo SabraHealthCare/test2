@@ -854,6 +854,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
 @st.cache_data(experimental_allow_widgets=True)
 def View_Summary():
     global Total_PL
+    st.write("Total_PL",Total_PL)
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     def color_missing(data):
