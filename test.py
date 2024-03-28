@@ -1253,6 +1253,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 
 	# find the reporting month from 0th row to property header row    
         reporting_month=Identify_Reporting_Month(PL,entity_header_row_number)  
+        st.write("reporting_month",reporting_month)
 	#remove row above property header
         PL=PL.iloc[entity_header_row_number+1:,:]
 
@@ -1294,7 +1295,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
         PL.rename(columns={"value":reporting_month},inplace=True)
         PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
-
+        st.write("PL",PL)
     return PL,PL_with_detail
 
 
