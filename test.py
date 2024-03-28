@@ -1181,7 +1181,10 @@ def Identify_Reporting_Month(PL,entity_header_row_number):
         for col_i in range(PL.shape[1]):
             month,year=Get_Month_Year(PL.iloc[row_i,col_i])   
             if month>0 and year>0:
-                return "{}{}".format(year,month)
+                if month<10:
+                    return "{}0{}".format(year,month)      
+		else:
+                    return "{}{}".format(year,month)
     return "reporting_month_TBD"
 
 #@st.cache_data(experimental_allow_widgets=True)        
