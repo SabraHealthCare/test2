@@ -1415,23 +1415,25 @@ def Check_Reporting_Month(PL):
                 st.stop()
             return latest_month
         elif st.session_state.clicked["no_button"]:
-            with st.form("latest_month"):
-                col1,col2=st.columns(2)
-                with col1:		    
-                    if len(reporting_month_list)>1:		    
-                        latest_month = st.selectbox('Select reporting month from P&L:', list(map(lambda x:x[0:4]+"/"+x[4:6],reporting_month_list)))
-                        latest_month=latest_month[0:4]+latest_month[5:7]
-	
-                    elif len(reporting_month_list)==1:	
-                        col3,col4=st.columns(2)
-                        with col3:
-                            selected_year = st.selectbox("Year", range(current_year, current_year-2,-1))
-                        with col4:    
-                            selected_month = st.selectbox("Month", [str(month).zfill(2) for month in range(1, 13)])
-                            latest_month=str(selected_year)+str(selected_month)
- 
-                confirm_select=st.form_submit_button("Submit")
-            if confirm_select:
+            st.write("Please select reporting month:")
+            col7,col8=st.columns([1,1])
+            with col7:
+                with st.form("latest_month"):
+                    col9,col10=st.columns([1,1])
+                    with col9:
+                        if len(reporting_month_list)>1:		    
+                            latest_month = st.selectbox('Select reporting month from P&L:', list(map(lambda x:x[0:4]+"/"+x[4:6],reporting_month_list)))
+                            latest_month=latest_month[0:4]+latest_month[5:7]
+                        elif len(reporting_month_list)==1:	
+                            col3,col4=st.columns(2)
+                            with col3:
+                                selected_year = st.selectbox("Year", range(current_year, current_year-2,-1))
+                            with col4:    
+                                selected_month = st.selectbox("Month", [str(month).zfill(2) for month in range(1, 13)])
+                                latest_month=str(selected_year)+str(selected_month)
+                    st.form_submit_button("Submit",on_click=clicked, args=["submit_reporting_date"])
+
+            if st.session_state.clicked["submit_reporting_date"]:
                 if latest_month>=current_date:
                     st.write("latest_month,current_date",latest_month,current_date)
                     st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
