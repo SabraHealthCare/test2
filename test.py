@@ -1448,7 +1448,7 @@ def Check_Reporting_Month(PL):
             with st.form("latest_month_TBD"):
                 col9,col10=st.columns([1,1])
                 with col9:
-                    selected_year = st.selectbox("Select Year", range(current_year - 1, current_year + 1))
+                    selected_year = st.selectbox("Select Year", range(current_year, current_year-2,-1))
                 with col10:
                     selected_month = st.selectbox("Select Month", [str(month).zfill(2) for month in range(1, 13)])
                     latest_month=str(selected_year)+str(selected_month)
