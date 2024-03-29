@@ -1425,9 +1425,9 @@ def Check_Reporting_Month(PL):
                     elif len(reporting_month_list)==1:	
                         col3,col4=st.columns(2)
                         with col3:
-                            selected_year = st.selectbox("Select Year", range(current_year - 1, current_year + 1))
+                            selected_year = st.selectbox("Year", range(current_year, current_year-2,-1))
                         with col4:    
-                            selected_month = st.selectbox("Select Month", [str(month).zfill(2) for month in range(1, 13)])
+                            selected_month = st.selectbox("Month", [str(month).zfill(2) for month in range(1, 13)])
                             latest_month=str(selected_year)+str(selected_month)
  
                 confirm_select=st.form_submit_button("Submit")
@@ -1448,9 +1448,9 @@ def Check_Reporting_Month(PL):
             with st.form("latest_month_TBD"):
                 col9,col10=st.columns([1,1])
                 with col9:
-                    selected_year = st.selectbox("Select Year", range(current_year, current_year-2,-1))
+                    selected_year = st.selectbox("Year", range(current_year, current_year-2,-1))
                 with col10:
-                    selected_month = st.selectbox("Select Month", [str(month).zfill(2) for month in range(1, 13)])
+                    selected_month = st.selectbox("Month", [str(month).zfill(2) for month in range(1, 13)])
                     latest_month=str(selected_year)+str(selected_month)
                 st.form_submit_button("Submit",on_click=clicked, args=["submit_reporting_date"])
 	     
