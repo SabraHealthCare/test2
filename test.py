@@ -854,7 +854,6 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
 @st.cache_data(experimental_allow_widgets=True)
 def View_Summary():
     global Total_PL
-    st.write("Total_PL",Total_PL)
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     def color_missing(data):
@@ -1433,7 +1432,6 @@ def Check_Reporting_Month(PL):
  
                 confirm_select=st.form_submit_button("Submit")
             if confirm_select:
-		    
                 if latest_month>=current_date:
                     st.write("latest_month,current_date",latest_month,current_date)
                     st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
@@ -1454,8 +1452,9 @@ def Check_Reporting_Month(PL):
                 with col10:
                     selected_month = st.selectbox("Select Month", [str(month).zfill(2) for month in range(1, 13)])
                     latest_month=str(selected_year)+str(selected_month)
-                confirm_select=st.form_submit_button("Submit")
-        if confirm_select:
+                st.form_submit_button("Submit",on_click=clicked, args=["submit_reporting_date"])
+	     
+        if st.session_state.clicked["submit_reporting_date"]:
             if latest_month>=current_date:
                 st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
                 st.stop()
@@ -1544,10 +1543,12 @@ authenticator = Authenticate(
         config['cookie']['expiry_days'],
         config['preauthorized']
     )
-# set button status
-if 'clicked' not in st.session_state:
-    st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False,"continue_button":False,"submit_report":False}
 
+# set button status
+button_initial_state={"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False,"continue_button":False,"submit_report":False,"submit_reporting_date":False}
+
+if 'clicked' not in st.session_state:
+    st.session_state.clicked = button_initial_state
 # login widget
 col1,col2=st.columns(2)
 with col1:
@@ -1591,7 +1592,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	    # clear cache for every upload
             st.cache_data.clear()
             st.cache_resource.clear()
-            st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False,"continue_button":False,"submit_report":False}
+            st.session_state.clicked = button_initial_state
         if uploaded_finance:
             with col1:
                 st.markdown("✔️ :green[P&L selected]")
@@ -1599,7 +1600,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.write("P&L wasn't upload.")
             st.stop()
  
-	    
         if BS_separate_excel=="Y" and uploaded_BS:
             with col2:
                 st.markdown("✔️ :green[Balance sheet selected]")
