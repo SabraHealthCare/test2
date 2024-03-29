@@ -1425,10 +1425,8 @@ def Check_Reporting_Month(PL):
                             latest_month = st.selectbox('Select reporting month from P&L:', list(map(lambda x:x[0:4]+"/"+x[4:6],reporting_month_list)))
                             latest_month=latest_month[0:4]+latest_month[5:7]
                         elif len(reporting_month_list)==1:	
-                            col3,col4=st.columns(2)
-                            with col3:
                                 selected_year = st.selectbox("Year", range(current_year, current_year-2,-1))
-                            with col4:    
+                            with col10:    
                                 selected_month = st.selectbox("Month", [str(month).zfill(2) for month in range(1, 13)])
                                 latest_month=str(selected_year)+str(selected_month)
                     st.form_submit_button("Submit",on_click=clicked, args=["submit_reporting_date"])
