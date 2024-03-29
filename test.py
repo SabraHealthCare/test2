@@ -1445,7 +1445,9 @@ def Check_Reporting_Month(PL):
         else:
             st.stop()
     elif  latest_month=="reporting_month_TBD" :
+	
         with st.form("latest_month_TBD"):
+            st.write('Please select reporting month:)
             col7,col8=st.columns([1,3])
             with col7:
                 selected_year = st.selectbox("Select Year", range(current_year - 1, current_year + 1))
@@ -1508,7 +1510,6 @@ def Upload_And_Process(uploaded_file,file_type):
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
-                    st.write(1,PL)
                     # check if census data in another sheet
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
@@ -1530,7 +1531,6 @@ def Upload_And_Process(uploaded_file,file_type):
                 
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)    
-            st.write(2,PL)
     return Total_PL,Total_PL_detail
 
 #----------------------------------website widges------------------------------------
@@ -1609,7 +1609,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.stop()
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
-            st.write("3Total_PL",Total_PL)
+
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             # process Finance 
             with st.spinner('Wait for P&L process'):
@@ -1623,7 +1623,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         
         with st.spinner('Wait for data checking'):    
             latest_month=Check_Reporting_Month(Total_PL)
-            st.write("latest_month",latest_month)
             if len(Total_PL.columns)==1:
                 Total_PL.columns=[latest_month]
             elif len(Total_PL.columns)>1:  # there are previous months in P&L
