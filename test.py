@@ -1445,15 +1445,16 @@ def Check_Reporting_Month(PL):
         else:
             st.stop()
     elif  latest_month=="reporting_month_TBD" :
-	
-        with st.form("latest_month_TBD"):
-            st.write("Please select reporting month:")
-            col7,col8=st.columns([1,3])
-            with col7:
-                selected_year = st.selectbox("Select Year", range(current_year - 1, current_year + 1))
-            with col8:
-                selected_month = st.selectbox("Select Month", [str(month).zfill(2) for month in range(1, 13)])
-                latest_month=str(selected_year)+str(selected_month)
+        st.write("Please select reporting month:")
+        col7,col8=st.columns([1,1])
+        with col7:
+            with st.form("latest_month_TBD"):
+                col9,col10=st.columns([1,1])
+                with col9:
+                    selected_year = st.selectbox("Select Year", range(current_year - 1, current_year + 1))
+                with col10:
+                    selected_month = st.selectbox("Select Month", [str(month).zfill(2) for month in range(1, 13)])
+                    latest_month=str(selected_year)+str(selected_month)
                 confirm_select=st.form_submit_button("Submit")
         if confirm_select:
             if latest_month>=current_date:
