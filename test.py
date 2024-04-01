@@ -994,15 +994,7 @@ def View_Summary():
         if not st.session_state.clicked["submit_report"]:
             st.stop()
         else:
-            # save tenant P&L to OneDrive
-            if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
-                st.write("unsuccess ")  #----------record into error report------------------------	
-
-            if BS_separate_excel=="Y":
-                # save tenant BS to OneDrive
-                if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
-                    st.write(" unsuccess")  #----------record into error report------------------------	
-
+            # save latest month data to OneDrive
             if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_latest_month,operator,False):
                 st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
             
@@ -1140,8 +1132,8 @@ def View_Discrepancy(percent_discrepancy_accounts):
                         st.write(" ")
                     # insert comments to diff_BPC_PL
                     diff_BPC_PL=pd.merge(diff_BPC_PL,edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Type comments below"]],on=["Property_Name","TIME","Sabra_Account_Full_Name"],how="left")
- 
-                submit_com=st.button("Submit comments")
+                    st.write(diff_BPC_PL)
+
         else:
             st.success("All previous data in P&L ties with Sabra data")
     else:
@@ -1637,10 +1629,20 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             if len(Total_PL.columns)>1:	
                 with st.spinner("********Running discrepancy check********"): 
                     View_Discrepancy(percent_discrepancy_accounts)
-                Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,"P&L")
-
+                
             elif len(Total_PL.columns)==1:
                 st.write("There is no previous month data in tenant P&L")
+		    
+        Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,"P&L")
+        # save original tenant P&L to OneDrive
+        if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
+            st.write("unsuccess ")  #----------record into error report------------------------	
+
+        if BS_separate_excel=="Y":
+            # save tenant BS to OneDrive
+            if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
+                st.write(" unsuccess")  #----------record into error report------------------------	
+
     elif choice=="Manage Mapping":
         BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
         entity_mapping,account_mapping=Initial_Mapping(operator)
