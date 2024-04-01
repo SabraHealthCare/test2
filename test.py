@@ -132,8 +132,8 @@ def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # 
         # append new data to original data
         new_data=new_data.reset_index(drop=False)
         new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns))
-        original_data=original_data[new_columns_name]	
         updated_data = pd.concat([original_data,new_data])
+        updated_data=updated_data[new_columns_name]
     elif original_data is None:
         updated_data=new_data.reset_index(drop=False)
         new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns))
