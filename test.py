@@ -872,27 +872,36 @@ def View_Summary():
     # check patient days ( available days > patient days)	
     check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(["A_ACH","A_IL","A_ALZ","A_SNF","A_ALF"])) | (latest_month_data["Category"]=='Patient Days')]
     check_patient_days['Category'] = check_patient_days['Category'].replace('Facility Information', 'Operating Beds')
-    st.write("check_patient_days",check_patient_days)
+
     check_patient_days=check_patient_days[["Category","Property_Name",latest_month]].groupby(["Category","Property_Name"]).sum()
     check_patient_days.fillna(0, inplace=True)
-    st.write("check_patient_days",check_patient_days)
+
     problem_properties=[]
     zero_patient_days=[]
-    st.write("latest_month_data",latest_month_data)
+
     month_days=monthrange(int(latest_month[:4]), int(latest_month[4:]))[1]
     for property_i in latest_month_data["Property_Name"].unique():
-        if check_patient_days.loc[("Patient Days",property_i),latest_month]>0 and check_patient_days.loc[("Operating Beds",property_i),latest_month]*month_days>check_patient_days.loc[("Patient Days",property_i),latest_month]:
+        try:
+            patient_day_i=check_patient_days.loc[("Patient Days",property_i),latest_month]
+        except:
+            patient_day_i=0
+        try:
+            operating_beds_i=check_patient_days.loc[("Operating Beds",property_i),latest_month]
+        except:
+            operating_beds_i=0
+		
+        if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
             continue
-        elif check_patient_days.loc[("Operating Beds",property_i),latest_month]>0 and check_patient_days.loc[("Patient Days",property_i),latest_month]>check_patient_days.loc[("Operating Beds",property_i),latest_month]*month_days:
+        elif operating_beds_i>0 and patient_day_i>operating_beds_i*month_days:
             st.error("Error：The patient days of {} is greater than its available days".format(property_i))
             problem_properties.append(property_i)
-        elif check_patient_days.loc[("Operating Beds",property_i),latest_month]==0 and check_patient_days.loc[("Patient Days",property_i),latest_month]==0:
+        elif operating_beds_i==0 and patient_day_i==0:
             zero_patient_days.append(property_i)
-        elif check_patient_days.loc[("Patient Days",property_i),latest_month]==0 and check_patient_days.loc[("Operating Beds",property_i),latest_month]>0:
-            st.error("Error：The patient days of {} is 0 while its available days is {}".format(property_i,check_patient_days.loc[("Operating Beds",property_i),latest_month]))
+        elif patient_day_i==0 and operating_beds_i>0:
+            st.error("Error：The patient days of {} is 0 while its available days is {}".format(property_i,operating_beds_i))
             problem_properties.append(property_i)     
-        elif check_patient_days.loc[("Patient Days",property_i),latest_month]>0 and check_patient_days.loc[("Operating Beds",property_i),latest_month]==0:
-            st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,check_patient_days.loc[("Operating Beds",property_i),latest_month]))
+        elif patient_day_i>0 and operating_beds_i==0:
+            st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,operating_beds_i))
             problem_properties.append(property_i) 
     if len(problem_properties)>0:
         st.dataframe(check_patient_days.loc[(slice(None),problem_properties),latest_month],
