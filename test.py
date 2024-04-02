@@ -870,7 +870,7 @@ def View_Summary():
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
 
     # check patient days ( available days > patient days)	
-    check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(["A_ACH","A_IL","A_ALZ","A_SNF","A_ALF"])) | (latest_month_data["Category"]=='Patient Days')]
+    check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(["A_ACH","A_IL","A_ALZ","A_SNF","A_ALF","A_BH","A_IRF","A_LTACH","A_SP_HOSP"])) | (latest_month_data["Category"]=='Patient Days')]
     check_patient_days['Category'] = check_patient_days['Category'].replace('Facility Information', 'Operating Beds')
 
     check_patient_days=check_patient_days[["Category","Property_Name",latest_month]].groupby(["Category","Property_Name"]).sum()
