@@ -853,7 +853,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
 
 @st.cache_data(experimental_allow_widgets=True)
 def View_Summary():
-    global Total_PL
+    global Total_PL,latest_month_data
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     def color_missing(data):
@@ -1111,16 +1111,13 @@ def View_Discrepancy(percent_discrepancy_accounts):
             		required =False)
 		}) 
 
-            col1,col2,col3=st.columns([2,2,4]) 
-            with col1:  
-                download_report(edited_diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)","Type comments below"]],"discrepancy_{}".format(operator))
-          
-            with col2:
+            col1,col2=st.columns([1,6]) 
+            with col1:
                 submit_com=st.button("Submit comments")
             View_Discrepancy_Detail()
             if submit_com:
                 with st.empty():
-                    with col3:
+                    with col2:
                         st.markdown("✔️ :green[Comments uploaded]")
                         st.write(" ")
                     # insert comments to diff_BPC_PL
@@ -1626,7 +1623,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             elif len(Total_PL.columns)==1:
                 st.write("There is no previous month data in tenant P&L")
 
-        download_report(Total_PL_detail.reset_index(drop=False),"Full mapping_{}".format(operator))
+
         download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
         download_report(diff_BPC_PL_detail,"accounts mapping for discrepancy_{}".format(operator))
 
