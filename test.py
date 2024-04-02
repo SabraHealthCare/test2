@@ -823,7 +823,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
                     continue
                 diff=BPC_value-PL_value
                 diff_percent=abs(diff)/max(abs(PL_value),abs(BPC_value))*100
-                if diff_percent>=0.3: 
+                if diff_percent>=0.1: 
                     # for diff_BPC_PL			
                     diff_single_record=pd.DataFrame({"TIME":timeid,"ENTITY":entity,"Sabra_Account":matrix,"Sabra":BPC_value,\
                                                      "P&L":PL_value,"Diff (Sabra-P&L)":diff,"Diff_Percent":diff_percent},index=[0])
