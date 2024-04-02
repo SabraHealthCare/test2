@@ -893,15 +893,15 @@ def View_Summary():
         if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
             continue
         elif operating_beds_i>0 and patient_day_i>operating_beds_i*month_days:
-            st.error("Error：The patient days of {} is greater than its available days".format(property_i))
+            st.error("Error：The patient days of {} is greater than its available days(Operating Beds*{})".format(property_i,month_days))
             problem_properties.append(property_i)
         elif operating_beds_i==0 and patient_day_i==0:
             zero_patient_days.append(property_i)
         elif patient_day_i==0 and operating_beds_i>0:
-            st.error("Error：The patient days of {} is 0 while its available days is {}".format(property_i,operating_beds_i))
+            st.error("Error：The patient days of {} is 0 while its available days(Operating Beds*{}) is {}".format(property_i,operating_beds_i,month_days))
             problem_properties.append(property_i)     
         elif patient_day_i>0 and operating_beds_i==0:
-            st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,patient_day_i))
+            st.error("Error：The patient days of {} is {} while its available days(Operating Beds*{}) is 0".format(property_i,patient_day_i,month_days))
             problem_properties.append(property_i) 
     if len(problem_properties)>0:
         st.dataframe(check_patient_days.loc[(slice(None),problem_properties),latest_month],
