@@ -973,7 +973,7 @@ def View_Summary():
         with col1:
             st.markdown("The reporting month is {}/{}. Reporting data is as below:".format(latest_month[4:6],latest_month[0:4]),unsafe_allow_html=True)
         with col2: 
-            download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
+            download_report(latest_month_data,"{} {}-{} Report".format(operator,latest_month[4:6],latest_month[0:4]))
 
         styled_table = (latest_month_data.replace(0,'').fillna('').style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
         # Display the HTML using st.markdown
