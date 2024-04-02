@@ -978,11 +978,7 @@ def View_Summary():
         st.write("")
   	
         # upload latest month data to AWS
-        col1,col2=st.columns([2,3])
-        with col1:
-            download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
-        with col2:
-            st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]),on_click=clicked, args=["submit_report"],key='latest_month')  
+        st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]),on_click=clicked, args=["submit_report"],key='latest_month')  
         
             
         upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
@@ -1047,7 +1043,7 @@ def View_Discrepancy_Detail():
     
     if diff_BPC_PL.shape[0]>0:      
         diff_BPC_PL_detail=Diff_Detail_Process(diff_BPC_PL_detail)    # format it to display
-        diff_BPC_PL_detail_for_download=diff_BPC_PL_detail.copy()
+
         
         diff_BPC_PL_detail=filters_widgets(diff_BPC_PL_detail,["Property","Month","Sabra Account"],"Horizontal")
         diff_BPC_PL_detail=diff_BPC_PL_detail.reset_index(drop=True)
@@ -1072,11 +1068,8 @@ def View_Discrepancy_Detail():
         st.markdown(diff_BPC_PL_detail.style.set_table_styles(styles).apply(color_coding, axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)	
         st.write("")
-        col1,col2=st.columns([1,3])
-        with col1:
-            download_report(Total_PL_detail.reset_index(drop=False),"Full mapping_{}".format(operator))
-        with col2:
-            download_report(diff_BPC_PL_detail_for_download,"accounts mapping for discrepancy_{}".format(operator))
+       
+         
 
 # don't use cache
 def View_Discrepancy(percent_discrepancy_accounts): 
@@ -1121,7 +1114,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
             col1,col2,col3=st.columns([2,2,4]) 
             with col1:  
                 download_report(edited_diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)","Type comments below"]],"discrepancy_{}".format(operator))
-        
+          
             with col2:
                 submit_com=st.button("Submit comments")
             View_Discrepancy_Detail()
@@ -1632,7 +1625,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 
             elif len(Total_PL.columns)==1:
                 st.write("There is no previous month data in tenant P&L")
-		    
+
+        download_report(Total_PL_detail.reset_index(drop=False),"Full mapping_{}".format(operator))
+        download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
+        download_report(diff_BPC_PL_detail,"accounts mapping for discrepancy_{}".format(operator))
+
+	    
         Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,False)
         # save original tenant P&L to OneDrive
         if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
