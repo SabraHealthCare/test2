@@ -868,10 +868,14 @@ def View_Summary():
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
+
+    # check patient days ( available days > patient days)	
     check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(["A_ACH","A_IL","A_ALZ","A_SNF","A_ALF"])) | (latest_month_data["Category"]=='Patient Days')]
     check_patient_days['Category'] = check_patient_days['Category'].replace('Facility Information', 'Operating Beds')
+    st.write("check_patient_days",check_patient_days)
     check_patient_days=check_patient_days[["Category","Property_Name",latest_month]].groupby(["Category","Property_Name"]).sum()
     check_patient_days.fillna(0, inplace=True)
+    st.write("check_patient_days",check_patient_days)
     problem_properties=[]
     zero_patient_days=[]
     st.write("latest_month_data",latest_month_data)
