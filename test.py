@@ -901,7 +901,7 @@ def View_Summary():
             st.error("Error：The patient days of {} is 0 while its available days is {}".format(property_i,operating_beds_i))
             problem_properties.append(property_i)     
         elif patient_day_i>0 and operating_beds_i==0:
-            st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,operating_beds_i))
+            st.error("Error：The patient days of {} is {} while its available days is 0".format(property_i,patient_day_i))
             problem_properties.append(property_i) 
     if len(problem_properties)>0:
         st.dataframe(check_patient_days.loc[(slice(None),problem_properties),latest_month],
