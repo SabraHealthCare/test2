@@ -1627,8 +1627,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.write("There is no previous month data in tenant P&L")
 
 
-        download_report(diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy_{}".format(operator))
-        download_report(diff_BPC_PL_detail,"accounts mapping for discrepancy_{}".format(operator))
+        download_report(diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy")
+        download_report(diff_BPC_PL_detail,"detail mapping for discrepancy")
 
 	    
         Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,False)
