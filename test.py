@@ -901,7 +901,7 @@ def View_Summary():
             st.error("Error: {} is missing patient days. If this facility is not currently functioning or in operation, please remove the number of operating beds associated with it.".format(property_i))
             problem_properties.append(property_i)     
         elif patient_day_i>0 and operating_beds_i==0:
-            st.error("Error：{} is missing operating beds. with {} patient days, this will result in incorrect occupancy.".format(property_i,int(patient_day_i)))
+            st.error("Error：{} is missing operating beds. With {} patient days, this will result in incorrect occupancy.".format(property_i,int(patient_day_i)))
 
             problem_properties.append(property_i) 
     if len(problem_properties)>0:
@@ -1210,11 +1210,11 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
             col1,col2=st.columns(2) 
             with col1: 
                 if sheet_type=="Sheet_Name_Finance":  
-                    st.warning("Please provide sheet name of P&L data for properties: {}. ".format(",".join(property_name_list)))
+                    st.warning("Please provide sheet name of **P&L** for properties: {}. ".format(",".join(property_name_list)))
                 elif sheet_type=="Sheet_Name_Occupancy":
-                    st.warning("Please provide sheet name of Occupancy data for properties {}. ".format(",".join(property_name_list)))
+                    st.warning("Please provide sheet name of **Occupancy** for properties {}. ".format(",".join(property_name_list)))
                 elif sheet_type=="Sheet_Name_Balance_Sheet":
-                    st.warning("Please provide sheet name of Balance Sheet data in for properties {}. ".format(",".join(property_name_list)))
+                    st.warning("Please provide sheet name of **Balance Sheet** for properties {}. ".format(",".join(property_name_list)))
 		    
             if len(PL_sheet_list)>0:
                 with st.form(key=str(count)):                
