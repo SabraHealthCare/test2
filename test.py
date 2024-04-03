@@ -623,7 +623,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                 if PL.iloc[row_month,col_month]==None or pd.isna(PL.iloc[row_month,col_month]) or PL.iloc[row_month,col_month]=="":
                     count_non+=1
                     continue
-                if type(PL.iloc[row_month,col_month])==float or type(PL.iloc[row_month,col_month])==int:
+                if isinstance(PL.iloc[row_month,col_month], float) or isinstance(PL.iloc[row_month,col_month], int):
                     count_num+=1
                 else:
                     count_str+=1
@@ -756,7 +756,7 @@ def Map_PL_Sabra(PL,entity):
     second_account_mapping=second_account_mapping.dropna(subset="Sabra_Account")
     second_account_mapping=second_account_mapping[second_account_mapping["Sabra_Account"]!=" "]
     PL.index.name="Tenant_Account"
-    PL["Tenant_Formated_Account"]=list(map(lambda x:x.upper() if type(x)==str else x,PL.index))
+    PL["Tenant_Formated_Account"]=list(map(lambda x:x.upper() if isinstance(x, str) else x,PL.index))
     PL=pd.concat([PL.merge(second_account_mapping,on="Tenant_Formated_Account",how='right'),PL.merge(main_account_mapping[main_account_mapping["Sabra_Account"]==main_account_mapping["Sabra_Account"]]\
                                             [["Sabra_Account","Tenant_Formated_Account","Tenant_Account","Conversion"]],on="Tenant_Formated_Account",how='right')])
     # remove blank sabra_account ( corresponds to "no need to map")	
@@ -1150,10 +1150,10 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
     # return the row number of property header and mapped_entity, for example: ["0","0",Sxxxx,Sxxxx,"0",Sxxxx,"0"...]
     #	Property_Name_Finance and entity_list has same order
     property_name_list_in_mapping = entity_mapping.loc[entity_list]["Property_Name_Finance"].tolist()    
-    property_name_list_in_mapping=list(map(lambda x: x.upper().strip() if not pd.isna(x) and isinstance(x, str)  else x,property_name_list_in_mapping))     
+    property_name_list_in_mapping=list(map(lambda x: x.upper().strip() if (not pd.isna(x)) and isinstance(x, str)  else x,property_name_list_in_mapping))     
     max_match=[]
     for row_i in range(PL.shape[0]):
-        canditate_row=list(map(lambda x: x.upper().strip() if not pd.isna(x) and isinstance(x, str)  else x,list(PL.iloc[row_i,:])))        
+        canditate_row=list(map(lambda x: x.upper().strip() if (not pd.isna(x)) and isinstance(x, str)  else x,list(PL.iloc[row_i,:])))        
         match_names = [item for item in canditate_row if item in property_name_list_in_mapping]	
         if len(match_names)==len(property_name_list_in_mapping): # find the property name header row, transfer them into entity id
             mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
@@ -1189,7 +1189,7 @@ def Identify_Reporting_Month(PL,entity_header_row_number):
 def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):  
     global latest_month,account_mapping
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
-    sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if not pd.isna(x)]
+    sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if (not pd.isna(x))]
     sheet_name_list = list(set(sheet_name_list))
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
     if len(sheet_name_list)!=1:
@@ -1259,11 +1259,11 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         PL.columns= [value for value in new_entity_header if value != "0"]
 	    
         #remove rows with nan tenant account
-        nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
+        nan_index=list(filter(lambda x: pd.isna(x) or x=="" or x==" " or x!=x or x=="nan",PL.index))
         PL.drop(nan_index, inplace=True)
         #set index as str ,strip
         PL.index=map(lambda x:str(x).strip(),PL.index)
-        PL=PL.map(lambda x: 0 if (x!=x) or (type(x)==str) or x==" " else x)	    
+        PL=PL.map(lambda x: 0 if x!=x or pd.isna(x) or isinstance(x, str) or x==" " else x)	    
         # remove columns with all nan/0
         PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
@@ -1359,11 +1359,11 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
 
 	    
         #remove rows with nan tenant account
-        nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
+        nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x!=x ,PL.index))
         PL.drop(nan_index, inplace=True)
         #set index as str ,strip
         PL.index=map(lambda x:str(x).strip(),PL.index)
-        PL=PL.map(lambda x: 0 if (x!=x) or (type(x)==str) or x==" " else x)	    
+        PL=PL.map(lambda x: 0 if (x!=x) or pd.isna(x) or isinstance(x, str) or x==" " else x)	    
         # remove columns with all nan/0
         PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
