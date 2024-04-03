@@ -1607,7 +1607,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.stop()
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
-            st.write("Total_PL",Total_PL)
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             # process Finance 
             with st.spinner('Wait for P&L process'):
