@@ -385,11 +385,13 @@ def Get_Year(single_string):
     return 0,""
 @st.cache_data
 def Get_Month_Year(single_string):
-    if (type(single_string)==float or type(single_string)==int) and int(single_string)==10:
-        st.write(1,single_string,type(single_string),len(str(int(single_string))))
+   
 	    
     if single_string!=single_string or pd.isna(single_string):
         return 0,0
+    elif (type(single_string)==float or type(single_string)==int) and int(single_string)==10:
+        st.write(1,single_string,type(single_string),len(str(int(single_string))))
+	    
     elif (type(single_string)==float or type(single_string)==int) and len(str(int(single_string)))<=3:
         return 0,0
     if type(single_string)==datetime:
