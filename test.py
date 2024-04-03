@@ -997,10 +997,26 @@ def View_Summary():
 # Define the button label
         button_label = "Confirm and upload {} {}-{} reporting".format(operator, latest_month[4:6], latest_month[0:4])
 
-        button_html = f'<button style="background-color:{button_color}; color:white; border:none; padding:10px 20px; border-radius:5px;">{button_label}</button>'
+      # Apply HTML and JavaScript to create the button with custom styling
+        button_html = f'<button id="custom_button" style="background-color:{button_color}; color:white; border:none; padding:10px 20px; border-radius:5px;">{button_label}</button>'
+        javascript = """
+<script>
+document.getElementById("custom_button").onclick = () => {
+    // Handle button click event here
+    // For example, you can use Streamlit's JavaScript API to trigger an event
+    Streamlit.setComponentValue("button_clicked", true);
+};
+</script>
+"""
 
 # Display the button
-        clicked1 = st.markdown(button_html, unsafe_allow_html=True)
+        clicked1 = st.markdown(button_html + javascript, unsafe_allow_html=True)
+
+# Check if the button is clicked
+        if clicked1:
+            button_clicked = True
+        else:
+            button_clicked = False
 
 	    
         upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
