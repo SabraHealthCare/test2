@@ -1316,12 +1316,12 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
                     st.warning("Please provide sheet name of **Balance Sheet** in for {}. ".format(property_name))
 		    
             if len(PL_sheet_list)>0:
-                with st.form(key=str(count)):                
+                with st.form(key=sheet_type+str(count)):                
                     sheet_name=st.selectbox(property_name,[""]+PL_sheet_list)
                     submitted = st.form_submit_button("Submit")
                     count+=1
             else:
-                with st.form(key=str(count)):     
+                with st.form(key=sheet_type+str(count)):     
                     sheet_name = st.text_input(property_name)
                     submitted = st.form_submit_button("Submit")
                     count+=1
