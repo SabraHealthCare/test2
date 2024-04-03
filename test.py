@@ -994,14 +994,11 @@ def View_Summary():
 # Define the button label
         button_label = "Confirm and upload {} {}-{} reporting".format(operator, latest_month[4:6], latest_month[0:4])
 
-# Apply HTML to create a filled button
-        button_html = f'<button style="background-color:{button_color};color:white;font-size:14px;padding:10px 20px;border-radius:5px;">{button_label}</button>'
 
-
-        clicked = st.button(label=button_label, key='latest_month')
+        clicked1 = st.button(label=button_label, key='latest_month')
 
 # Apply CSS to the button
-        if clicked:
+        if clicked1:
             st.markdown(f'<style>div[data-testid="stButton"] button {{background-color: {button_color}; color: white;}}</style>', unsafe_allow_html=True)
 	    
 
