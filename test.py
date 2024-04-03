@@ -1638,13 +1638,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             elif len(Total_PL.columns)==1:
                 st.write("There is no previous month data in tenant P&L")
 
-        if diff_BPC_PL.shape[0]>0:
+        if len(Total_PL.columns)>1 and diff_BPC_PL.shape[0]>0:
             download_report(diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy")
-
-
-	    
-        Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,False)
-        # save original tenant P&L to OneDrive
+            Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,False)
+        
+	# save original tenant P&L to OneDrive
         if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
             st.write("unsuccess ")  #----------record into error report------------------------	
 
