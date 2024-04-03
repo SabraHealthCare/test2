@@ -388,7 +388,7 @@ def Get_Year(single_string):
         return 0,""
 @st.cache_data
 def Get_Month_Year(single_string):
-    if single_string!=single_string or single_string==None or type(single_string)==float:
+    if single_string!=single_string or pd.isna(single_string) or type(single_string)==float or len(str(x))<=2:
         return 0,0
     if type(single_string)==datetime:
         return int(single_string.month),int(single_string.year)
