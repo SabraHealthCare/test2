@@ -225,7 +225,7 @@ def Initial_Mapping(operator):
     account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]==operator]
     if account_mapping.shape[0]==1:# and account_mapping.loc[:,"Sabra_Account"][0]=='Template':
         account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]=="Template"]
-        account_mapping["Operator"]=operator
+        account_mapping.loc[:,"Operator"]=operator
     account_mapping.loc[:, 'Sabra_Account'] = account_mapping['Sabra_Account'].apply(lambda x: x.upper().strip() if  pd.notna(x) else x)
     account_mapping.loc[:, 'Sabra_Second_Account'] = account_mapping['Sabra_Second_Account'].apply(lambda x:  x.upper().strip() if pd.notna(x) else x)
     account_mapping.loc[:, "Tenant_Formated_Account"] = account_mapping["Tenant_Account"].apply(lambda x: x.upper().strip() if pd.notna(x) else x)
