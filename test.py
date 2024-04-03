@@ -385,7 +385,7 @@ def Get_Year(single_string):
     return 0,""
 @st.cache_data
 def Get_Month_Year(single_string):
-
+    ori=single_string
     if single_string!=single_string or pd.isna(single_string):
         return 0,0
 	    
@@ -410,9 +410,9 @@ def Get_Month_Year(single_string):
                 if len(remaining)>=3:
                     return 0,0
                 else:   
-                    st.write(single_string,type(single_string),Month,Year)
-                    if type(single_string)==float or type(single_string)==int :
-                        st.write(len(str(int(single_string))))
+                    st.write(ori,type(ori),Month,Year)
+                    if type(ori)==float or type(ori)==int :
+                        st.write(len(str(int(ori))))
                     return Month,Year
             # string doesn't contain month keyword, continue to next month keyword
             else:
