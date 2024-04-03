@@ -1309,11 +1309,11 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
             col1,col2=st.columns(2) 
             with col1: 
                 if sheet_type=="Sheet_Name_Finance":  
-                    st.warning("Please provide sheet name of P&L data for property {}. ".format(property_name))
+                    st.warning("Please provide sheet name of <b>P&L<b> for property {}. ".format(property_name))
                 elif sheet_type=="Sheet_Name_Occupancy":
-                    st.warning("Please provide sheet name of Occupancy data for property {}. ".format(property_name))
+                    st.warning("Please provide sheet name of <b>Occupancy<b> for property {}. ".format(property_name))
                 elif sheet_type=="Sheet_Name_Balance_Sheet":
-                    st.warning("Please provide sheet name of Balance Sheet data in for property {}. ".format(property_name))
+                    st.warning("Please provide sheet name of <b>Balance Sheet<b> in for property {}. ".format(property_name))
 		    
             if len(PL_sheet_list)>0:
                 with st.form(key=str(count)):                
