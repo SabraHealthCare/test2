@@ -893,7 +893,7 @@ def View_Summary():
         if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
             continue
         elif operating_beds_i>0 and patient_day_i>operating_beds_i*month_days:
-            st.error("Error：The number of patient days for {} exceeds its available days (Operating Beds * {}). This will result in incorrect occupancy calculations.".format(property_i,month_days))
+            st.error("Error：The number of patient days for {} exceeds its available days (Operating Beds * {}). This will result in incorrect occupancy.".format(property_i,month_days))
             problem_properties.append(property_i)
         elif operating_beds_i==0 and patient_day_i==0:
             zero_patient_days.append(property_i)
@@ -901,7 +901,7 @@ def View_Summary():
             st.error("Error: {} is missing patient days. If this facility is not currently functioning or in operation, please remove the number of operating beds associated with it.".format(property_i))
             problem_properties.append(property_i)     
         elif patient_day_i>0 and operating_beds_i==0:
-            st.error("Error：{} is missing operating beds. with {} patient days, this will result in incorrect occupancy calculations.".format(property_i,patient_day_i))
+            st.error("Error：{} is missing operating beds. with {} patient days, this will result in incorrect occupancy calculations.".format(property_i,int(patient_day_i)))
 
             problem_properties.append(property_i) 
     if len(problem_properties)>0:
