@@ -1001,7 +1001,7 @@ def View_Summary():
         st.markdown(f'<style>div[data-testid="stButton"] button {{background-color: {button_color} !important; color: white !important;}}</style>', unsafe_allow_html=True)
 
 # Display the button
-        clicked1 = st.button(label=button_label, key='latest_month')
+        clicked1 = st.button(label=button_label, key='latest_month', style=f'background-color: {button_color}; color: white')
 
 	    
         upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
