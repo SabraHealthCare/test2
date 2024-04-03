@@ -1210,11 +1210,11 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
             col1,col2=st.columns(2) 
             with col1: 
                 if sheet_type=="Sheet_Name_Finance":  
-                    st.warning("Please provide sheet name of **P&L** for properties: {}. ".format(",".join(property_name_list)))
+                    st.warning("Please provide sheet name of <b>P&L<b> for properties: {}. ".format(",".join(property_name_list)))
                 elif sheet_type=="Sheet_Name_Occupancy":
-                    st.warning("Please provide sheet name of **Occupancy** for properties {}. ".format(",".join(property_name_list)))
+                    st.warning("Please provide sheet name of <b>Occupancy<b> for properties {}. ".format(",".join(property_name_list)))
                 elif sheet_type=="Sheet_Name_Balance_Sheet":
-                    st.warning("Please provide sheet name of **Balance Sheet** for properties {}. ".format(",".join(property_name_list)))
+                    st.warning("Please provide sheet name of <b>Balance Sheet<b> for properties {}. ".format(",".join(property_name_list)))
 		    
             if len(PL_sheet_list)>0:
                 with st.form(key=str(count)):                
