@@ -980,7 +980,7 @@ def View_Summary():
     else:
         latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]   
 	
-    with st.expander("Summary of P&L" ,expanded=True):
+    with st.expander("Summary of {}/{} reporting".format(latest_month[4:6],latest_month[0:4]) ,expanded=True):
         ChangeWidgetFontSize('Summary of P&L', '25px')
         st.write("Reporting months detected in P&L : "+m_str[1:]) 
         col1,col2=st.columns(2)
