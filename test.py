@@ -997,8 +997,14 @@ def View_Summary():
 # Apply HTML to create a filled button
         button_html = f'<button style="background-color:{button_color};color:white;font-size:14px;padding:10px 20px;border-radius:5px;">{button_label}</button>'
 
-# Display the button
-        st.markdown(button_html, unsafe_allow_html=True)
+
+        clicked = st.button(label=button_label, key='latest_month')
+
+# Apply CSS to the button
+        if clicked:
+            st.markdown(f'<style>div[data-testid="stButton"] button {{background-color: {button_color}; color: white;}}</style>', unsafe_allow_html=True)
+	    
+
 
 	    
         upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
