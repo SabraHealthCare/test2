@@ -378,17 +378,16 @@ def download_report(df,button_display):
     return st.download_button(label="Download "+button_display,data=download_file,file_name=button_display+".csv",mime="text/csv")
     
 def Get_Year(single_string):
-    if single_string!=single_string or single_string==None or type(single_string)==float:
-        return 0,""
-    else:
-        for Year in year_dic.keys():
-            for Year_keyword in year_dic[Year]:
-                if Year_keyword in single_string:
-                    return Year,Year_keyword
-        return 0,""
+    for Year in year_dic.keys():
+        for Year_keyword in year_dic[Year]:
+            if Year_keyword in single_string:
+                return Year,Year_keyword
+    return 0,""
 @st.cache_data
 def Get_Month_Year(single_string):
-    if single_string!=single_string or pd.isna(single_string) or type(single_string)==float or len(str(single_string))<=2:
+    if single_string!=single_string or pd.isna(single_string):
+        return 0,0
+    elif type(single_string)==float or type(single_string)==int) and len(str(int(single_string)))<=2:
         return 0,0
     if type(single_string)==datetime:
         return int(single_string.month),int(single_string.year)
