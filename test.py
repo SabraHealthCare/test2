@@ -410,8 +410,8 @@ def Get_Month_Year(single_string):
                 if len(remaining)>=3:
                     return 0,0
                 else:   
-                    st.write("ori",ori,type(ori),Month,Year)
-                    if type(ori)==float or type(ori)==int :
+                    st.write("ori",ori,isinstance(x, float),Month,Year)
+                    if isinstance(x, float) or isinstance(x, int) :
                         st.write(len(str(int(ori))))
                     return Month,Year
             # string doesn't contain month keyword, continue to next month keyword
