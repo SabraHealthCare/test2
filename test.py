@@ -901,7 +901,7 @@ def View_Summary():
             st.error("Error: {} is missing patient days. If this facility is not currently functioning or in operation, please remove the number of operating beds associated with it.".format(property_i))
             problem_properties.append(property_i)     
         elif patient_day_i>0 and operating_beds_i==0:
-            st.error("Error：{} is missing operating beds. with {} patient days, this will result in incorrect occupancy calculations.".format(property_i,int(patient_day_i)))
+            st.error("Error：{} is missing operating beds. with {} patient days, this will result in incorrect occupancy.".format(property_i,int(patient_day_i)))
 
             problem_properties.append(property_i) 
     if len(problem_properties)>0:
