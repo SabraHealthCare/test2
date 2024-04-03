@@ -387,7 +387,7 @@ def Get_Year(single_string):
 def Get_Month_Year(single_string):
     if single_string!=single_string or pd.isna(single_string):
         return 0,0
-    elif (type(single_string)==float or type(single_string)==int) and len(str(int(single_string)))<=2:
+    elif (type(single_string)==float or type(single_string)==int) and len(str(int(single_string)))<=3:
         return 0,0
     if type(single_string)==datetime:
         return int(single_string.month),int(single_string.year)
