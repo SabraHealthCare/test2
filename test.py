@@ -1408,8 +1408,7 @@ def Check_Reporting_Month(PL):
             st.button("No", on_click=clicked, args=["no_button"])       
         if st.session_state.clicked["yes_button"]:
             if latest_month>=current_date:
-                st.write("latest_month,current_date",latest_month,current_date)
-                st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
+                st.error("The reporting month should precede the current month.")
                 st.stop()
             return latest_month
         elif st.session_state.clicked["no_button"]:
@@ -1431,8 +1430,7 @@ def Check_Reporting_Month(PL):
 
             if st.session_state.clicked["submit_reporting_date"]:
                 if latest_month>=current_date:
-                    st.write("latest_month,current_date",latest_month,current_date)
-                    st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
+                    st.error("The reporting month should precede the current month.")
                     st.stop()
                 return latest_month
             else:
@@ -1454,7 +1452,7 @@ def Check_Reporting_Month(PL):
 	     
         if st.session_state.clicked["submit_reporting_date"]:
             if latest_month>=current_date:
-                st.error("The reporting month is supposed to be smaller than {}/{} ".format(current_date[4:6],current_date[0:4]))
+                st.error("The reporting month should precede the current month.")
                 st.stop()
             return latest_month
         else:
