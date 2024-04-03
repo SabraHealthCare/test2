@@ -997,11 +997,10 @@ def View_Summary():
 # Define the button label
         button_label = "Confirm and upload {} {}-{} reporting".format(operator, latest_month[4:6], latest_month[0:4])
 
-# Apply CSS to the button
-        st.markdown(f'<style>div[data-testid="stButton"] button {{background-color: {button_color} !important; color: white !important;}}</style>', unsafe_allow_html=True)
+        button_html = f'<button style="background-color:{button_color}; color:white; border:none; padding:10px 20px; border-radius:5px;">{button_label}</button>'
 
 # Display the button
-        clicked1 = st.button(label=button_label, key='latest_month', style=f'background-color: {button_color}; color: white')
+        clicked1 = st.markdown(button_html, unsafe_allow_html=True)
 
 	    
         upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
