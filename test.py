@@ -860,10 +860,6 @@ def View_Summary():
     def color_missing(data):
         return f'background-color: rgb(255, 204, 204);'
 
-    months=map(lambda x:x[4:6]+"/"+x[0:4],Total_PL.columns)
-    m_str = ''
-    for month in months:
-        m_str += ", " + month
 
     Total_PL=Total_PL.fillna(0)
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
@@ -982,12 +978,7 @@ def View_Summary():
 	
     with st.expander("Summary of {}/{} reporting".format(latest_month[4:6],latest_month[0:4]) ,expanded=True):
         ChangeWidgetFontSize('Summary of P&L', '25px')
-        st.write("Reporting months detected in P&L : "+m_str[1:]) 
-        col1,col2=st.columns(2)
-        with col1:
-            st.markdown("The reporting month is {}/{}. Reporting data is as below:".format(latest_month[4:6],latest_month[0:4]),unsafe_allow_html=True)
-        with col2: 
-            download_report(latest_month_data,"{} {}-{} Report".format(operator,latest_month[4:6],latest_month[0:4]))
+        download_report(latest_month_data,"{} {}-{} Report".format(operator,latest_month[4:6],latest_month[0:4]))
 
         styled_table = (latest_month_data.replace(0,'').fillna('').style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
         # Display the HTML using st.markdown
