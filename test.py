@@ -986,9 +986,21 @@ def View_Summary():
         st.write("")
   	
         # upload latest month data to AWS
-        st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]),on_click=clicked, args=["submit_report"],key='latest_month')  
+        #st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]),on_click=clicked, args=["submit_report"],key='latest_month')  
         
-            
+
+        button_color = '#FF5733'  # Red color
+
+# Define the button label
+        button_label = "Confirm and upload {} {}-{} reporting".format(operator, latest_month[4:6], latest_month[0:4])
+
+# Apply HTML to create a filled button
+        button_html = f'<button style="background-color:{button_color};color:white;font-size:14px;padding:10px 20px;border-radius:5px;">{button_label}</button>'
+
+# Display the button
+        st.markdown(button_html, unsafe_allow_html=True)
+
+	    
         upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
         upload_latest_month["TIME"]=latest_month
         upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
