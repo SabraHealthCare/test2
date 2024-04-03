@@ -999,7 +999,7 @@ def View_Summary():
 
 # Apply CSS to the button
         if clicked1:
-            st.markdown(f'<style>div[data-testid="stButton"] button {{background-color: {button_color}; color: white;}}</style>', unsafe_allow_html=True)
+            st.markdown(f'<style>div[data-testid="stButton"] button {{background-color: {button_color}; color: red;}}</style>', unsafe_allow_html=True)
 	    
 
 
