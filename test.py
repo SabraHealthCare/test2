@@ -989,19 +989,17 @@ def View_Summary():
         #st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]),on_click=clicked, args=["submit_report"],key='latest_month')  
         
 
+       # Define the button color
         button_color = '#FF5733'  # Red color
 
 # Define the button label
         button_label = "Confirm and upload {} {}-{} reporting".format(operator, latest_month[4:6], latest_month[0:4])
 
-
-        clicked1 = st.button(label=button_label, key='latest_month')
-
 # Apply CSS to the button
-        if clicked1:
-            st.markdown(f'<style>div[data-testid="stButton"] button {{background-color: {button_color}; color: red;}}</style>', unsafe_allow_html=True)
-	    
+        st.markdown(f'<style>div[data-testid="stButton"] button {{background-color: {button_color} !important; color: white !important;}}</style>', unsafe_allow_html=True)
 
+# Display the button
+        clicked1 = st.button(label=button_label, key='latest_month')
 
 	    
         upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
