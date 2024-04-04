@@ -625,11 +625,10 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
             # for a real month column, numeric data is supposed to be more than character data
             if count_str>0 and (count_num/count_str)<0.8:
                 continue
-	    elif count_num==0:
+            elif count_num==0:
                 continue
             else:
-                PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
-                        month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x))) 
+                PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x))) 
                 return PL_date_header,month_row_index
     st.error("Can't identify Year/Month header for sheet: '"+sheet_name+"'")
     st.stop()
