@@ -682,7 +682,7 @@ def Manage_Entity_Mapping(operator):
         return entity_mapping
 
 # no cache @st.cache_data(experimental_allow_widgets=True)
-def Manage_Account_Mapping(new_tenant_account_list):
+def Manage_Account_Mapping(new_tenant_account_list,sheet_name):
     global account_mapping
     st.warning("Please complete mapping for below new account:")
     i=0
@@ -693,7 +693,7 @@ def Manage_Account_Mapping(new_tenant_account_list):
     Sabra_second_account_value=[np.nan] * count
     with st.form(key="Mapping_new_accounts"):
         for i in range(count):
-            st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
+            st.markdown("## Map **'{}'** in '{}' to Sabra account".format(new_tenant_account_list[i]),sheet_name) 
             col1,col2=st.columns(2) 
             with col1:
                 st.write("Sabra main account")
@@ -1260,7 +1260,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         # remove duplicate new account
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
-            account_mapping=Manage_Account_Mapping(new_tenant_account_list)
+            account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name)
 		
         #if there are duplicated accounts, ask for confirming
         dup_tenant_account=set([x for x in PL.index if list(PL.index).count(x) > 1])
@@ -1358,7 +1358,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
-            account_mapping=Manage_Account_Mapping(new_tenant_account_list)        
+            account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name)        
      
         #if there are duplicated accounts in P&L, ask for confirming
         dup_tenant_account=set([x for x in PL.index if list(PL.index).count(x) > 1])
