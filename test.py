@@ -52,6 +52,9 @@ PL_path="Documents/Tenant Monthly Uploading/Tenant P&L"
 mapping_path="Documents/Tenant Monthly Uploading/Tenant Mapping"
 master_template_path="Documents/Tenant Monthly Uploading/Master Template"
 
+today=date.today()
+current_year= today.year
+current_month= today.month
 
 # Acquire a token using client credentials flow
 app = ConfidentialClientApplication(
@@ -453,8 +456,6 @@ def Year_continuity_check(year_list):
 # add year to month_header: identify current year/last year giving a list of month
 def Add_year_to_header(month_list):
     available_month=list(filter(lambda x:x!=0,month_list))
-    today=date.today()
-    current_year= today.year
     last_year=current_year-1
     if len(available_month)==1:
         if datetime.strptime(str(available_month[0])+"/01/"+str(current_year),'%m/%d/%Y').date()<today:
@@ -595,7 +596,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
 	    # find the col of first month
             while(month_table.iloc[month_row_index,col_month]==0):
                 col_month+=1
-            if month_table.iloc[month_row_index,col_month]==date.today().month:
+            if month_table.iloc[month_row_index,col_month]==current_month:
                 continue
             #if there is no year in month row, check above row or next row
             if  year_table.iloc[month_row_index,col_month]==0:
@@ -987,7 +988,7 @@ def View_Summary():
         upload_latest_month["TIME"]=latest_month
         upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
         upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
-        upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
+        upload_latest_month["Latest_Upload_Time"]=str(today)+" "+datetime.now().strftime("%H:%M")
         upload_latest_month["Operator"]=operator
         if not st.session_state.clicked["submit_report"]:
             st.stop()
@@ -1372,9 +1373,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
 
 @st.cache_data(experimental_allow_widgets=True) 
 def Check_Reporting_Month(PL):
-    today=date.today()
-    current_year= today.year
-    current_month= today.month
+    
     if current_month<10:
         current_date=str(current_year)+"0"+str(current_month)
     else:
