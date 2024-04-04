@@ -1361,11 +1361,13 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
             account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name)        
      
         #if there are duplicated accounts in P&L, ask for confirming
-        dup_tenant_account=set([x for x in PL.index if list(PL.index).count(x) > 1])
-        if len(dup_tenant_account)>0:
-            for dup in dup_tenant_account:
-                if dup.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"]):
-                    st.warning("Warning: There are more than one '{}' accounts in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
+        dup_tenant_account_total=set([x for x in PL.index if list(PL.index).count(x) > 1])
+        if len(dup_tenant_account_total)>0:
+            dup_tenant_account=[x for x in dup_tenant_account if x not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"])]
+            if len(dup_tenant_account)>0
+                st.error("Warning: Below are the duplicated accounts in sheet '{}'. Please rectify them to avoid redundant calculations".format(dup,sheet_name))
+                st.error(",".join(dup_tenant_account))
+
         
         # Map PL accounts and Sabra account
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
