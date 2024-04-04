@@ -692,7 +692,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name):
     Sabra_second_account_value=[np.nan] * count
     with st.form(key="Mapping_new_accounts"):
         for i in range(count):
-            st.markdown("## Map **'{}'** in '{}' to Sabra account".format(new_tenant_account_list[i]),sheet_name) 
+            st.markdown("## Map **'{}'** in '{}' to Sabra account".format(new_tenant_account_list[i],sheet_name)) 
             col1,col2=st.columns(2) 
             with col1:
                 st.write("Sabra main account")
