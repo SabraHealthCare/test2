@@ -41,6 +41,8 @@ monthly_reporting_filename="Total monthly reporting.csv"
 operator_list_filename="Operator_list.csv"
 BPC_account_filename="Sabra_account_list.csv"
 previous_monthes_comparison=1
+stop_sign=False
+
 
 #One drive authority. Set application details
 client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
@@ -1365,8 +1367,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         if len(dup_tenant_account_total)>0:
             dup_tenant_account=[x for x in dup_tenant_account_total if x not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"])]
             if len(dup_tenant_account)>0:
-                st.error("Duplicated accounts detected in sheet '{}'. Please rectify them to avoid redundant calculations: **{}** ".format(sheet_name,", ".join(dup_tenant_account)))
-
+                st.error("Duplicated accounts detected in sheet '{}'. Please rectify them to avoid repeated calculations: **{}** ".format(sheet_name,", ".join(dup_tenant_account)))
+                stop_sign=True
         
         # Map PL accounts and Sabra account
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
@@ -1607,6 +1609,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             elif len(Total_PL.columns)>1:  # there are previous months in P&L
                 previous_month_list=[month for month in Total_PL.columns.sort_values() if month<latest_month]
                 diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month,previous_month_list)
+        
+        if stop_sign==True:
+            st.stop()
+		
 	# 1 Summary
         View_Summary()
       
