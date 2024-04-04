@@ -988,7 +988,7 @@ def View_Summary():
         st.write("")
   	
         # upload latest month data to AWS
-        st.button("Confirm and upload {} {}-{} reporting".format(operator,latest_month[4:6],latest_month[0:4]),on_click=clicked, args=["submit_report"],key='latest_month')  
+        st.button("**Confirm and upload {} {}-{} reporting**".format(operator,latest_month[4:6],latest_month[0:4]),on_click=clicked, args=["submit_report"],key='latest_month')  
         
 	    
         upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
