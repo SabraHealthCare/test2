@@ -595,7 +595,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
 	    # find the col of first month
             while(month_table.iloc[month_row_index,col_month]==0):
                 col_month+=1
-            if month_table.iloc[month_row_index,,col_month]==date.today().month:
+            if month_table.iloc[month_row_index,col_month]==date.today().month:
                 continue
             #if there is no year in month row, check above row or next row
             if  year_table.iloc[month_row_index,col_month]==0:
