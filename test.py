@@ -799,8 +799,8 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)","Diff_Percent"])
     diff_BPC_PL_detail=pd.DataFrame(columns=["ENTITY","Sabra_Account","Tenant_Account","Month","Sabra","P&L Value","Diff (Sabra-P&L)",""])
     
-    if len(month_list)>previous_monthes_comparison:  # only compare 1 months
-        month_list=month_list[-2:]
+    if len(month_list)>=previous_monthes_comparison:  # only compare 1 months
+        month_list=month_list[-1:]
 	    
     for entity in entity_mapping.index:
         for timeid in month_list: 
@@ -1173,7 +1173,7 @@ def Identify_Reporting_Month(PL,entity_header_row_number):
                     return "{}{}".format(year,month)
     return "reporting_month_TBD"
 
-#@st.cache_data(experimental_allow_widgets=True)        
+@st.cache_data  #@st.cache_data(experimental_allow_widgets=True)        
 def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):  
     global latest_month,account_mapping,stop_sign
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
@@ -1197,37 +1197,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
         sheet_name=sheet_name_list[0]
 
     # read data from uploaded file
-    count=0
-    while(True):
-        try:		
-            PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
-            break
-        except:
-            col1,col2=st.columns(2) 
-            with col1: 
-                st.warning("Please provide sheet name of **{}**".format(sheet_type_name))
-		    
-            if len(PL_sheet_list)>0:
-                with st.form(key=sheet_type+str(count)):                
-                    sheet_name=st.selectbox(" ",[""]+PL_sheet_list)
-                    submitted = st.form_submit_button("Submit")
-                    count+=1
-            else:
-                with st.form(key=sheet_type+str(count)):     
-                    sheet_name = st.text_input("")
-                    submitted = st.form_submit_button("Submit")
-                    count+=1
-            if submitted:   
-                continue
-            else:
-                st.stop()
-		    
-    if count>0:
-        # update sheet name in entity_mapping
-         
-        entity_mapping.loc[entity_list,sheet_type]=sheet_name  	   
-        # update entity_mapping in onedrive  
-        Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
+    PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
+   
     # Start checking process
     if True:   
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
@@ -1283,7 +1254,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
     return PL,PL_with_detail
 
 
-#@st.cache_data(experimental_allow_widgets=True)        
+@st.cache_data #@st.cache_data(experimental_allow_widgets=True)        
 def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
     global latest_month,account_mapping,stop_sign
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
@@ -1297,36 +1268,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
         sheet_type_name="Balance Sheet"
 
     # read data from uploaded file
-    count=0
-    while(True):
-        try:		
-            PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
-            break
-        except: 
-            col1,col2=st.columns(2) 
-            with col1: 
-                st.warning("Please provide **{}** sheet name for {}. ".format(sheet_type_name,property_name))
-		    
-            if len(PL_sheet_list)>0:
-                with st.form(key=entity_i+sheet_type+str(count)):                
-                    sheet_name=st.selectbox(property_name,[""]+PL_sheet_list)
-                    submitted = st.form_submit_button("Submit")
-                    count+=1
-            else:
-                with st.form(key=entity_i+sheet_type+str(count)):     
-                    sheet_name = st.text_input(property_name)
-                    submitted = st.form_submit_button("Submit")
-                    count+=1
-            if submitted:   
-                continue
-            else:
-                st.stop()
-		    
-    if count>0:
-        # update sheet name in entity_mapping
-        entity_mapping.loc[entity_i,sheet_type]=sheet_name  
-        # update entity_mapping in onedrive  
-        Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
+    PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
+   
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
@@ -1449,19 +1392,15 @@ def Check_Reporting_Month(PL):
         else:
             st.stop()
         
-#@st.cache_data(experimental_allow_widgets=True)  
+@st.cache_data#(experimental_allow_widgets=True)  
 def Upload_And_Process(uploaded_file,file_type):
     global latest_month,property_name  # property_name is currently processed entity
-    if True:
-        if uploaded_file.name[-5:]=='.xlsx':
-            PL_sheet_list=load_workbook(uploaded_file).sheetnames
-        else:
-            PL_sheet_list=[]
-		
-        Total_PL=pd.DataFrame()
-        Total_PL_detail=pd.DataFrame()
-        total_entity_list=list(entity_mapping.index)
-        while(total_entity_list):   # entity_i is the entity code for each property
+    PL_sheet_list=load_workbook(uploaded_file).sheetnames
+       
+    Total_PL=pd.DataFrame()
+    Total_PL_detail=pd.DataFrame()
+    total_entity_list=list(entity_mapping.index)
+    while(total_entity_list):   # entity_i is the entity code S number
             entity_i=total_entity_list[0]  
             sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
             sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
@@ -1606,7 +1545,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
-        st.write("Yes")
+
         #if stop_sign==True:
             #st.write("Please fix above errors and re_upload")
             #st.stop()
