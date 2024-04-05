@@ -1605,7 +1605,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
-        
+
+        if stop_sign==True:
+            st.write("Please fix above errors and re_upload")
+            st.stop()
         with st.spinner('Wait for data checking'):    
             latest_month=Check_Reporting_Month(Total_PL)
             if len(Total_PL.columns)==1:
@@ -1614,8 +1617,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 previous_month_list=[month for month in Total_PL.columns.sort_values() if month<latest_month]
                 diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month,previous_month_list)
         
-        if stop_sign==True:
-            st.stop()
+
 		
 	# 1 Summary
         View_Summary()
