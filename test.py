@@ -1367,7 +1367,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):
             account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name)        
      
         #if there are duplicated accounts in P&L, ask for confirming
-        st.write("Total Property Expenses","Total Property Expenses" in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"]))	    
+        if sheet_name=="134":
+            st.write("Total Property Expenses",list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"]))
         dup_tenant_account_total=set([x for x in PL.index if list(PL.index).count(x) > 1])
         if len(dup_tenant_account_total)>0:
             dup_tenant_account=[x for x in dup_tenant_account_total if x not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"])]
