@@ -1606,9 +1606,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
 
-        if stop_sign==True:
-            st.write("Please fix above errors and re_upload")
-            st.stop()
+        #if stop_sign==True:
+            #st.write("Please fix above errors and re_upload")
+            #st.stop()
         with st.spinner('Wait for data checking'):    
             latest_month=Check_Reporting_Month(Total_PL)
             if len(Total_PL.columns)==1:
