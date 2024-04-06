@@ -1027,6 +1027,61 @@ def EPM_Formula(data,value_name): # make sure there is no col on index for data
         data.loc[r-2,"Upload_Check"]=upload_check_formula
     data["""="Consistence check:"&AND({}2:{}{})""".format(upload_Check_col_letter,upload_Check_col_letter,row_size+1)]=""
     return data
+            
+	
+def Check_Sheet_Name_List(uploaded_file,sheet_type):
+    PL_sheet_list=load_workbook(uploaded_file).sheetnames	
+
+    if sheet_type=="Finance":
+        missing_PL_sheet_property = entity_mapping[~entity_mapping["Sheet_Name_Finance"].isin(PL_sheet_list)]
+        missing_occ_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Occupancy"].isin(PL_sheet_list)==False) & (entity_mapping["Sheet_Name_Occupancy"].notna())]
+        if  (entity_mapping.loc[:,"BS_separate_excel"]=="N").all():
+            missing_BS_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Balance_Sheet"].isin(PL_sheet_list)==False) & (entity_mapping["Sheet_Name_Balance_Sheet"].notna())]		
+	else:
+            missing_BS_sheet_property=pd.DataFrame()
+    elif sheet_type=="BS":
+        missing_BS_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Balance_Sheet"].isin(PL_sheet_list)==False) & (entity_mapping["Sheet_Name_Balance_Sheet"].notna())]
+        missing_PL_sheet_property=pd.DataFrame()
+        missing_occ_sheet_property=pd.DataFrame()
+
+    total_missing_len=missing_PL_sheet_property.shape[0]+missing_occ_sheet_property.shape[0]+missing_BS_sheet_property.shape[0]	  
+    
+    if  total_missing_len>0:
+	    
+        with st.form(key=sheet_type):
+            st.warning("Please provide sheet name for below facilities")		
+            if missing_PL_sheet_property.shape[0]>0:
+                for entity_i in missing_PL_sheet_property.index:
+                     missing_PL_sheet_property.loc[entity_i,"Sheet_Name_Finance"]=st.selectbox(property_name,[""]+PL_sheet_list)
+            if missing_occ_sheet_property.shape[0]>0:
+                for entity_i in missing_PL_sheet_property.index:
+                     missing_PL_sheet_property.loc[entity_i,"Sheet_Name_Finance"]=st.selectbox(property_name,[""]+PL_sheet_list)
+                
+            sheet_name=st.selectbox(" ",[""]+PL_sheet_list)
+                submitted = st.form_submit_button("Submit")
+                count+=1
+           
+        entity_mapping.loc[entity_i,sheet_type]=sheet_	
+    if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="N":
+        
+    st.warning("Please provide sheet name of **{}**".format(sheet_type_name))
+    with st.form(key=sheet_type+str(count)):                
+                sheet_name=st.selectbox(" ",[""]+PL_sheet_list)
+                submitted = st.form_submit_button("Submit")
+                count+=1
+           
+            if submitted:   
+                continue
+            else:
+                st.stop()
+		    
+    if count>0:
+        # update sheet name in entity_mapping
+         
+        entity_mapping.loc[entity_list,sheet_type]=sheet_name  	   
+        # update entity_mapping in onedrive  
+        Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
+
 
 @st.cache_data	    
 def Diff_Detail_Process(diff_BPC_PL_detail):	    
@@ -1255,7 +1310,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 
 
 @st.cache_data #@st.cache_data(experimental_allow_widgets=True)        
-def Read_Clean_PL_Single(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
+def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):  
     global latest_month,account_mapping,stop_sign
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
@@ -1395,8 +1450,7 @@ def Check_Reporting_Month(PL):
 @st.cache_data#(experimental_allow_widgets=True)  
 def Upload_And_Process(uploaded_file,file_type):
     global latest_month,property_name  # property_name is currently processed entity
-    PL_sheet_list=load_workbook(uploaded_file).sheetnames
-       
+    
     Total_PL=pd.DataFrame()
     Total_PL_detail=pd.DataFrame()
     total_entity_list=list(entity_mapping.index)
@@ -1410,48 +1464,48 @@ def Upload_And_Process(uploaded_file,file_type):
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
-                    PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
+                    PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file)
                     # check if census data in another sheet
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
-                        PL_occ,PL_with_detail_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",PL_sheet_list,uploaded_file) 
+                        PL_occ,PL_with_detail_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file) 
                         PL=PL.combine_first(PL_occ)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
         
 		    # check if balance sheet data existed   
                     if sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
-                        PL_BS,PL_with_detail_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
+                        PL_BS,PL_with_detail_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file)
                         PL=PL.combine_first(PL_BS)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
                 elif file_type=="Finance" and BS_separate_excel=="Y": 
-                    PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
+                    PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file)
 
                 elif file_type=="BS" and BS_separate_excel=="Y": 
-                    PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
+                    PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file)
                 total_entity_list.remove(entity_i) 
             # All the properties are in one sheet		
             elif entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="N":
                 entity_list=entity_mapping.index[entity_mapping["Property_in_separate_sheets"]=="N"].tolist()	
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
-                    PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
+                    PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file)
                     # check if census data in another sheet
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
-                        PL_occ,PL_with_detail_occ=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Occupancy",PL_sheet_list,uploaded_file) 
+                        PL_occ,PL_with_detail_occ=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Occupancy",uploaded_file) 
                         PL=PL.combine_first(PL_occ)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
         
 		    # check if balance sheet data existed   
                     if sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
-                        PL_BS,PL_with_detail_BS=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
+                        PL_BS,PL_with_detail_BS=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file)
                         PL=PL.combine_first(PL_BS)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
                 elif file_type=="Finance" and BS_separate_excel=="Y": 
-                    PL,PL_with_detail=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
+                    PL,PL_with_detail=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Finance",uploaded_file)
 
                 elif file_type=="BS" and BS_separate_excel=="Y": 
-                    PL,PL_with_detail=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
+                    PL,PL_with_detail=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file)
                 total_entity_list=[x for x in total_entity_list if x not in entity_list]
                 
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
@@ -1497,7 +1551,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         global latest_month
         latest_month='2023'
         if all(entity_mapping["BS_separate_excel"]=="Y"):
-	
             BS_separate_excel="Y"
         else:
             BS_separate_excel="N"
@@ -1506,11 +1559,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             col1,col2=st.columns(2)
             with col1:
                 st.subheader("Upload P&L:")
-                uploaded_finance=st.file_uploader(":star: :red[Only XLSX allowed] :star:",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
+                uploaded_finance=st.file_uploader(":star: :red[Only XLSX accepted] :star:",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
                 
             with col2:
                 if BS_separate_excel=="Y":
-			
                     st.subheader("Upload Balance Sheet:")
                     uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
             submitted = st.form_submit_button("Upload")
@@ -1529,13 +1581,17 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if BS_separate_excel=="Y" and uploaded_BS:
             with col2:
                 st.markdown("✔️ :green[Balance sheet selected]")
-
         elif BS_separate_excel=="Y" and not uploaded_BS:
             st.write("Balance sheet wasn't upload.")
             st.stop()
+		
         if BS_separate_excel=="N":  # Finance/BS are in one excel
+            Check_Sheet_Name_list(uploaded_finance,"Finance")		
             Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
+            Check_Sheet_Name_list(uploaded_finance,"Finance")
+            Check_Sheet_Name_list(uploaded_finance,"BS")
+		
             # process Finance 
             with st.spinner('Wait for P&L process'):
                 Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
