@@ -1480,7 +1480,7 @@ def Check_Reporting_Month(date_header):
         
 @st.cache_data
 def Upload_And_Process(uploaded_file,file_type):
-    global latest_month  
+    global latest_month ,reporting_month_label
     
     Total_PL=pd.DataFrame()
     Total_PL_detail=pd.DataFrame()
