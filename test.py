@@ -1409,7 +1409,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
 
 @st.cache_data(experimental_allow_widgets=True) 
 def Check_Reporting_Month(PL):
-    
     if current_month<10:
         current_date=str(current_year)+"0"+str(current_month)
     else:
@@ -1477,7 +1476,7 @@ def Check_Reporting_Month(PL):
         else:
             st.stop()
         
-@st.cache_data#(experimental_allow_widgets=True)  
+@st.cache_data
 def Upload_And_Process(uploaded_file,file_type):
     global latest_month,property_name  # property_name is currently processed entity
     
@@ -1496,14 +1495,14 @@ def Upload_And_Process(uploaded_file,file_type):
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file)
                     # check if census data in another sheet
-                    if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
+                    if not pd.isna(sheet_name_occupancy) and sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy is not None and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
                         PL_occ,PL_with_detail_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file) 
                         PL=PL.combine_first(PL_occ)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
         
 		    # check if balance sheet data existed   
-                    if sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
+                    if not pd.isna(sheet_name_balance) and sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
                         PL_BS,PL_with_detail_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file)
                         PL=PL.combine_first(PL_BS)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
