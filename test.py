@@ -1478,7 +1478,7 @@ def Check_Reporting_Month(date_header):
         else:
             st.stop()
         
-#@st.cache_data
+@st.cache_data
 def Upload_And_Process(uploaded_file,file_type):
     global latest_month ,reporting_month_label
     
