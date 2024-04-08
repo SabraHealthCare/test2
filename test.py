@@ -1366,9 +1366,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
         if len(date_header[0])==1 and date_header[0]==[0]:
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()     
-        if reporting_month_label==True:
-            latest_month=Check_Reporting_Month(date_header[0])
-            reporting_month_label=False	 
+
 		
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
@@ -1481,7 +1479,7 @@ def Check_Reporting_Month(date_header):
         
 @st.cache_data
 def Upload_And_Process(uploaded_file,file_type):
-    global latest_month,property_name  # property_name is currently processed entity
+    global latest_month  
     
     Total_PL=pd.DataFrame()
     Total_PL_detail=pd.DataFrame()
@@ -1497,6 +1495,11 @@ def Upload_And_Process(uploaded_file,file_type):
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file)
+                    if reporting_month_label==True:
+                        latest_month=Check_Reporting_Month(list(PL.columns))
+                        reporting_month_label=False	 
+
+		
                     # check if census data in another sheet
                     if not pd.isna(sheet_name_occupancy) and sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy is not None and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
@@ -1521,6 +1524,10 @@ def Upload_And_Process(uploaded_file,file_type):
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file)
+                    if reporting_month_label==True:
+                        latest_month=Check_Reporting_Month(list(PL.columns))
+                        reporting_month_label=False	
+			    
                     # check if census data in another sheet
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
@@ -1542,7 +1549,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)    
-    return Total_PL,Total_PL_detail
+    return Total_PL,Total_PL_detail,latest_month
 
 #----------------------------------website widges------------------------------------
 config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
@@ -1620,16 +1627,16 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 		
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             Check_Sheet_Name_List(uploaded_finance,"Finance")		
-            Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
+            Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             Check_Sheet_Name_List(uploaded_finance,"Finance")
             Check_Sheet_Name_List(uploaded_finance,"BS")
 		
             # process Finance 
             with st.spinner('Wait for P&L process'):
-                Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
+                Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
 		# process BS 
-                Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
+                Total_BL,Total_BL_detail,latest_month=Upload_And_Process(uploaded_BS,"BS")
             
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
