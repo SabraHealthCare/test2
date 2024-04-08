@@ -1051,10 +1051,8 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
     
     if  total_missing_len>0 and (entity_mapping["Property_in_separate_sheets"]=="Y").all():
         with st.form(key=sheet_type):
-        	
             if missing_PL_sheet_property.shape[0]>0:
                 for entity_i in missing_PL_sheet_property.index:
-
                     st.warning("Please provide P&L sheet name for {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
                     missing_PL_sheet_property.loc[entity_i,"Sheet_Name_Finance"]=st.selectbox("Original P&L sheet name: {}".format(entity_mapping.loc[entity_i,"Sheet_Name_Finance"]),[""]+PL_sheet_list)
             if missing_occ_sheet_property.shape[0]>0:
@@ -1631,7 +1629,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             Check_Sheet_Name_List(uploaded_finance,"Finance")
-            Check_Sheet_Name_List(uploaded_finance,"BS")
+            Check_Sheet_Name_List(uploaded_BS,"BS")
 		
             # process Finance 
             with st.spinner('Wait for P&L process'):
