@@ -1085,7 +1085,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
             st.stop()
                 
     elif total_missing_len>0 and (entity_mapping["Property_in_separate_sheets"]=="N").all():
-         with st.form(key=sheet_type):
+        with st.form(key=sheet_type):
 		
             if missing_PL_sheet_property.shape[0]>0:
                  st.warning("Please provide P&L Sheet sheet name:")
@@ -1097,7 +1097,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                 st.warning("Please provide Balance Sheet sheet name:")
                 BS_sheet.loc[:,"Sheet_Name_Balance_Sheet"]=st.selectbox(property_name,[""]+PL_sheet_list)   
             submitted = st.form_submit_button("Submit")
-         if submitted:
+        if submitted:
             if (missing_PL_sheet_property.shape[0]>0 and PL_sheet.isna()) or (missing_occ_sheet_property.shape[0]>0 and occ_sheet.isna().any()) or (Sheet_Name_Balance_Sheet.shape[0]>0 and BS_sheet.isna()):
                 st.error("Please complete above mapping.")
                 st.stop()
