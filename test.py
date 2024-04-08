@@ -1629,6 +1629,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             Check_Sheet_Name_List(uploaded_finance,"Finance")		
             Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
+
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
             Check_Sheet_Name_List(uploaded_finance,"Finance")
             Check_Sheet_Name_List(uploaded_BS,"BS")
@@ -1636,9 +1637,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             # process Finance 
             with st.spinner('Wait for P&L process'):
                 Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
+                st.write("latest_month1",latest_month)
 		# process BS 
                 Total_BL,Total_BL_detail,latest_month=Upload_And_Process(uploaded_BS,"BS")
-            
+                st.write("latest_month2",latest_month)
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
