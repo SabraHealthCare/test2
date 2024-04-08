@@ -123,7 +123,7 @@ def Save_as_CSV_Onedrive(df,path,file_name):
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
 @st.cache_data
 def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # replace original data
-    original_data =Read_CSV_From_Onedrive(path,file_name)
+    original_data=Read_CSV_From_Onedrive(path,file_name)
    
     if  isinstance(original_data, pd.DataFrame):
         if "TIME" in original_data.columns and "TIME" in new_data.columns:
@@ -1029,8 +1029,9 @@ def EPM_Formula(data,value_name): # make sure there is no col on index for data
     return data
             
 	
-def Check_Sheet_Name_List(PL_sheet_list,sheet_type):
+def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping
+    PL_sheet_list=load_workbook(uploaded_file).sheetnames	
     if sheet_type=="Finance":
         missing_PL_sheet_property = entity_mapping[~entity_mapping["Sheet_Name_Finance"].isin(PL_sheet_list)]
         missing_occ_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Occupancy"].isin(PL_sheet_list)==False) & (entity_mapping["Sheet_Name_Occupancy"].notna())]
@@ -1405,12 +1406,12 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
     return PL,PL_with_detail
 
 
-def Check_Reporting_Month(sheet_name,uploaded_finance):
+def Check_Reporting_Month(uploaded_finance):
     if current_month<10:
         current_date=str(current_year)+"0"+str(current_month)
     else:
         current_date=str(current_year)+str(current_month)
-
+    sheet_name=entity_mapping["Sheet_Name_Finance"][0]
     # read data from uploaded file
     PL = pd.read_excel(uploaded_finance,sheet_name=sheet_name,header=None)	
    
@@ -1626,17 +1627,14 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.stop()
 		
         if BS_separate_excel=="N":  # Finance/BS are in one excel
-            PL_sheet_list=load_workbook(uploaded_finance).sheetnames	
-            entity_mapping=Check_Sheet_Name_List(PL_sheet_list,"Finance")	
-            latest_month=Check_Reporting_Month(PL_sheet_list[0],uploaded_finance)	 
+            entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	
+            latest_month=Check_Reporting_Month(uploaded_finance)	 
             Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
 
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel 
-            PL_sheet_list=load_workbook(uploaded_finance).sheetnames	
-            entity_mapping=Check_Sheet_Name_List(PL_sheet_list,"Finance")
-            BS_sheet_list=load_workbook(uploaded_BS).sheetnames
-            entity_mapping=Check_Sheet_Name_List(BS_sheet_list,"BS")
-            latest_month=Check_Reporting_Month(PL_sheet_list[0],uploaded_finance)
+            entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")
+            entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
+            latest_month=Check_Reporting_Month(uploaded_finance)
 
             # process Finance 
             with st.spinner('Wait for P&L process'):
