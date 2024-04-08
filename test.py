@@ -1029,9 +1029,8 @@ def EPM_Formula(data,value_name): # make sure there is no col on index for data
     return data
             
 	
-def Check_Sheet_Name_List(uploaded_file,sheet_type):
-    PL_sheet_list=load_workbook(uploaded_file).sheetnames	
-
+def Check_Sheet_Name_List(PL_sheet_list,sheet_type):
+    global entity_mapping
     if sheet_type=="Finance":
         missing_PL_sheet_property = entity_mapping[~entity_mapping["Sheet_Name_Finance"].isin(PL_sheet_list)]
         missing_occ_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Occupancy"].isin(PL_sheet_list)==False) & (entity_mapping["Sheet_Name_Occupancy"].notna())]
@@ -1047,7 +1046,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
     total_missing_len=missing_PL_sheet_property.shape[0]+missing_occ_sheet_property.shape[0]+missing_BS_sheet_property.shape[0]	  
     	
     if total_missing_len==0:        
-        return None
+        return entity_mapping
     
     if  total_missing_len>0 and (entity_mapping["Property_in_separate_sheets"]=="Y").all():
         with st.form(key=sheet_type):
@@ -1112,7 +1111,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
             st.stop()
     # update entity_mapping in onedrive  
     Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
-    
+    return entity_mapping
 
 @st.cache_data	    
 def Diff_Detail_Process(diff_BPC_PL_detail):	    
@@ -1261,7 +1260,7 @@ def Identify_Reporting_Month(PL,entity_header_row_number):
 
 @st.cache_data(experimental_allow_widgets=True)      
 def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):  
-    global latest_month,account_mapping
+    global account_mapping
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
     sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if (not pd.isna(x))]
     sheet_name_list = list(set(sheet_name_list))
@@ -1331,8 +1330,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
             if len(dup_tenant_account)>0:
                 st.error("Duplicated accounts detected in {} sheet '{}'. Please rectify them to avoid repeated calculations: **{}** ".format(sheet_type_name,sheet_name,", ".join(dup_tenant_account)))
     
-
-	    
         # Map PL accounts and Sabra account
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
         PL.rename(columns={"value":reporting_month},inplace=True)
@@ -1342,7 +1339,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 
 @st.cache_data(experimental_allow_widgets=True)      
 def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):  
-    global latest_month,account_mapping,reporting_month_label
+    global account_mapping
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
 
@@ -1403,19 +1400,31 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
       
             if len(dup_tenant_account)>0:
                 st.error("Duplicated accounts detected in {} sheet '{}'. Please rectify them to avoid repeated calculations: **{}** ".format(sheet_type_name,sheet_name,", ".join(dup_tenant_account)))
-
-        
         # Map PL accounts and Sabra account
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
     return PL,PL_with_detail
 
-@st.cache_data(experimental_allow_widgets=True) 
-def Check_Reporting_Month(date_header):
+
+def Check_Reporting_Month(sheet_name,uploaded_finance):
     if current_month<10:
         current_date=str(current_year)+"0"+str(current_month)
     else:
         current_date=str(current_year)+str(current_month)
-    reporting_month_list=list(map(lambda x:str(x),date_header))	
+
+    # read data from uploaded file
+    PL = pd.read_excel(uploaded_finance,sheet_name=sheet_name,header=None)	
+   
+    tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
+    if tenantAccount_col_no==None:
+        st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
+        st.stop()   
+
+    date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
+    if len(date_header[0])==1 and date_header[0]==[0]:
+        st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
+        st.stop()     
+
+    reporting_month_list=list(map(lambda x:str(x),date_header[0]))	
     latest_month=max(reporting_month_list)
     if latest_month!="reporting_month_TBD":
         st.write("The reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
@@ -1480,8 +1489,6 @@ def Check_Reporting_Month(date_header):
         
 @st.cache_data
 def Upload_And_Process(uploaded_file,file_type):
-    global latest_month ,reporting_month_label
-    
     Total_PL=pd.DataFrame()
     Total_PL_detail=pd.DataFrame()
     total_entity_list=list(entity_mapping.index)
@@ -1496,11 +1503,7 @@ def Upload_And_Process(uploaded_file,file_type):
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file)
-                    if reporting_month_label==True:
-                        latest_month=Check_Reporting_Month(list(PL.columns))
-                        reporting_month_label=False	 
-
-		
+                    
                     # check if census data in another sheet
                     if not pd.isna(sheet_name_occupancy) and sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy is not None and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
@@ -1524,10 +1527,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 entity_list=entity_mapping.index[entity_mapping["Property_in_separate_sheets"]=="N"].tolist()	
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
-                    PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file)
-                    if reporting_month_label==True:
-                        latest_month=Check_Reporting_Month(list(PL.columns))
-                        reporting_month_label=False	
+                    PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file)	
 			    
                     # check if census data in another sheet
                     if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
@@ -1550,7 +1550,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)    
-    return Total_PL,Total_PL_detail,latest_month
+    return Total_PL,Total_PL_detail
 
 #----------------------------------website widges------------------------------------
 config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
@@ -1626,29 +1626,28 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.stop()
 		
         if BS_separate_excel=="N":  # Finance/BS are in one excel
-            Check_Sheet_Name_List(uploaded_finance,"Finance")		
-            Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
+            PL_sheet_list=load_workbook(uploaded_finance).sheetnames	
+            entity_mapping=Check_Sheet_Name_List(PL_sheet_list,"Finance")	
+            latest_month=Check_Reporting_Month(PL_sheet_list[0],uploaded_finance)	 
+            Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
 
-        elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
-            Check_Sheet_Name_List(uploaded_finance,"Finance")
-            Check_Sheet_Name_List(uploaded_BS,"BS")
-		
+        elif BS_separate_excel=="Y":     # Finance/BS are in different excel 
+            PL_sheet_list=load_workbook(uploaded_finance).sheetnames	
+            entity_mapping=Check_Sheet_Name_List(PL_sheet_list,"Finance")
+            BS_sheet_list=load_workbook(uploaded_BS).sheetnames
+            entity_mapping=Check_Sheet_Name_List(BS_sheet_list,"BS")
+            latest_month=Check_Reporting_Month(PL_sheet_list[0],uploaded_finance)
+
             # process Finance 
             with st.spinner('Wait for P&L process'):
-                Total_PL,Total_PL_detail,latest_month=Upload_And_Process(uploaded_finance,"Finance")
-                st.write("latest_month1",latest_month)
+                Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
 		# process BS 
-                Total_BL,Total_BL_detail,latest_month=Upload_And_Process(uploaded_BS,"BS")
-                st.write("latest_month2",latest_month)
+                Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
 
-        #if stop_sign==True:
-            #st.write("Please fix above errors and re_upload")
-            #st.stop()
         with st.spinner('Wait for data checking'):    
-            #latest_month=Check_Reporting_Month(Total_PL)
             if len(Total_PL.columns)==1:
                 Total_PL.columns=[latest_month]
             elif len(Total_PL.columns)>1:  # there are previous months in P&L
