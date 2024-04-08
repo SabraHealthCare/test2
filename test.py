@@ -1054,17 +1054,18 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
             st.warning("Please provide sheet name for below facilities")		
             if missing_PL_sheet_property.shape[0]>0:
                 for entity_i in missing_PL_sheet_property.index:
+
                     st.warning("Please provide P&L sheet name for {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
-                    missing_PL_sheet_property.loc[entity_i,"Sheet_Name_Finance"]=st.selectbox(property_name,[""]+PL_sheet_list)
+                    missing_PL_sheet_property.loc[entity_i,"Sheet_Name_Finance"]=st.selectbox("Original P&L sheet name: {}".format(entity_mapping.loc[entity_i,"Sheet_Name_Finance"]),[""]+PL_sheet_list)
             if missing_occ_sheet_property.shape[0]>0:
                 for entity_i in missing_occ_sheet_property.index:
-                    st.warning("Please provide Occupancy sheet name for {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
-                    missing_occ_sheet_property.loc[entity_i,"Sheet_Name_Occupancy"]=st.selectbox(property_name,[""]+PL_sheet_list)
+                    st.warning("Please provide Census sheet name for {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                    missing_occ_sheet_property.loc[entity_i,"Sheet_Name_Occupancy"]=st.selectbox("Original Census sheet name: {}".format(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"]),[""]+PL_sheet_list)
             
             if missing_BS_sheet_property.shape[0]>0:
                 for entity_i in missing_BS_sheet_property.index:
                     st.warning("Please provide Balance Sheet sheet name for {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
-                    missing_BS_sheet_property.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.selectbox(property_name,[""]+PL_sheet_list)   
+                    missing_BS_sheet_property.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.selectbox("Original 'Balance Sheet' sheet name: {}".format(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]),[""]+PL_sheet_list)   
             submitted = st.form_submit_button("Submit")
            
         if submitted:
