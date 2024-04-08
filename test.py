@@ -1051,7 +1051,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
     
     if  total_missing_len>0 and (entity_mapping["Property_in_separate_sheets"]=="Y").all():
         with st.form(key=sheet_type):
-            st.warning("Please provide sheet name for below facilities")		
+        	
             if missing_PL_sheet_property.shape[0]>0:
                 for entity_i in missing_PL_sheet_property.index:
 
