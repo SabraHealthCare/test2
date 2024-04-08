@@ -974,7 +974,7 @@ def View_Summary():
         latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]   
 	
     with st.expander("Summary of {}/{} reporting".format(latest_month[4:6],latest_month[0:4]) ,expanded=True):
-        ChangeWidgetFontSize('Summary of P&L', '25px')
+        ChangeWidgetFontSize("Summary of {}/{} reporting".format(latest_month[4:6],latest_month[0:4]), '25px')
         download_report(latest_month_data,"{} {}-{} Report".format(operator,latest_month[4:6],latest_month[0:4]))
 
         styled_table = (latest_month_data.replace(0,'').fillna('').style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
