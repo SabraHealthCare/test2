@@ -1589,7 +1589,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
         entity_mapping,account_mapping=Initial_Mapping(operator)
         global latest_month,reporting_month_label
-        latest_month='2023'
         reporting_month_label=True
         if all(entity_mapping["BS_separate_excel"]=="Y"):
             BS_separate_excel="Y"
