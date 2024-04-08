@@ -1615,11 +1615,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.stop()
 		
         if BS_separate_excel=="N":  # Finance/BS are in one excel
-            Check_Sheet_Name_list(uploaded_finance,"Finance")		
+            Check_Sheet_Name_List(uploaded_finance,"Finance")		
             Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
-            Check_Sheet_Name_list(uploaded_finance,"Finance")
-            Check_Sheet_Name_list(uploaded_finance,"BS")
+            Check_Sheet_Name_List(uploaded_finance,"Finance")
+            Check_Sheet_Name_List(uploaded_finance,"BS")
 		
             # process Finance 
             with st.spinner('Wait for P&L process'):
