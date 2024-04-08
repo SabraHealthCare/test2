@@ -1069,7 +1069,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
             submitted = st.form_submit_button("Submit")
            
         if submitted:
-            if (missing_PL_sheet_property.shape[0]>0 and missing_PL_sheet_property["Sheet_Name_Finance"].isna().any()) or (missing_occ_sheet_property.shape[0]>0 and missing_occ_sheet_property["Sheet_Name_Occupancy"].isna().any()) or (Sheet_Name_Balance_Sheet.shape[0]>0 and Sheet_Name_Balance_Sheet["Sheet_Name_Balance_Sheet"].isna().any()):
+            if (missing_PL_sheet_property.shape[0]>0 and missing_PL_sheet_property["Sheet_Name_Finance"].isna().any()) or (missing_occ_sheet_property.shape[0]>0 and missing_occ_sheet_property["Sheet_Name_Occupancy"].isna().any()) or (missing_BS_sheet_property.shape[0]>0 and missing_BS_sheet_property["Sheet_Name_Balance_Sheet"].isna().any()):
                 st.error("Please complete above mapping.")
                 st.stop()
             else:
