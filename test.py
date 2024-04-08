@@ -1367,7 +1367,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()     
         if reporting_month_label==True:
-            latest_month=Check_Reporting_Month(PL)
+            latest_month=Check_Reporting_Month(date_header[0])
             reporting_month_label=False	 
 		
         #set tenant_account as index of PL
@@ -1411,12 +1411,12 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
     return PL,PL_with_detail
 
 @st.cache_data(experimental_allow_widgets=True) 
-def Check_Reporting_Month(PL):
+def Check_Reporting_Month(date_header):
     if current_month<10:
         current_date=str(current_year)+"0"+str(current_month)
     else:
         current_date=str(current_year)+str(current_month)
-    reporting_month_list=list(map(lambda x:str(x),PL.columns))	
+    reporting_month_list=list(map(lambda x:str(x),date_header))	
     latest_month=max(reporting_month_list)
     if latest_month!="reporting_month_TBD":
         st.write("The reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
