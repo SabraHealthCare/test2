@@ -1081,7 +1081,8 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                 if missing_BS_sheet_property.shape[0]>0:
                     for entity_i in missing_BS_sheet_property.index:
                         entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]=missing_BS_sheet_property.loc[entity_i,"Sheet_Name_Balance_Sheet"]
-			
+	else:
+            st.stop()
                 
     elif total_missing_len>0 and (entity_mapping["Property_in_separate_sheets"]=="N").all():
          with st.form(key=sheet_type):
@@ -1107,7 +1108,8 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                     entity_mapping.loc[:,"Sheet_Name_Occupancy"]=occ_sheet
                 if missing_BS_sheet_property.shape[0]>0:
                     entity_mapping.loc[:,"Sheet_Name_Balance_Sheet"]=BS_sheet
-
+	else:
+            st.stop()
     # update entity_mapping in onedrive  
     Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
     
