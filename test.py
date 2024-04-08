@@ -1414,7 +1414,7 @@ def Check_Reporting_Month(sheet_name,uploaded_finance):
     # read data from uploaded file
     PL = pd.read_excel(uploaded_finance,sheet_name=sheet_name,header=None)	
    
-    tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
+    tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,"Sheet_Name_Finance")
     if tenantAccount_col_no==None:
         st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
         st.stop()   
