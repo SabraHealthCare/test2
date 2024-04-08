@@ -41,7 +41,7 @@ monthly_reporting_filename="Total monthly reporting.csv"
 operator_list_filename="Operator_list.csv"
 BPC_account_filename="Sabra_account_list.csv"
 previous_monthes_comparison=1
-stop_sign=False
+
 
 
 #One drive authority. Set application details
@@ -1260,7 +1260,7 @@ def Identify_Reporting_Month(PL,entity_header_row_number):
 
 @st.cache_data  #@st.cache_data(experimental_allow_widgets=True)        
 def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):  
-    global latest_month,account_mapping,stop_sign
+    global latest_month,account_mapping
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
     sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if (not pd.isna(x))]
     sheet_name_list = list(set(sheet_name_list))
@@ -1329,7 +1329,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
             dup_tenant_account=[x for x in dup_tenant_account_total if x not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"])]
             if len(dup_tenant_account)>0:
                 st.error("Duplicated accounts detected in {} sheet '{}'. Please rectify them to avoid repeated calculations: **{}** ".format(sheet_type_name,sheet_name,", ".join(dup_tenant_account)))
-                stop_sign=True
+    
 
 	    
         # Map PL accounts and Sabra account
@@ -1341,7 +1341,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 
 @st.cache_data #@st.cache_data(experimental_allow_widgets=True)        
 def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):  
-    global latest_month,account_mapping,stop_sign
+    global latest_month,account_mapping,reporting_month_label
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
 
@@ -1366,7 +1366,10 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
         if len(date_header[0])==1 and date_header[0]==[0]:
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()     
-	    
+        if reporting_month_label==True:
+            latest_month=Check_Reporting_Month(PL)
+            reporting_month_label=False	 
+		
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         #remove row above date
@@ -1401,7 +1404,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
       
             if len(dup_tenant_account)>0:
                 st.error("Duplicated accounts detected in {} sheet '{}'. Please rectify them to avoid repeated calculations: **{}** ".format(sheet_type_name,sheet_name,", ".join(dup_tenant_account)))
-                stop_sign=True
+
         
         # Map PL accounts and Sabra account
         PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
@@ -1577,8 +1580,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     if choice=="Upload P&L":
         BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
         entity_mapping,account_mapping=Initial_Mapping(operator)
-        global latest_month
+        global latest_month,reporting_month_label
         latest_month='2023'
+        reporting_month_label=True
         if all(entity_mapping["BS_separate_excel"]=="Y"):
             BS_separate_excel="Y"
         else:
@@ -1635,7 +1639,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             #st.write("Please fix above errors and re_upload")
             #st.stop()
         with st.spinner('Wait for data checking'):    
-            latest_month=Check_Reporting_Month(Total_PL)
+            #latest_month=Check_Reporting_Month(Total_PL)
             if len(Total_PL.columns)==1:
                 Total_PL.columns=[latest_month]
             elif len(Total_PL.columns)>1:  # there are previous months in P&L
