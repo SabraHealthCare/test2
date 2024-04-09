@@ -427,7 +427,7 @@ def Get_Month_Year(single_string):
                 continue
     # didn't find month. return month as 0
     return 0,Year    
-    
+@st.cache_data    
 def Month_continuity_check(month_list):
     inv=[]
     month_list=list(filter(lambda x:x!=0,month_list))
@@ -441,7 +441,7 @@ def Month_continuity_check(month_list):
             return True  # Month list is continous 
         else:
             return False # Month list is not continous 
-            
+@st.cache_data            
 def Year_continuity_check(year_list):
     inv=[]
     year_list=list(filter(lambda x:x!=0,year_list))
@@ -636,7 +636,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
     st.error("Can't identify Year/Month header for sheet: '"+sheet_name+"'")
     st.stop()
 
-#@st.cache_data(experimental_allow_widgets=True)
+
 def Manage_Entity_Mapping(operator):
     global entity_mapping
     #all the properties are supposed to be in entity_mapping. 
@@ -932,16 +932,16 @@ def View_Summary():
 		                 latest_month:latest_month[4:6]+"/"+latest_month[0:4]},
 			    hide_index=True)
 	     
-        col1,col2,col3=st.columns([4,1,25])
-        with col1:
-            st.button("Fix and re-upload P&L")
-        with col2:
-            st.write("or")
-        with col3:
-            continue_run=st.button("Ignore and Continue", on_click=clicked, args=["continue_button"]) 
-            st.write("")#-----------------------write to error log-----------------------   
-        if not st.session_state.clicked["continue_button"]:
-            st.stop()	
+        #col1,col2,col3=st.columns([4,1,25])
+        #with col1:
+            #st.button("Fix and re-upload P&L")
+        #with col2:
+            #st.write("or")
+        #with col3:
+            #continue_run=st.button("Ignore and Continue", on_click=clicked, args=["continue_button"]) 
+            #st.write("")#-----------------------write to error log-----------------------   
+        #if not st.session_state.clicked["continue_button"]:
+            #st.stop()	
 
     duplicates = latest_month_data[latest_month_data.duplicated(subset=["Sabra_Account_Full_Name", "Category"], keep=False)]
 
