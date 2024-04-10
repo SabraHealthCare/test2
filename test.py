@@ -1360,6 +1360,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
+        st.write("tenantAccount_col_no",tenantAccount_col_no)
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()   
@@ -1369,12 +1370,12 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()     
 
-		
+        st.write("PL before header",PL)	
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         #remove row above date
         PL=PL.iloc[date_header[1]+1:,:]
-
+        st.write("PL after header",PL)	
         # remove column without date col name, (the date row is not equal to 0)
         non_zero_columns = [val !="0" for val in date_header[0]]
         PL = PL.loc[:,non_zero_columns]   
