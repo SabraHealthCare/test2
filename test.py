@@ -1369,7 +1369,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
         if len(date_header[0])==1 and date_header[0]==[0]:
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()     
-
+        st.write("date_header",date_header[0],date_header[1])	
         st.write("PL before header",PL)	
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
