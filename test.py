@@ -745,6 +745,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name):
 
 @st.cache_data 
 def Map_PL_Sabra(PL,entity):
+    st.write("PL before Map",PL)
     # remove no need to map from account_mapping
     main_account_mapping=account_mapping.loc[list(map(lambda x:x==x and x.upper()!='NO NEED TO MAP',account_mapping["Sabra_Account"])),:]
 
@@ -787,7 +788,7 @@ def Map_PL_Sabra(PL,entity):
             
     PL_with_detail=copy.copy(PL)
     PL_with_detail=PL_with_detail.set_index(['ENTITY', 'Sabra_Account',"Tenant_Account"])
-    
+    st.write("PL after Map",PL)
     # group by Sabra_Account
     PL=PL.drop(["Tenant_Account"], axis=1)
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum().replace(0,None)
