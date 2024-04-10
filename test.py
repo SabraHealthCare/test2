@@ -242,6 +242,7 @@ def Initial_Mapping(operator):
     entity_mapping=entity_mapping.reset_index(drop=True)
     entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
     entity_mapping = entity_mapping.dropna(subset=['Property_in_separate_sheets'])	
+    st.write(account_mapping)
     entity_mapping=entity_mapping.set_index("ENTITY")
     return entity_mapping,account_mapping
 
