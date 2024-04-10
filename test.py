@@ -1652,8 +1652,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 previous_month_list=[month for month in Total_PL.columns.sort_values() if month<latest_month]
                 diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month,previous_month_list)
         
-
-		
+        st.write(Total_PL_detail)		
 	# 1 Summary
         View_Summary()
       
