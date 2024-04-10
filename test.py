@@ -399,12 +399,8 @@ def Get_Month_Year(single_string):
         return int(single_string.month),int(single_string.year)
 
     if isinstance(single_string, (int,float)):
-        single_string=str(int(single_string))
-        if len(single_string)<=3:
-            return 0,0
-        Year,Year_keyword=Get_Year(single_string)
-        if Year==0:
-            return 0,0
+        return 0,0
+        
     elif isinstance(single_string, str):
         single_string=single_string.lower()
         Year,Year_keyword=Get_Year(single_string)
