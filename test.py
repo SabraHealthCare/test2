@@ -203,7 +203,7 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
 def clicked(button_name):
     st.session_state.clicked[button_name] = True
 
-@st.cache_data
+
 def Initial_Paramaters(operator):
     # drop down list of operator
     if operator!="Sabra":
