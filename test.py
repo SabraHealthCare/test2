@@ -242,7 +242,6 @@ def Initial_Mapping(operator):
     entity_mapping=entity_mapping.reset_index(drop=True)
     entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
     entity_mapping = entity_mapping.dropna(subset=['Property_in_separate_sheets'])	
-    st.write(account_mapping)
     entity_mapping=entity_mapping.set_index("ENTITY")
     return entity_mapping,account_mapping
 
@@ -405,7 +404,6 @@ def Get_Month_Year(single_string):
         single_string=single_string.lower()
         Year,Year_keyword=Get_Year(single_string)
 	    
-    
     # remove year from string, remove days from string
     single_string=single_string.replace(Year_keyword,"").replace("30","").replace("31","").replace("28","").replace("29","").replace("as of","").replace("Actual","")
     
@@ -741,7 +739,6 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name):
 
 @st.cache_data 
 def Map_PL_Sabra(PL,entity):
-    st.write("PL before Map",PL)
     # remove no need to map from account_mapping
     main_account_mapping=account_mapping.loc[list(map(lambda x:x==x and x.upper()!='NO NEED TO MAP',account_mapping["Sabra_Account"])),:]
 
@@ -784,12 +781,9 @@ def Map_PL_Sabra(PL,entity):
             
     PL_with_detail=copy.copy(PL)
     PL_with_detail=PL_with_detail.set_index(['ENTITY', 'Sabra_Account',"Tenant_Account"])
-    st.write("PL after Map",PL)
     # group by Sabra_Account
     PL=PL.drop(["Tenant_Account"], axis=1)
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum().replace(0,None)
-    st.write("PL1",PL)
-    st.write("PL11",PL_with_detail)
     return PL,PL_with_detail        
     
 @st.cache_data
@@ -1352,7 +1346,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
 
     # read data from uploaded file
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
-    st.write("PL",PL)
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
@@ -1365,13 +1358,10 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
         if len(date_header[0])==1 and date_header[0]==[0]:
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()     
-        st.write("date_header",date_header[0],date_header[1])	
-        st.write("PL before header",PL)	
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         #remove row above date
         PL=PL.iloc[date_header[1]+1:,:]
-        st.write("PL after header",PL)	
         # remove column without date col name, (the date row is not equal to 0)
         non_zero_columns = [val !="0" for val in date_header[0]]
         PL = PL.loc[:,non_zero_columns]   
