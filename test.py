@@ -1349,7 +1349,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
-        st.write("tenantAccount_col_no",tenantAccount_col_no)
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()   
