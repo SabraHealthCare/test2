@@ -1649,7 +1649,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
             if len(Total_PL.columns)>1:	
                 with st.spinner("********Running discrepancy check********"): 
-                    #View_Discrepancy(percent_discrepancy_accounts)
+                    View_Discrepancy(percent_discrepancy_accounts)
                 
             elif len(Total_PL.columns)==1:
                 st.write("There is no previous month data in tenant P&L")
