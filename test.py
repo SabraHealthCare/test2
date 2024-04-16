@@ -1824,25 +1824,25 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             st.subheader("Summary")
             data=Read_CSV_From_Onedrive(master_template_path,monthly_reporting_filename)
             #if data is None:  # empty file
-     
             if True:
                 data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
                 data["Upload_Check"]=""
                 # summary for operator upload
                 data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
-                col1,col2,col3=st.columns((3,1,1))
+                col1,col2,col3=st.columns((2,1,1))
                 summary=data[["TIME","Operator","Latest_Upload_Time"]].drop_duplicates()
-                with col2:
-                    data=filters_widgets(data,["Operator","TIME"],"Horizontal")
+		summary = summary.sort_values(by="Latest_Upload_Time", ascending=False)
+                #with col2:
+                    #data=filters_widgets(data,["Operator","TIME"],"Horizontal")
                 with col1:
                     st.dataframe(
 			    summary,
 			    column_config={
 			        "TIME": "Reporting month",
-			        "Latest_Upload_Time":"Latest submit"},
+			        "Latest_Upload_Time":"Latest submit time"},
 			    hide_index=True)
                 st.write("")
-                st.subheader("Download reporting data")    
+                st.subheader("Download reporting data with EPM Formula")    
 		    
                 # add average column for each line , average is from BPC_pull
                 BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename)
