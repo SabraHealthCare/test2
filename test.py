@@ -1415,7 +1415,7 @@ def Check_Reporting_Month(uploaded_finance):
         st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
         st.stop()     
 
-    reporting_month_list=filter(lambda x: x!="0",list(map(lambda x:str(x),date_header[0]))	)
+    reporting_month_list=list(filter(lambda x: x!="0",list(map(lambda x:str(x),date_header[0]))	))
     latest_month=max(reporting_month_list)
     if latest_month!="reporting_month_TBD":
         st.write("The reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
