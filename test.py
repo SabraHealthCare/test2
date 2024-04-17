@@ -842,7 +842,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
     return diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts
 	
 
-@st.cache_data(experimental_allow_widgets=True)
+#@st.cache_data(experimental_allow_widgets=True)
 def View_Summary():
     global Total_PL,latest_month_data,latest_month
     def highlight_total(df):
