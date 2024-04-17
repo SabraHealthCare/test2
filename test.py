@@ -1478,7 +1478,7 @@ def Check_Reporting_Month(uploaded_finance):
         else:
             st.stop()
         
-@st.cache_data
+@st.cache_data(experimental_allow_widgets=True)
 def Upload_And_Process(uploaded_file,file_type):
     Total_PL=pd.DataFrame()
     Total_PL_detail=pd.DataFrame()
