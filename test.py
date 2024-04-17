@@ -1439,7 +1439,6 @@ def Check_Reporting_Month(uploaded_finance):
                     col9,col10=st.columns([1,1])
                     with col9:
                         if len(reporting_month_list)>1:		
-                            st.write("reporting_month_list",reporting_month_list)
                             latest_month = st.selectbox('Select reporting month from P&L:', list(map(lambda x:x[0:4]+"/"+x[4:6],reporting_month_list)))
                             latest_month=latest_month[0:4]+latest_month[5:7]
                         elif len(reporting_month_list)==1:	
