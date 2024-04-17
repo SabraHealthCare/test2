@@ -980,21 +980,21 @@ def View_Summary():
 # no cache
 def Submit_Upload_Latestmonth():
     global Total_PL,latest_month   
-        upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
-        upload_latest_month["TIME"]=latest_month
-        upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
-        upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
-        upload_latest_month["Latest_Upload_Time"]=str(today)+" "+datetime.now().strftime("%H:%M")
-        upload_latest_month["Operator"]=operator
-        if not st.session_state.clicked["submit_report"]:
-            st.stop()
-        else:
-            # save latest month data to OneDrive
-            if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_latest_month,operator,False):
-                st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
+    upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
+    upload_latest_month["TIME"]=latest_month
+    upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
+    upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
+    upload_latest_month["Latest_Upload_Time"]=str(today)+" "+datetime.now().strftime("%H:%M")
+    upload_latest_month["Operator"]=operator
+    if not st.session_state.clicked["submit_report"]:
+        st.stop()
+    else:
+     # save latest month data to OneDrive
+        if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_latest_month,operator,False):
+            st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
             
-            else:
-                st.write(" ")  #----------record into error report------------------------	
+        else:
+            st.write(" ")  #----------record into error report------------------------	
        
 # create EPM formula for download data
 def EPM_Formula(data,value_name): # make sure there is no col on index for data
