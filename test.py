@@ -800,8 +800,8 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
 	    # if this entity don't have data for this timeid(new/transferred property), skip to next month
             if all(list(map(lambda x:x!=x,Total_PL.loc[entity,][timeid]))):
                 break
-            #for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
-            for matrix in BPC_Account["BPC_Account_Name"]: 
+            for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
+            #for matrix in BPC_Account["BPC_Account_Name"]: 
                 try:
                     BPC_value=int(BPC_pull.loc[entity,matrix][timeid+'00'])
                 except:
