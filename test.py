@@ -1253,7 +1253,7 @@ def Identify_Reporting_Month(PL,entity_header_row_number):
                     return "{}{}".format(year,month)
     return "reporting_month_TBD"
 
-@st.cache_data(experimental_allow_widgets=True)      
+#@st.cache_data(experimental_allow_widgets=True)      
 def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):  
     global account_mapping
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
@@ -1332,7 +1332,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
     return PL,PL_with_detail
 
 
-@st.cache_data(experimental_allow_widgets=True)      
+#@st.cache_data(experimental_allow_widgets=True)      
 def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):  
     global account_mapping
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
