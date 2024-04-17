@@ -842,7 +842,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
     return diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts
 	
 
-#@st.cache_data(experimental_allow_widgets=True)
+@st.cache_data
 def View_Summary():
     global Total_PL,latest_month_data,latest_month
     def highlight_total(df):
@@ -977,8 +977,9 @@ def View_Summary():
   	
         # upload latest month data to AWS
         st.button("******Confirm and upload {} {}-{} reporting******".format(operator,latest_month[4:6],latest_month[0:4]),on_click=clicked, args=["submit_report"],key='latest_month')  
-        
-	    
+# no cache
+def Submit_Upload_Latestmonth():
+    global Total_PL,latest_month   
         upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
         upload_latest_month["TIME"]=latest_month
         upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
@@ -1644,7 +1645,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         	
 	# 1 Summary
         View_Summary()
-      
+        Submit_Upload_Latestmonth()      
         # 2 Discrepancy of Historic Data
         with st.expander("Discrepancy for Historic Data",expanded=True):
             ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
