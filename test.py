@@ -1119,7 +1119,7 @@ def Diff_Detail_Process(diff_BPC_PL_detail):
     return diff_BPC_PL_detail
 
 def View_Discrepancy_Detail():
-    global diff_BPC_PL,Total_PL_detail,Total_PL ,diff_BPC_PL_detail,
+    global diff_BPC_PL,Total_PL_detail,Total_PL ,diff_BPC_PL_detail
     # Sabra detail accounts mapping table
     def color_coding(row):
     	return ['color: blue'] * len(row) if row.Tenant_Account == " Total" else ['color: black'] * len(row)
