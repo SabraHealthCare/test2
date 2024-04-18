@@ -834,12 +834,11 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
 
                     diff_BPC_PL_detail=pd.concat([diff_BPC_PL_detail,diff_detail_records])
     if diff_BPC_PL.shape[0]>0:
-        percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
+        #percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
         diff_BPC_PL=diff_BPC_PL.merge(BPC_Account[["Category","Sabra_Account_Full_Name","BPC_Account_Name"]],left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")        
         diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-    else:
-        percent_discrepancy_accounts=0
-    return diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts
+    
+    return diff_BPC_PL,diff_BPC_PL_detail
 	
 
 #@st.cache_data(experimental_allow_widgets=True)
@@ -897,7 +896,6 @@ def View_Summary():
 			        "Category":"Account Total",
 		                 latest_month:latest_month[4:6]+"/"+latest_month[0:4]},
 			    hide_index=True)
-	     
         st.stop()
 
     #check missing category ( example: total revenue= 0, total Opex=0...)	
@@ -1121,7 +1119,7 @@ def Diff_Detail_Process(diff_BPC_PL_detail):
     return diff_BPC_PL_detail
 
 def View_Discrepancy_Detail():
-    global diff_BPC_PL,diff_BPC_PL_detail,Total_PL_detail,Total_PL
+    global diff_BPC_PL,Total_PL_detail,Total_PL ,diff_BPC_PL_detail,
     # Sabra detail accounts mapping table
     def color_coding(row):
     	return ['color: blue'] * len(row) if row.Tenant_Account == " Total" else ['color: black'] * len(row)
@@ -1157,10 +1155,10 @@ def View_Discrepancy_Detail():
          
 
 # don't use cache
-def View_Discrepancy(percent_discrepancy_accounts): 
+def View_Discrepancy(): 
     global diff_BPC_PL	
 
-    if percent_discrepancy_accounts>0:
+    if diff_BPC_PL.shape[0]>0:
         # save all the discrepancy 
         diff_BPC_PL["Operator"]=operator
         diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
@@ -1171,7 +1169,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
 	# only display the big discrepancy
         edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>15] 
         if edited_diff_BPC_PL.shape[0]>0:
-            st.error("{0:.1f}% P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.".format(percent_discrepancy_accounts*100))
+            st.error("Below P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.")
             edited_diff_BPC_PL["Type comments below"]=""
             edited_diff_BPC_PL = st.data_editor(
 	    edited_diff_BPC_PL,
@@ -1640,21 +1638,21 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 Total_PL.columns=[latest_month]
             elif len(Total_PL.columns)>1:  # there are previous months in P&L
                 previous_month_list=[month for month in Total_PL.columns.sort_values() if month<latest_month]
-                diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month,previous_month_list)
+                diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month,previous_month_list)
         	
 	# 1 Summary
         View_Summary()
-        Submit_Upload_Latestmonth()      
+        #Submit_Upload_Latestmonth()      
         # 2 Discrepancy of Historic Data
         with st.expander("Discrepancy for Historic Data",expanded=True):
             ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
             if len(Total_PL.columns)>1:	
                 with st.spinner("********Running discrepancy check********"): 
-                    View_Discrepancy(percent_discrepancy_accounts)
+                    View_Discrepancy()
                 
             elif len(Total_PL.columns)==1:
                 st.write("There is no previous month data in tenant P&L")
-
+        Submit_Upload_Latestmonth()      
         if len(Total_PL.columns)>1 and diff_BPC_PL.shape[0]>0:
             download_report(diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy")
             Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,False)
