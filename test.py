@@ -1587,6 +1587,48 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
     if choice=="Upload P&L":
+
+    # Custom CSS for blinking animation
+        blink_css = """
+    @keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+.blink {
+    animation: blink 1s infinite;
+}
+"""
+
+        # Custom JavaScript to add blink class to button on page load
+        blink_js = """
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var button = document.getElementById("blinking_button");
+    button.classList.add("blink");
+});
+</script>
+"""
+
+        # Injecting custom CSS and JavaScript into the app
+        st.write("11111")
+        st.markdown(f'<style>{blink_css}</style>', unsafe_allow_html=True)
+        st.markdown(blink_js, unsafe_allow_html=True)
+
+        # Create a button without the 'blink' class
+        if st.button("Blinking Button", key="blinking_button"):
+            st.write("Button clicked!")
+	    
+
+
+
+
+
+
+
+
+
+	    
         BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
         entity_mapping,account_mapping=Initial_Mapping(operator)
         global latest_month,reporting_month_label
@@ -1654,36 +1696,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         	
 	# 1 Summary
         View_Summary()
-        # Custom CSS for blinking animation
-        blink_css = """
-    @keyframes blink {
-    0% { opacity: 1; }
-    50% { opacity: 0; }
-    100% { opacity: 1; }
-}
-.blink {
-    animation: blink 1s infinite;
-}
-"""
-
-        # Custom JavaScript to add blink class to button on page load
-        blink_js = """
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    var button = document.getElementById("blinking_button");
-    button.classList.add("blink");
-});
-</script>
-"""
-
-        # Injecting custom CSS and JavaScript into the app
-        st.markdown(f'<style>{blink_css}</style>', unsafe_allow_html=True)
-        st.markdown(blink_js, unsafe_allow_html=True)
-
-        # Create a button without the 'blink' class
-        if st.button("Blinking Button", key="blinking_button"):
-            st.write("Button clicked!")
-	    
+       
 
 
 
