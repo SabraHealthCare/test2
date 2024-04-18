@@ -1157,7 +1157,7 @@ def View_Discrepancy_Detail():
 # don't use cache
 def View_Discrepancy(): 
     global diff_BPC_PL	
-
+    st.write("diff_BPC_PL",diff_BPC_PL)
     if diff_BPC_PL.shape[0]>0:
         # save all the discrepancy 
         diff_BPC_PL["Operator"]=operator
