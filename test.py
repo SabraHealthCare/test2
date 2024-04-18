@@ -814,7 +814,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
                     continue
                 diff=BPC_value-PL_value
                 diff_percent=abs(diff)/max(abs(PL_value),abs(BPC_value))*100
-                if diff_percent>=1: 
+                if diff_percent>=0.001: 
                     # for diff_BPC_PL			
                     diff_single_record=pd.DataFrame({"TIME":timeid,"ENTITY":entity,"Sabra_Account":matrix,"Sabra":BPC_value,\
                                                      "P&L":PL_value,"Diff (Sabra-P&L)":diff,"Diff_Percent":diff_percent},index=[0])
@@ -842,7 +842,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
     return diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts
 	
 
-@st.cache_data(experimental_allow_widgets=True)
+#@st.cache_data(experimental_allow_widgets=True)
 def View_Summary():
     global Total_PL,latest_month_data,latest_month
     def highlight_total(df):
@@ -1169,7 +1169,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
 
 	    
 	# only display the big discrepancy
-        edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>1] 
+        edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>15] 
         if edited_diff_BPC_PL.shape[0]>0:
             st.error("{0:.1f}% P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.".format(percent_discrepancy_accounts*100))
             edited_diff_BPC_PL["Type comments below"]=""
@@ -1199,7 +1199,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
             col1,col2=st.columns([1,6]) 
             with col1:
                 submit_com=st.button("Submit comments")
-            View_Discrepancy_Detail()
+            #View_Discrepancy_Detail()
             if submit_com:
                 with st.empty():
                     with col2:
@@ -1477,8 +1477,8 @@ def Check_Reporting_Month(uploaded_finance):
             return latest_month
         else:
             st.stop()
-        
-@st.cache_data(experimental_allow_widgets=True)
+#why        
+#@st.cache_data(experimental_allow_widgets=True) 
 def Upload_And_Process(uploaded_file,file_type):
     Total_PL=pd.DataFrame()
     Total_PL_detail=pd.DataFrame()
