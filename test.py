@@ -841,7 +841,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
     return diff_BPC_PL,diff_BPC_PL_detail
 	
 
-#@st.cache_data(experimental_allow_widgets=True)
+@st.cache_data(experimental_allow_widgets=True)
 def View_Summary():
     global Total_PL,latest_month_data,latest_month
     def highlight_total(df):
@@ -973,8 +973,7 @@ def View_Summary():
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
   	
-        # upload latest month data to AWS
-        st.button("******Confirm and upload {} {}-{} reporting******".format(operator,latest_month[4:6],latest_month[0:4]),on_click=clicked, args=["submit_report"],key='latest_month')  
+        
 # no cache
 def Submit_Upload_Latestmonth():
     global Total_PL,latest_month   
@@ -987,13 +986,27 @@ def Submit_Upload_Latestmonth():
     if not st.session_state.clicked["submit_report"]:
         st.stop()
     else:
-     # save latest month data to OneDrive
+         # save latest month data to OneDrive
         if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_latest_month,operator,False):
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
             
         else:
             st.write(" ")  #----------record into error report------------------------	
-       
+         # save discrepancy data to OneDrive
+        if len(Total_PL.columns)>1 and diff_BPC_PL.shape[0]>0:
+            download_report(diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy")
+            Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,False)
+        
+	# save original tenant P&L to OneDrive
+        if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
+            st.write("unsuccess ")  #----------record into error report------------------------	
+
+        if BS_separate_excel=="Y":
+            # save tenant BS to OneDrive
+            if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
+                st.write(" unsuccess")  #----------record into error report------------------------	
+
+
 # create EPM formula for download data
 def EPM_Formula(data,value_name): # make sure there is no col on index for data
     data["EPM_Formula"]=""
@@ -1641,6 +1654,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         	
 	# 1 Summary
         View_Summary()
+        # upload latest month data to AWS
+        st.button("******Confirm and upload {} {}-{} reporting******".format(operator,latest_month[4:6],latest_month[0:4]),on_click=clicked, args=["submit_report"],key='latest_month')  
         #Submit_Upload_Latestmonth()      
         # 2 Discrepancy of Historic Data
         with st.expander("Discrepancy for Historic Data",expanded=True):
@@ -1652,18 +1667,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             elif len(Total_PL.columns)==1:
                 st.write("There is no previous month data in tenant P&L")
         Submit_Upload_Latestmonth()      
-        if len(Total_PL.columns)>1 and diff_BPC_PL.shape[0]>0:
-            download_report(diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy")
-            Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,False)
-        
-	# save original tenant P&L to OneDrive
-        if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
-            st.write("unsuccess ")  #----------record into error report------------------------	
-
-        if BS_separate_excel=="Y":
-            # save tenant BS to OneDrive
-            if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
-                st.write(" unsuccess")  #----------record into error report------------------------	
+       
 
     elif choice=="Manage Mapping":
         BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
