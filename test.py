@@ -1197,6 +1197,7 @@ def View_Discrepancy():
             col1,col2=st.columns([1,6]) 
             with col1:
                 submit_com=st.button("Submit comments")
+            st.write("11111111111111111111111111111111111")
             #View_Discrepancy_Detail()
             if submit_com:
                 with st.empty():
