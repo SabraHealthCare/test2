@@ -1167,7 +1167,7 @@ def View_Discrepancy():
 
 	    
 	# only display the big discrepancy
-        edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>15] 
+        edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>0.15] 
         if edited_diff_BPC_PL.shape[0]>0:
             st.error("Below P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.")
             edited_diff_BPC_PL["Type comments below"]=""
@@ -1197,7 +1197,6 @@ def View_Discrepancy():
             col1,col2=st.columns([1,6]) 
             with col1:
                 submit_com=st.button("Submit comments")
-            st.write("11111111111111111111111111111111111")
             #View_Discrepancy_Detail()
             if submit_com:
                 with st.empty():
