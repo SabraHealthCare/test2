@@ -896,7 +896,7 @@ def View_Summary():
 			        "Category":"Account Total",
 		                 latest_month:latest_month[4:6]+"/"+latest_month[0:4]},
 			    hide_index=True)
-        st.stop()
+        #st.stop()
 
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
