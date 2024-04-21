@@ -1687,24 +1687,23 @@ document.addEventListener("DOMContentLoaded", function() {
             Total_PL=Total_PL.combine_first(Total_BL)
             Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
 
-        with st.spinner('Wait for data checking'):    
-            if len(Total_PL.columns)==1:
-                Total_PL.columns=[latest_month]
-            elif len(Total_PL.columns)>1:  # there are previous months in P&L
-                previous_month_list=[month for month in Total_PL.columns.sort_values() if month<latest_month]
-                diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month,previous_month_list)
-        	
+        
+        if len(Total_PL.columns)==1:
+            Total_PL.columns=[latest_month]
+
+        elif len(Total_PL.columns)>1:  # there are previous months in P&L
+            previous_month_list=[month for month in Total_PL.columns.sort_values() if month<latest_month]
+            diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month,previous_month_list)
+	# make all the data int
+        Total_PL = Total_PL.astype(int) 	
+        diff_BPC_PL=diff_BPC_PL.astype(int) 
+        diff_BPC_PL_detail=diff_BPC_PL_detail.astype(int) 
+	    
 	# 1 Summary
         View_Summary()
-       
+       	
 
 
-
-
-
-
-
-	    
         # upload latest month data to AWS
         st.button("******Confirm and upload {} {}-{} reporting******".format(operator,latest_month[4:6],latest_month[0:4]),on_click=clicked, args=["submit_report"],key='latest_month')  
         #Submit_Upload_Latestmonth()      
