@@ -1487,7 +1487,7 @@ def Check_Reporting_Month(uploaded_finance):
             return latest_month
         else:
             st.stop()
-#why        
+        
 #@st.cache_data(experimental_allow_widgets=True) 
 def Upload_And_Process(uploaded_file,file_type):
     Total_PL=pd.DataFrame()
@@ -1588,46 +1588,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     choice=st.sidebar.selectbox("Menu", menu)
     if choice=="Upload P&L":
 
-    # Custom CSS for blinking animation
-        blink_css = """
-    @keyframes blink {
-    0% { opacity: 1; }
-    50% { opacity: 0; }
-    100% { opacity: 1; }
-}
-.blink {
-    animation: blink 1s infinite;
-}
-"""
-
-        # Custom JavaScript to add blink class to button on page load
-        blink_js = """
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    var button = document.getElementById("blinking_button");
-    button.classList.add("blink");
-});
-</script>
-"""
-
-        # Injecting custom CSS and JavaScript into the app
-        st.write("11111")
-        st.markdown(f'<style>{blink_css}</style>', unsafe_allow_html=True)
-        st.markdown(blink_js, unsafe_allow_html=True)
-
-        # Create a button without the 'blink' class
-        if st.button("Blinking Button", key="blinking_button"):
-            st.write("Button clicked!")
-	    
-
-
-
-
-
-
-
-
-
 	    
         BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
         entity_mapping,account_mapping=Initial_Mapping(operator)
@@ -1702,7 +1662,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	# 1 Summary
         View_Summary()
        	
-
 
         # upload latest month data to AWS
         st.button("******Confirm and upload {} {}-{} reporting******".format(operator,latest_month[4:6],latest_month[0:4]),on_click=clicked, args=["submit_report"],key='latest_month')  
