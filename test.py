@@ -1659,7 +1659,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         Total_PL = Total_PL.astype(int) 
         diff_BPC_PL.fillna(0, inplace=True)
         diff_BPC_PL=diff_BPC_PL.astype(int) 
-        diff_BPC_PL_detail=diff_BPC_PL_detail.astype(int) 
+        #diff_BPC_PL_detail=diff_BPC_PL_detail.astype(int) 
 	    
 	# 1 Summary
         View_Summary()
