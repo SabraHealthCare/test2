@@ -1656,7 +1656,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month,previous_month_list)
 	# make all the data int
         Total_PL.fillna(0, inplace=True)    
-        Total_PL = Total_PL.astype(int) 	
+        Total_PL = Total_PL.astype(int) 
+        diff_BPC_PL.fillna(0, inplace=True)
         diff_BPC_PL=diff_BPC_PL.astype(int) 
         diff_BPC_PL_detail=diff_BPC_PL_detail.astype(int) 
 	    
