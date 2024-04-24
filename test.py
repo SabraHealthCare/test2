@@ -1355,7 +1355,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 
 #@st.cache_data(experimental_allow_widgets=True)      
 def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):  
-    global account_mapping
+    global account_mapping,latest_month
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
 
@@ -1378,7 +1378,9 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
         date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
         if len(date_header[0])==1 and date_header[0]==[0]:
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
-            st.stop()     
+            st.stop()  
+        if latest_month=="0":
+            latest_month=Check_Reporting_Month(date_header)
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         #remove row above date
@@ -1417,24 +1419,11 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
     return PL,PL_with_detail
 
 
-def Check_Reporting_Month(uploaded_finance):
+def Check_Reporting_Month(date_header):
     if current_month<10:
         current_date=str(current_year)+"0"+str(current_month)
     else:
         current_date=str(current_year)+str(current_month)
-    sheet_name=entity_mapping["Sheet_Name_Finance"].iloc[0]
-    # read data from uploaded file
-    PL = pd.read_excel(uploaded_finance,sheet_name=sheet_name,header=None)	
-   
-    tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,"Sheet_Name_Finance")
-    if tenantAccount_col_no==None:
-        st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
-        st.stop()   
-
-    date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
-    if len(date_header[0])==1 and date_header[0]==[0]:
-        st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
-        st.stop()     
 
     reporting_month_list=list(filter(lambda x: x!="0",list(map(lambda x:str(x),date_header[0]))	))
     latest_month=max(reporting_month_list)
@@ -1605,6 +1594,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         entity_mapping,account_mapping=Initial_Mapping(operator)
         global latest_month,reporting_month_label
         reporting_month_label=True
+        latest_month="0"
         if all(entity_mapping["BS_separate_excel"]=="Y"):
             BS_separate_excel="Y"
         else:
@@ -1641,14 +1631,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.stop()
 		
         if BS_separate_excel=="N":  # Finance/BS are in one excel
-            entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	
-            latest_month=Check_Reporting_Month(uploaded_finance)	 
+            entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
 
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel 
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")
             entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
-            latest_month=Check_Reporting_Month(uploaded_finance)
 
             # process Finance 
             with st.spinner('Wait for P&L process'):
