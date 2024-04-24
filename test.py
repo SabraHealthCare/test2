@@ -849,8 +849,7 @@ def View_Summary():
     def color_missing(data):
         return f'background-color: rgb(255, 204, 204);'
 
-
-    Total_PL=Total_PL.fillna(0)
+    Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
@@ -860,8 +859,7 @@ def View_Summary():
     check_patient_days['Category'] = check_patient_days['Category'].replace('Facility Information', 'Operating Beds')
 
     check_patient_days=check_patient_days[["Category","Property_Name",latest_month]].groupby(["Category","Property_Name"]).sum()
-    check_patient_days.fillna(0, inplace=True)
-
+    check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
     problem_properties=[]
     zero_patient_days=[]
 
@@ -968,7 +966,9 @@ def View_Summary():
         ChangeWidgetFontSize("Summary of {}/{} reporting".format(latest_month[4:6],latest_month[0:4]), '25px')
         download_report(latest_month_data,"{} {}-{} Report".format(operator,latest_month[4:6],latest_month[0:4]))
 
-        styled_table = (latest_month_data.replace(0,'').fillna('').style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
+        latest_month_data=latest_month_data.fillna(0).infer_objects(copy=False)
+        latest_month_data=latest_month_data.replace(0,'')
+        styled_table = (latest_month_data.style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
@@ -1655,8 +1655,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             previous_month_list=[month for month in Total_PL.columns.sort_values() if month<latest_month]
             diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month,previous_month_list)
 	# make all the data int
-        #Total_PL.fillna(0, inplace=True)    
-        #Total_PL = Total_PL.astype(int) 
+        Total_PL = Total_PL.fillna(0).infer_objects(copy=False)  
+        Total_PL = Total_PL.astype(int) 
         #diff_BPC_PL.fillna(0, inplace=True)
         #diff_BPC_PL=diff_BPC_PL.astype(int) 
         #diff_BPC_PL_detail=diff_BPC_PL_detail.astype(int) 
