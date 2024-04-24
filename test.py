@@ -837,9 +837,9 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
                     if diff_BPC_PL.isna().shape[0]==0:
                         diff_BPC_PL = diff_single_record
                         diff_BPC_PL_detail=diff_detail_records
-		    else:
+                    else:
                         diff_BPC_PL=pd.concat([diff_BPC_PL,diff_single_record],ignore_index=True)
-                        diff_BPC_PL_detail=pd.concat([diff_BPC_PL_detail,diff_detail_records])
+                        diff_BPC_PL_detail=pd.concat([diff_BPC_PL_detail,diff_detail_records],ignore_index=True)
 			    
                     
     if diff_BPC_PL.shape[0]>0:
