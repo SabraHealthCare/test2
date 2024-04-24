@@ -1411,7 +1411,7 @@ def Check_Reporting_Month(uploaded_finance):
         current_date=str(current_year)+"0"+str(current_month)
     else:
         current_date=str(current_year)+str(current_month)
-    sheet_name=entity_mapping["Sheet_Name_Finance"][0]
+    sheet_name=entity_mapping["Sheet_Name_Finance"].iloc[0]
     # read data from uploaded file
     PL = pd.read_excel(uploaded_finance,sheet_name=sheet_name,header=None)	
    
@@ -1551,6 +1551,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)    
+            Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multiindex of Total_Pl
     return Total_PL,Total_PL_detail
 
 #----------------------------------website widges------------------------------------
