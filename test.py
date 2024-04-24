@@ -923,7 +923,7 @@ def View_Summary():
     if missing_category.shape[0]>0:
         st.write("No data detected for below properties and accounts: ")
         missing_category=missing_category[["ENTITY",latest_month,"Category"]].merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-        st.dataframe(missing_category[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
+        st.dataframe(missing_category[["Property_Name","Category",latest_month]].style.map(color_missing, subset=[latest_month]),
 		    column_config={
 			        "Property_Name": "Property",
 			        "Category":"Account category",
