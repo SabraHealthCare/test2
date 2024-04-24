@@ -819,7 +819,8 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
                     # for diff_BPC_PL			
                     diff_single_record=pd.DataFrame({"TIME":timeid,"ENTITY":entity,"Sabra_Account":matrix,"Sabra":BPC_value,\
                                                      "P&L":PL_value,"Diff (Sabra-P&L)":diff,"Diff_Percent":diff_percent},index=[0])
-                    diff_BPC_PL=pd.concat([diff_BPC_PL,diff_single_record],ignore_index=True)
+
+
                     
 		    # for diff_detail_records
                     diff_detail_records=PL_with_detail.loc[(PL_with_detail["Sabra_Account"]==matrix)&(PL_with_detail["ENTITY"]==entity)]\
@@ -833,7 +834,14 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month,month_list):
                         diff_detail_records["Sabra"]=BPC_value
                         diff_detail_records["Diff (Sabra-P&L)"]=diff
 
-                    diff_BPC_PL_detail=pd.concat([diff_BPC_PL_detail,diff_detail_records])
+                    if diff_BPC_PL.isna().shape[0]==0:
+                        diff_BPC_PL = diff_single_record
+                        diff_BPC_PL_detail=diff_detail_records
+		    else:
+                        diff_BPC_PL=pd.concat([diff_BPC_PL,diff_single_record],ignore_index=True)
+                        diff_BPC_PL_detail=pd.concat([diff_BPC_PL_detail,diff_detail_records])
+			    
+                    
     if diff_BPC_PL.shape[0]>0:
         #percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
         diff_BPC_PL=diff_BPC_PL.merge(BPC_Account[["Category","Sabra_Account_Full_Name","BPC_Account_Name"]],left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")        
