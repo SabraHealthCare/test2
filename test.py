@@ -865,8 +865,8 @@ def View_Summary():
 
     # check patient days ( available days > patient days)	
     check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(["A_ACH","A_IL","A_ALZ","A_SNF","A_ALF","A_BH","A_IRF","A_LTACH","A_SP_HOSP"])) | (latest_month_data["Category"]=='Patient Days')]
-    check_patient_days['Category'] = check_patient_days['Category'].replace('Facility Information', 'Operating Beds')
-
+    #check_patient_days['Category'] = check_patient_days['Category'].replace('Facility Information', 'Operating Beds')
+    check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
     check_patient_days=check_patient_days[["Category","Property_Name",latest_month]].groupby(["Category","Property_Name"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
     problem_properties=[]
@@ -954,7 +954,8 @@ def View_Summary():
     latest_month_data.Category = latest_month_data.Category.cat.set_categories(sorter)
     latest_month_data=latest_month_data.sort_values(["Category"]) 
 
-    latest_month_data = pd.concat([latest_month_data.groupby(by='Category',as_index=False).sum().assign(Sabra_Account="Total_Sabra"),latest_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns]     
+    #latest_month_data = pd.concat([latest_month_data.groupby(by='Category',as_index=False).sum().assign(Sabra_Account="Total_Sabra"),latest_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns]     
+    latest_month_data = pd.concat([latest_month_data.groupby(by='Category', as_index=False).sum().assign(Sabra_Account="Total_Sabra"), latest_month_data], observed=False).sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns]
     set_empty=list(latest_month_data.columns)
     set_empty.remove("Category")
     set_empty.remove("Sabra_Account")
