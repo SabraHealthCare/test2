@@ -1349,7 +1349,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
                 if (records_idx == records_idx.iloc[0]).all(axis=None):
                     PL = pd.concat([PL.loc[idx_account].drop_duplicates().head(1), PL.loc[PL.index != idx_account]])
                     dup_tenant_account.remove(idx_account)  
-                    st.write("1",dup_tenant_account,idx_account)
+
             if len(dup_tenant_account)>0:
                 st.error("Duplicated accounts detected in {} sheet '{}'. Please rectify them to avoid repeated calculations: **{}** ".format(sheet_type_name,sheet_name,", ".join(dup_tenant_account)))
 	    
@@ -1424,7 +1424,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
                 # if all records have the same data, remove the duplicated records, remove this account from dup_tenant_account
                 if (records_idx == records_idx.iloc[0]).all(axis=None):
                     PL = pd.concat([PL.loc[idx_account].drop_duplicates().head(1), PL.loc[PL.index != idx_account]])
-                    dup_tenant_account.remove(idx_account)   
+                    dup_tenant_account.remove(idx_account)  
+                    st.write("1",dup_tenant_account,idx_account)
             if len(dup_tenant_account)>0:
                 st.error("Duplicated accounts detected in {} sheet '{}'. Please rectify them to avoid repeated calculations: **{}** ".format(sheet_type_name,sheet_name,", ".join(dup_tenant_account)))
         # Map PL accounts and Sabra account
