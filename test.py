@@ -1419,6 +1419,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
 
         if len(dup_tenant_account_total)>0:
             dup_tenant_account=[x for x in dup_tenant_account_total if x.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"])]
+            st.write("dup_tenant_account",dup_tenant_account)
             for idx_account in dup_tenant_account[:]:
 		# Extract records with current index value
                 records_idx = PL.loc[idx_account]
