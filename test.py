@@ -1181,14 +1181,13 @@ def View_Discrepancy_Detail():
 # don't use cache
 def View_Discrepancy(): 
     global diff_BPC_PL	
-    st.write("0",diff_BPC_PL)
     if diff_BPC_PL.shape[0]>0:
         # save all the discrepancy 
         diff_BPC_PL["Operator"]=operator
         diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
 	# insert dims to diff_BPC_PL
         diff_BPC_PL["TIME"]=diff_BPC_PL["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
-        st.write("1",diff_BPC_PL)
+
 	# only display the big discrepancy
         edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>0.15] 
         if edited_diff_BPC_PL.shape[0]>0:
