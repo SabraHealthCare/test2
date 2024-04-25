@@ -1416,6 +1416,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
      
         #if there are duplicated accounts in P&L, ask for confirming
         dup_tenant_account_total=set([x for x in PL.index if list(PL.index).count(x) > 1])
+        st.write("0",dup_tenant_account_total)
         if len(dup_tenant_account_total)>0:
             dup_tenant_account=[x for x in dup_tenant_account_total if x.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"])]
             for idx_account in dup_tenant_account:
