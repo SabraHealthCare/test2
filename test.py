@@ -23,6 +23,7 @@ from msal import ConfidentialClientApplication
 import requests
 from itertools import product
 from pandas.errors import EmptyDataError
+import pytz
 s3 = boto3.client('s3')
 
 #---------------------------define parameters--------------------------
@@ -147,6 +148,10 @@ def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # 
 
     if value_name is not False: # set formula 
         updated_data=EPM_Formula(updated_data,value_name)
+    if file_name==monthly_reporting_filename:
+        updated_data['Amount'] = updated_data.to_numeric(updated_data['Amount'], errors='coerce')
+    elif file_name==discrepancy_filename:
+        updated_data["P&L"] = updated_data.to_numeric(updated_data['P&L'], errors='coerce')
     return Save_as_CSV_Onedrive(updated_data,path,file_name)  # return True False
 
 
@@ -992,8 +997,11 @@ def Submit_Upload_Latestmonth():
     upload_latest_month["TIME"]=latest_month
     upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
     upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
-    upload_latest_month["Latest_Upload_Time"]=str(today)+" "+datetime.now().strftime("%H:%M")
+    current_time = datetime.now(pytz.timezone('America/Los_Angeles')).strftime("%H:%M")
+    upload_latest_month["Latest_Upload_Time"]=str(today)+" "+current_time
     upload_latest_month["Operator"]=operator
+
+
     if not st.session_state.clicked["submit_report"]:
         st.stop()
     else:
@@ -1668,12 +1676,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         elif len(Total_PL.columns)>1:  # there are previous months in P&L
             previous_month_list=[month for month in Total_PL.columns.sort_values() if month<latest_month]
             diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month,previous_month_list)
-	# make all the data int
-        Total_PL = Total_PL.fillna(0).infer_objects(copy=False)  
-        Total_PL = Total_PL.astype(int) 
-        #diff_BPC_PL.fillna(0, inplace=True)
-        #diff_BPC_PL=diff_BPC_PL.astype(int) 
-        #diff_BPC_PL_detail=diff_BPC_PL_detail.astype(int) 
 	    
 	# 1 Summary
         View_Summary()
@@ -1681,7 +1683,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
         # upload latest month data to AWS
         st.button("******Confirm and upload {} {}-{} reporting******".format(operator,latest_month[4:6],latest_month[0:4]),on_click=clicked, args=["submit_report"],key='latest_month')  
-        #Submit_Upload_Latestmonth()      
+       
         # 2 Discrepancy of Historic Data
         with st.expander("Discrepancy for Historic Data",expanded=True):
             ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
@@ -1691,7 +1693,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 
             elif len(Total_PL.columns)==1:
                 st.write("There is no previous month data in tenant P&L")
-        Submit_Upload_Latestmonth()      
+        Submit_Upload_Latestmonth(Submit_Upload_Latestmonth)      
        
 
     elif choice=="Manage Mapping":
