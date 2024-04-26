@@ -1695,7 +1695,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 
             elif len(Total_PL.columns)==1:
                 st.write("There is no previous month data in tenant P&L")
-        Submit_Upload_Latestmonth(Submit_Upload_Latestmonth)      
+        Submit_Upload_Latestmonth()      
        
 
     elif choice=="Manage Mapping":
