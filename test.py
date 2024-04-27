@@ -791,7 +791,6 @@ def Map_PL_Sabra(PL,entity):
     PL=PL.drop(["Tenant_Account"], axis=1)
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()#.replace(0,None)
     PL= PL.astype(int)    
-    st.write("after int",PL)
     return PL,PL_with_detail        
     
 @st.cache_data
@@ -1540,12 +1539,14 @@ def Upload_And_Process(uploaded_file,file_type):
                     if not pd.isna(sheet_name_balance) and sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
                         PL_BS,PL_with_detail_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file)
                         PL=PL.combine_first(PL_BS)
+
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
                 elif file_type=="Finance" and BS_separate_excel=="Y": 
                     PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file)
 
                 elif file_type=="BS" and BS_separate_excel=="Y": 
                     PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file)
+                    st.write("BS_PL",PL)
                 total_entity_list.remove(entity_i) 
             # All the properties are in one sheet		
             elif entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="N":
