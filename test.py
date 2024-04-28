@@ -789,8 +789,9 @@ def Map_PL_Sabra(PL,entity):
     PL_with_detail=PL_with_detail.set_index(['ENTITY', 'Sabra_Account',"Tenant_Account"])
     # group by Sabra_Account
     PL=PL.drop(["Tenant_Account"], axis=1)
-    PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()#.replace(0,None)
+    PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.astype(int)    
+    PL=PL.replace(0,None)
     return PL,PL_with_detail        
     
 @st.cache_data
@@ -1546,7 +1547,6 @@ def Upload_And_Process(uploaded_file,file_type):
 
                 elif file_type=="BS" and BS_separate_excel=="Y": 
                     PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file)
-                    st.write("BS_PL",PL)
                 total_entity_list.remove(entity_i) 
             # All the properties are in one sheet		
             elif entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="N":
@@ -1576,7 +1576,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)    
-            Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multiindex of Total_Pl
+    Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multiindex of Total_Pl
     return Total_PL,Total_PL_detail
 
 #----------------------------------website widges------------------------------------
