@@ -29,6 +29,7 @@ s3 = boto3.client('s3')
 #---------------------------define parameters--------------------------
 st.set_page_config(
    initial_sidebar_state="expanded",
+    client_show_cursor_widget=False
     layout="wide")
 placeholder = st.empty()
 st.title("Sabra HealthCare Monthly Reporting App")
