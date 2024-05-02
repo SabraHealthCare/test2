@@ -998,7 +998,6 @@ def Submit_Upload_Latestmonth():
     upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
     upload_latest_month["TIME"]=latest_month
     upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
-    upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
     current_time = datetime.now(pytz.timezone('America/Los_Angeles')).strftime("%H:%M")
     upload_latest_month["Latest_Upload_Time"]=str(today)+" "+current_time
     upload_latest_month["Operator"]=operator
