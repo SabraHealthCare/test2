@@ -1855,8 +1855,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 col1,col2,col3=st.columns((2,1,1))
                 summary=data[["TIME","Operator","Latest_Upload_Time"]].drop_duplicates()
                 summary = summary.sort_values(by="Latest_Upload_Time", ascending=False)
-                #with col2:
-                    #data=filters_widgets(data,["Operator","TIME"],"Horizontal")
+
                 with col1:
                     st.dataframe(
 			    summary,
