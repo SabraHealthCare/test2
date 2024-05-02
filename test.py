@@ -123,7 +123,7 @@ def Save_as_CSV_Onedrive(df,path,file_name):
 
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
 @st.cache_data
-def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # replace original data
+def Update_File_Onedrive(path,file_name,new_data,operator):  # replace original data
     original_data=Read_CSV_From_Onedrive(path,file_name)
    
     if  isinstance(original_data, pd.DataFrame):
@@ -144,13 +144,6 @@ def Update_File_Onedrive(path,file_name,new_data,operator,value_name=False):  # 
         updated_data=new_data.reset_index(drop=False)
         new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns))
         updated_data=updated_data[new_columns_name]	
-
-    if value_name is not False: # set formula 
-        updated_data=EPM_Formula(updated_data,value_name)
-    if file_name==monthly_reporting_filename:
-        updated_data['Amount'] = updated_data.to_numeric(updated_data['Amount'], errors='coerce')
-    elif file_name==discrepancy_filename:
-        updated_data["P&L"] = updated_data.to_numeric(updated_data['P&L'], errors='coerce')
     return Save_as_CSV_Onedrive(updated_data,path,file_name)  # return True False
 
 
@@ -1006,7 +999,7 @@ def Submit_Upload_Latestmonth():
         st.stop()
     else:
          # save latest month data to OneDrive
-        if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_latest_month,operator,False):
+        if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_latest_month,operator):
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
             
         else:
@@ -1014,7 +1007,7 @@ def Submit_Upload_Latestmonth():
          # save discrepancy data to OneDrive
         if len(Total_PL.columns)>1 and diff_BPC_PL.shape[0]>0:
             download_report(diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy")
-            Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,False)
+            Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator)
         
 	# save original tenant P&L to OneDrive
         if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
