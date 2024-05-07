@@ -348,23 +348,13 @@ def filters_widgets(df, columns,location="Vertical"):
 
 
 @st.cache_data
-def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
+def Identify_Tenant_Account_Col(PL,sheet_name):
     #search tenant account column in P&L, return col number of tenant account	
-    account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
-
-    if sheet_type=="Sheet_Name_Finance":
-        account_pool=account_pool.loc[account_pool["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Formated_Account"]
-    elif sheet_type=="Sheet_Name_Occupancy": 
-        account_pool=account_pool.loc[account_pool["Category"]=="Patient Days"]["Tenant_Formated_Account"]	       
-    elif sheet_type=="Sheet_Name_Balance_Sheet":
-        account_pool=account_pool.loc[account_pool["Category"]=="Balance Sheet"]["Tenant_Formated_Account"] 
-
     max_match=0
-    for tenantAccount_col_no in range(0,min(20,PL.shape[1])):
-
+    for tenantAccount_col_no in range(0,min(15,PL.shape[1])):
         candidate_col=list(map(lambda x: str(x).strip().upper() if not pd.isna(x) and isinstance(x, str) else x,PL.iloc[:,tenantAccount_col_no]))
-        #find out how many tenant accounts match with account_pool
-        match=[x in candidate_col for x in account_pool]
+        #find out how many tenant accounts match with account_mapping
+        match=[x in candidate_col for x in account_mapping]
 
         #If 10% of accounts match with account_mapping list, identify this col as a candidate tenant account col.
 	#and sum(x for x in match)/len(match)>0.1
@@ -1297,7 +1287,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 
     # read data from uploaded file
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
-   
+	
     # Start checking process
     if True:   
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
