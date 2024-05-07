@@ -348,22 +348,29 @@ def filters_widgets(df, columns,location="Vertical"):
 
 
 @st.cache_data
-def Identify_Tenant_Account_Col(PL,sheet_name):
+def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type,account_pool,pre_max_match_col=10000):
     #search tenant account column in P&L, return col number of tenant account	
+    if pre_max_match!=10000:
+        #check if pre_max_match is the tenant_col
+	candidate_col=list(map(lambda x: str(x).strip().upper() if not pd.isna(x) and isinstance(x, str) else x,PL.iloc[:,pre_max_match_col]))
+        match=[x in candidate_col for x in account_pool]
+        if len(match)>0 and sum(x for x in match)/len(account_pool)>0.5:
+            return pre_max_match_col
     max_match=0
     for tenantAccount_col_no in range(0,min(15,PL.shape[1])):
         candidate_col=list(map(lambda x: str(x).strip().upper() if not pd.isna(x) and isinstance(x, str) else x,PL.iloc[:,tenantAccount_col_no]))
         #find out how many tenant accounts match with account_mapping
-        match=[x in candidate_col for x in account_mapping]
+        match=[x in candidate_col for x in account_pool]
 
         #If 10% of accounts match with account_mapping list, identify this col as a candidate tenant account col.
-	#and sum(x for x in match)/len(match)>0.1
-        if len(match)>0 and sum(x for x in match)>max_match:
+	#and sum(x for x in match)/len(account_pool)>0.1
+        match_count=sum(x for x in match)
+        if len(match)>0 and match_count>max_match:
             max_match_col=tenantAccount_col_no
-            max_match=sum(x for x in match)
+            max_match=match_count
     if max_match>0:
         return max_match_col     
-    st.error("Fail to identify tenant accounts column in sheet—— '"+sheet_name+"'")
+    st.error("Fail to identify tenant accounts column in {} sheet —— {}".format(sheet_type,sheet_name))
     st.stop()
 
 
