@@ -1357,7 +1357,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file):
 
 
 #@st.cache_data(experimental_allow_widgets=True)      
-def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):  
+def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):  
     global account_mapping,latest_month
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
@@ -1373,7 +1373,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file):
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
-        tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
+        tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type,account_pool)
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()   
@@ -1513,8 +1513,10 @@ def Upload_And_Process(uploaded_file,file_type):
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
-                    PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file)
-                    
+                    account_pool=account_mapping.loc[account_mapping["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Formated_Account"]
+                    PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool)
+
+			
                     # check if census data in another sheet
                     if not pd.isna(sheet_name_occupancy) and sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy is not None and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
