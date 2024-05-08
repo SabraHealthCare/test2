@@ -1367,7 +1367,7 @@ def get_previous_months(latest_month,full_date_header):
         previous_date = latest_date - timedelta(days=latest_date.day, weeks=i*4)
         # Format the date back to the desired string format and append to the list
         month_list.append(previous_date.strftime("%Y%m"))
-    month_column=filter(lambda x: x in month_list for x in full_date_header)
+    month_column=list(filter(lambda x: x in month_list,full_date_header))
     return month_column
 
 #no cache    
