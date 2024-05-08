@@ -508,7 +508,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     if len(pre_date_header[2])!=0:
         st.write(111)
         st.write(PL.iloc[pre_date_header[1],:],pre_date_header[2])
-        if PL.iloc[pre_date_header[1],:]==pre_date_header[2]:	
+        if are_equal = PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]) :#PL.iloc[pre_date_header[1],:]==pre_date_header[2]:	
             st.write("yess")
             return pre_date_header
     PL_row_size=PL.shape[0]
