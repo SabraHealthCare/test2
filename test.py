@@ -307,8 +307,6 @@ def Create_Tree_Hierarchy(bucket_mapping):
 parent_hierarchy_main,parent_hierarchy_second,BPC_Account=Create_Tree_Hierarchy(bucket_mapping)
 
 #-----------------------------------------------functions---------------------------------------------
-# setting for page
-@st.cache_data
 def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
     htmlstr = """<script>var elements = window.parent.document.querySelectorAll('*'), i;
                     for (i = 0; i < elements.length; ++i) { if (elements[i].innerText == |wgt_txt|) 
@@ -344,9 +342,6 @@ def filters_widgets(df, columns,location="Vertical"):
             return df
         else:
             return df
-
-
-@st.cache_data
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type,account_pool,pre_max_match_col):
     #search tenant account column in P&L, return col number of tenant account	
     if pre_max_match_col!=10000:
@@ -383,7 +378,8 @@ def Get_Year(single_string):
             if Year_keyword in single_string:
                 return Year,Year_keyword
     return 0,""
-@st.cache_data
+
+
 def Get_Month_Year(single_string):
     if single_string!=single_string or pd.isna(single_string):
         return 0,0
@@ -415,7 +411,8 @@ def Get_Month_Year(single_string):
                 continue
     # didn't find month. return month as 0
     return 0,Year    
-@st.cache_data    
+
+
 def Month_continuity_check(month_list):
     inv=[]
     month_list=list(filter(lambda x:x!=0,month_list))
@@ -429,7 +426,8 @@ def Month_continuity_check(month_list):
             return True  # Month list is continous 
         else:
             return False # Month list is not continous 
-@st.cache_data            
+
+
 def Year_continuity_check(year_list):
     inv=[]
     year_list=list(filter(lambda x:x!=0,year_list))
@@ -1351,6 +1349,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file,ac
 	    
         # Map PL accounts and Sabra account
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
+	# map sabra account with tenant account, groupby sabra account
         PL=Map_PL_Sabra(PL,entity_list) 
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
@@ -1358,7 +1357,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file,ac
     return PL
 	
 @st.cache_data
-def get_previous_months(latest_month,full_date_header):
+def Get_Previous_Months(latest_month,full_date_header):
     # Convert the latest_month string to a datetime object
     latest_date = datetime.strptime(latest_month, "%Y%m")
     month_list = [latest_month]
@@ -1400,8 +1399,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         if latest_month=="0":
             latest_month=Check_Reporting_Month(date_header)
 
-        # select only two or one previous months for column
-        month_select = get_previous_months(latest_month,date_header[0])
+        # select only two or one previous months for columns
+        month_select = Get_Previous_Months(latest_month,date_header[0])
 	
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
@@ -1518,8 +1517,8 @@ def Check_Reporting_Month(date_header):
             return latest_month
         else:
             st.stop()
-        
-#@st.cache_data(experimental_allow_widgets=True) 
+
+# no cache
 def Upload_And_Process(uploaded_file,file_type):
     Total_PL=pd.DataFrame()
     Total_PL_detail=pd.DataFrame()
