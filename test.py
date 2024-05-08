@@ -787,7 +787,7 @@ def Map_PL_Sabra(PL,entity):
 @st.cache_data
 def Compare_PL_Sabra(Total_PL,latest_month):
 #def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
-    PL_with_detail=PL_with_detail.reset_index(drop=False)
+    #PL_with_detail=PL_with_detail.reset_index(drop=False)
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)","Diff_Percent"])
     #diff_BPC_PL_detail=pd.DataFrame(columns=["ENTITY","Sabra_Account","Tenant_Account","Month","Sabra","P&L Value","Diff (Sabra-P&L)",""])
     month_list = list(filter(lambda x:x!=latest_month, Total_PL.columns))
