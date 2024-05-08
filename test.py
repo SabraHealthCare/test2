@@ -355,8 +355,10 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type,account_pool,pre_max_ma
         candidate_col=list(map(lambda x: str(x).strip().upper() if not pd.isna(x) and isinstance(x, str) else x,PL.iloc[:,pre_max_match_col]))
         match=[x in candidate_col for x in account_pool]
         if len(match)>0 and sum(x for x in match)/len(account_pool)>0.5:
+            st.write("yes")
             return pre_max_match_col
     max_match=0
+    st.write("No")
     for tenantAccount_col_no in range(0,min(15,PL.shape[1])):
         candidate_col=list(map(lambda x: str(x).strip().upper() if not pd.isna(x) and isinstance(x, str) else x,PL.iloc[:,tenantAccount_col_no]))
         #find out how many tenant accounts match with account_mapping
@@ -1374,14 +1376,12 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
-        st.write("tenant_account_col",tenant_account_col)
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type,account_pool,tenant_account_col)
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()   
         else:
             tenant_account_col=tenantAccount_col_no
-        st.write("tenant_account_col",tenant_account_col)
         date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
         if len(date_header[0])==1 and date_header[0]==[0]:
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
