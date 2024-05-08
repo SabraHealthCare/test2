@@ -567,7 +567,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                     if Year_continuity_check(year_row) and year_count[year_row_index]==month_count[month_row_index]:
                         PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
                         month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                        return PL_date_header,month_row_index,PL.iloc[month_row_index:,:]
+                        return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
                     
 
 		# all the year rows are not valid, add year to month
