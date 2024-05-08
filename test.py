@@ -1358,7 +1358,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file,ac
     return PL,PL_with_detail
 	
 @st.cache_data
-def get_previous_months(latest_month,full_date_header,previous_monthes_comparison):
+def get_previous_months(latest_month,full_date_header):
     # Convert the latest_month string to a datetime object
     latest_date = datetime.strptime(latest_month, "%Y%m")
     month_list = [latest_month]
@@ -1401,7 +1401,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
             latest_month=Check_Reporting_Month(date_header)
 
         # select only two or one previous months for column
-        month_select = get_previous_months(latest_month,date_header[0],2)
+        month_select = get_previous_months(latest_month,date_header[0])
 	
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
