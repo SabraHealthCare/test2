@@ -504,7 +504,10 @@ def Fill_Facility_Info(missing_category,latest_month):
         st.write(previous_facility_data_display)
 	
 @st.cache_data
-def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
+def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
+    if date_header[3]!=[] and date_header[0]!=[0] and PL.iloc[pre_date_header[1]+1:,:]==pre_date_header[3]:	
+            st.write("yess")
+            return pre_date_header
     PL_row_size=PL.shape[0]
     PL_col_size=PL.shape[1]
     search_row_size=min(30,PL_row_size)
@@ -561,7 +564,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                     if Year_continuity_check(year_row) and year_count[year_row_index]==month_count[month_row_index]:
                         PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
                         month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                        return PL_date_header,month_row_index
+                        return PL_date_header,month_row_index,PL.iloc[month_row_index:,:]
                     
 
 		# all the year rows are not valid, add year to month
@@ -579,7 +582,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                 
                 st.warning("Fail to identify **'Year'** in the date header for sheet '"+sheet_name+"'. Filled year as:")
                 st.markdown(d_str[1:])
-                return PL_date_header,month_row_index
+                return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
                 
         # only one month in header
         elif month_count[month_row_index]==1:	
@@ -621,7 +624,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                 continue
             else:
                 PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x))) 
-                return PL_date_header,month_row_index
+                return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
     st.error("Can't identify Year/Month header for sheet: '"+sheet_name+"'")
     st.stop()
 
@@ -1359,7 +1362,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file,ac
 
 #@st.cache_data(experimental_allow_widgets=True)      
 def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):  
-    global account_mapping,latest_month,tenant_account_col
+    global account_mapping,latest_month,tenant_account_col,date_header
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
 
@@ -1617,10 +1620,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
         entity_mapping,account_mapping=Initial_Mapping(operator)
         account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
-        global latest_month,reporting_month_label,tenant_account_col
+        global latest_month,reporting_month_label,tenant_account_col,date_header
         reporting_month_label=True
         latest_month="0"
         tenant_account_col=10000
+        date_header=[[0],0,[]]
         if all(entity_mapping["BS_separate_excel"]=="Y"):
             BS_separate_excel="Y"
         else:
