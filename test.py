@@ -15,7 +15,6 @@ import copy
 import streamlit.components.v1 as components
 from calendar import monthrange,month_abbr
 from authenticate import Authenticate
-import json
 import yaml
 from st_aggrid import AgGrid, GridUpdateMode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
@@ -1783,10 +1782,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	# update user details widget
         try:
             authenticator.update_user_details(st.session_state["username"], 'Update user details',config)
-            #if authenticator.update_user_details(st.session_state["username"], 'Update user details'):
-                #s33 = boto3.resource("s3").Bucket(bucket_PL)
-                #json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
-                #json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
+
         except Exception as e:
             st.error(e)
 
