@@ -1446,7 +1446,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         # Map PL accounts and Sabra account
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
         PL=Map_PL_Sabra(PL,entity_i) 
-    return PL,PL_with_detail
+    #return PL,PL_with_detail
+    return PL
        
 
 def Check_Reporting_Month(date_header):
