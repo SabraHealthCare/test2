@@ -44,7 +44,6 @@ BPC_account_filename="Sabra_account_list.csv"
 previous_monthes_comparison=1
 
 
-
 #One drive authority. Set application details
 client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
 client_secret = '1h28Q~Tw-xwTMPW9w0TqjbeaOhkYVDrDQ8VHcbkd'
@@ -1359,15 +1358,15 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file,ac
     return PL,PL_with_detail
 	
 @st.cache_data
-def get_previous_months(latest_month,full_date_header,compare_month_num):
+def get_previous_months(latest_month,full_date_header,previous_monthes_comparison):
     # Convert the latest_month string to a datetime object
     latest_date = datetime.strptime(latest_month, "%Y%m00")
     month_list = [latest_month]
-    for i in range(compare_month_num):
+    for i in range(previous_monthes_comparison):
         # Subtract i months to get the previous month
         previous_date = latest_date - timedelta(days=latest_date.day, weeks=i*4)
         # Format the date back to the desired string format and append to the list
-        month_list.append(previous_date.strftime("%Y%m00"))
+        month_list.append(previous_date.strftime("%Y%m"))
     month_column=filter(lambda x: x in month_list for x in full_date_header)
     return month_column
 
@@ -1408,9 +1407,9 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         #remove row above date
         PL=PL.iloc[date_header[1]+1:,:]
-        # remove column without date col name, (the date row is not equal to 0)
-        non_zero_columns = [val in month_select for val in date_header[0]]
-        PL = PL.loc[:,non_zero_columns]   
+        # filter columns with month_select
+        selected_columns = [val in month_select for val in date_header[0]]
+        PL = PL.loc[:,selected_columns]   
         PL.columns= [value for value in date_header[0] if value in month_select]
   
         #remove rows with nan tenant account
@@ -1420,7 +1419,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         PL.index=map(lambda x:str(x).strip(),PL.index)
         PL=PL.map(lambda x: 0 if (x!=x) or pd.isna(x) or isinstance(x, str) or x==" " else x)	    
         # remove columns with all nan/0
-        PL=PL.loc[:,(PL!= 0).any(axis=0)]
+        #PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
         PL=PL.loc[(PL!= 0).any(axis=1),:]
 	    
