@@ -790,7 +790,7 @@ def Compare_PL_Sabra(Total_PL,latest_month):
     PL_with_detail=PL_with_detail.reset_index(drop=False)
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)","Diff_Percent"])
     #diff_BPC_PL_detail=pd.DataFrame(columns=["ENTITY","Sabra_Account","Tenant_Account","Month","Sabra","P&L Value","Diff (Sabra-P&L)",""])
-    month_list = list(filter(lambda x:x!=latest_month, Total_PL.columns)
+    month_list = list(filter(lambda x:x!=latest_month, Total_PL.columns))
     for entity in entity_mapping.index:
         for timeid in month_list: 
 	    # if this entity don't have data for this timeid(new/transferred property), skip to next month
