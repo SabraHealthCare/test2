@@ -505,7 +505,7 @@ def Fill_Facility_Info(missing_category,latest_month):
 	
 @st.cache_data
 def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
-    if date_header[3]!=[] and date_header[0]!=[0] and PL.iloc[pre_date_header[1]+1:,:]==pre_date_header[3]:	
+    if pre_date_header[2]!=[] and pre_date_header[0]!=[0] and PL.iloc[pre_date_header[1],:]==pre_date_header[2]:	
             st.write("yess")
             return pre_date_header
     PL_row_size=PL.shape[0]
