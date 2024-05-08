@@ -1360,7 +1360,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file,ac
 @st.cache_data
 def get_previous_months(latest_month,full_date_header,previous_monthes_comparison):
     # Convert the latest_month string to a datetime object
-    latest_date = datetime.strptime(latest_month, "%Y%m00")
+    latest_date = datetime.strptime(latest_month, "%Y%m")
     month_list = [latest_month]
     for i in range(previous_monthes_comparison):
         # Subtract i months to get the previous month
