@@ -506,10 +506,7 @@ def Fill_Facility_Info(missing_category,latest_month):
 @st.cache_data
 def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     if len(pre_date_header[2])!=0:
-        #st.write(111)
-        #st.write(PL.iloc[pre_date_header[1],:],pre_date_header[2])
-        if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]) :#PL.iloc[pre_date_header[1],:]==pre_date_header[2]:	
-            st.write("yess")
+        if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
             return pre_date_header
     PL_row_size=PL.shape[0]
     PL_col_size=PL.shape[1]
@@ -538,7 +535,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         
     month_sort_index = np.argsort(np.array(month_count))
     year_sort_index = np.argsort(np.array(year_count))
-    for month_index_i in range(-1,-10,-1): # only check three of the most possible rows
+    for month_index_i in range(-1,-10,-1): 
         #month_sort_index[-1] is the index number of month_count in which has max month count
         #month_row_index is also the index/row number of PL
         month_row_index=month_sort_index[month_index_i]
@@ -1275,9 +1272,9 @@ def Identify_Reporting_Month(PL,entity_header_row_number):
                     return "{}{}".format(year,month)
     return "reporting_month_TBD"
 
-#@st.cache_data(experimental_allow_widgets=True)      
+# no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file,account_pool):  
-    global account_mapping,tenant_account_col
+    global account_mapping
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
     sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if (not pd.isna(x))]
     sheet_name_list = list(set(sheet_name_list))
@@ -1307,8 +1304,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file,ac
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
-        else:
-            tenant_account_col=tenantAccount_col_no
+
         entity_header_row_number,new_entity_header=Identify_Property_Name_Header(PL,entity_list,sheet_name) 
 	#set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
@@ -1361,9 +1357,21 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file,ac
         PL.rename(columns={"value":reporting_month},inplace=True)
         PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
     return PL,PL_with_detail
+	
+@st.cache_data
+def get_previous_months(latest_month,full_date_header,compare_month_num):
+    # Convert the latest_month string to a datetime object
+    latest_date = datetime.strptime(latest_month, "%Y%m00")
+    month_list = [latest_month]
+    for i in range(compare_month_num):
+        # Subtract i months to get the previous month
+        previous_date = latest_date - timedelta(days=latest_date.day, weeks=i*4)
+        # Format the date back to the desired string format and append to the list
+        month_list.append(previous_date.strftime("%Y%m00"))
+    month_column=filter(lambda x: x in month_list for x in full_date_header)
+    return month_column
 
-
-#@st.cache_data(experimental_allow_widgets=True)      
+#no cache    
 def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):  
     global account_mapping,latest_month,tenant_account_col,date_header
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
@@ -1387,19 +1395,23 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         else:
             tenant_account_col=tenantAccount_col_no
         date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,date_header)
-        if len(date_header[0])==1 and date_header[0]==[0]:
+        if len(date_header[2])==0:
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()  
         if latest_month=="0":
             latest_month=Check_Reporting_Month(date_header)
+
+        # select only two or one previous months for column
+        month_select = get_previous_months(latest_month,date_header[0],2)
+	
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         #remove row above date
         PL=PL.iloc[date_header[1]+1:,:]
         # remove column without date col name, (the date row is not equal to 0)
-        non_zero_columns = [val !="0" for val in date_header[0]]
+        non_zero_columns = [val in month_select for val in date_header[0]]
         PL = PL.loc[:,non_zero_columns]   
-        PL.columns= [value for value in date_header[0] if value != "0"]
+        PL.columns= [value for value in date_header[0] if value in month_select]
   
         #remove rows with nan tenant account
         nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x!=x ,PL.index))
