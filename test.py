@@ -822,8 +822,7 @@ def Compare_PL_Sabra(Total_PL,latest_month):
 			                #[["ENTITY","Sabra_Account","Tenant_Account",timeid]].rename(columns={timeid:"P&L Value"})
                     #if there is no record in diff_detail_records, means there is no mapping
                     #if diff_detail_records.shape[0]==0:
-                        #diff_detail_records=pd.DataFrame({"ENTITY":entity,"Sabra_Account":matrix,"Tenant_Account":"Miss mapping accounts","Month":timeid,\
-							"Sabra":BPC_value,"P&L Value":0,"Diff (Sabra-P&L)":diff},index=[0]) 
+                        #diff_detail_records=pd.DataFrame({"ENTITY":entity,"Sabra_Account":matrix,"Tenant_Account":"Miss mapping accounts","Month":timeid,"Sabra":BPC_value,"P&L Value":0,"Diff (Sabra-P&L)":diff},index=[0]) 
                     #else:
                         #diff_detail_records["Month"]=timeid
                         #diff_detail_records["Sabra"]=BPC_value
