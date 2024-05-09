@@ -120,7 +120,6 @@ def Save_as_CSV_Onedrive(df,path,file_name):
 
 
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
-@st.cache_data
 def Update_File_Onedrive(path,file_name,new_data,operator):  # replace original data
     original_data=Read_CSV_From_Onedrive(path,file_name)
    
@@ -218,7 +217,7 @@ def Initial_Paramaters(operator):
         st.stop()
     return BPC_pull,month_dic,year_dic
 
-#@st.cache_resource
+# No cache
 def Initial_Mapping(operator):
     # read account mapping
     account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename)
@@ -341,6 +340,7 @@ def filters_widgets(df, columns,location="Vertical"):
             return df
         else:
             return df
+		
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type,account_pool,pre_max_match_col):
     #search tenant account column in P&L, return col number of tenant account	
     if pre_max_match_col!=10000:
@@ -1185,7 +1185,7 @@ def View_Discrepancy():
         edited_diff_BPC_PL=diff_BPC_PL[diff_BPC_PL["Diff_Percent"]>0.15] 
         if edited_diff_BPC_PL.shape[0]>0:
             st.error("Below P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.")
-            edited_diff_BPC_PL["Type comments below"]=""
+            edited_diff_BPC_PL.loc[:, "Type comments below"] = ""
             edited_diff_BPC_PL = st.data_editor(
 	    edited_diff_BPC_PL,
 	    width = 1200,
