@@ -947,7 +947,7 @@ def View_Summary():
 
     #latest_month_data = pd.concat([latest_month_data.groupby(by='Category',as_index=False).sum().assign(Sabra_Account="Total_Sabra"),latest_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns]     
     #latest_month_data = pd.concat([latest_month_data.groupby(by='Category', as_index=False).sum().assign(Sabra_Account="Total_Sabra"), latest_month_data], observed=False).sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns]
-    latest_month_data = pd.concat([latest_month_data.groupby(by='Category', as_index=False).sum().assign(Sabra_Account="Total_Sabra"), latest_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns]
+    latest_month_data = pd.concat([latest_month_data.groupby(by='Category', as_index=False,observed=False).sum().assign(Sabra_Account="Total_Sabra"), latest_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns]
     set_empty=list(latest_month_data.columns)
     set_empty.remove("Category")
     set_empty.remove("Sabra_Account")
