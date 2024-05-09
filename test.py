@@ -111,11 +111,9 @@ def Save_as_CSV_Onedrive(df,path,file_name):
         # Check the response
         if response.status_code == 200:
             return True
-        else:
-            st.write("") # error log
+	else:
             return False
     except:
-        st.write("") # error log
         return False
 
 
@@ -501,9 +499,11 @@ def Fill_Facility_Info(missing_category,latest_month):
 	
 @st.cache_data
 def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
+    #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
             return pre_date_header
+		
     PL_row_size=PL.shape[0]
     PL_col_size=PL.shape[1]
     search_row_size=min(30,PL_row_size)
@@ -602,9 +602,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                     year_table.iloc[month_row_index,col_month]=Add_year_to_header(list(month_table.iloc[month_row_index,]))	
  
            
-            count_num=0
-            count_str=0
-            count_non=0
+            count_num=count_str=count_non=0
             for row_month in range(month_row_index,PL.shape[0]):
                 if pd.isna(PL.iloc[row_month,col_month]) or PL.iloc[row_month,col_month]==" ":
                     count_non+=1
@@ -671,7 +669,7 @@ def Manage_Entity_Mapping(operator):
         Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
         return entity_mapping
 
-# no cache @st.cache_data(experimental_allow_widgets=True)
+# no cache 
 def Manage_Account_Mapping(new_tenant_account_list,sheet_name):
     global account_mapping
     st.warning("Please complete mapping for below new account:")
@@ -792,7 +790,7 @@ def Compare_PL_Sabra(Total_PL,latest_month):
     for entity in entity_mapping.index:
         for timeid in month_list: 
 	    # if this entity don't have data for this timeid(new/transferred property), skip to next month
-            if all(list(map(lambda x:x!=x,Total_PL.loc[entity,][timeid]))):
+            if all(list(map(lambda x:pd.isna(x) or x!=x,Total_PL.loc[entity,][timeid]))):
                 break
             for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
             #for matrix in BPC_Account["BPC_Account_Name"]: 
