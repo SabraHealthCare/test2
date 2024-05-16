@@ -531,6 +531,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         
     month_sort_index = np.argsort(np.array(month_count))
     year_sort_index = np.argsort(np.array(year_count))
+    candidate_date=[]
     for month_index_i in range(-1,-10,-1): 
         #month_sort_index[-1] is the index number of month_count in which has max month count
         #month_row_index is also the index/row number of PL
@@ -580,7 +581,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 st.markdown(d_str[1:])
                 return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
                 
-        # only one month in header
+        # only one month in header, all the rows that have multiple month have been removed
         elif month_count[month_row_index]==1:	
             col_month=0      #col_month is the col number of month
 	    # find the col of first month
@@ -618,9 +619,27 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 continue
             else:
                 PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x))) 
-                return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
-    st.error("Can't identify Year/Month header for sheet: '"+sheet_name+"'")
-    st.stop()
+                st.write(PL_date_header)
+		if latest_month!="0":
+		    current_date=list(filter(lambda x: x!="00", PL_date_header))[0]
+                    st.write(current_date)
+                    if current_date!=latest_month:
+                        st.write("NO match")
+                        continue
+                candidate_date.append([PL_date_header,month_row_index,PL.iloc[month_row_index,:]] )
+		continue
+                
+
+    if len(candidate_date)>1:
+        st.write("We've detected multiple date headers in sheet {}. Please ensure there's only one date column at the top of the data and remove any irrelevant ones. Otherwise, it will be confusing to determine the correct column for the data." ".format(sheet_name))
+        for i in range(len(candidate_date)):
+            st.write(candidate_date[i][PL_date_header])
+    elif len(candidate_date)==1:
+        return candidate_date[0]
+        # return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
+    else:
+        st.error("Can't identify Year/Month header for sheet: '"+sheet_name+"'")
+        st.stop()
 
 
 def Manage_Entity_Mapping(operator):
