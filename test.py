@@ -630,7 +630,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         display_list=[]
         st.error("We detected {} date headers in sheet-'{}'. Please ensure there's only one date header and remove the irreverent one. Otherwise, it will be confusing to determine the correct column for the data.".format(len(candidate_date),sheet_name))
         for i in range(len(candidate_date)):
-            display_list.append(PL.iloc[candidate_date[i][1],list(map(lambda x: x!="0", candidate_date[i][0]))].iloc[0]))
+            display_list.append(PL.iloc[candidate_date[i][1],list(map(lambda x: x!="0", candidate_date[i][0]))].iloc[0])
         st.write("   ".join(display_list))
         st.stop()
     elif len(candidate_date)==1:	    
