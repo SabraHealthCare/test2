@@ -631,7 +631,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 
 
     if len(candidate_date)>1:
-        st.write("We've detected multiple date headers in sheet {}. Please ensure there's only one date column at the top of the data and remove any irrelevant ones. Otherwise, it will be confusing to determine the correct column for the data." ".format(sheet_name))
+        st.write("We've detected multiple date headers in sheet {}. Please ensure there's only one date column at the top of the data and remove any irrelevant ones. Otherwise, it will be confusing to determine the correct column for the data.".format(sheet_name))
         for i in range(len(candidate_date)):
             st.write(candidate_date[i][PL_date_header])
     elif len(candidate_date)==1:
