@@ -621,7 +621,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x))) 
                 if latest_month!="0":
                     current_date=list(filter(lambda x: x!="0", PL_date_header))[0]
-                    st.write("current_date",current_date)
                     if current_date!=latest_month:
                         st.write("NO match")
                         continue
@@ -630,9 +629,9 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 
 
     if len(candidate_date)>1:
-        st.write("We've detected multiple date headers in sheet {}. Please ensure there's only one date column at the top of the data and remove any irrelevant ones. Otherwise, it will be confusing to determine the correct column for the data.".format(sheet_name))
+        st.error("We detected {} date headers in sheet {}. Please ensure there's only one date header at the top of the data. Otherwise, it will be confusing to determine the correct column for the data.".format(len(candidate_date),sheet_name))
         for i in range(len(candidate_date)):
-            st.write(PL.iloc[candidate_date[i][1],list(map(lambda x: x!="0", candidate_date[i][0]))])
+            st.write(PL.iloc[candidate_date[i][1],list(map(lambda x: x!="0", candidate_date[i][0]))][0])
         st.stop()
     elif len(candidate_date)==1:
         return candidate_date[0]
