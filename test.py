@@ -622,7 +622,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 if latest_month!="0":
                     current_date=list(filter(lambda x: x!="0", PL_date_header))[0]
                     if current_date!=latest_month:
-                        st.write("NO match")
                         continue
                 candidate_date.append([PL_date_header,month_row_index,PL.iloc[month_row_index,:]] )
                 continue
