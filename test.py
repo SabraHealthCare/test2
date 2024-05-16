@@ -499,8 +499,6 @@ def Fill_Facility_Info(missing_category,latest_month):
 	
 @st.cache_data
 def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
-    st.write(sheet_name,PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]))
-    st.write(PL.iloc[pre_date_header[1],:],pre_date_header[2])
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
@@ -635,7 +633,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     if len(candidate_date)>1:
         st.write("We've detected multiple date headers in sheet {}. Please ensure there's only one date column at the top of the data and remove any irrelevant ones. Otherwise, it will be confusing to determine the correct column for the data.".format(sheet_name))
         for i in range(len(candidate_date)):
-            st.write(candidate_date[i][0])
             st.write(PL.iloc[candidate_date[i][1],list(map(lambda x: x!="0", candidate_date[i][0]))])
         st.stop()
     elif len(candidate_date)==1:
