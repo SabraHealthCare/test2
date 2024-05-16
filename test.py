@@ -500,8 +500,6 @@ def Fill_Facility_Info(missing_category,latest_month):
 @st.cache_data
 def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
-    st.write(sheet_name,PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]))
-    st.write(PL.iloc[pre_date_header[1],:],pre_date_header[2])
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
             return pre_date_header
@@ -604,7 +602,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 else:  # there is no year in precede or next row, add year to month. 
                     year_table.iloc[month_row_index,col_month]=Add_year_to_header(list(month_table.iloc[month_row_index,]))	
  
-           
             count_num=count_str=count_non=0
             for row_month in range(month_row_index,PL.shape[0]):
                 if pd.isna(PL.iloc[row_month,col_month]) or PL.iloc[row_month,col_month]==" ":
@@ -630,14 +627,14 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 
 
     if len(candidate_date)>1:
+        display_list=[]
         st.error("We detected {} date headers in sheet-'{}'. Please ensure there's only one date header and remove the irreverent one. Otherwise, it will be confusing to determine the correct column for the data.".format(len(candidate_date),sheet_name))
         for i in range(len(candidate_date)):
-            st.write(PL.iloc[candidate_date[i][1],list(map(lambda x: x!="0", candidate_date[i][0]))].iloc[0])
+            display_list.append(PL.iloc[candidate_date[i][1],list(map(lambda x: x!="0", candidate_date[i][0]))].iloc[0]))
+        st.write("   ".join(display_list))
         st.stop()
-    elif len(candidate_date)==1:
-        st.write(candidate_date[0])	    
+    elif len(candidate_date)==1:	    
         return candidate_date[0]
-        # return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
     else:
         st.error("Can't identify Year/Month header for sheet: '"+sheet_name+"'")
         st.stop()
