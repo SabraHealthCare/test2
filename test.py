@@ -352,10 +352,12 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type,account_pool,pre_max_ma
         candidate_col=list(map(lambda x: str(x).strip().upper() if not pd.isna(x) and isinstance(x, str) else x,PL.iloc[:,tenantAccount_col_no]))
         #find out how many tenant accounts match with account_mapping
         match=[x in candidate_col for x in account_pool]
+        st.write("candidate_col",candidate_col)
 
-        #If 10% of accounts match with account_mapping list, identify this col as a candidate tenant account col.
-	#and sum(x for x in match)/len(account_pool)>0.1
+
         match_count=sum(x for x in match)
+        st.write("match_count",match_count)
+        st.write("max_match",max_match)
         if len(match)>0 and match_count>max_match:
             max_match_col=tenantAccount_col_no
             max_match=match_count
