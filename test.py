@@ -1310,9 +1310,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):
         sheet_type_name="Occupancy"
     elif sheet_type=="Sheet_Name_Balance_Sheet":
         sheet_type_name="Balance Sheet"
-
+    sheet_name=sheet_name_list[0]
     # read data from uploaded file
-    st.write("sheet_name",sheet_name)
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
 	
     # Start checking process
