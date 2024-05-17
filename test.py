@@ -356,12 +356,13 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type,account_pool,pre_max_ma
 
 
         match_count=sum(x for x in match)
-        st.write("match_count",match_count)
+        st.write("match_count",match_count,"tenantAccount_col_no",tenantAccount_col_no)
         st.write("max_match",max_match)
         if len(match)>0 and match_count>max_match:
             max_match_col=tenantAccount_col_no
             max_match=match_count
     if max_match>0:
+        st.write("return tenantAccount_col_no",tenantAccount_col_no)
         return max_match_col     
     st.error("Fail to identify tenant accounts column in {} sheet —— {}".format(sheet_type,sheet_name))
     st.stop()
