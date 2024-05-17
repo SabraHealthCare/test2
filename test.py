@@ -1312,6 +1312,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):
         sheet_type_name="Balance Sheet"
 
     # read data from uploaded file
+    st.write("sheet_name",sheet_name)
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
 	
     # Start checking process
