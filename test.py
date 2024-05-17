@@ -1057,7 +1057,20 @@ def EPM_Formula(data,value_name): # make sure there is no col on index for data
             
 	
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
-    global entity_mapping
+    global entity_mapping,PL_sheet_list
+#*******************************************
+#for multiple
+# if len(sheet_name_list)!=1:
+#        st.warring("Please select {} sheet name :".format(",".join(sheet_type_name)))
+#        with st.form(key="Sheet name"):                
+#            sheet_name=st.selectbox(" ",[""]+PL_sheet_list)
+#            submitted = st.form_submit_button("Submit")      
+#    else:
+#        sheet_name=sheet_name_list[0]
+
+#*******************************************
+ if len(sheet_name_list)!=1:
+	
     PL_sheet_list=load_workbook(uploaded_file).sheetnames	
     if sheet_type=="Finance":
         missing_PL_sheet_property = entity_mapping[~entity_mapping["Sheet_Name_Finance"].isin(PL_sheet_list)]
@@ -1285,7 +1298,7 @@ def Identify_Reporting_Month(PL,entity_header_row_number):
     return "reporting_month_TBD"
 
 # no cache
-def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file,account_pool):  
+def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):  
     global account_mapping
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
     sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if (not pd.isna(x))]
@@ -1298,14 +1311,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,PL_sheet_list,uploaded_file,ac
         sheet_type_name="Occupancy"
     elif sheet_type=="Sheet_Name_Balance_Sheet":
         sheet_type_name="Balance Sheet"
-
-    if len(sheet_name_list)!=1:
-        st.warring("P&L of properties {} is in one sheet. Please select sheet name :".format(",".join(property_name_list)))
-        with st.form(key="Sheet name"):                
-            sheet_name=st.selectbox(" ",[""]+PL_sheet_list)
-            submitted = st.form_submit_button("Submit")      
-    else:
-        sheet_name=sheet_name_list[0]
 
     # read data from uploaded file
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
@@ -1568,7 +1573,6 @@ def Upload_And_Process(uploaded_file,file_type):
                         #PL_BS,PL_with_detail_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
                         PL_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
                         PL=PL.combine_first(PL_BS)
-
                         #PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
                 elif file_type=="Finance" and BS_separate_excel=="Y": 
                     #PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
@@ -1590,7 +1594,7 @@ def Upload_And_Process(uploaded_file,file_type):
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     #PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file,account_pool_full)	
-                    PL=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file,account_pool_full)				    
+                    PL=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file,account_pool_full)			    
                     # check if census data in another sheet
                     if pd.isna(sheet_name_occupancy) and sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
