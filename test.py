@@ -1067,10 +1067,9 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
 #            submitted = st.form_submit_button("Submit")      
 #    else:
 #        sheet_name=sheet_name_list[0]
-
+# if len(sheet_name_list)!=1:
 #*******************************************
- if len(sheet_name_list)!=1:
-	
+
     PL_sheet_list=load_workbook(uploaded_file).sheetnames	
     if sheet_type=="Finance":
         missing_PL_sheet_property = entity_mapping[~entity_mapping["Sheet_Name_Finance"].isin(PL_sheet_list)]
