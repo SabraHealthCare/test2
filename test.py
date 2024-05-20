@@ -379,7 +379,7 @@ def Get_Year(single_string):
 def Get_Month_Year(single_string):
     if single_string!=single_string or pd.isna(single_string):
         return 0,0
-    if isinstance(single_string, datetime):
+    if isinstance(single_string, datetime) or isinstance(single_string, datetime.time):
         return int(single_string.month),int(single_string.year)
 
     if isinstance(single_string, (int,float)):
