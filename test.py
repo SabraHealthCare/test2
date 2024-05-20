@@ -389,7 +389,7 @@ def Get_Month_Year(single_string):
         single_string=single_string.lower()
         Year,Year_keyword=Get_Year(single_string)
     else:
-        st.write("single_string",single_string)	    
+        st.write("single_string",type(single_string),single_string)	    
     # remove year from string, remove days from string
     single_string=single_string.replace(Year_keyword,"").replace("30","").replace("31","").replace("28","").replace("29","").replace("as of","").replace("Actual","")
     
