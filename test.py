@@ -1595,30 +1595,30 @@ def Upload_And_Process(uploaded_file,file_type):
                     # check if census data in another sheet
                     if not pd.isna(sheet_name_occupancy) and sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
-                        #PL_occ,PL_with_detail_occ=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
+                        #PL_occ,PL_with_detail_occ=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
                         PL_occ=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
                         PL=PL.combine_first(PL_occ)
                         #PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
 
 		    # check if balance sheet data existed   
                     if not pd.isna(sheet_name_balance) and sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
-                        #PL_BS,PL_with_detail_BS=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
-                        PL_BS=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
+                        #PL_BS,PL_with_detail_BS=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
+                        PL_BS=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
                         PL=PL.combine_first(PL_BS)
                         #PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
                 elif file_type=="Finance" and BS_separate_excel=="Y": 
-                    #PL,PL_with_detail=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
-                    PL=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
+                    #PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file,account_pool_full)
+                    PL=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                     if pd.isna(sheet_name_occupancy) and sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
-                        #PL_occ,PL_with_detail_occ=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
-                        PL_occ=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
+                        #PL_occ,PL_with_detail_occ=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
+                        PL_occ=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
                         PL=PL.combine_first(PL_occ)
                         #PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
 
                 elif file_type=="BS" and BS_separate_excel=="Y": 
-                    #PL,PL_with_detail=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
-                    PL=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
+                    #PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
+                    PL=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
                 total_entity_list=[x for x in total_entity_list if x not in entity_list]
                 
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
