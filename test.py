@@ -1369,7 +1369,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
 	# map sabra account with tenant account, groupby sabra account
         PL=Map_PL_Sabra(PL,entity_list) 
-        PL.rename(columns={"value":reporting_month},inplace=True)
+        PL.rename(columns={"value":latest_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
     #return PL,PL_with_detail
     return PL
