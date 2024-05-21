@@ -1592,7 +1592,7 @@ def Upload_And_Process(uploaded_file,file_type):
                     #PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file,account_pool_full)	
                     PL=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file,account_pool_full)	
                     # check if census data in another sheet
-                    if pd.isna(sheet_name_occupancy) and sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
+                    if not pd.isna(sheet_name_occupancy) and sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
                         #PL_occ,PL_with_detail_occ=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
                         PL_occ=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
@@ -1600,12 +1600,10 @@ def Upload_And_Process(uploaded_file,file_type):
                         #PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
 
 		    # check if balance sheet data existed   
-                    if pd.isna(sheet_name_balance) and sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
+                    if not pd.isna(sheet_name_balance) and sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
                         #PL_BS,PL_with_detail_BS=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
                         PL_BS=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
                         PL=PL.combine_first(PL_BS)
-                        st.write("PL_BS",PL_BS)
-                        st.write("PL",PL)
                         #PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
                 elif file_type=="Finance" and BS_separate_excel=="Y": 
                     #PL,PL_with_detail=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
