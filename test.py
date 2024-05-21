@@ -1283,19 +1283,21 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
 
 @st.cache_data
 def Identify_Reporting_Month(PL,entity_header_row_number):
+    header=["reporting_month_TBD"]
+    # search month above the header row
     for row_i in range(entity_header_row_number):
         for col_i in range(PL.shape[1]):
             month,year=Get_Month_Year(PL.iloc[row_i,col_i])   
             if month>0 and year>0:
                 if month<10:
-                    return "{}0{}".format(year,month)      
+                    header=["{}0{}".format(year,month)]
                 else:
-                    return "{}{}".format(year,month)
-    return "reporting_month_TBD"
+                    header=["{}{}".format(year,month)]
+    return Check_Reporting_Month(header)
 
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):  
-    global account_mapping
+    global account_mapping,latest_month
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
     sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if (not pd.isna(x))]
     sheet_name_list = list(set(sheet_name_list))
@@ -1322,7 +1324,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):
 	#set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
 	# find the reporting month from 0th row to property header row    
-        reporting_month=Identify_Reporting_Month(PL,entity_header_row_number)  
+        if latest_month=="0":
+            latest_month=Identify_Reporting_Month(PL,entity_header_row_number)  
 	#remove row above property header
         PL=PL.iloc[entity_header_row_number+1:,:]
 
@@ -1413,7 +1416,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()  
         if latest_month=="0":
-            latest_month=Check_Reporting_Month(date_header)
+            latest_month=Check_Reporting_Month(date_header[0])
 
         # select only two or one previous months for columns
         month_select = Get_Previous_Months(latest_month,date_header[0])
@@ -1465,13 +1468,13 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
     return PL
        
 
-def Check_Reporting_Month(date_header):
+def Check_Reporting_Month(date_header_list):
     if current_month<10:
         current_date=str(current_year)+"0"+str(current_month)
     else:
         current_date=str(current_year)+str(current_month)
 
-    reporting_month_list=list(filter(lambda x: x!="0",list(map(lambda x:str(x),date_header[0]))	))
+    reporting_month_list=list(filter(lambda x: x!="0",list(map(lambda x:str(x),date_header_list))	))
     latest_month=max(reporting_month_list)
     if latest_month!="reporting_month_TBD":
         st.write("The reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
@@ -1550,7 +1553,6 @@ def Upload_And_Process(uploaded_file,file_type):
             property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
 	    # properties in seperate sheet 	
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
-                st.write("11111in  single def")
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     #PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
@@ -1708,7 +1710,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
             Total_PL=Upload_And_Process(uploaded_finance,"Finance")
-            st.write("final total:",Total_PL)
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel 
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")
             entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
