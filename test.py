@@ -1320,10 +1320,9 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):
             st.stop()    
 
         entity_header_row_number,new_entity_header=Identify_Property_Name_Header(PL,entity_list,sheet_name) 
-        st.write("entity_header_row_number,new_entity_header",entity_header_row_number,new_entity_header)
 	#set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
-        st.write("PL_multiple",PL)
+        st.write("1",PL)
 	# find the reporting month from 0th row to property header row    
         reporting_month=Identify_Reporting_Month(PL,entity_header_row_number)  
 	#remove row above property header
@@ -1344,7 +1343,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):
         PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
         PL=PL.loc[(PL!= 0).any(axis=1),:]
-
+        st.write("2",PL)
         # mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
         # remove duplicate new account
@@ -1373,6 +1372,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):
         PL=Map_PL_Sabra(PL,entity_list) 
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
+        st.write("3",PL)
     #return PL,PL_with_detail
     return PL
 	
