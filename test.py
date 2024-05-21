@@ -786,17 +786,14 @@ def Map_PL_Sabra(PL,entity):
          
     elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value" 
         property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
-        PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=property_header, var_name='ENTITY')
-        st.write(6,"PL",PL)            
+        PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=property_header, var_name='ENTITY')           
     #PL_with_detail=copy.copy(PL)
     #PL_with_detail=PL_with_detail.set_index(['ENTITY', 'Sabra_Account',"Tenant_Account"])
     # group by Sabra_Account
     PL=PL.drop(["Tenant_Account"], axis=1)
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
-    st.write(7,"PL",PL) 
     PL= PL.astype(int)    
     PL=PL.replace(0,None)
-    st.write(8,"PL",PL)
     #return PL,PL_with_detail   
     return PL   
     
@@ -1372,7 +1369,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):
         PL=Map_PL_Sabra(PL,entity_list) 
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
-        st.write("3",PL)
     #return PL,PL_with_detail
     return PL
 	
@@ -1596,7 +1592,6 @@ def Upload_And_Process(uploaded_file,file_type):
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     #PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file,account_pool_full)	
                     PL=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file,account_pool_full)	
-                    st.write(2,PL)	
                     # check if census data in another sheet
                     if pd.isna(sheet_name_occupancy) and sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
@@ -1610,6 +1605,8 @@ def Upload_And_Process(uploaded_file,file_type):
                         #PL_BS,PL_with_detail_BS=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
                         PL_BS=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
                         PL=PL.combine_first(PL_BS)
+                        st.write("PL_BS",PL_BS)
+                        st.write("PL",PL)
                         #PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
                 elif file_type=="Finance" and BS_separate_excel=="Y": 
                     #PL,PL_with_detail=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
@@ -1627,8 +1624,10 @@ def Upload_And_Process(uploaded_file,file_type):
                 total_entity_list=[x for x in total_entity_list if x not in entity_list]
                 
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
+            st.write("Total_PL",Total_PL)
             #Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)    
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multiindex of Total_Pl
+    st.write("Total_PL2",Total_PL)
     #return Total_PL,Total_PL_detail
     return Total_PL
 
