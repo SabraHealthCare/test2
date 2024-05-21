@@ -1320,9 +1320,10 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):
             st.stop()    
 
         entity_header_row_number,new_entity_header=Identify_Property_Name_Header(PL,entity_list,sheet_name) 
+        st.write("entity_header_row_number,new_entity_header",entity_header_row_number,new_entity_header)
 	#set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
-
+        st.write("PL_multiple",PL)
 	# find the reporting month from 0th row to property header row    
         reporting_month=Identify_Reporting_Month(PL,entity_header_row_number)  
 	#remove row above property header
@@ -1590,9 +1591,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 total_entity_list.remove(entity_i) 
             # All the properties are in one sheet		
             elif entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="N":
-                st.write("22222in  multiple def")
                 entity_list=entity_mapping.index[entity_mapping["Property_in_separate_sheets"]=="N"].tolist()	
-                st.write(1,entity_list)
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     #PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file,account_pool_full)	
