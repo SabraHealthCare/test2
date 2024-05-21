@@ -745,7 +745,6 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name):
 
 @st.cache_data 
 def Map_PL_Sabra(PL,entity):
-    st.write(4,PL)
     # remove no need to map from account_mapping
     main_account_mapping=account_mapping.loc[list(map(lambda x:x==x and x.upper()!='NO NEED TO MAP',account_mapping["Sabra_Account"])),:]
 
@@ -787,7 +786,6 @@ def Map_PL_Sabra(PL,entity):
          
     elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value" 
         property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
-        st.write(5,"property_header",property_header)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=property_header, var_name='ENTITY')
         st.write(6,"PL",PL)            
     #PL_with_detail=copy.copy(PL)
@@ -795,8 +793,10 @@ def Map_PL_Sabra(PL,entity):
     # group by Sabra_Account
     PL=PL.drop(["Tenant_Account"], axis=1)
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
+    st.write(7,"PL",PL) 
     PL= PL.astype(int)    
     PL=PL.replace(0,None)
+    st.write(8,"PL",PL)
     #return PL,PL_with_detail   
     return PL   
     
