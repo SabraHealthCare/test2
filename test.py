@@ -1290,7 +1290,7 @@ def Identify_Reporting_Month(PL,entity_header_row_number):
             if month>0 and year>0:
                 if month<10:
                     header=["{}0{}".format(year,month)]
-                else:entity_list
+                else:
                     header=["{}{}".format(year,month)]
     return Check_Reporting_Month(header)
 
