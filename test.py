@@ -1281,7 +1281,6 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
         return max_match_row,mapped_entity
 
-@st.cache_data
 def Identify_Reporting_Month(PL,entity_header_row_number):
     header=["reporting_month_TBD"]
     # search month above the header row
