@@ -1544,8 +1544,6 @@ def Upload_And_Process(uploaded_file,file_type):
     account_pool_balance_sheet=account_pool.loc[account_pool["Category"]=="Balance Sheet"]["Tenant_Formated_Account"]              
     while(total_entity_list):   # entity_i is the entity code S number
             entity_i=total_entity_list[0]  
-	    
-            st.write("entity_i",entity_i,entity_mapping)
             sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
             sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
             sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
