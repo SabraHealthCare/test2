@@ -1290,14 +1290,13 @@ def Identify_Reporting_Month(PL,entity_header_row_number):
             if month>0 and year>0:
                 if month<10:
                     header=["{}0{}".format(year,month)]
-                else:
+                else:entity_list
                     header=["{}{}".format(year,month)]
     return Check_Reporting_Month(header)
 
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):  
     global account_mapping,latest_month
-    st.write("entity_list",entity_list)
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
     sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if (not pd.isna(x))]
     sheet_name_list = list(set(sheet_name_list))
