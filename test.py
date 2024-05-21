@@ -745,6 +745,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name):
 
 @st.cache_data 
 def Map_PL_Sabra(PL,entity):
+    st.write(4,PL)
     # remove no need to map from account_mapping
     main_account_mapping=account_mapping.loc[list(map(lambda x:x==x and x.upper()!='NO NEED TO MAP',account_mapping["Sabra_Account"])),:]
 
@@ -781,13 +782,14 @@ def Map_PL_Sabra(PL,entity):
                    
 
     PL=PL.drop(["Tenant_Formated_Account","Conversion"], axis=1)
-    if isinstance(entity, str):# properties are in separate sheet
+    if isinstance(entity, str):# one entity,  properties are in separate sheet
         PL["ENTITY"]=entity	    
          
     elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value" 
         property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
+        st.write(5,"property_header",property_header)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=property_header, var_name='ENTITY')
-            
+        st.write(6,"PL",PL)            
     #PL_with_detail=copy.copy(PL)
     #PL_with_detail=PL_with_detail.set_index(['ENTITY', 'Sabra_Account',"Tenant_Account"])
     # group by Sabra_Account
@@ -1322,7 +1324,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):
         entity_header_row_number,new_entity_header=Identify_Property_Name_Header(PL,entity_list,sheet_name) 
 	#set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
-        st.write("1",PL)
 	# find the reporting month from 0th row to property header row    
         reporting_month=Identify_Reporting_Month(PL,entity_header_row_number)  
 	#remove row above property header
@@ -1343,7 +1344,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):
         PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
         PL=PL.loc[(PL!= 0).any(axis=1),:]
-        st.write("2",PL)
         # mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
         # remove duplicate new account
@@ -1611,7 +1611,6 @@ def Upload_And_Process(uploaded_file,file_type):
                         PL_BS=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
                         PL=PL.combine_first(PL_BS)
                         #PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
-                        st.write(3,PL_BS)
                 elif file_type=="Finance" and BS_separate_excel=="Y": 
                     #PL,PL_with_detail=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                     PL=Read_Clean_PL_Multiple(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
