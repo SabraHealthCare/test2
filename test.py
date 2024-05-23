@@ -1758,7 +1758,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             ChangeWidgetFontSize('Manage Account Mapping', '25px')
             col1,col2=st.columns(2)
             with col1:
-                new_tenant_account=st.text_input("Enter new account and press Enter to apply. Use commas to separate them if there are multiple accounts.)
+                new_tenant_account=st.text_input("Enter new account and press Enter to apply. Use commas to separate them if there are multiple accounts.")
                 
                 if new_tenant_account:
                     new_tenant_account_list=list(set(map(lambda x:x.strip(),new_tenant_account.split(",") )))
