@@ -1758,7 +1758,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             ChangeWidgetFontSize('Manage Account Mapping', '25px')
             col1,col2=st.columns(2)
             with col1:
-                new_tenant_account=st.text_input("Enter new tenant account and press enter to apply. If there are multiple accounts mapping to the same Sabra account, use commas to separate them. For example: Revenue_A,Revenue_B,Revenue_C")
+                new_tenant_account=st.text_input("Enter new account and press Enter to apply. Use commas to separate them if there are multiple accounts.)
                 
                 if new_tenant_account:
                     new_tenant_account_list=list(set(map(lambda x:x.strip(),new_tenant_account.split(",") )))
@@ -1775,7 +1775,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     if len(new_tenant_account_list)==0:
                         st.stop()
                     st.markdown("## Map **'{}'** to Sabra account".format(",".join(new_tenant_account_list))) 
-                    Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(",".join(new_tenant_account_list))
+                    Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(",".join(new_tenant_account_list),"")
                     
                     if len(new_tenant_account_list)>1:  # there is a list of new tenant accounts mapping to one sabra account   
                         new_row=[]
