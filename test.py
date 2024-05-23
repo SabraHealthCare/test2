@@ -339,7 +339,7 @@ def filters_widgets(df, columns,location="Vertical"):
         else:
             return df
 		
-def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type,account_pool,pre_max_match_col):
+def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,pre_max_match_col):
     #search tenant account column in P&L, return col number of tenant account	
     if pre_max_match_col!=10000 and pre_max_match_col<PL.shape[1]:
         #check if pre_max_match is the tenant_col
@@ -360,7 +360,7 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type,account_pool,pre_max_ma
             max_match=match_count
     if max_match>0:
         return max_match_col     
-    st.error("Fail to identify tenant accounts column in {} sheet —— {}".format(sheet_type,sheet_name))
+    st.error("Fail to identify tenant accounts column in {} sheet —— {}".format(sheet_type_name,sheet_name))
     st.stop()
 
 
@@ -1317,7 +1317,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):
 	
     # Start checking process
     if True:   
-        tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type,account_pool,tenant_account_col)
+        tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
@@ -1401,15 +1401,15 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
     elif sheet_type=="Sheet_Name_Occupancy":
         sheet_type_name="Occupancy"
     elif sheet_type=="Sheet_Name_Balance_Sheet":
-        sheet_type_name="Balance Sheet"
+        sheet_type_name="Balance"
 
     # read data from uploaded file
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
-        tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type,account_pool,tenant_account_col)
+        tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
         if tenantAccount_col_no==None:
-            st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
+            st.error("Fail to identify tenant account column in {} sheet '{}'".format(sheet_type_name,sheet_name))
             st.stop()   
         else:
             tenant_account_col=tenantAccount_col_no
