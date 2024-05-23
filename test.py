@@ -1794,9 +1794,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
-
-
-
 # ----------------for Sabra account--------------------	    
 elif st.session_state["authentication_status"] and st.session_state["operator"]=="Sabra":
     operator_list=Read_CSV_From_Onedrive(mapping_path,operator_list_filename)
