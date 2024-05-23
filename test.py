@@ -685,7 +685,7 @@ def Manage_Entity_Mapping(operator):
         return entity_mapping
 
 # no cache 
-def Manage_Account_Mapping(new_tenant_account_list,sheet_name):
+def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
     global account_mapping
     st.warning("Please complete mapping for below new account:")
     i=0
@@ -696,7 +696,10 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name):
     Sabra_second_account_value=[np.nan] * count
     with st.form(key=new_tenant_account_list[0]):
         for i in range(count):
-            st.markdown("## Map **'{}'** in '{}' to Sabra account".format(new_tenant_account_list[i],sheet_name)) 
+            if sheet_name=="False":
+                st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
+	    else:
+                st.markdown("## Map **'{}'** in '{}' to Sabra account".format(new_tenant_account_list[i],sheet_name)) 
             col1,col2=st.columns(2) 
             with col1:
                 st.write("Sabra main account")
@@ -1775,20 +1778,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     if len(new_tenant_account_list)==0:
                         st.stop()
                     st.markdown("## Map **'{}'** to Sabra account".format(",".join(new_tenant_account_list))) 
-                    Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping([",".join(new_tenant_account_list)],"")
-                    
-                    if len(new_tenant_account_list)>1:  # there is a list of new tenant accounts mapping to one sabra account   
-                        new_row=[]
-                        for account_i in range(len(new_tenant_account_list)):
-                            new_row.append([operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[account_i],new_tenant_account_list[account_i].upper(),"N"])
-                        new_accounts_df = pd.DataFrame(new_row, columns=account_mapping.columns)
-
-                        #insert new records to the bottom line of account_mapping one by one
-                        account_mapping = pd.concat([account_mapping, new_accounts_df], ignore_index=True)
-
-                    elif len(new_tenant_account_list)==1:
-	                #insert new record to the bottom line of account_mapping
-                        account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[0],new_tenant_account_list[0].upper(),"N"]   
+                    account_mapping=Manage_Account_Mapping([",".join(new_tenant_account_list)])
                     Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
 			
     elif choice=='Instructions':
