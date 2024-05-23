@@ -698,7 +698,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
         for i in range(count):
             if sheet_name=="False":
                 st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
-	    else:
+            else:
                 st.markdown("## Map **'{}'** in '{}' to Sabra account".format(new_tenant_account_list[i],sheet_name)) 
             col1,col2=st.columns(2) 
             with col1:
@@ -1777,7 +1777,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     new_tenant_account_list=list(set(new_tenant_account_list) - set(duplicate_accounts))
                     if len(new_tenant_account_list)==0:
                         st.stop()
-                    st.markdown("## Map **'{}'** to Sabra account".format(",".join(new_tenant_account_list))) 
                     account_mapping=Manage_Account_Mapping([",".join(new_tenant_account_list)])
                     Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
 			
