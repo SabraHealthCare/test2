@@ -1765,7 +1765,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 
                 if new_tenant_account:
                     new_tenant_account_list=list(set(map(lambda x:x.strip(),new_tenant_account.split(",") )))
-             
                     duplicate_accounts=list(filter(lambda x:x.upper() in list(account_mapping['Tenant_Formated_Account']),new_tenant_account_list))
                    
                     if len(duplicate_accounts)>1:
@@ -1777,7 +1776,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     new_tenant_account_list=list(set(new_tenant_account_list) - set(duplicate_accounts))
                     if len(new_tenant_account_list)==0:
                         st.stop()
-                    account_mapping=Manage_Account_Mapping([",".join(new_tenant_account_list)])
+                    account_mapping=Manage_Account_Mapping(new_tenant_account_list)
                     Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
 			
     elif choice=='Instructions':
