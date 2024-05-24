@@ -785,7 +785,7 @@ def Map_PL_Sabra(PL,entity):
                     elif conversion[0]=="*":
                         PL.loc[i,month]= before_conversion*float(conversion.split("*")[1])
 	
-	PL=PL.drop(["Tenant_Formated_Account","Conversion","Tenant_Account"], axis=1)
+        PL=PL.drop(["Tenant_Formated_Account","Conversion","Tenant_Account"], axis=1)
         PL["ENTITY"]=entity	    
          
     elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value" 
