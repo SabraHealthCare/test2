@@ -748,8 +748,6 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
 
 @st.cache_data 
 def Map_PL_Sabra(PL,entity):
-    st.write("PL",PL)
-    st.write("entity",entity)
     # remove no need to map from account_mapping
     main_account_mapping=account_mapping.loc[list(map(lambda x:x==x and x.upper()!='NO NEED TO MAP',account_mapping["Sabra_Account"])),:]
 
@@ -768,6 +766,8 @@ def Map_PL_Sabra(PL,entity):
     PL=PL.reset_index(drop=True)
     month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
     for i in range(len(PL.index)):
+        st.write("PL",PL)
+
         conversion=PL.loc[i,"Conversion"]
         if conversion!=conversion or pd.isna(conversion):
             continue
