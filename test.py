@@ -789,7 +789,7 @@ def Map_PL_Sabra(PL,entity):
         PL["ENTITY"]=entity	    
          
     elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value" 
-        st.write("1PL",PL)
+
         monthdays=monthrange(int(str(latest_month)[0:4]), int(str(latest_month)[4:6]))[1]
         for i in range(len(PL.index)):
             conversion=PL.loc[i,"Conversion"]
@@ -807,12 +807,14 @@ def Map_PL_Sabra(PL,entity):
                     elif conversion[0]=="*":
                         PL.loc[i,entity_j]= before_conversion*float(conversion.split("*")[1])
         st.write("2PL",PL)    
-        property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
-        PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=property_header, var_name='ENTITY')     
+        #property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
+        PL=PL.drop(["Tenant_Formated_Account","Conversion"], axis=1)
+        PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='ENTITY')     
+        st.write("3PL",PL)
         PL=PL.drop(["Tenant_Account"], axis=1)
     #PL_with_detail=copy.copy(PL)
     #PL_with_detail=PL_with_detail.set_index(['ENTITY', 'Sabra_Account',"Tenant_Account"])
-    st.write("3PL",PL)
+
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.astype(int)    
