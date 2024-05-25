@@ -202,7 +202,7 @@ def Initial_Paramaters(operator):
     if operator!="Sabra":
         BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename)
         BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
-        BPC_pull=BPC_pull.set_index(["ENTITY","ACCOUNT"])
+        BPC_pull=BPC_pull.set_index(["ENTITY","Sabra_Account"])
         BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
                   
         month_dic={10:["october","oct","10/","-10","/10","10"],11:["november","nov","11/","-11","/11","11"],12:["december","dec","12/","-12","/12","12"],1:["january","jan","01/","1/","-1","-01","/1","/01"],\
@@ -487,10 +487,10 @@ def Fill_Facility_Info(missing_category,latest_month):
 # search for the Month/year row and return row number
         entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
         onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]<str(latest_month),BPC_pull.columns)))
-        previous_facility_data=BPC_pull.merge(BPC_Account,left_on="ACCOUNT",right_on="BPC_Account_Name")
+        previous_facility_data=BPC_pull.merge(BPC_Account,left_on="Sabra_Account",right_on="BPC_Account_Name")
         previous_facility_data=previous_facility_data[previous_facility_data["Category"]=="Facility Information"]#[["Property_Name",onemonth_before_latest_month,"Sabra_Account_Full_Name"]]	  
         previous_facility_data=previous_facility_data.reset_index(drop=False)
-        previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_latest_month:latest_month})	
+        previous_facility_data=previous_facility_data.rename(columns={onemonth_before_latest_month:latest_month})	
         st.error("Below properties miss facility information in P&L. It has been filled by historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
         previous_facility_data_display = previous_facility_data.pivot(index=["Sabra_Account_Full_Name"], columns="Property_Name", values=latest_month)
         st.write(previous_facility_data_display)
@@ -1925,7 +1925,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 		    
                 # add average column for each line , average is from BPC_pull
                 BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename)
-                BPC_pull.columns=list(map(lambda x :str(x) if x!="ACCOUNT" else "Sabra_Account", BPC_pull.columns))
+                BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
                 data=data.merge(BPC_pull[["ENTITY","Sabra_Account","Mean"]], on=["ENTITY","Sabra_Account"],how="left")	
 		# add "GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE" from entity_mapping
                 entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename)
