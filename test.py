@@ -1615,7 +1615,6 @@ def Upload_And_Process(uploaded_file,file_type):
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     #PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file,account_pool_full)	
                     PL=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file,account_pool_full)
-                    st.write("2PL",PL)
                     # check if census data in another sheet
                     if not pd.isna(sheet_name_occupancy) and sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
@@ -1648,6 +1647,7 @@ def Upload_And_Process(uploaded_file,file_type):
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             #Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)    
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multiindex of Total_Pl
+    st.write("Total_PL",Total_PL)
     #return Total_PL,Total_PL_detail
     return Total_PL
 
@@ -1746,7 +1746,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	    # combine Finance and BS
             Total_PL=Total_PL.combine_first(Total_BL)
             #Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
-        
+        st.write("3Total_PL",Total_PL)    
         if len(Total_PL.columns)==1:
             Total_PL.columns=[latest_month]
 
