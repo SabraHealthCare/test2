@@ -806,7 +806,7 @@ def Map_PL_Sabra(PL,entity):
                         PL.loc[i,entity_j]= before_conversion*monthdays
                     elif conversion[0]=="*":
                         PL.loc[i,entity_j]= before_conversion*float(conversion.split("*")[1])
-	st.write("2PL",PL)    
+        st.write("2PL",PL)    
         property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=property_header, var_name='ENTITY')     
         PL=PL.drop(["Tenant_Account"], axis=1)
