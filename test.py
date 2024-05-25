@@ -883,7 +883,6 @@ def Compare_PL_Sabra(Total_PL,latest_month):
 @st.cache_data(experimental_allow_widgets=True)
 def View_Summary():
     global Total_PL,latest_month_data,latest_month
-    st.write("1Total_PL",Total_PL)
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     def color_missing(data):
@@ -893,7 +892,6 @@ def View_Summary():
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-    st.write("1latest_month_data",latest_month_data)
     # check patient days ( available days > patient days)	
     check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(["A_ACH","A_IL","A_ALZ","A_SNF","A_ALF","A_BH","A_IRF","A_LTACH","A_SP_HOSP"])) | (latest_month_data["Category"]=='Patient Days')]
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
@@ -901,7 +899,7 @@ def View_Summary():
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
     problem_properties=[]
     zero_patient_days=[]
-    st.write("2latest_month_data",latest_month_data)
+
     month_days=monthrange(int(latest_month[:4]), int(latest_month[4:]))[1]
     for property_i in latest_month_data["Property_Name"].unique():
         try:
@@ -934,7 +932,7 @@ def View_Summary():
 		                 latest_month:latest_month[4:6]+"/"+latest_month[0:4]},
 			    hide_index=True)
         #st.stop()
-    st.write("3latest_month_data",latest_month_data)
+
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
     entity_list=list(latest_month_data["ENTITY"].unique())
@@ -972,7 +970,7 @@ def View_Summary():
             #st.stop()	
 
     #duplicates = latest_month_data[latest_month_data.duplicated(subset=["Sabra_Account_Full_Name", "Category"], keep=False)]
-    st.write("4latest_month_data",latest_month_data)
+
     latest_month_data =latest_month_data.pivot_table(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month,aggfunc='last')
     latest_month_data.reset_index(drop=False,inplace=True)
 
@@ -995,7 +993,7 @@ def View_Summary():
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
             if latest_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 latest_month_data.loc[i,set_empty]=np.nan
-    st.write("5latest_month_data",latest_month_data)		    
+		    
     entity_columns=latest_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
         latest_month_data["Total"] = latest_month_data[entity_columns].sum(axis=1)
