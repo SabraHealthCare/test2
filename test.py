@@ -485,6 +485,8 @@ def Add_year_to_header(month_list):
 @st.cache_data
 def Check_Available_Units(check_patient_days,latest_month):
     month_days=monthrange(int(latest_month[:4]), int(latest_month[4:]))[1]
+    problem_properties=[]
+    zero_patient_days=[]
     for property_i in latest_month_data["Property_Name"].unique():
         try:
             patient_day_i=check_patient_days.loc[("Patient Days",property_i),latest_month]
@@ -555,7 +557,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
 
         month_count.append(len(valid_month))
         year_count.append(len(valid_year))
-    st.write("month_count",month_count,month_table)
     # can't find month keyword in any rows
     if all(map(lambda x:x==0,month_count)):
         st.error("Can't identify Month/Year header in sheet——'"+sheet_name+"'")   
@@ -931,8 +932,7 @@ def View_Summary():
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
     check_patient_days=check_patient_days[["Category","Property_Name",latest_month]].groupby(["Category","Property_Name"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
-    problem_properties=[]
-    zero_patient_days=[]
+
 
     #check if available unit changed by previous month
     Check_Available_Units(check_patient_days,latest_month)
