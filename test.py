@@ -526,9 +526,9 @@ def Check_Available_Units(check_patient_days,latest_month):
     previous_available_unit=BPC_pull_temp.loc[BPC_pull_temp["Sabra_Account"].isin(availble_unit_accounts),["ENTITY","Property_Name",onemonth_before_latest_month]]  
     #previous_available_unit=BPC_pull.reset_index(drop=False).merge(BPC_Account,left_on="Sabra_Account",right_on="BPC_Account_Name")
     previous_available_unit[["ENTITY","Property_Name",onemonth_before_latest_month]].groupby(["Property_Name","ENTITY"]).sum()
-    previous_available_unit=previous_available_unit.reset_index(drop=False)
-    #previous_available_unit=previous_available_unit.rename(columns={onemonth_before_latest_month:latest_month})	
-    previous_available_unit_display = previous_available_unit.pivot(index=["Category"], columns="Property_Name", values=onemonth_before_latest_month)
+    #previous_available_unit=previous_available_unit.rename(columns={onemonth_before_latest_month:latest_month})
+    st.write(previous_available_unit)
+    previous_available_unit_display = previous_available_unit.pivot(columns="Property_Name", values=onemonth_before_latest_month)
     st.write(previous_facility_data_display)
 	
 @st.cache_data
