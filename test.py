@@ -508,7 +508,6 @@ def Check_Available_Units(check_patient_days,latest_month):
             problem_properties.append(property_i)     
         elif patient_day_i>0 and operating_beds_i==0:
             st.error("Error：{} is missing operating beds. With {} patient days, this will result in incorrect occupancy.".format(property_i,int(patient_day_i)))
-
             problem_properties.append(property_i) 
     if len(problem_properties)>0:
         st.dataframe(check_patient_days.loc[(slice(None),problem_properties),latest_month],
@@ -526,6 +525,8 @@ def Check_Available_Units(check_patient_days,latest_month):
     previous_available_unit=BPC_pull_temp.loc[BPC_pull_temp["Sabra_Account"].isin(availble_unit_accounts),["ENTITY","Property_Name",onemonth_before_latest_month]]  
     previous_available_unit[["ENTITY","Property_Name",onemonth_before_latest_month]].groupby(["Property_Name","ENTITY"]).sum()
     st.write(previous_available_unit)
+    st.write(check_patient_days)
+    st.write(pd.concat([previous_available_unit, check_patient_days], axis=0)
     
 	
 @st.cache_data
@@ -928,7 +929,7 @@ def View_Summary():
     # check patient days ( available days > patient days)	
     check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(availble_unit_accounts)) | (latest_month_data["Category"]=='Patient Days')]
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
-    check_patient_days=check_patient_days[["Category","Property_Name",latest_month]].groupby(["Category","Property_Name"]).sum()
+    check_patient_days=check_patient_days[["ENTITY","Category","Property_Name",latest_month]].groupby(["ENTITY","Category","Property_Name"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
 
 
