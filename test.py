@@ -483,8 +483,7 @@ def Add_year_to_header(month_list):
     return month_list  
 
 @st.cache_data
-def Check_Available_Units(check_patient_days):
-
+def Check_Available_Units(check_patient_days,latest_month):
     month_days=monthrange(int(latest_month[:4]), int(latest_month[4:]))[1]
     for property_i in latest_month_data["Property_Name"].unique():
         try:
@@ -522,11 +521,11 @@ def Check_Available_Units(check_patient_days):
     #entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
     onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]<str(latest_month),BPC_pull.columns)))
     previous_available_unit=BPC_pull.merge(BPC_Account,left_on="Sabra_Account",right_on="BPC_Account_Name")
-    previous_available_unit=previous_available_unit[previous_available_unit["Sabra_Account"].isin(availble_unit_accounts)]#[["Property_Name",onemonth_before_latest_month,"Sabra_Account_Full_Name"]]	  
-    previous_available_unit.groupby(["Sabra_Account","ENTITY"]).sum()
+    previous_available_unit=previous_available_unit.loc[previous_available_unit["Sabra_Account"].isin(availble_unit_accounts),previous_available_unit]  
+    previous_available_unit["Category","ENTITY","Property_Name",previous_available_unit].groupby(["Property_Name","Category","ENTITY"]).sum()
     previous_available_unit=previous_available_unit.reset_index(drop=False)
-    previous_available_unit=previous_available_unit.rename(columns={onemonth_before_latest_month:latest_month})	
-    previous_available_unit_display = previous_available_unit.pivot(index=["Sabra_Account_Full_Name"], columns="Property_Name", values=latest_month)
+    #previous_available_unit=previous_available_unit.rename(columns={onemonth_before_latest_month:latest_month})	
+    previous_available_unit_display = previous_available_unit.pivot(index=["Category"], columns="Property_Name", values=onemonth_before_latest_month)
     st.write(previous_facility_data_display)
 	
 @st.cache_data
