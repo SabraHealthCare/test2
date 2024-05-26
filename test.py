@@ -526,7 +526,7 @@ def Check_Available_Units(check_patient_days,latest_month):
     previous_available_unit[["ENTITY","Property_Name",onemonth_before_latest_month]].groupby(["Property_Name","ENTITY"]).sum()
     st.write(previous_available_unit)
     st.write(check_patient_days)
-    st.write(pd.concat([previous_available_unit, check_patient_days], axis=0)
+    st.write(pd.concat([previous_available_unit, check_patient_days], axis=0))
     
 	
 @st.cache_data
