@@ -523,7 +523,7 @@ def Check_Available_Units(check_patient_days,latest_month):
     #entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
     onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]<str(latest_month),BPC_pull.columns)))
     previous_available_unit=BPC_pull.merge(BPC_Account,left_on="Sabra_Account",right_on="BPC_Account_Name")
-    st.write(previous_available_unit)
+    st.write(BPC_pull,previous_available_unit)
     previous_available_unit=previous_available_unit.loc[previous_available_unit["Sabra_Account"].isin(availble_unit_accounts),onemonth_before_latest_month]  
     previous_available_unit["Category","ENTITY","Property_Name",previous_available_unit].groupby(["Property_Name","Category","ENTITY"]).sum()
     previous_available_unit=previous_available_unit.reset_index(drop=False)
