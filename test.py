@@ -389,7 +389,7 @@ def Get_Month_Year(single_string):
         single_string=str(single_string).lower()
         Year,Year_keyword=Get_Year(single_string)	    
     # remove year from string, remove days from string
-    single_string=single_string.replace(Year_keyword,"").replace("30","").replace("31","").replace("28","").replace("29","").replace("as of","").replace("Actual","")
+    single_string=single_string.replace(Year_keyword,"").replace("30","").replace("31","").replace("28","").replace("29","").replace("as of","").replace("actual","")
     
     for Month in month_dic.keys() :#[01,02,03...12]
         for  Month_keyword in month_dic[Month]: #['december','dec','12',...]
