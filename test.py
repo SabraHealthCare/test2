@@ -518,6 +518,7 @@ def Check_Available_Units(check_patient_days,latest_month):
 			    hide_index=True)
         #st.stop()
 
+	
     # search for the Month/year row and return row number
     #entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
     onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]<str(latest_month),BPC_pull.columns)))
