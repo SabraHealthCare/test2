@@ -525,7 +525,7 @@ def Check_Available_Units(check_patient_days,latest_month):
     previous_available_unit=BPC_pull_temp.loc[BPC_pull_temp["Sabra_Account"].isin(availble_unit_accounts),["ENTITY","Property_Name",onemonth_before_latest_month]]  
     previous_available_unit[["ENTITY","Property_Name",onemonth_before_latest_month]].groupby(["Property_Name","ENTITY"]).sum()
     previous_available_unit=previous_available_unit.reset_index(drop=False)[["ENTITY","Property_Name",onemonth_before_latest_month]]
-    st.write(pd.merge(previous_available_unit, check_patient_days, on=[["ENTITY","Property_Name"]], how='left'))
+    st.write(pd.merge(previous_available_unit, check_patient_days, on=["ENTITY","Property_Name"], how='left'))
 @st.cache_data
 def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
