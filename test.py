@@ -528,8 +528,8 @@ def Check_Available_Units(check_patient_days,latest_month):
     previous_available_unit=previous_available_unit.reset_index(drop=False)[["Property_Name",onemonth_before_latest_month]]
     check_patient_days=check_patient_days.reset_index(drop=False)
     Unit_changed=pd.merge(previous_available_unit, check_patient_days.loc[check_patient_days['Category'] == 'Operating Beds',["Property_Name",latest_month]],on=["Property_Name"], how='left')
-    Unit_changed["Delta of Operating beds"]=Unit_changed[onemonth_before_latest_month]-Unit_changed[latest_month]
-    Unit_changed=Unit_changed.loc[Unit_changed["Delta of Operating beds"]!=0,]
+    Unit_changed["Delta"]=Unit_changed[onemonth_before_latest_month]-Unit_changed[latest_month]
+    Unit_changed=Unit_changed.loc[(Unit_changed["Delta"]!=0)&(Unit_changed[latest_month]!=0),]
     st.write("Unit_changed",Unit_changed)
 @st.cache_data
 def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
