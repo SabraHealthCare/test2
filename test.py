@@ -527,8 +527,9 @@ def Check_Available_Units(check_patient_days,latest_month):
     previous_available_unit[["ENTITY","Property_Name",onemonth_before_latest_month]].groupby(["Property_Name","ENTITY"]).sum()
     previous_available_unit=previous_available_unit.reset_index(drop=False)[["ENTITY","Property_Name",onemonth_before_latest_month]]
     st.write("previous_available_unit",previous_available_unit)
+    check_patient_days.reset_index(drop=False)
     st.write("check_patient_days",check_patient_days)
-    #st.write(pd.merge(previous_available_unit, check_patient_days.loc[check_patient_days['Category'] == 'Operating Beds',["ENTITY","Property_Name",latest_month]],on=["ENTITY","Property_Name"], how='left'))
+    st.write(pd.merge(previous_available_unit, check_patient_days.loc[check_patient_days['Category'] == 'Operating Beds',["ENTITY","Property_Name",latest_month]],on=["ENTITY","Property_Name"], how='left'))
 	     
 @st.cache_data
 def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
