@@ -933,7 +933,7 @@ def View_Summary():
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
     check_patient_days=check_patient_days[["ENTITY","Category","Property_Name",latest_month]].groupby(["ENTITY","Category","Property_Name"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
-
+    st.write("check_patient_days",check_patient_days)
 
     #check if available unit changed by previous month
     Check_Available_Units(check_patient_days,latest_month)
