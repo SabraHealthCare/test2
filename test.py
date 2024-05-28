@@ -510,7 +510,7 @@ def Check_Available_Units(check_patient_days,latest_month):
             st.write("Error：{} is missing operating beds. With {} patient days, this will result in incorrect occupancy.".format(property_i,int(patient_day_i)))
             problem_properties.append(property_i) 
     if len(problem_properties)>0:
-        st.dataframe(check_patient_days.loc[(problem_properties,slice(None)),latest_month],
+        st.dataframe(check_patient_days.loc[(problem_properties,slice(None)),latest_month].style.map(color_missing, subset=[latest_month]),
 		    column_config={
 			        "Property_Name": "Property",
 			        "Category":"Account Total",
@@ -531,7 +531,7 @@ def Check_Available_Units(check_patient_days,latest_month):
     Unit_changed["Delta"]=Unit_changed[onemonth_before_latest_month]-Unit_changed[latest_month]
     Unit_changed=Unit_changed.loc[(Unit_changed["Delta"]!=0)&(Unit_changed[latest_month]!=0),]
     if len(Unit_changed)>0:
-        st.dataframe(Unit_changed,
+        st.dataframe(Unit_changed.style.map(color_missing, subset=[Delta]),
 		    column_config={
 			        "Property_Name": "Property",
 			        onemonth_before_latest_month:onemonth_before_latest_month+" Operating beds",
@@ -923,14 +923,14 @@ def Compare_PL_Sabra(Total_PL,latest_month):
     return diff_BPC_PL
     #return diff_BPC_PL,diff_BPC_PL_detail
 	
-
+def color_missing(data):
+    return f'background-color: rgb(255, 204, 204);'
 @st.cache_data(experimental_allow_widgets=True)
 def View_Summary():
     global Total_PL,latest_month_data,latest_month
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
-    def color_missing(data):
-        return f'background-color: rgb(255, 204, 204);'
+
 
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
