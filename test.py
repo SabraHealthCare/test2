@@ -530,7 +530,15 @@ def Check_Available_Units(check_patient_days,latest_month):
     Unit_changed=pd.merge(previous_available_unit, check_patient_days.loc[check_patient_days['Category'] == 'Operating Beds',["Property_Name",latest_month]],on=["Property_Name"], how='left')
     Unit_changed["Delta"]=Unit_changed[onemonth_before_latest_month]-Unit_changed[latest_month]
     Unit_changed=Unit_changed.loc[(Unit_changed["Delta"]!=0)&(Unit_changed[latest_month]!=0),]
-    st.write("Unit_changed",Unit_changed)
+    if len(Unit_changed)>0:
+	st.dataframe(Unit_changed,
+		    column_config={
+			        "Property_Name": "Property",
+			        onemonth_before_latest_month:onemonth_before_latest_month+" Operating beds",
+		                 latest_month:latest_month+" Operating beds",
+		                 "Delta": "Changed"},
+			    hide_index=True)
+    
 @st.cache_data
 def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
