@@ -515,7 +515,7 @@ def Check_Available_Units(check_patient_days,latest_month):
 
         st.dataframe(check_patient_days.to_frame().style.map(color_missing, subset=[latest_month]).format(precision=0, thousands=",").hide(axis="index"),
 		    column_config={
-			        "Property_Name": "Property",
+			        "Property_Name": "Property"},
 			        #"Category":"Account Total",
 		                 #latest_month:latest_month[4:6]+"/"+latest_month[0:4]},
 			    hide_index=True)
