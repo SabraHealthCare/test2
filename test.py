@@ -484,21 +484,18 @@ def Add_year_to_header(month_list):
 
 @st.cache_data
 def Check_Available_Units(check_patient_days,latest_month):
-    st.write("check_patient_days2",check_patient_days)
     month_days=monthrange(int(latest_month[:4]), int(latest_month[4:]))[1]
     problem_properties=[]
     zero_patient_days=[]
-    for property_i in check_patient_days["Property_Name"].unique():
+    for property_i in latest_month_data["Property_Name"].unique():
         try:
-            patient_day_i=check_patient_days.loc[("Patient Days",property_i),latest_month]
+            patient_day_i=check_patient_days.loc[(property_i,"Patient Days"),latest_month]
         except:
             patient_day_i=0
         try:
-            operating_beds_i=check_patient_days.loc[("Operating Beds",property_i),latest_month]
+            operating_beds_i=check_patient_days.loc[(property_i,"Operating Beds"),latest_month]
         except:
             operating_beds_i=0
-        st.write("patient_day_i",patient_day_i)
-        st.write("operating_beds_i",operating_beds_i)
         if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
             continue
         elif operating_beds_i>0 and patient_day_i>operating_beds_i*month_days:
@@ -526,11 +523,11 @@ def Check_Available_Units(check_patient_days,latest_month):
     #entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
     onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)<str(latest_month),BPC_pull.columns)))
     BPC_pull_temp=BPC_pull.reset_index(drop=False)
-    previous_available_unit=BPC_pull_temp.loc[BPC_pull_temp["Sabra_Account"].isin(availble_unit_accounts),["ENTITY","Property_Name",onemonth_before_latest_month]]  
+    previous_available_unit=BPC_pull_temp.loc[BPC_pull_temp["Sabra_Account"].isin(availble_unit_accounts),["Property_Name",onemonth_before_latest_month]]  
     previous_available_unit[["ENTITY","Property_Name",onemonth_before_latest_month]].groupby(["Property_Name","ENTITY"]).sum()
-    previous_available_unit=previous_available_unit.reset_index(drop=False)[["ENTITY","Property_Name",onemonth_before_latest_month]]
+    previous_available_unit=previous_available_unit.reset_index(drop=False)[["Property_Name",onemonth_before_latest_month]]
     check_patient_days=check_patient_days.reset_index(drop=False)
-    st.write(pd.merge(previous_available_unit, check_patient_days.loc[check_patient_days['Category'] == 'Operating Beds',["ENTITY","Property_Name",latest_month]],on=["ENTITY","Property_Name"], how='left'))
+    st.write(pd.merge(previous_available_unit, check_patient_days.loc[check_patient_days['Category'] == 'Operating Beds',["Property_Name",latest_month]],on=["Property_Name"], how='left'))
 	     
 @st.cache_data
 def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
@@ -932,9 +929,8 @@ def View_Summary():
     # check patient days ( available days > patient days)	
     check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(availble_unit_accounts)) | (latest_month_data["Category"]=='Patient Days')]
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
-    check_patient_days=check_patient_days[["ENTITY","Category","Property_Name",latest_month]].groupby(["ENTITY","Category","Property_Name"]).sum()
+    check_patient_days=check_patient_days[["Property_Name","Category",latest_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
-    st.write("check_patient_days",check_patient_days)
 
     #check if available unit changed by previous month
     Check_Available_Units(check_patient_days,latest_month)
