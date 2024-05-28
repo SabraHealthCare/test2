@@ -532,6 +532,8 @@ def Check_Available_Units(check_patient_days,latest_month):
     Unit_changed["Delta"]=Unit_changed[onemonth_before_latest_month]-Unit_changed[latest_month]
     Unit_changed=Unit_changed.loc[(Unit_changed["Delta"]!=0)&(Unit_changed[latest_month]!=0),]
     if len(Unit_changed)>0:
+        st.write("The number of operating beds for the properties listed below have changed compared to the previous reporting month.")
+        st.write("Please double-check to confirm if these changes are accurate.")
         st.dataframe(Unit_changed.style.map(color_missing, subset=["Delta"]).format(precision=0, thousands=",").hide(axis="index"),
 		    column_config={
 			        "Property_Name": "Property",
