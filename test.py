@@ -484,10 +484,11 @@ def Add_year_to_header(month_list):
 
 @st.cache_data
 def Check_Available_Units(check_patient_days,latest_month):
+    st.write("check_patient_days2",check_patient_days)
     month_days=monthrange(int(latest_month[:4]), int(latest_month[4:]))[1]
     problem_properties=[]
     zero_patient_days=[]
-    for property_i in latest_month_data["Property_Name"].unique():
+    for property_i in check_patient_days["Property_Name"].unique():
         try:
             patient_day_i=check_patient_days.loc[("Patient Days",property_i),latest_month]
         except:
