@@ -510,7 +510,7 @@ def Check_Available_Units(check_patient_days,latest_month):
             st.error("Error：{} is missing operating beds. With {} patient days, this will result in incorrect occupancy.".format(property_i,int(patient_day_i)))
             problem_properties.append(property_i) 
     if len(problem_properties)>0:
-        st.dataframe(check_patient_days.loc[(slice(None),problem_properties),latest_month],
+        st.dataframe(check_patient_days.loc[(problem_properties,slice(None)),latest_month],
 		    column_config={
 			        "Property_Name": "Property",
 			        "Category":"Account Total",
