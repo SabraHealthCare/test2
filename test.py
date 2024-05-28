@@ -509,11 +509,10 @@ def Check_Available_Units(check_patient_days,latest_month):
         elif patient_day_i>0 and operating_beds_i==0:
             st.write("Error：{} is missing operating beds. With {} patient days, this will result in incorrect occupancy.".format(property_i,int(patient_day_i)))
             problem_properties.append(property_i) 
+    check_patient_days=check_patient_days.loc[(problem_properties,slice(None)),latest_month].reset_index(drop=False)
     if len(problem_properties)>0:
-        check_patient_days=check_patient_days.loc[(problem_properties,slice(None)),latest_month].reset_index(drop=False)
-        check_patient_days=check_patient_days.pivot_table(index=["Property_Name"],columns="Category", values=latest_month,aggfunc='last')
-
-        st.dataframe(check_patient_days.style.map(color_missing, subset=["Patient Days","Operating Beds"]).format(precision=0, thousands=",").hide(axis="index"),
+        check_patient_days_display=check_patient_days.pivot_table(index=["Property_Name"],columns="Category", values=latest_month,aggfunc='last')
+        st.dataframe(check_patient_days_display.style.map(color_missing, subset=["Patient Days","Operating Beds"]).format(precision=0, thousands=",").hide(axis="index"),
 		    column_config={
 			        "Property_Name": "Property"},
 			        #"Category":"Account Total",
