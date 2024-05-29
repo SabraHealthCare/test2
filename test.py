@@ -234,9 +234,7 @@ def Initial_Mapping(operator):
     entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename)
     entity_mapping=entity_mapping.reset_index(drop=True)
     entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
-    st.write("before",entity_mapping)
-    entity_mapping = entity_mapping.dropna(subset=['Property_in_separate_sheets'])	
-    st.write("after",entity_mapping)
+    #entity_mapping = entity_mapping.dropna(subset=['Property_in_separate_sheets'])	
     entity_mapping=entity_mapping.set_index("ENTITY")
     return entity_mapping,account_mapping
 
@@ -1111,7 +1109,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
 
     PL_sheet_list=load_workbook(uploaded_file).sheetnames	
     if sheet_type=="Finance":
-        st.write("entity_mapping[Sheet_Name_Finance]==nan",entity_mapping["Sheet_Name_Finance"]=="nan")
+        #st.write("entity_mapping[Sheet_Name_Finance]==nan",entity_mapping["Sheet_Name_Finance"]=="nan")
         st.write(entity_mapping)
         missing_PL_sheet_property = entity_mapping[(~entity_mapping["Sheet_Name_Finance"].isin(PL_sheet_list))|(pd.isna(entity_mapping["Sheet_Name_Finance"]))|(entity_mapping["Sheet_Name_Finance"]=="nan")]
         missing_occ_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Occupancy"].isin(PL_sheet_list)==False) & (entity_mapping["Sheet_Name_Occupancy"].notna())]
