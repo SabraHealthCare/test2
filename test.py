@@ -1112,13 +1112,13 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
         #st.write("entity_mapping[Sheet_Name_Finance]==nan",entity_mapping["Sheet_Name_Finance"]=="nan")
         st.write(entity_mapping)
         missing_PL_sheet_property = entity_mapping[(~entity_mapping["Sheet_Name_Finance"].isin(PL_sheet_list))|(pd.isna(entity_mapping["Sheet_Name_Finance"]))|(entity_mapping["Sheet_Name_Finance"]=="nan")]
-        missing_occ_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Occupancy"].isin(PL_sheet_list)==False) & (entity_mapping["Sheet_Name_Occupancy"].notna())]
+        missing_occ_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Occupancy"].isin(PL_sheet_list)==False)|(pd.isna(entity_mapping["Sheet_Name_Occupancy"]))|(entity_mapping["Sheet_Name_Occupancy"]=="nan")]
         if  (entity_mapping.loc[:,"BS_separate_excel"]=="N").all():
-            missing_BS_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Balance_Sheet"].isin(PL_sheet_list)==False) & (entity_mapping["Sheet_Name_Balance_Sheet"].notna())]		
+            missing_BS_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Balance_Sheet"].isin(PL_sheet_list)==False)|(pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))|(entity_mapping["Sheet_Name_Balance_Sheet"]=="nan")]		
         else:
             missing_BS_sheet_property=pd.DataFrame()
-    elif sheet_type=="BS":
-        missing_BS_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Balance_Sheet"].isin(PL_sheet_list)==False) & (entity_mapping["Sheet_Name_Balance_Sheet"].notna())]
+    elif sheet_type=="BS": # BS in another excel file
+        missing_BS_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Balance_Sheet"].isin(PL_sheet_list)==False)|(pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))|(entity_mapping["Sheet_Name_Balance_Sheet"]=="nan")]
         missing_PL_sheet_property=pd.DataFrame()
         missing_occ_sheet_property=pd.DataFrame()
 
