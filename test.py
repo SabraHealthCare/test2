@@ -1109,7 +1109,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
 
     PL_sheet_list=load_workbook(uploaded_file).sheetnames	
     if sheet_type=="Finance":
-        missing_PL_sheet_property = entity_mapping[~entity_mapping["Sheet_Name_Finance"].isin(PL_sheet_list)]
+        missing_PL_sheet_property = entity_mapping[(~entity_mapping["Sheet_Name_Finance"].isin(PL_sheet_list))|(pd.isna(entity_mapping["Sheet_Name_Finance"]))|(entity_mapping["Sheet_Name_Finance"]=="nan")]
         missing_occ_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Occupancy"].isin(PL_sheet_list)==False) & (entity_mapping["Sheet_Name_Occupancy"].notna())]
         if  (entity_mapping.loc[:,"BS_separate_excel"]=="N").all():
             missing_BS_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Balance_Sheet"].isin(PL_sheet_list)==False) & (entity_mapping["Sheet_Name_Balance_Sheet"].notna())]		
@@ -1161,8 +1161,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
             st.stop()
                 
     elif total_missing_len>0 and (entity_mapping["Property_in_separate_sheets"]=="N").all():
-        with st.form(key=sheet_type):
-		
+        with st.form(key=sheet_type):	
             if missing_PL_sheet_property.shape[0]>0:
                  st.warning("Please provide P&L Sheet sheet name:")
                  PL_sheet=st.selectbox(property_name,[""]+PL_sheet_list)
