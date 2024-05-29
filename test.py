@@ -1599,7 +1599,6 @@ def Upload_And_Process(uploaded_file,file_type):
                     # check if census data in another sheet
                     if not pd.isna(sheet_name_occupancy) and sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy is not None and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
-                        st.write(11111111111111111111111111)
                         #PL_occ,PL_with_detail_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
                         PL_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
                         PL=PL.combine_first(PL_occ)
@@ -1616,6 +1615,7 @@ def Upload_And_Process(uploaded_file,file_type):
                     PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                     # check if census data in another sheet
                     if not pd.isna(sheet_name_occupancy) and sheet_name_occupancy!='nan' and sheet_name_occupancy!=" " and sheet_name_occupancy!=sheet_name_finance:
+                        st.write(11111111111111111111111111)
                         PL_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
                         #PL_occ,PL_with_detail_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
                         PL=PL.combine_first(PL_occ)
@@ -1747,16 +1747,19 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
-            Total_PL=Upload_And_Process(uploaded_finance,"Finance")
+	 
+            with st.spinner('Wait for P&L processing'):
+                Total_PL=Upload_And_Process(uploaded_finance,"Finance")
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel 
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")
             entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
 
             # process Finance 
-            with st.spinner('Wait for P&L process'):
+            with st.spinner('Wait for P&L processing'):
                 #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
                 Total_PL=Upload_And_Process(uploaded_finance,"Finance")
-		# process BS 
+	    # process BS 
+            with st.spinner('Wait for Balance Sheet processing'):
                 #Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
                 Total_BL=Upload_And_Process(uploaded_BS,"BS")
 	    # combine Finance and BS
