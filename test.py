@@ -234,7 +234,9 @@ def Initial_Mapping(operator):
     entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename)
     entity_mapping=entity_mapping.reset_index(drop=True)
     entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
+    st.write("before",entity_mapping)
     entity_mapping = entity_mapping.dropna(subset=['Property_in_separate_sheets'])	
+    st.write("after",entity_mapping)
     entity_mapping=entity_mapping.set_index("ENTITY")
     return entity_mapping,account_mapping
 
