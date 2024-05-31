@@ -1736,22 +1736,23 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
         latest_month=Input_Reporting_Month()
 
-	    
+        	    
         if all(entity_mapping["BS_separate_excel"]=="Y"):
             BS_separate_excel="Y"
         else:
             BS_separate_excel="N"
-
-        with st.form("upload_form", clear_on_submit=True):
-            col1,col2=st.columns(2)
-            with col1:
-                st.subheader("Upload P&L:")
-                uploaded_finance=st.file_uploader(":star: :red[Only XLSX accepted] :star:",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
+        col1,col2=st.columns(2)
+	with col1:
+            with st.form("upload_form", clear_on_submit=True):
+                col3,col4=st.columns(2)
+                with col3:
+                    st.subheader("Upload P&L:")
+                    uploaded_finance=st.file_uploader(":star: :red[Only XLSX accepted] :star:",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
                 
-            with col2:
-                if BS_separate_excel=="Y":
-                    st.subheader("Upload Balance Sheet:")
-                    uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
+                with col4:
+                    if BS_separate_excel=="Y":
+                        st.subheader("Upload Balance Sheet:")
+                        uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
             submitted = st.form_submit_button("Upload")
         if submitted:
 	    # clear cache for every upload
