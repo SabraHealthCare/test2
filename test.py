@@ -1742,7 +1742,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         else:
             BS_separate_excel="N"
         col1,col2=st.columns(2)
-	with col1:
+        with col1:
             with st.form("upload_form", clear_on_submit=True):
                 col3,col4=st.columns(2)
                 with col3:
