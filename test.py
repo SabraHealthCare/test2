@@ -196,30 +196,14 @@ def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace 
 def clicked(button_name):
     st.session_state.clicked[button_name] = True
 
-
-def Initial_Paramaters(operator):
-    # drop down list of operator
-    if operator!="Sabra":
-        BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename)
-        BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
-        BPC_pull=BPC_pull.set_index(["ENTITY","Sabra_Account"])
-        BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
-                  
-        month_dic={10:["october","oct","10/","-10","/10","10"],11:["november","nov","11/","-11","/11","11"],12:["december","dec","12/","-12","/12","12"],1:["january","jan","01/","1/","-1","-01","/1","/01"],\
-                   2:["february","feb","02/","2/","-2","-02","/2","/02"],3:["march","mar","03/","3/","-3","-03","/3","/03"],4:["april","apr","04/","4/","-4","-04","/4","/04"],\
-                   5:["may","05/","5/","-5","-05","/5","/05"],6:["june","jun","06/","6/","-06","-6","/6","/06"],\
-                   7:["july","jul","07/","7/","-7","-07","/7","/07"],8:["august","aug","08/","8/","-8","-08","/8","/08"],9:["september","sep","09/","9/","-09","-9","/9","/09"]}
-        year_dic={2023:["2023","23"],2024:["2024","24"]} 
-
-    else:
-        st.stop()
-    return BPC_pull,month_dic,year_dic
-
 # No cache
-def Initial_Mapping(operator):
-    # read account mapping
+def Initial_Mapping(operator,latest_month):
+    BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename)
+    BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
+    BPC_pull=BPC_pull.set_index(["ENTITY","Sabra_Account"])
+    BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
+    # read account mapping	
     account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename)
-
     account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]==operator]
     if account_mapping.shape[0]==1:# and account_mapping.loc[:,"Sabra_Account"][0]=='Template':
         account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]=="Template"]
@@ -227,7 +211,6 @@ def Initial_Mapping(operator):
     account_mapping.loc[:, 'Sabra_Account'] = account_mapping['Sabra_Account'].apply(lambda x: x.upper().strip() if  pd.notna(x) else x)
     account_mapping.loc[:, 'Sabra_Second_Account'] = account_mapping['Sabra_Second_Account'].apply(lambda x:  x.upper().strip() if pd.notna(x) else x)
     account_mapping.loc[:, "Tenant_Formated_Account"] = account_mapping["Tenant_Account"].apply(lambda x: x.upper().strip() if pd.notna(x) else x)
-
 	
     account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
     # read property mapping
@@ -236,6 +219,14 @@ def Initial_Mapping(operator):
     entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
     #entity_mapping = entity_mapping.dropna(subset=['Property_in_separate_sheets'])	
     entity_mapping=entity_mapping.set_index("ENTITY")
+
+    if latest_month!="000000":
+        filtered_months = [x for x in BPC_pull.columns if x <latest_month]
+        # Sort the filtered filtered_months in descending order
+        sorted_months = sorted(filtered_months, reverse=True)
+        BPC_pull=BPC_pull[sorted_months[:n]]
+    
+        entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]>=latest_month)&((pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))| (entity_mapping["DATE_SOLD_PAYOFF"]<=latest_month))),]
     return entity_mapping,account_mapping
 
 	
@@ -369,6 +360,7 @@ def download_report(df,button_display):
     return st.download_button(label="Download "+button_display,data=download_file,file_name=button_display+".csv",mime="text/csv")
     
 def Get_Year(single_string):
+    year_dic={2023:["2023","23"],2024:["2024","24"]} 	
     for Year in year_dic.keys():
         for Year_keyword in year_dic[Year]:
             if Year_keyword in single_string:
@@ -377,6 +369,10 @@ def Get_Year(single_string):
 
 
 def Get_Month_Year(single_string):
+    month_dic={10:["october","oct","10/","-10","/10","10"],11:["november","nov","11/","-11","/11","11"],12:["december","dec","12/","-12","/12","12"],1:["january","jan","01/","1/","-1","-01","/1","/01"],\
+                   2:["february","feb","02/","2/","-2","-02","/2","/02"],3:["march","mar","03/","3/","-3","-03","/3","/03"],4:["april","apr","04/","4/","-4","-04","/4","/04"],\
+                   5:["may","05/","5/","-5","-05","/5","/05"],6:["june","jun","06/","6/","-06","-6","/6","/06"],\
+                   7:["july","jul","07/","7/","-7","-07","/7","/07"],8:["august","aug","08/","8/","-8","-08","/8","/08"],9:["september","sep","09/","9/","-09","-9","/9","/09"]}
     if single_string!=single_string or pd.isna(single_string):
         return 0,0
     if isinstance(single_string, datetime):
@@ -1725,16 +1721,17 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
     if choice=="Upload P&L":
-        BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
-        entity_mapping,account_mapping=Initial_Mapping(operator)
-        account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
         global latest_month,reporting_month_label,tenant_account_col,date_header
+        latest_month=Input_Reporting_Month()
+        st.write(latest_month)
+        BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator,latest_month)
+        account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
         reporting_month_label=True
         #latest_month="0"
         tenant_account_col=10000
         date_header=[[0],0,[]]
 
-        latest_month=Input_Reporting_Month()
+
 
         	    
         if all(entity_mapping["BS_separate_excel"]=="Y"):
@@ -1821,8 +1818,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
        
 
     elif choice=="Manage Mapping":
-        BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
-        entity_mapping,account_mapping=Initial_Mapping(operator)
+        BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator,"000000")
         with st.expander("Manage Property Mapping" ,expanded=True):
             ChangeWidgetFontSize('Manage Property Mapping', '25px')
             entity_mapping=Manage_Entity_Mapping(operator)
