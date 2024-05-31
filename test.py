@@ -1359,8 +1359,6 @@ def Input_Reporting_Month():
                 return latest_month
             else:
                 st.stop()
-        else:
-            st.stop()
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):  
     global account_mapping,latest_month
