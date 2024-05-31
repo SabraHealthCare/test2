@@ -227,7 +227,7 @@ def Initial_Mapping(operator,latest_month):
         sorted_months = sorted(filtered_months, reverse=True)
         BPC_pull=BPC_pull[sorted_months[:previous_monthes_comparison]]
         st.write("1","entity_mapping",entity_mapping)	    
-        entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]>=latest_month)&((pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))| (entity_mapping["DATE_SOLD_PAYOFF"]<=latest_month))),]
+        entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]>=latest_month),]#&((pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))| (entity_mapping["DATE_SOLD_PAYOFF"]<=latest_month))),]
         st.write("2","entity_mapping",entity_mapping)	 
     return BPC_pull,entity_mapping,account_mapping
 
