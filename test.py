@@ -499,15 +499,15 @@ def Check_Available_Units(check_patient_days,latest_month):
         if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
             continue
         elif operating_beds_i>0 and patient_day_i>operating_beds_i*month_days:
-            st.write("Error：The number of patient days for {} exceeds its available days (Operating Beds * {}). This will result in incorrect occupancy.".format(property_i,month_days))
+            st.error("Error：The number of patient days for {} exceeds its available days (Operating Beds * {}). This will result in incorrect occupancy.".format(property_i,month_days))
             problem_properties.append(property_i)
         elif operating_beds_i==0 and patient_day_i==0:
             zero_patient_days.append(property_i)
         elif patient_day_i==0 and operating_beds_i>0:
-            st.write("Error: {} is missing patient days. If this facility is not currently functioning or in operation, please remove the number of operating beds associated with it.".format(property_i))
+            st.error("Error: {} is missing patient days. If this facility is not currently functioning or in operation, please remove the number of operating beds associated with it.".format(property_i))
             problem_properties.append(property_i)     
         elif patient_day_i>0 and operating_beds_i==0:
-            st.write("Error：{} is missing operating beds. With {} patient days, this will result in incorrect occupancy.".format(property_i,int(patient_day_i)))
+            st.error("Error：{} is missing operating beds. With {} patient days, this will result in incorrect occupancy.".format(property_i,int(patient_day_i)))
             problem_properties.append(property_i) 
     
     if len(problem_properties)>0:
@@ -534,8 +534,8 @@ def Check_Available_Units(check_patient_days,latest_month):
     Unit_changed["Delta"]=Unit_changed[onemonth_before_latest_month]-Unit_changed[latest_month]
     Unit_changed=Unit_changed.loc[(Unit_changed["Delta"]!=0)&(Unit_changed[latest_month]!=0),]
     if len(Unit_changed)>0:
-        st.write("The number of operating beds for the properties listed below have changed compared to the previous reporting month.")
-        st.write("Please double-check to confirm if these changes are accurate.")
+        st.warning("The number of operating beds for the properties listed below have changed compared to the previous reporting month.")
+        st.warning("Please double-check if these changes are accurate.")
         st.dataframe(Unit_changed.style.map(color_missing, subset=["Delta"]).format(precision=0, thousands=",").hide(axis="index"),
 		    column_config={
 			        "Property_Name": "Property",
@@ -683,7 +683,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     elif len(candidate_date)==1:	    
         return candidate_date[0]
     else:
-        st.error("Can't identify Year/Month header for sheet: '"+sheet_name+"'")
+        st.error("Can't identify Year/Month header for sheet: '{}', please fix it and re_upload.".format(sheet_name))
         st.stop()
 
 
@@ -1334,6 +1334,33 @@ def Identify_Reporting_Month(PL,entity_header_row_number):
                     header=["{}{}".format(year,month)]
     return Check_Reporting_Month(header)
 
+def Input_Reporting_Month():
+    if current_month<10:
+        current_date=str(current_year)+"0"+str(current_month)
+    else:
+        current_date=str(current_year)+str(current_month)
+	
+    st.write("Please select reporting month(not current month):") 
+    col1,col2=st.columns([1,1])
+    with col1:
+        with st.form("latest_month"):
+            col3,col4=st.columns([1,1])
+            with col3:
+                selected_year = st.selectbox("Year", range(current_year, current_year-2,-1))
+            with col4:    
+                selected_month = st.selectbox("Month", [str(month).zfill(2) for month in range(1, 13)])
+            latest_month=str(selected_year)+str(selected_month)
+            st.form_submit_button("Submit",on_click=clicked, args=["submit_reporting_date"])
+
+            if st.session_state.clicked["submit_reporting_date"]:
+                if latest_month>=current_date:
+                    st.error("The reporting month should precede the current month.")
+                    st.stop()
+                return latest_month
+            else:
+                st.stop()
+        else:
+            st.stop()
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):  
     global account_mapping,latest_month
@@ -1705,9 +1732,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
         global latest_month,reporting_month_label,tenant_account_col,date_header
         reporting_month_label=True
-        latest_month="0"
+        #latest_month="0"
         tenant_account_col=10000
         date_header=[[0],0,[]]
+
+        latest_month=Input_Reporting_Month()
+
+	    
         if all(entity_mapping["BS_separate_excel"]=="Y"):
             BS_separate_excel="Y"
         else:
