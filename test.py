@@ -219,14 +219,14 @@ def Initial_Mapping(operator,latest_month):
     entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
     #entity_mapping = entity_mapping.dropna(subset=['Property_in_separate_sheets'])	
     entity_mapping=entity_mapping.set_index("ENTITY")
-
+    entity_mapping['DATE_ACQUIRED'] = entity_mapping['DATE_ACQUIRED'].astype(str)
+    entity_mapping['DATE_SOLD_PAYOFF'] = entity_mapping['DATE_SOLD_PAYOFF'].astype(str)
     if latest_month!="000000":
         filtered_months = [x for x in BPC_pull.columns if x <latest_month]
         # Sort the filtered filtered_months in descending order
         sorted_months = sorted(filtered_months, reverse=True)
         BPC_pull=BPC_pull[sorted_months[:previous_monthes_comparison]]
-    
-        entity_mapping.loc[((str(entity_mapping["DATE_ACQUIRED"])>=latest_month)&((pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))| (str(entity_mapping["DATE_SOLD_PAYOFF"])<=latest_month))),]
+        entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]>=latest_month)&((pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))| (entity_mapping["DATE_SOLD_PAYOFF"]<=latest_month))),]
     st.write("BPC_pull",BPC_pull,"entity_mapping",entity_mapping)
     return BPC_pull,entity_mapping,account_mapping
 
