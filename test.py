@@ -226,7 +226,7 @@ def Initial_Mapping(operator,latest_month):
         # Sort the filtered filtered_months in descending order
         sorted_months = sorted(filtered_months, reverse=True)
         BPC_pull=BPC_pull[sorted_months[:previous_monthes_comparison]]
-        entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]>=latest_month)&((pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))| (entity_mapping["DATE_SOLD_PAYOFF"]<=latest_month))),]
+        entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]>=latest_month)&((pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))| (entity_mapping["DATE_SOLD_PAYOFF"]<=latest_month))),]
     st.write("BPC_pull",BPC_pull,"entity_mapping",entity_mapping)
     return BPC_pull,entity_mapping,account_mapping
 
@@ -1724,7 +1724,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     if choice=="Upload P&L":
         global latest_month,reporting_month_label,tenant_account_col,date_header
         latest_month=Input_Reporting_Month()
-        st.write("latest_month",latest_month)
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator,latest_month)
         account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
         reporting_month_label=True
