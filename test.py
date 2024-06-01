@@ -603,34 +603,40 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                     # check validation of year
                     if Year_continuity_check(year_row) and year_count[year_row_index]==month_count[month_row_index]:
                         PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
-                        month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                        return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
-                    
+                                                      month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
+
+                        if latest_month in PL_date_header:
+			    return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
+			else:
+                            continue
 
 		# all the year rows are not valid, add year to month
                 year_table.iloc[year_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
                 PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                 original_header=PL.iloc[month_row_index,]
-                
-                d_str = ''
-                for i in range(len(PL_date_header)):
+                if latest_month in PL_date_header:
+                    d_str = ''
+                    for i in range(len(PL_date_header)):
                         if PL_date_header[i]==0 or PL_date_header[i]=="0":
                             continue
                         else:
                             date=str(PL_date_header[i][4:6])+"/"+str(PL_date_header[i][0:4])
                             d_str +=",  "+str(original_header[i])+" — "+ date
                 
-                st.warning("Fail to identify **'Year'** in the date header for sheet '"+sheet_name+"'. Filled year as:")
-                st.markdown(d_str[1:])
-                return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
+                    st.warning("Fail to identify **'Year'** in the date header for sheet '"+sheet_name+"'. Filled year as:")
+                    st.markdown(d_str[1:])
+                    return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
+		else:
+                    continue
                 
-        # only one month in header, all the rows that have multiple month have been removed
+                
+        # only one month in header, all the rows that have multiple months were out
         elif month_count[month_row_index]==1:	
             col_month=0      #col_month is the col number of month
 	    # find the col of first month
             while(month_table.iloc[month_row_index,col_month]==0):
                 col_month+=1
-            if month_table.iloc[month_row_index,col_month]==current_month:
+            if month_table.iloc[month_row_index,col_month]!=int(latest_month[4:]):
                 continue
             #if there is no year in month row, check above row or next row
             if  year_table.iloc[month_row_index,col_month]==0:
@@ -679,7 +685,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     elif len(candidate_date)==1:	    
         return candidate_date[0]
     else:
-        st.error("Can't identify Year/Month header for sheet: '{}', please fix it and re_upload.".format(sheet_name))
+        st.error("failed to identify Year/Month header for sheet: '{}', please fix and re-upload.".format(sheet_name))
         st.stop()
 
 
@@ -1384,8 +1390,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):
 	#set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
 	# find the reporting month from 0th row to property header row    
-        if latest_month=="0":
-            latest_month=Identify_Reporting_Month(PL,entity_header_row_number)  
+  
 	#remove row above property header
         PL=PL.iloc[entity_header_row_number+1:,:]
 
@@ -1475,8 +1480,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         if len(date_header[2])==0:
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()  
-        if latest_month=="0":
-            latest_month=Check_Reporting_Month(date_header[0])
 
         # select only two or one previous months for columns
         month_select = Get_Previous_Months(latest_month,date_header[0])
@@ -1527,75 +1530,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
     #return PL,PL_with_detail
     return PL
        
-
-def Check_Reporting_Month(date_header_list):
-    if current_month<10:
-        current_date=str(current_year)+"0"+str(current_month)
-    else:
-        current_date=str(current_year)+str(current_month)
-
-    reporting_month_list=list(filter(lambda x: x!="0",list(map(lambda x:str(x),date_header_list))	))
-    latest_month=max(reporting_month_list)
-    if latest_month!="reporting_month_TBD":
-        st.write("The reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
-        col4,col5,col6=st.columns([3,2,22])
-        with col4:  	
-            st.button('Yes', on_click=clicked, args=["yes_button"])    
-        with col5:
-            st.write("or")
-        with col6:
-            st.button("No", on_click=clicked, args=["no_button"])       
-        if st.session_state.clicked["yes_button"]:
-            if latest_month>=current_date:
-                st.error("The reporting month should precede the current month.")
-                st.stop()
-            return latest_month
-        elif st.session_state.clicked["no_button"]:
-            st.write("Please select reporting month:")
-            col7,col8=st.columns([1,1])
-            with col7:
-                with st.form("latest_month"):
-                    col9,col10=st.columns([1,1])
-                    with col9:
-                        if len(reporting_month_list)>1:		
-                            latest_month = st.selectbox('Select reporting month from P&L:', list(map(lambda x:x[0:4]+"/"+x[4:6],reporting_month_list)))
-                            latest_month=latest_month[0:4]+latest_month[5:7]
-                        elif len(reporting_month_list)==1:	
-                            selected_year = st.selectbox("Year", range(current_year, current_year-2,-1))
-                            with col10:    
-                                selected_month = st.selectbox("Month", [str(month).zfill(2) for month in range(1, 13)])
-                                latest_month=str(selected_year)+str(selected_month)
-                    st.form_submit_button("Submit",on_click=clicked, args=["submit_reporting_date"])
-
-            if st.session_state.clicked["submit_reporting_date"]:
-                if latest_month>=current_date:
-                    st.error("The reporting month should precede the current month.")
-                    st.stop()
-                return latest_month
-            else:
-                st.stop()
-        else:
-            st.stop()
-    elif  latest_month=="reporting_month_TBD" :
-        st.write("Please select reporting month:")
-        col7,col8=st.columns([1,1])
-        with col7:
-            with st.form("latest_month_TBD"):
-                col9,col10=st.columns([1,1])
-                with col9:
-                    selected_year = st.selectbox("Year", range(current_year, current_year-2,-1))
-                with col10:
-                    selected_month = st.selectbox("Month", [str(month).zfill(2) for month in range(1, 13)])
-                    latest_month=str(selected_year)+str(selected_month)
-                st.form_submit_button("Submit",on_click=clicked, args=["submit_reporting_date"])
-	     
-        if st.session_state.clicked["submit_reporting_date"]:
-            if latest_month>=current_date:
-                st.error("The reporting month should precede the current month.")
-                st.stop()
-            return latest_month
-        else:
-            st.stop()
 
 # no cache
 def Upload_And_Process(uploaded_file,file_type):
