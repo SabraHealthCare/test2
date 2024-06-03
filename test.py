@@ -79,6 +79,55 @@ def Upload_to_Onedrive(uploaded_file,path,file_name):
         return False
 
 # no cache read csv/excel from onedrive , return dataframe
+def detect_encoding(file_content):
+    result = chardet.detect(file_content)
+    return result['encoding']
+
+def Read_CSV_From_Onedrive(path, file_name, user_id, headers):
+    # Set the API endpoint and headers for file download
+    api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/root:/{path}/{file_name}:/content'
+    
+    # Make the request to download the file
+    response = requests.get(api_url, headers=headers)
+    
+    # Check the status code
+    if response.status_code == 200 or response.status_code == 201:
+        # Content of the file is available in response.content
+        try:
+            file_content = response.content
+            detected_encoding = detect_encoding(file_content)
+            st.write(f"Detected encoding: {detected_encoding}")
+            
+            if file_name.lower().endswith(".csv"):
+                # Try reading the CSV with the detected encoding
+                try:
+                    df = pd.read_csv(BytesIO(file_content), encoding=detected_encoding, error_bad_lines=False, warn_bad_lines=True)
+                except UnicodeDecodeError:
+                    # If detected encoding fails, try common fallback encodings
+                    try:
+                        df = pd.read_csv(BytesIO(file_content), encoding='utf-8', error_bad_lines=False, warn_bad_lines=True)
+                    except UnicodeDecodeError:
+                        df = pd.read_csv(BytesIO(file_content), encoding='latin1', error_bad_lines=False, warn_bad_lines=True)
+            elif file_name.lower().endswith(".xlsx"):
+                df = pd.read_excel(BytesIO(file_content))
+            return df
+        except EmptyDataError:
+            st.write("The file is empty.")
+            return None
+        except pd.errors.ParserError as e:
+            st.write(f"ParserError: {e}")
+            return None
+        except Exception as e:
+            st.write(f"An error occurred: {e}")
+            return None
+    else:
+        st.write(f"Failed to download file. Status code: {response.status_code}")
+        st.write(f"Response content: {response.content}")
+        return False
+
+
+
+
 def Read_CSV_From_Onedrive(path,file_name):
     # Set the API endpoint and headers for file download
     api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/root:/{path}/{file_name}:/content'
