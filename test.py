@@ -1643,17 +1643,17 @@ if st.session_state["authentication_status"] is False:
 #---------------operator account-----------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
     operator=st.session_state["operator"]
-    reporting_month_label=True  
-    tenant_account_col=10000
     st.title(operator)
-    if current_month<10:
-        current_date=str(current_year)+"0"+str(current_month)
-    else:
-        current_date=str(current_year)+str(current_month)
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
     if choice=="Upload P&L":
+        if current_month<10:
+            current_date=str(current_year)+"0"+str(current_month)
+        else:
+            current_date=str(current_year)+str(current_month)
         global latest_month,reporting_month_label,tenant_account_col,date_header
+        reporting_month_label=True  
+        tenant_account_col=10000
         col1,col2=st.columns(2)
         with col1:
             with st.form("upload_form", clear_on_submit=True):
