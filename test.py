@@ -1666,16 +1666,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                         uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
                 submitted = st.form_submit_button("Upload")
             if submitted:
-                if latest_month>=current_date:
-                    st.error("The reporting month should precede the current month.")
-                    st.stop()
-                	
 	        # clear cache for every upload
                 st.cache_data.clear()
                 st.cache_resource.clear()
                 st.session_state.clicked = button_initial_state
-            else:
-                st.stop()
+
         if uploaded_finance:
             with col1:
                 st.markdown("✔️ :green[P&L selected]")
@@ -1689,7 +1684,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         elif BS_separate_excel=="Y" and not uploaded_BS:
             st.write("Balance sheet wasn't upload.")
             st.stop()
-		
+        if latest_month>=current_date:
+            st.error("The reporting month should precede the current month.")
+            st.stop()
+                		
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
