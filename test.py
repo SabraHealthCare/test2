@@ -83,7 +83,7 @@ def detect_encoding(file_content):
     result = chardet.detect(file_content)
     return result['encoding']
 
-def Read_CSV_From_Onedrive(path, file_name, user_id, headers):
+def Read_CSV_From_Onedrive(path, file_name):
     # Set the API endpoint and headers for file download
     api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/root:/{path}/{file_name}:/content'
     
@@ -128,7 +128,7 @@ def Read_CSV_From_Onedrive(path, file_name, user_id, headers):
 
 
 
-def Read_CSV_From_Onedrive(path,file_name):
+def Read_CSV_From_Onedrive1(path,file_name):
     # Set the API endpoint and headers for file download
     api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/root:/{path}/{file_name}:/content'
     # Make the request to download the file
