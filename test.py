@@ -1663,12 +1663,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     selected_year = st.selectbox("Year", years_range,index=years_range.index(st.session_state.selected_year))
                 with col4:    
                     selected_month = st.selectbox("Month", months_range,index=months_range.index(st.session_state.selected_month))
-        
-                col5,col6=st.columns(2)
-                with col5:
+   
+                with col3:
                     st.subheader("Upload P&L:")
                     uploaded_finance=st.file_uploader(":star: :red[Only XLSX accepted] :star:",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
-                with col6:
+                with col4:
                     if BS_separate_excel=="Y":
                         st.subheader("Upload Balance Sheet:")
                         uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
@@ -1682,7 +1681,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.selected_month = selected_month
                     latest_month=str(selected_year)+str(selected_month)
         if uploaded_finance:
-            with col1:
+            with col3:
                 st.markdown("✔️ :green[P&L selected]")
         else:
             st.write("P&L wasn't upload.")
@@ -1700,7 +1699,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         else:
             BS_separate_excel="N"
         if BS_separate_excel=="Y" and uploaded_BS:
-            with col2:
+            with col4:
                 st.markdown("✔️ :green[Balance sheet selected]")
         elif BS_separate_excel=="Y" and not uploaded_BS:
             st.write("Balance sheet wasn't upload.")
