@@ -98,7 +98,6 @@ def Read_CSV_From_Onedrive(path, file_name):
         try:
             file_content = response.content
             detected_encoding = detect_encoding(file_content)
-            st.write(f"Detected encoding: {detected_encoding}")
             
             if file_name.lower().endswith(".csv"):
                 # Try reading the CSV with the detected encoding
@@ -115,13 +114,13 @@ def Read_CSV_From_Onedrive(path, file_name):
             return df
         except EmptyDataError:
             st.write("The file is empty.")
-            return None
+            return False
         except pd.errors.ParserError as e:
             st.write(f"ParserError: {e}")
-            return None
+            return False
         except Exception as e:
             st.write(f"An error occurred: {e}")
-            return None
+            return False
     else:
         st.write(f"Failed to download file. Status code: {response.status_code}")
         st.write(f"Response content: {response.content}")
