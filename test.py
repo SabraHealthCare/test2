@@ -559,7 +559,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     year_count=[]        
     month_count=[]
     max_len=0
-    st.write(sheet_name,"month_table",month_table)
     for row_i in range(search_row_size):
         # save the number of valid months of each row to month_count
         valid_month=list(filter(lambda x:x!=0,month_table.iloc[row_i,]))
@@ -581,7 +580,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         month_row_index=month_sort_index[month_index_i]
         if month_count[month_row_index]>1:   # if there are more than one month in header
             month_row=list(month_table.iloc[month_row_index,])
-            st.write("month_count[month_row_index]",month_count[month_row_index],month_table.iloc[month_row_index,])
             if not Month_continuity_check(month_row):   # month is not continuous, check next
                 st.write("not continue")
                 continue
@@ -594,13 +592,11 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                         year_row_index=year_sort_index[year_index_i]
                         #month row and year row is supposed to be adjacent
                         if abs(year_row_index-month_row_index)>2:
-                            st.write("1")
                             continue
                     
                     year_row=list(year_table.iloc[year_row_index,])
 		    # if month and year are not in the same places in the columns, year_row is not the correct one
                     if not all([year_row[i]==0 if month_row[i]==0 else year_row[i]!=0 for i in range(len(month_row))]):
-                        st.write("1")
                         continue
             
                     # check validation of year
@@ -611,14 +607,13 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                         if latest_month in PL_date_header:
                             return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
                         else:
-                            st.write("3")
                             continue
 
 		# all the year rows are not valid, add year to month
                 year_table.iloc[year_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
                 PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                 original_header=PL.iloc[month_row_index,]
-                if latest_month in PL_date_header:
+                if latest_month in list(PL_date_header):
                     d_str = ''
                     for i in range(len(PL_date_header)):
                         if PL_date_header[i]==0 or PL_date_header[i]=="0":
