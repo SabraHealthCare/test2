@@ -19,4 +19,5 @@ sendgrid
 Pillow
 msal
 requests
+chardet
 git+https://github.com/streamlit/files-connection 
