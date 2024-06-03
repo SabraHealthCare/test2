@@ -1648,7 +1648,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.write(entity_mapping)
                 date_header=[[0],0,[]]
                 #if all(entity_mapping["BS_separate_excel"]=="Y"):
-		if False:
+                if False:
                     BS_separate_excel="Y"
                 else:
                     BS_separate_excel="N"
