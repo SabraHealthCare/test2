@@ -218,7 +218,7 @@ def clicked(button_name):
     st.session_state.clicked[button_name] = True
 
 # No cache
-def Initial_Mapping(operator,latest_month):
+def Initial_Mapping(operator):
     BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename)
     BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
     BPC_pull=BPC_pull.set_index(["ENTITY","Sabra_Account"])
@@ -242,12 +242,6 @@ def Initial_Mapping(operator,latest_month):
     entity_mapping=entity_mapping.set_index("ENTITY")
     entity_mapping['DATE_ACQUIRED'] = entity_mapping['DATE_ACQUIRED'].astype(str)
     entity_mapping['DATE_SOLD_PAYOFF'] = entity_mapping['DATE_SOLD_PAYOFF'].astype(str)
-    if latest_month!="000000":
-        filtered_months = [x for x in BPC_pull.columns if x <latest_month]
-        # Sort the filtered filtered_months in descending order
-        sorted_months = sorted(filtered_months, reverse=True)
-        BPC_pull=BPC_pull[["Property_Name"]+sorted_months[:previous_monthes_comparison]]    
-        entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=latest_month) &((pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))| (entity_mapping["DATE_SOLD_PAYOFF"]>=latest_month))),]
     return BPC_pull,entity_mapping,account_mapping
 
 	
@@ -1648,13 +1642,19 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if 'selected_month' not in st.session_state:
             st.session_state.selected_month = '01'
         global latest_month,reporting_month_label,tenant_account_col,date_header
+        BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
         reporting_month_label=True  
         tenant_account_col=10000
+        date_header=[[0],0,[]]
         col1,col2=st.columns(2)
         # Calculate the list of years and their indices
         years_range = list(range(current_year, current_year - 2, -1))
         # Calculate the list of months and their indices
         months_range = [str(month).zfill(2) for month in range(1, 13)]
+        if all(entity_mapping["BS_separate_excel"]=="Y"):             
+            BS_separate_excel="Y"
+        else:
+            BS_separate_excel="N"
         with col1:
             with st.form("upload_form", clear_on_submit=True):
                 st.write("Please select reporting month(not current month):") 
@@ -1663,19 +1663,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     selected_year = st.selectbox("Year", years_range,index=years_range.index(st.session_state.selected_year))
                 with col4:    
                     selected_month = st.selectbox("Month", months_range,index=months_range.index(st.session_state.selected_month))
-                latest_month=str(selected_year)+str(selected_month)
-                date_header=[[0],0,[]]
-                BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator,latest_month)
-                account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
-                if all(entity_mapping["BS_separate_excel"]=="Y"):
-                    BS_separate_excel="Y"
-                else:
-                    BS_separate_excel="N"
+        
                 col5,col6=st.columns(2)
                 with col5:
                     st.subheader("Upload P&L:")
                     uploaded_finance=st.file_uploader(":star: :red[Only XLSX accepted] :star:",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
-                
                 with col6:
                     if BS_separate_excel=="Y":
                         st.subheader("Upload Balance Sheet:")
@@ -1688,23 +1680,34 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.clicked = button_initial_state
                     st.session_state.selected_year = selected_year
                     st.session_state.selected_month = selected_month
+                    latest_month=str(selected_year)+str(selected_month)
         if uploaded_finance:
             with col1:
                 st.markdown("✔️ :green[P&L selected]")
         else:
             st.write("P&L wasn't upload.")
             st.stop()
- 
+
+        latest_month=str(selected_year)+str(selected_month)
+        if latest_month>=current_date:
+            st.error("The reporting month should precede the current month.")
+            st.stop()
+        filtered_months =sorted([x for x in BPC_pull.columns if x <latest_month],reverse=True)
+        BPC_pull=BPC_pull[["Property_Name"]+filtered_months[:previous_monthes_comparison]]    
+        entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=latest_month) &((pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))| (entity_mapping["DATE_SOLD_PAYOFF"]>=latest_month))),]
+        if all(entity_mapping["BS_separate_excel"]=="Y"):             
+            BS_separate_excel="Y"
+        else:
+            BS_separate_excel="N"
         if BS_separate_excel=="Y" and uploaded_BS:
             with col2:
                 st.markdown("✔️ :green[Balance sheet selected]")
         elif BS_separate_excel=="Y" and not uploaded_BS:
             st.write("Balance sheet wasn't upload.")
             st.stop()
-        if latest_month>=current_date:
-            st.error("The reporting month should precede the current month.")
-            st.stop()
-                      		
+        
+        account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
+	    
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
@@ -1753,7 +1756,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
        
 
     elif choice=="Manage Mapping":
-        BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator,"000000")
+        BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
         with st.expander("Manage Property Mapping" ,expanded=True):
             ChangeWidgetFontSize('Manage Property Mapping', '25px')
             entity_mapping=Manage_Entity_Mapping(operator)
