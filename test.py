@@ -73,10 +73,17 @@ headers = {'Authorization': 'Bearer ' + access_token,}
 def Upload_to_Onedrive(uploaded_file,path,file_name):
     # Set the API endpoint and headers
     api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
-    # Read the file content directly
+
+
+    # Ensure the file pointer is at the start
+    uploaded_file.seek(0)
+    
+    # Read the file content as binary data
     file_content = uploaded_file.read()
-    # Set the headers
-    headers.update({'Content-Type': 'application/octet-stream'})
+    
+    # Set the Content-Type header for Excel files
+    headers.update({'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})
+    
     
     # Make the request to upload the file
     response = requests.put(api_url, headers=headers, data=file_content)
