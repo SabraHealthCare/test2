@@ -1665,6 +1665,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     selected_month = st.selectbox("Month", [str(month).zfill(2) for month in range(1, 13)])
                 latest_month=str(selected_year)+str(selected_month)
                 date_header=[[0],0,[]]
+                BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator,latest_month)
+                account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
                 if all(entity_mapping["BS_separate_excel"]=="Y"):
                     BS_separate_excel="Y"
                 else:
@@ -1701,9 +1703,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if latest_month>=current_date:
             st.error("The reporting month should precede the current month.")
             st.stop()
-        BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator,latest_month)
-        account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
-                        		
+                      		
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
