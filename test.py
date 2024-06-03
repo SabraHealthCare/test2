@@ -1643,7 +1643,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     selected_month = st.selectbox("Month", [str(month).zfill(2) for month in range(1, 13)])
                 latest_month=str(selected_year)+str(selected_month)
                 #st.form_submit_button("Submit",on_click=clicked, args=["submit_reporting_date"])
-         
                 BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator,latest_month)
                 account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
                 reporting_month_label=True  
@@ -1653,8 +1652,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     BS_separate_excel="Y"
                 else:
                     BS_separate_excel="N"
-    
-		    
                 col5,col6=st.columns(2)
                 with col5:
                     st.subheader("Upload P&L:")
@@ -1664,7 +1661,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     if BS_separate_excel=="Y":
                         st.subheader("Upload Balance Sheet:")
                         uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
-                submitted = st.form_submit_button("Upload")
+            submitted = st.form_submit_button("Upload")
             if submitted:
 	        # clear cache for every upload
                 st.cache_data.clear()
