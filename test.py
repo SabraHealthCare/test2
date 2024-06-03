@@ -994,16 +994,6 @@ def View_Summary():
 		                 latest_month:latest_month[4:6]+"/"+latest_month[0:4]},
 			    hide_index=True)
 	     
-        #col1,col2,col3=st.columns([4,1,25])
-        #with col1:
-            #st.button("Fix and re-upload P&L")
-        #with col2:
-            #st.write("or")
-        #with col3:
-            #continue_run=st.button("Ignore and Continue", on_click=clicked, args=["continue_button"]) 
-            #st.write("")#-----------------------write to error log-----------------------   
-        #if not st.session_state.clicked["continue_button"]:
-            #st.stop()	
 
     #duplicates = latest_month_data[latest_month_data.duplicated(subset=["Sabra_Account_Full_Name", "Category"], keep=False)]
 
@@ -1631,6 +1621,8 @@ button_initial_state={"forgot_password_button":False,"forgot_username_button":Fa
 
 if 'clicked' not in st.session_state:
     st.session_state.clicked = button_initial_state
+	
+
 # login widget
 col1,col2=st.columns(2)
 with col1:
@@ -1651,18 +1643,26 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             current_date=str(current_year)+"0"+str(current_month)
         else:
             current_date=str(current_year)+str(current_month)
+        if 'selected_year' not in st.session_state:
+            st.session_state.selected_year = current_year
+        if 'selected_month' not in st.session_state:
+            st.session_state.selected_month = '01'
         global latest_month,reporting_month_label,tenant_account_col,date_header
         reporting_month_label=True  
         tenant_account_col=10000
         col1,col2=st.columns(2)
+        # Calculate the list of years and their indices
+        years_range = list(range(current_year, current_year - 2, -1))
+        # Calculate the list of months and their indices
+        months_range = [str(month).zfill(2) for month in range(1, 13)]
         with col1:
             with st.form("upload_form", clear_on_submit=True):
                 st.write("Please select reporting month(not current month):") 
                 col3,col4=st.columns([1,1])
                 with col3:
-                    selected_year = st.selectbox("Year", range(current_year, current_year-2,-1))
+                    selected_year = st.selectbox("Year", years_range,index=years_range.index(st.session_state.selected_year))
                 with col4:    
-                    selected_month = st.selectbox("Month", [str(month).zfill(2) for month in range(1, 13)])
+                    selected_month = st.selectbox("Month", months_range,index=months_range.index(st.session_state.selected_month))
                 latest_month=str(selected_year)+str(selected_month)
                 date_header=[[0],0,[]]
                 BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator,latest_month)
