@@ -579,11 +579,11 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         #month_sort_index[-1] is the index number of month_count in which has max month count
         #month_row_index is also the index/row number of PL
         month_row_index=month_sort_index[month_index_i]
-        st.write("month_count[month_row_index]",month_count[month_row_index])
         if month_count[month_row_index]>1:   # if there are more than one month in header
             month_row=list(month_table.iloc[month_row_index,])
-
+            st.write("month_count[month_row_index]",month_count[month_row_index],month_table.iloc[month_row_index,])
             if not Month_continuity_check(month_row):   # month is not continuous, check next
+                st.write("not continue")
                 continue
             else:   # if Month_continuity_check is True, this is the correct month row. Then start to process year row
                 for year_index_i in range(0,-4,-1):
