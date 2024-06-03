@@ -98,7 +98,7 @@ def Read_CSV_From_Onedrive(path, file_name):
         try:
             file_content = response.content
             detected_encoding = detect_encoding(file_content)
-            print(f"Detected encoding: {detected_encoding}")
+            st.write(f"Detected encoding: {detected_encoding}")
             
             if file_name.lower().endswith(".csv"):
                 # Try reading the CSV with the detected encoding
@@ -114,17 +114,17 @@ def Read_CSV_From_Onedrive(path, file_name):
                 df = pd.read_excel(BytesIO(file_content))
             return df
         except EmptyDataError:
-            print("The file is empty.")
+            st.write("The file is empty.")
             return None
         except pd.errors.ParserError as e:
-            print(f"ParserError: {e}")
+            st.write(f"ParserError: {e}")
             return None
         except Exception as e:
-            print(f"An error occurred: {e}")
+            st.write(f"An error occurred: {e}")
             return None
     else:
-        print(f"Failed to download file. Status code: {response.status_code}")
-        print(f"Response content: {response.content}")
+        st.write(f"Failed to download file. Status code: {response.status_code}")
+        st.write(f"Response content: {response.content}")
         return False
 
 def Read_CSV_From_Onedrive1(path,file_name):
@@ -320,7 +320,6 @@ def Create_Tree_Hierarchy(bucket_mapping):
     parent_hierarchy_main=[{'label': "No need to map","value":"No need to map"}]
     parent_hierarchy_second=[{'label': "No need to map","value":"No need to map"}]
     BPC_Account = Read_CSV_From_Onedrive(mapping_path,BPC_account_filename)
-    st.write(BPC_Account,BPC_Account[BPC_Account["Type"]=="Main"])
     for category in BPC_Account[BPC_Account["Type"]=="Main"]["Category"].unique():
         children_hierarchy=[]
         for account in BPC_Account[(BPC_Account["Category"]==category)&(BPC_Account["Type"]=="Main")]["Sabra_Account_Full_Name"]:
