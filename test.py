@@ -98,37 +98,34 @@ def Read_CSV_From_Onedrive(path, file_name):
         try:
             file_content = response.content
             detected_encoding = detect_encoding(file_content)
-            st.write(f"Detected encoding: {detected_encoding}")
+            print(f"Detected encoding: {detected_encoding}")
             
             if file_name.lower().endswith(".csv"):
                 # Try reading the CSV with the detected encoding
                 try:
-                    df = pd.read_csv(BytesIO(file_content), encoding=detected_encoding, error_bad_lines=False, warn_bad_lines=True)
+                    df = pd.read_csv(BytesIO(file_content), encoding=detected_encoding, on_bad_lines='skip')
                 except UnicodeDecodeError:
                     # If detected encoding fails, try common fallback encodings
                     try:
-                        df = pd.read_csv(BytesIO(file_content), encoding='utf-8', error_bad_lines=False, warn_bad_lines=True)
+                        df = pd.read_csv(BytesIO(file_content), encoding='utf-8', on_bad_lines='skip')
                     except UnicodeDecodeError:
-                        df = pd.read_csv(BytesIO(file_content), encoding='latin1', error_bad_lines=False, warn_bad_lines=True)
+                        df = pd.read_csv(BytesIO(file_content), encoding='latin1', on_bad_lines='skip')
             elif file_name.lower().endswith(".xlsx"):
                 df = pd.read_excel(BytesIO(file_content))
             return df
         except EmptyDataError:
-            st.write("The file is empty.")
+            print("The file is empty.")
             return None
         except pd.errors.ParserError as e:
-            st.write(f"ParserError: {e}")
+            print(f"ParserError: {e}")
             return None
         except Exception as e:
-            st.write(f"An error occurred: {e}")
+            print(f"An error occurred: {e}")
             return None
     else:
-        st.write(f"Failed to download file. Status code: {response.status_code}")
-        st.write(f"Response content: {response.content}")
+        print(f"Failed to download file. Status code: {response.status_code}")
+        print(f"Response content: {response.content}")
         return False
-
-
-
 
 def Read_CSV_From_Onedrive1(path,file_name):
     # Set the API endpoint and headers for file download
