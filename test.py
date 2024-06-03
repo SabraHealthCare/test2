@@ -73,9 +73,16 @@ headers = {'Authorization': 'Bearer ' + access_token,}
 def Upload_to_Onedrive(uploaded_file,path,file_name):
     # Set the API endpoint and headers
     api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
+    # Read the file content directly
+    file_content = uploaded_file.read()
+    # Set the headers
+    headers.update({'Content-Type': 'application/octet-stream'})
+    
     # Make the request to upload the file
-    response = requests.put(api_url, headers=headers, data=BytesIO(uploaded_file.read()))
-    if response.status_code==200 or response.status_code==201:
+    response = requests.put(api_url, headers=headers, data=file_content)
+	
+    #response = requests.put(api_url, headers=headers, data=BytesIO(uploaded_file.read()))
+    if response.status_code in [200,201]:# or response.status_code==201:
         return True
     else:
         return False
