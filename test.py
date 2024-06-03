@@ -113,13 +113,10 @@ def Read_CSV_From_Onedrive(path, file_name):
                 df = pd.read_excel(BytesIO(file_content))
             return df
         except EmptyDataError:
-            st.write("The file is empty.")
             return False
         except pd.errors.ParserError as e:
-            st.write(f"ParserError: {e}")
             return False
         except Exception as e:
-            st.write(f"An error occurred: {e}")
             return False
     else:
         st.write(f"Failed to download file. Status code: {response.status_code}")
@@ -1630,7 +1627,7 @@ authenticator = Authenticate(
     )
 
 # set button status
-button_initial_state={"forgot_password_button":False,"forgot_username_button":False,"submit_report":False}#,"submit_reporting_date":False}
+button_initial_state={"forgot_password_button":False,"forgot_username_button":False,"submit_report":False}
 
 if 'clicked' not in st.session_state:
     st.session_state.clicked = button_initial_state
@@ -1646,6 +1643,8 @@ if st.session_state["authentication_status"] is False:
 #---------------operator account-----------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
     operator=st.session_state["operator"]
+    reporting_month_label=True  
+    tenant_account_col=10000
     st.title(operator)
     if current_month<10:
         current_date=str(current_year)+"0"+str(current_month)
@@ -1665,12 +1664,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col4:    
                     selected_month = st.selectbox("Month", [str(month).zfill(2) for month in range(1, 13)])
                 latest_month=str(selected_year)+str(selected_month)
-                st.write(latest_month)
-                reporting_month_label=True  
-                tenant_account_col=10000
                 date_header=[[0],0,[]]
-                #if all(entity_mapping["BS_separate_excel"]=="Y"):
-                if False:
+                if all(entity_mapping["BS_separate_excel"]=="Y"):
                     BS_separate_excel="Y"
                 else:
                     BS_separate_excel="N"
