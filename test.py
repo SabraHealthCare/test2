@@ -1333,31 +1333,7 @@ def Identify_Reporting_Month(PL,entity_header_row_number):
     return Check_Reporting_Month(header)
 
 def Input_Reporting_Month():
-    if current_month<10:
-        current_date=str(current_year)+"0"+str(current_month)
-    else:
-        current_date=str(current_year)+str(current_month)
-	
-    st.write("Please select reporting month(not current month):") 
-    col1,col2=st.columns([1,1])
-    with col1:
-        with st.form("latest_month"):
-            col3,col4=st.columns([1,1])
-            with col3:
-                selected_year = st.selectbox("Year", range(current_year, current_year-2,-1))
-            with col4:    
-                selected_month = st.selectbox("Month", [str(month).zfill(2) for month in range(1, 13)])
-            latest_month=str(selected_year)+str(selected_month)
-            #st.form_submit_button("Submit",on_click=clicked, args=["submit_reporting_date"])
-            
-            #if st.session_state.clicked["submit_reporting_date"]:
-            if st.form_submit_button("Submit"): 
-                if latest_month>=current_date:
-                    st.error("The reporting month should precede the current month.")
-                    st.stop()
-                return latest_month
-            else:
-                st.stop()
+
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):  
     global account_mapping,latest_month
@@ -1648,41 +1624,58 @@ if st.session_state["authentication_status"] is False:
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
     operator=st.session_state["operator"]
     st.title(operator)
-
+    if current_month<10:
+        current_date=str(current_year)+"0"+str(current_month)
+    else:
+        current_date=str(current_year)+str(current_month)
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
     if choice=="Upload P&L":
         global latest_month,reporting_month_label,tenant_account_col,date_header
-        latest_month=Input_Reporting_Month()
-        BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator,latest_month)
-        account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
-        
-        reporting_month_label=True
-        tenant_account_col=10000
-        date_header=[[0],0,[]]
-    
-        if all(entity_mapping["BS_separate_excel"]=="Y"):
-            BS_separate_excel="Y"
-        else:
-            BS_separate_excel="N"
         col1,col2=st.columns(2)
         with col1:
             with st.form("upload_form", clear_on_submit=True):
-                col3,col4=st.columns(2)
+                st.write("Please select reporting month(not current month):") 
+                col3,col4=st.columns([1,1])
                 with col3:
+                    selected_year = st.selectbox("Year", range(current_year, current_year-2,-1))
+                with col4:    
+                    selected_month = st.selectbox("Month", [str(month).zfill(2) for month in range(1, 13)])
+                latest_month=str(selected_year)+str(selected_month)
+                #st.form_submit_button("Submit",on_click=clicked, args=["submit_reporting_date"])
+         
+                BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator,latest_month)
+                account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
+                reporting_month_label=True  
+                tenant_account_col=10000
+                date_header=[[0],0,[]]
+                if all(entity_mapping["BS_separate_excel"]=="Y"):
+                    BS_separate_excel="Y"
+                else:
+                    BS_separate_excel="N"
+    
+		    
+                col5,col6=st.columns(2)
+                with col5:
                     st.subheader("Upload P&L:")
                     uploaded_finance=st.file_uploader(":star: :red[Only XLSX accepted] :star:",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
                 
-                with col4:
+                with col6:
                     if BS_separate_excel=="Y":
                         st.subheader("Upload Balance Sheet:")
                         uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
                 submitted = st.form_submit_button("Upload")
-        if submitted:
-	    # clear cache for every upload
-            st.cache_data.clear()
-            st.cache_resource.clear()
-            st.session_state.clicked = button_initial_state
+            if submitted:
+                if latest_month>=current_date:
+                    st.error("The reporting month should precede the current month.")
+                    st.stop()
+                	
+	        # clear cache for every upload
+                st.cache_data.clear()
+                st.cache_resource.clear()
+                st.session_state.clicked = button_initial_state
+            else:
+                st.stop()
         if uploaded_finance:
             with col1:
                 st.markdown("✔️ :green[P&L selected]")
