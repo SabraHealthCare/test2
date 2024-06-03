@@ -754,7 +754,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
                 st.write("Sabra second account")
                 Sabra_second_account_list[i]= streamlit_tree_select.tree_select(parent_hierarchy_second,only_leaf_checkboxes=True,key=str(new_tenant_account_list[i])+"1")
         submitted = st.form_submit_button("Submit")    
-        st.write("1111")
+
         if submitted:
             for i in range(count):
                 if len(Sabra_main_account_list[i]['checked'])==1:
@@ -1630,7 +1630,7 @@ authenticator = Authenticate(
     )
 
 # set button status
-button_initial_state={"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False,"continue_button":False,"submit_report":False,"submit_reporting_date":False}
+button_initial_state={"forgot_password_button":False,"forgot_username_button":False,"submit_report":False}#,"submit_reporting_date":False}
 
 if 'clicked' not in st.session_state:
     st.session_state.clicked = button_initial_state
@@ -1655,8 +1655,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         latest_month=Input_Reporting_Month()
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator,latest_month)
         account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
+        
         reporting_month_label=True
-        #latest_month="0"
         tenant_account_col=10000
         date_header=[[0],0,[]]
     
