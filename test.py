@@ -594,11 +594,13 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                         year_row_index=year_sort_index[year_index_i]
                         #month row and year row is supposed to be adjacent
                         if abs(year_row_index-month_row_index)>2:
+                            st.write("1")
                             continue
                     
                     year_row=list(year_table.iloc[year_row_index,])
 		    # if month and year are not in the same places in the columns, year_row is not the correct one
                     if not all([year_row[i]==0 if month_row[i]==0 else year_row[i]!=0 for i in range(len(month_row))]):
+                        st.write("1")
                         continue
             
                     # check validation of year
@@ -609,6 +611,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                         if latest_month in PL_date_header:
                             return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
                         else:
+                            st.write("3")
                             continue
 
 		# all the year rows are not valid, add year to month
@@ -628,6 +631,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                     st.markdown(d_str[1:])
                     return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
                 else:
+                    st.write("latest_month",latest_month,"PL_date_header",PL_date_header)
                     continue
                 
                 
