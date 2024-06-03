@@ -214,30 +214,7 @@ def Upload_File_toS3(uploaded_file, bucket, key):
         return True
     except:
         return False  
-# For updating account_mapping, entity_mapping, latest_month_data, only for operator use
-def Update_File_inS3(bucket,key,new_data,operator,value_name=False):  # replace original data
-    original_file =s3.get_object(Bucket=bucket, Key=key)
-    try:
-        original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
-        original_data=original_data.loc[new_data.columns,:]
-        empty_file=False
-    except:
-        original_data=pd.DataFrame()
-        empty_file=True
-    if not empty_file:	    
-        if "TIME" in original_data.columns and "TIME" in new_data.columns:
-            original_data.TIME = original_data.TIME.astype(str)
-	    # remove original data by operator and month 
-            months_of_new_data=new_data["TIME"].unique()
-            original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))].index)
-        elif "TIME" not in original_data.columns and "TIME" not in new_data.columns:
-            original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
-    # append new data to original data
-    new_data=new_data.reset_index(drop=False)
-    updated_data = pd.concat([original_data,new_data])
-    if value_name is not False: # set formula 
-        updated_data=EPM_Formula(updated_data,value_name)
-    return Save_CSV_ToS3(updated_data,bucket,key)  
+
 
 # Function to update the value in session state
 def clicked(button_name):
