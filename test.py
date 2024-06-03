@@ -1332,7 +1332,7 @@ def Identify_Reporting_Month(PL,entity_header_row_number):
                     header=["{}{}".format(year,month)]
     return Check_Reporting_Month(header)
 
-def Input_Reporting_Month():
+
 
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):  
