@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd 
 pd.set_option('future.no_silent_downcasting', True)
 import numpy as np
 from datetime import datetime, timedelta,date
@@ -581,7 +581,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         if month_count[month_row_index]>1:   # if there are more than one month in header
             month_row=list(month_table.iloc[month_row_index,])
             if not Month_continuity_check(month_row):   # month is not continuous, check next
-                st.write("not continue")
                 continue
             else:   # if Month_continuity_check is True, this is the correct month row. Then start to process year row
                 for year_index_i in range(0,-4,-1):
@@ -604,7 +603,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                         PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
 
-                        if latest_month in PL_date_header:
+                        if latest_month in list(PL_date_header):
                             return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
                         else:
                             continue
@@ -613,20 +612,20 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 year_table.iloc[year_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
                 PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                 original_header=PL.iloc[month_row_index,]
-                if latest_month in list(PL_date_header):
+                PL_date_header_list=list(PL_date_header)
+                if latest_month in PL_date_header_list:
                     d_str = ''
-                    for i in range(len(PL_date_header)):
-                        if PL_date_header[i]==0 or PL_date_header[i]=="0":
+                    for i in range(len(PL_date_header_list)):
+                        if PL_date_header_list[i]==0 or PL_date_header_list[i]=="0":
                             continue
                         else:
-                            date=str(PL_date_header[i][4:6])+"/"+str(PL_date_header[i][0:4])
+                            date=str(PL_date_header_list[i][4:6])+"/"+str(PL_date_header_list[i][0:4])
                             d_str +=",  "+str(original_header[i])+" — "+ date
                 
                     st.warning("Fail to identify **'Year'** in the date header for sheet '"+sheet_name+"'. Filled year as:")
                     st.markdown(d_str[1:])
                     return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
                 else:
-                    st.write("latest_month",latest_month,"PL_date_header",PL_date_header)
                     continue
                 
                 
@@ -667,10 +666,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 continue
             else:
                 PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x))) 
-                if latest_month!="0":
-                    current_date=list(filter(lambda x: x!="0", PL_date_header))[0]
-                    if current_date!=latest_month:
-                        continue
                 candidate_date.append([PL_date_header,month_row_index,PL.iloc[month_row_index,:]] )
                 continue
                 
