@@ -631,7 +631,9 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 
                 
         # only one month in header, all the rows that have multiple months were out
-        elif month_count[month_row_index]==1:	
+        elif month_count[month_row_index]==1:
+
+            st.write("month_count[month_row_index]",month_count[month_row_index],"month_table",month_table)
             col_month=0      #col_month is the col number of month
 	    # find the col of first month
             while(month_table.iloc[month_row_index,col_month]==0):
