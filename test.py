@@ -323,7 +323,7 @@ def Create_Tree_Hierarchy(bucket_mapping):
     parent_hierarchy_main=[{'label': "No need to map","value":"No need to map"}]
     parent_hierarchy_second=[{'label': "No need to map","value":"No need to map"}]
     BPC_Account = Read_CSV_From_Onedrive(mapping_path,BPC_account_filename)
- 
+    st.write(BPC_Account,BPC_Account[BPC_Account["Type"]=="Main"])
     for category in BPC_Account[BPC_Account["Type"]=="Main"]["Category"].unique():
         children_hierarchy=[]
         for account in BPC_Account[(BPC_Account["Category"]==category)&(BPC_Account["Type"]=="Main")]["Sabra_Account_Full_Name"]:
