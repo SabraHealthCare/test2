@@ -1657,7 +1657,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             BS_separate_excel="N"
         with col1:
             with st.form("upload_form", clear_on_submit=True):
-                st.write("Please select reporting month(not current month):") 
+                st.subheader("Select reporting month:") 
                 col3,col4=st.columns([1,1])
                 with col3:
                     selected_year = st.selectbox("Year", years_range,index=years_range.index(st.session_state.selected_year))
