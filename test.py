@@ -1660,12 +1660,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     if BS_separate_excel=="Y":
                         st.subheader("Upload Balance Sheet:")
                         uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
-            #submitted = st.form_submit_button("Upload")
-            if st.form_submit_button("Upload"):
-	        # clear cache for every upload
-                st.cache_data.clear()
-                st.cache_resource.clear()
-                st.session_state.clicked = button_initial_state
+                submitted = st.form_submit_button("Upload")
+                if submitted:
+	            # clear cache for every upload
+                    st.cache_data.clear()
+                    st.cache_resource.clear()
+                    st.session_state.clicked = button_initial_state
 
         if uploaded_finance:
             with col1:
