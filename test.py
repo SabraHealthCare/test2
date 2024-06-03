@@ -559,7 +559,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     year_count=[]        
     month_count=[]
     max_len=0
-
+    st.write(sheet_name,"month_table",month_table)
     for row_i in range(search_row_size):
         # save the number of valid months of each row to month_count
         valid_month=list(filter(lambda x:x!=0,month_table.iloc[row_i,]))
@@ -576,6 +576,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     year_sort_index = np.argsort(np.array(year_count))
     candidate_date=[]
     for month_index_i in range(-1,-10,-1): 
+        st.write("month_count[month_row_index]",month_count[month_row_index])
         #month_sort_index[-1] is the index number of month_count in which has max month count
         #month_row_index is also the index/row number of PL
         month_row_index=month_sort_index[month_index_i]
@@ -632,8 +633,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 
         # only one month in header, all the rows that have multiple months were out
         elif month_count[month_row_index]==1:
-
-            st.write("month_count[month_row_index]",month_count[month_row_index],"month_table",month_table)
             col_month=0      #col_month is the col number of month
 	    # find the col of first month
             while(month_table.iloc[month_row_index,col_month]==0):
