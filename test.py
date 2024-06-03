@@ -1348,9 +1348,10 @@ def Input_Reporting_Month():
             with col4:    
                 selected_month = st.selectbox("Month", [str(month).zfill(2) for month in range(1, 13)])
             latest_month=str(selected_year)+str(selected_month)
-            st.form_submit_button("Submit",on_click=clicked, args=["submit_reporting_date"])
-
-            if st.session_state.clicked["submit_reporting_date"]:
+            #st.form_submit_button("Submit",on_click=clicked, args=["submit_reporting_date"])
+            
+            #if st.session_state.clicked["submit_reporting_date"]:
+            if st.form_submit_button("Submit"): 
                 if latest_month>=current_date:
                     st.error("The reporting month should precede the current month.")
                     st.stop()
