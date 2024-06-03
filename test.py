@@ -1665,7 +1665,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         years_range = list(range(current_year, current_year - 2, -1))
         # Calculate the list of months and their indices
         months_range = [str(month).zfill(2) for month in range(1, 13)]
-        if all(entity_mapping["BS_separate_excel"]=="Y"):             
+        if not pd.isna(entity_mapping["BS_separate_excel"]) any(entity_mapping["BS_separate_excel"]=="Y"):             
             BS_separate_excel="Y"
         else:
             BS_separate_excel="N"
@@ -1708,7 +1708,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         filtered_months =sorted([x for x in BPC_pull.columns if x <latest_month],reverse=True)
         BPC_pull=BPC_pull[["Property_Name"]+filtered_months[:previous_monthes_comparison]]    
         entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=latest_month) &((pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))| (entity_mapping["DATE_SOLD_PAYOFF"]>=latest_month))),]
-        if all(entity_mapping["BS_separate_excel"]=="Y"):             
+        if not pd.isna(entity_mapping["BS_separate_excel"]) any(entity_mapping["BS_separate_excel"]=="Y"):                
             BS_separate_excel="Y"
         else:
             BS_separate_excel="N"
