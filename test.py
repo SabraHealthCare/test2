@@ -23,6 +23,8 @@ import requests
 from itertools import product
 from pandas.errors import EmptyDataError
 import pytz
+import chardet
+from pandas.errors import EmptyDataError
 s3 = boto3.client('s3')
 
 #---------------------------define parameters--------------------------
