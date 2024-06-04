@@ -533,40 +533,33 @@ def Check_Available_Units(check_patient_days,latest_month):
         elif patient_day_i>0 and operating_beds_i==0:
             st.error("Error：{} is missing operating beds. With {} patient days, this will result in incorrect occupancy.".format(property_i,int(patient_day_i)))
             problem_properties.append(property_i) 
-    
+    miss_all_A_unit=False
     if len(problem_properties)>0:
         check_patient_days_display=check_patient_days.loc[(problem_properties,slice(None)),latest_month].reset_index(drop=False)
         check_patient_days_display=check_patient_days_display.pivot_table(index=["Property_Name"],columns="Category", values=latest_month,aggfunc='last')
         if "Operating Beds" not in check_patient_days_display.columns:
             check_patient_days_display["Operating Beds"]=0
-        st.write("check_patient_days_display",check_patient_days_display)
+            miss_all_A_unit=True
         st.dataframe(check_patient_days_display.style.map(color_missing, subset=["Patient Days","Operating Beds"]).format(precision=0, thousands=",").hide(axis="index"),
 		    column_config={
 			        "Property_Name": "Property",
 		                "Patient Days": "Patient Days",
-		                "Operating Beds": "Operating Beds",
-		    },
-			        #"Category":"Account Total",
-		                 #latest_month:latest_month[4:6]+"/"+latest_month[0:4]},
+		                "Operating Beds": "Operating Beds"},
 			    hide_index=True)
-        #st.stop()
-
-	
-    # search for the Month/year row and return row number
-    #entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
-    onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)<str(latest_month),BPC_pull.columns)))
-    BPC_pull_temp=BPC_pull.reset_index(drop=False)
-    previous_available_unit=BPC_pull_temp.loc[BPC_pull_temp["Sabra_Account"].isin(availble_unit_accounts),["Property_Name",onemonth_before_latest_month]]  
-    previous_available_unit[["Property_Name",onemonth_before_latest_month]].groupby(["Property_Name"]).sum()
-    previous_available_unit=previous_available_unit.reset_index(drop=False)[["Property_Name",onemonth_before_latest_month]]
-    check_patient_days=check_patient_days.reset_index(drop=False)
-    Unit_changed=pd.merge(previous_available_unit, check_patient_days.loc[check_patient_days['Category'] == 'Operating Beds',["Property_Name",latest_month]],on=["Property_Name"], how='left')
-    Unit_changed["Delta"]=Unit_changed[onemonth_before_latest_month]-Unit_changed[latest_month]
-    Unit_changed=Unit_changed.loc[(Unit_changed["Delta"]!=0)&(Unit_changed[latest_month]!=0),]
-    if len(Unit_changed)>0:
-        st.warning("The number of operating beds for the properties listed below have changed compared to the previous reporting month.")
-        st.warning("Please double-check if these changes are accurate.")
-        st.dataframe(Unit_changed.style.map(color_missing, subset=["Delta"]).format(precision=0, thousands=",").hide(axis="index"),
+    if miss_all_A_unit==False:
+        onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)<str(latest_month),BPC_pull.columns)))
+        BPC_pull_temp=BPC_pull.reset_index(drop=False)
+        previous_available_unit=BPC_pull_temp.loc[BPC_pull_temp["Sabra_Account"].isin(availble_unit_accounts),["Property_Name",onemonth_before_latest_month]]  
+        previous_available_unit[["Property_Name",onemonth_before_latest_month]].groupby(["Property_Name"]).sum()
+        previous_available_unit=previous_available_unit.reset_index(drop=False)[["Property_Name",onemonth_before_latest_month]]
+        check_patient_days=check_patient_days.reset_index(drop=False)
+        Unit_changed=pd.merge(previous_available_unit, check_patient_days.loc[check_patient_days['Category'] == 'Operating Beds',["Property_Name",latest_month]],on=["Property_Name"], how='left')
+        Unit_changed["Delta"]=Unit_changed[onemonth_before_latest_month]-Unit_changed[latest_month]
+        Unit_changed=Unit_changed.loc[(Unit_changed["Delta"]!=0)&(Unit_changed[latest_month]!=0)&(pd.isna(Unit_changed[latest_month])),]
+        if len(Unit_changed)>0:
+            st.warning("The number of operating beds for the properties listed below have changed compared to the previous reporting month.")
+            st.warning("Please double-check if these changes are accurate.")
+            st.dataframe(Unit_changed.style.map(color_missing, subset=["Delta"]).format(precision=0, thousands=",").hide(axis="index"),
 		    column_config={
 			        "Property_Name": "Property",
 			        onemonth_before_latest_month:onemonth_before_latest_month+" Operating beds",
