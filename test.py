@@ -1604,7 +1604,7 @@ def Upload_And_Process(uploaded_file,file_type):
                     #PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
                     PL=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
                 total_entity_list=[x for x in total_entity_list if x not in entity_list]
-            st.write(Total_PL)
+            st.write("PL",PL)
             Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
             #Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)    
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multiindex of Total_Pl
