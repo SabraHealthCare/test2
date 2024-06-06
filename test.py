@@ -958,7 +958,7 @@ def Compare_PL_Sabra(Total_PL,latest_month):
     if diff_BPC_PL.shape[0]>0:
         #percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
         diff_BPC_PL=diff_BPC_PL.merge(BPC_Account[["Category","Sabra_Account_Full_Name","BPC_Account_Name"]],left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")        
-        diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
+        diff_BPC_PL=diff_BPC_PL.merge(entity_mapping.reset_index(drop=False)[["ENTITY","Property_Name"]], on="ENTITY",how="left")
     return diff_BPC_PL
     #return diff_BPC_PL,diff_BPC_PL_detail
 	
