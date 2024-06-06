@@ -176,17 +176,24 @@ def Save_as_CSV_Onedrive(df,path,file_name):
 
 
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
-def Update_File_Onedrive(path,file_name,new_data,operator):  # replace original data
+def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=[]):  # replace original data
     original_data=Read_CSV_From_Onedrive(path,file_name)
-   
     if  isinstance(original_data, pd.DataFrame):
         if "TIME" in original_data.columns and "TIME" in new_data.columns:
             original_data.TIME = original_data.TIME.astype(str)
-	    # remove original data by operator and month 
             months_of_new_data=new_data["TIME"].unique()
-            original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))].index)
+            if len(entity_list)==0:
+                # remove original data by operator and month
+                original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))].index)
+            elif len(entity_list)>0:
+            	# remove original data by operator and month and entity
+                original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))&(original_data['ENTITY'].isin(entity_list))].index)
         elif "TIME" not in original_data.columns and "TIME" not in new_data.columns:
-            original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
+            if len(entity_list)==0:
+                original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
+            elif len(entity_list)>0:
+            	# remove original data by operator and month and entity
+                original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['ENTITY'].isin(entity_list))].index)
 	    		
         # append new data to original data
         new_data=new_data.reset_index(drop=False)
@@ -237,7 +244,7 @@ def Initial_Mapping(operator):
     BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
     BPC_pull=BPC_pull.set_index(["ENTITY","Sabra_Account"])
     BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
-    # read account mapping	
+	
     account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename)
     account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]==operator]
     if account_mapping.shape[0]==1:# and account_mapping.loc[:,"Sabra_Account"][0]=='Template':
@@ -246,9 +253,8 @@ def Initial_Mapping(operator):
     account_mapping.loc[:, 'Sabra_Account'] = account_mapping['Sabra_Account'].apply(lambda x: x.upper().strip() if  pd.notna(x) else x)
     account_mapping.loc[:, 'Sabra_Second_Account'] = account_mapping['Sabra_Second_Account'].apply(lambda x:  x.upper().strip() if pd.notna(x) else x)
     account_mapping.loc[:, "Tenant_Formated_Account"] = account_mapping["Tenant_Account"].apply(lambda x: x.upper().strip() if pd.notna(x) else x)
-	
     account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
-    # read property mapping
+
     entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename)
     entity_mapping=entity_mapping.reset_index(drop=True)
     entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
@@ -388,7 +394,7 @@ def download_report(df,button_display):
     return st.download_button(label="Download "+button_display,data=download_file,file_name=button_display+".csv",mime="text/csv")
     
 def Get_Year(single_string):
-    year_dic={2023:["2023","23"],2024:["2024","24"]} 	
+    year_dic={2023:["2023","23"],2024:["2024","24"],2025:["2025","25"],2026:["2026","26"]} 	
     for Year in year_dic.keys():
         for Year_keyword in year_dic[Year]:
             if Year_keyword in single_string:
@@ -405,7 +411,6 @@ def Get_Month_Year(single_string):
         return 0,0
     if isinstance(single_string, datetime):
         return int(single_string.month),int(single_string.year)
-
     if isinstance(single_string, (int,float)):
         return 0,0
         
@@ -439,7 +444,7 @@ def Month_continuity_check(month_list):
     if month_len==0:
         return False
     else:
-        inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
+        inv=[int(monh_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
         #there are at most two types of difference in the month list which are in 1,-1,11,-11 
         if  len(set(inv))<=2 and all([x in [1,-1,11,-11] for x in set(inv)]):
             return True  # Month list is continous 
@@ -547,8 +552,8 @@ def Check_Available_Units(check_patient_days,latest_month):
 		                "Operating Beds": "Operating Beds"},
 			    hide_index=True)
     if miss_all_A_unit==False:
-        onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)<str(latest_month),BPC_pull.columns)))
         BPC_pull_temp=BPC_pull.reset_index(drop=False)
+        onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)<str(latest_month),BPC_pull.columns)))
         previous_available_unit=BPC_pull_temp.loc[BPC_pull_temp["Sabra_Account"].isin(availble_unit_accounts),["Property_Name",onemonth_before_latest_month]]  
         previous_available_unit[["Property_Name",onemonth_before_latest_month]].groupby(["Property_Name"]).sum()
         previous_available_unit=previous_available_unit.reset_index(drop=False)[["Property_Name",onemonth_before_latest_month]]
@@ -713,7 +718,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         st.error("failed to identify Year/Month header for sheet: '{}', please fix and re-upload.".format(sheet_name))
         st.stop()
 
-
+# manage entity mapping in "Manage Mapping" 
 def Manage_Entity_Mapping(operator):
     global entity_mapping
     #all the properties are supposed to be in entity_mapping. 
@@ -1072,7 +1077,7 @@ def Submit_Upload_Latestmonth():
          # save discrepancy data to OneDrive
         if len(Total_PL.columns)>1 and diff_BPC_PL.shape[0]>0:
             download_report(diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy")
-            Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator)
+            Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,list(diff_BPC_PL["ENTITY"]))
         
 	# save original tenant P&L to OneDrive
         if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
@@ -1205,7 +1210,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
         else:
             st.stop()
     # update entity_mapping in onedrive  
-    Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
+    Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,list(entity_mapping["ENTITY"]))
     return entity_mapping
 
 @st.cache_data	    
@@ -1713,15 +1718,16 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=latest_month) &((pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))| (entity_mapping["DATE_SOLD_PAYOFF"]>=latest_month))),]
         if "Y" in entity_mapping["BS_separate_excel"][~pd.isna(entity_mapping["BS_separate_excel"])].values:                     
             BS_separate_excel="Y"
+            if uploaded_BS:
+                with col4:
+                    st.markdown("✔️ :green[Balance sheet selected]")
+            elif not uploaded_BS:
+                st.write("Balance sheet wasn't upload.")
+                st.stop()
         else:
             BS_separate_excel="N"
-        if BS_separate_excel=="Y" and uploaded_BS:
-            with col4:
-                st.markdown("✔️ :green[Balance sheet selected]")
-        elif BS_separate_excel=="Y" and not uploaded_BS:
-            st.write("Balance sheet wasn't upload.")
-            st.stop()
-        
+
+
         account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
 	    
         if BS_separate_excel=="N":  # Finance/BS are in one excel
@@ -1796,7 +1802,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     if len(new_tenant_account_list)==0:
                         st.stop()
                     account_mapping=Manage_Account_Mapping(new_tenant_account_list)
-                    Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
+                    Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator,[])
 			
     elif choice=='Instructions':
         # insert Video
