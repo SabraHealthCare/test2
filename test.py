@@ -445,7 +445,7 @@ def Month_continuity_check(month_list):
         return False
     else:
         st.write("month_list,month_len",month_list,month_len)	    
-        inv=[int(monh_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
+        inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
         #there are at most two types of difference in the month list which are in 1,-1,11,-11 
         if  len(set(inv))<=2 and all([x in [1,-1,11,-11] for x in set(inv)]):
             return True  # Month list is continous 
