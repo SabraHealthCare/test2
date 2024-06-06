@@ -1211,6 +1211,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
         else:
             st.stop()
     # update entity_mapping in onedrive  
+    st.write("entity_mapping_filename",entity_mapping)
     Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,list(entity_mapping["ENTITY"]))
     return entity_mapping
 
