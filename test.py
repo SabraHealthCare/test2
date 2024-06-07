@@ -449,6 +449,7 @@ def Month_continuity_check(month_list):
         #there are at most two types of difference in the month list which are in 1,-1,11,-11 
         if  len(set(inv))<=2 and all([x in [1,-1,11,-11] for x in set(inv)]):
             return True  # Month list is continous 
+        elif
         else:
             return False # Month list is not continous 
 
@@ -575,6 +576,7 @@ def Check_Available_Units(check_patient_days,latest_month):
     
 @st.cache_data
 def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header): 
+    st.write("PL",PL)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
