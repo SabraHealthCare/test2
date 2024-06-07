@@ -600,7 +600,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         month_count.append(len(valid_month))
         year_count.append(len(valid_year))
     # can't find month keyword in any rows
-    #st.write("month_table",month_table,year_table)
+    st.write("month_table",month_table,year_table)
     if all(map(lambda x:x==0,month_count)):
         st.error("Can't identify Month/Year header in sheet——'"+sheet_name+"'")   
         st.stop()
