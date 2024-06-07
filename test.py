@@ -449,7 +449,6 @@ def Month_continuity_check(month_list):
         #there are at most two types of difference in the month list which are in 1,-1,11,-11 
         if  len(set(inv))<=2 and all([x in [1,-1,11,-11] for x in set(inv)]):
             return True  # Month list is continous 
-        elif
         else:
             return False # Month list is not continous 
 
