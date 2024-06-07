@@ -1170,7 +1170,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                 for entity_i in missing_BS_sheet_property_Y.index:
                     st.warning("Please provide Balance Sheet sheet name for {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
                     missing_BS_sheet_property_Y.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.selectbox("Original 'Balance Sheet' sheet name: {}".format(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]),[""]+PL_sheet_list,key=entity_i+"bs_Y")   
-            submitted = st.form_submit_button("Submit",,key="total_missing_Y")
+            submitted = st.form_submit_button("Submit",key="total_missing_Y")
            
         if submitted:
             if sheet_type=="Finance":
