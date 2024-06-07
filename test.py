@@ -583,7 +583,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
 		
     PL_row_size=PL.shape[0]
     PL_col_size=PL.shape[1]
-    search_row_size=min(30,PL_row_size)
+    search_row_size=min(40,PL_row_size)
     month_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
     year_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
 
