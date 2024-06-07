@@ -1178,7 +1178,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                     st.error("Please complete above mapping.")
                     st.stop()
                 else:
-		    if missing_PL_sheet_property_Y.shape[0]>0:
+                    if missing_PL_sheet_property_Y.shape[0]>0:
                         for entity_i in missing_PL_sheet_property_Y.index: 
 		            entity_mapping.loc[entity_i,"Sheet_Name_Finance"]=missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"] 
                     if missing_occ_sheet_property_Y.shape[0]>0:
