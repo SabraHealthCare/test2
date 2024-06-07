@@ -1145,7 +1145,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
         total_missing_Y=missing_PL_sheet_property_Y.shape[0]+missing_occ_sheet_property_Y.shape[0]+missing_BS_sheet_property_Y.shape[0]
         total_missing_N=missing_PL_sheet_property_N.shape[0]+missing_occ_sheet_property_N.shape[0]+missing_BS_sheet_property_N.shape[0]
     elif sheet_type=="BS": # BS in another excel file
-        missing_BS_sheet_property = entity_mapping[(entity_mapping.loc["BS_separate_excel"]=="Y") & (entity_mapping["Sheet_Name_Balance_Sheet"].isin(PL_sheet_list)==False)&(~pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))&(entity_mapping["Sheet_Name_Balance_Sheet"]!="nan")]
+        missing_BS_sheet_property = entity_mapping[(entity_mapping["BS_separate_excel"]=="Y") & (entity_mapping["Sheet_Name_Balance_Sheet"].isin(PL_sheet_list)==False)&(~pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))&(entity_mapping["Sheet_Name_Balance_Sheet"]!="nan")]
         missing_BS_sheet_property_Y=missing_BS_sheet_property.loc[missing_BS_sheet_property["Property_in_separate_sheets"]=="Y",:]
         missing_BS_sheet_property_N=missing_BS_sheet_property.loc[missing_BS_sheet_property["Property_in_separate_sheets"]=="N",:]  
         total_missing_Y=missing_BS_sheet_property_Y.shape[0]
