@@ -1180,7 +1180,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                 else:
                     if missing_PL_sheet_property_Y.shape[0]>0:
                         for entity_i in missing_PL_sheet_property_Y.index: 
-		            entity_mapping.loc[entity_i,"Sheet_Name_Finance"]=missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"] 
+                            entity_mapping.loc[entity_i,"Sheet_Name_Finance"]=missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"] 
                     if missing_occ_sheet_property_Y.shape[0]>0:
                         for entity_i in missing_occ_sheet_property_Y.index:
                             entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"]=missing_occ_sheet_property_Y.loc[entity_i,"Sheet_Name_Occupancy"]
