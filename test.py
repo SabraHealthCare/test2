@@ -1155,7 +1155,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
         return entity_mapping
     
     if  total_missing_Y>0:
-        with st.form(key=sheet_type):
+        with st.form(key=sheet_type+"_Y"):
             if sheet_type=="Finance":
                 if missing_PL_sheet_property_Y.shape[0]>0:
                     for entity_i in missing_PL_sheet_property_Y.index:
@@ -1197,7 +1197,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
             st.stop()
                 
     elif total_missing_N>0:
-        with st.form(key=sheet_type):
+        with st.form(key=sheet_type+"_N"):
             if sheet_type=="Finance":	    
                 if missing_PL_sheet_property_N.shape[0]>0:
                     st.warning("Please provide P&L sheet name for properties: {}...".format(",".join(list(missing_PL_sheet_property_N.index))))
