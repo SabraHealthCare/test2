@@ -575,7 +575,6 @@ def Check_Available_Units(check_patient_days,latest_month):
     
 @st.cache_data
 def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header): 
-    st.write("sheet_name",PL)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
@@ -601,7 +600,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         month_count.append(len(valid_month))
         year_count.append(len(valid_year))
     # can't find month keyword in any rows
-    st.write("month_table",month_table,year_table)
+    #st.write("month_table",month_table,year_table)
     if all(map(lambda x:x==0,month_count)):
         st.error("Can't identify Month/Year header in sheet——'"+sheet_name+"'")   
         st.stop()
