@@ -445,12 +445,19 @@ def Month_continuity_check(month_list):
     if month_len==0:
         return False
     else:	    
+	#there are at most two types of differences in the month list which are in 1,-1,11,-11 
         inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
-        #there are at most two types of difference in the month list which are in 1,-1,11,-11 
-        if  len(set(inv))<=2 and all([x in [1,-1,11,-11] for x in set(inv)]):
-            return True  # Month list is continous 
+        contious_check_bool=[x in [1,-1,11,-11] for x in set(inv)]
+        len_of_contious=sum(continue_check_bool)
+        len_of_non_contious=len(continue_check_bool)-len_of_contious
+        if  len_of_contious==contious_check_bool or len_of_contious>=10:
+            return True  # Months are all continous 
+	elif len_of_contious<10 and len_of_contious>3 and len_of_non_contious<2:
+            return True
+	elif month_len==2 and len_of_contious:
+ 
         else:
-            return False # Month list is not continous 
+            return False # Month list is not continuous 
 
 
 def Year_continuity_check(year_list):
