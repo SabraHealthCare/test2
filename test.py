@@ -452,10 +452,8 @@ def Month_continuity_check(month_list):
         len_of_non_contious=len(continue_check_bool)-len_of_contious
         if  len_of_contious==contious_check_bool or len_of_contious>=10:
             return True  # Months are all continous 
-	elif len_of_contious<10 and len_of_contious>3 and len_of_non_contious<2:
-            return True
-	elif month_len==2 and len_of_contious:
- 
+        elif len_of_contious<10 and len_of_contious>3 and len_of_non_contious<2:
+            return True 
         else:
             return False # Month list is not continuous 
 
