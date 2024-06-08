@@ -634,12 +634,19 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                             continue
                     
                     year_row=list(year_table.iloc[year_row_index,])
-		    # if month and year are not in the same places in the columns, year_row is not the correct one
-                    if not all([year_row[i]==0 if month_row[i]==0 else year_row[i]!=0 for i in range(len(month_row))]):
-                        continue
-            
-                    # check validation of year
-                    if Year_continuity_check(year_row) and year_count[year_row_index]==month_count[month_row_index]:
+		    # year_check_bool is the year that match with month [True, True, Flase...]
+                    year_check_bool=[year_row[i]==0 if month_row[i]==0 else year_row[i]!=0 for i in range(len(month_row))]
+                    if all(year_check_bool):
+                         PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
+                                                      month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
+
+                        if latest_month in list(PL_date_header):
+                            return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
+                        else:
+                            continue
+                        
+                    elif sum(year_check_bool)/month_count[month_row_index])>0.8:
+			#if Year_continuity_check(year_row) and year_count[year_row_index]==month_count[month_row_index]:
                         PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
 
