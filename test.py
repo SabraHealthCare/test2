@@ -452,7 +452,7 @@ def Month_continuity_check(month_list):
         len_of_non_continuous=len(continuous_check_bool)-len_of_continuous
         if  len_of_non_continuous==continuous_check_bool or len_of_continuous>=10:
             return True  # Months are all continous 
-        elif len_of_non_continuous<10 and len_of_non_continuous>3 and len_of_non_continuous<2:
+        elif len_of_non_continuous<10 and len_of_non_continuous>=4 and len_of_non_continuous<=1:
             return True 
         else:
             return False # Month list is not continuous 
@@ -620,6 +620,81 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         month_row_index=month_sort_index[month_index_i]
         if month_count[month_row_index]>1:   # if there are more than one month in header
             month_row=list(month_table.iloc[month_row_index,])
+            year_row=list(year_table.iloc[year_row_index,])
+            year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]
+            
+           #year_check_bool=[year_row[i]==0 if month_row[i]==0 else year_row[i]!=0 for i in range(len(month_row))]
+
+        #check month continuous
+        inv=[]
+        month_list=list(filter(lambda x:x!=0,month_row))
+        month_len=len(month_list)
+        if month_len==0:
+            continue
+        else:	    
+	    #check month continuous, there are at most two types of differences in the month list which are in 1,-1,11,-11 
+            inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
+            continuous_check_bool=[x in [1,-1,11,-11] for x in inv]
+            len_of_continuous=sum(continuous_check_bool)
+            len_of_non_continuous=len(continuous_check_bool)-len_of_continuous
+            if  len_of_continuous==len(continuous_check_bool) or len_of_continuous>=10:
+		#check corresponding year
+                if len(year_match)==month_len:#all(year_check_bool):
+                    PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
+                                                      month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
+                else len(year_match)==0:
+		    #add year to month
+                    year_table.iloc[year_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
+                    PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
+                    original_header=PL.iloc[month_row_index,]
+                    PL_date_header_list=list(PL_date_header)
+                    if latest_month in PL_date_header_list:
+                        d_str = ''
+                        for i in range(len(PL_date_header_list)):
+                            if PL_date_header_list[i]==0 or PL_date_header_list[i]=="0":
+                                continue
+                            else:
+                                date=str(PL_date_header_list[i][4:6])+"/"+str(PL_date_header_list[i][0:4])
+                                d_str +=",  "+str(original_header[i])+" — "+ date
+                
+                        st.warning("Fail to identify **'Year'** in the date header for sheet '"+sheet_name+"'. Filled year as:")
+                        st.markdown(d_str[1:])
+                        return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
+                    else:
+                        continue
+
+		    
+                
+		if latest_month in list(PL_date_header):
+                        return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
+		    else:
+                        continue
+                if 
+
+		    # year_check_bool is the year that match with month [True, True, Flase...]
+                    year_check_bool=[year_row[i]==0 if month_row[i]==0 else year_row[i]!=0 for i in range(len(month_row))]
+                    if all(year_check_bool):
+                         PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
+                                                      month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
+
+                         if latest_month in list(PL_date_header):
+                            return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
+                        else:
+                            continue
+				
+	     elif len_of_non_continuous<=9 and len_of_non_continuous>=3 and len_of_non_continuous<=1:  
+                 if 
+		    
+                return True  # Months are all continous 
+            elif len_of_non_continuous<10 and len_of_non_continuous>=4 and len_of_non_continuous<=1:
+            return True 
+        else:
+            return False # Month list is not continuous 
+
+		
+
+
+		
             if not Month_continuity_check(month_row):   # month is not continuous, check next
                 continue
             else:   # if Month_continuity_check is True, this is the correct month row. Then start to process year row
