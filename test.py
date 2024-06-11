@@ -473,39 +473,38 @@ def Year_continuity_check(year_list):
 
 # add year to month_header: identify current year/last year giving a list of month
 def Add_year_to_header(month_list):
-    available_month=list(filter(lambda x:x!=0,month_list))
+    add_year=list(filter(lambda x:x!=0,month_list))
     last_year=current_year-1
-    if len(available_month)==1:
-        if datetime.strptime(str(available_month[0])+"/01/"+str(current_year),'%m/%d/%Y').date()<today:
-            year=current_year
+    year_change=0  
+    if len(add_year)==1:
+        if datetime.strptime(str(add_year[0])+"/01/"+str(current_year),'%m/%d/%Y').date()<today:
+            add_year[0]=current_year
         else:
-            year=today.year-1
-        return year
-     
-    year_change=0     
-    # month decending  #and available_month[0]<today.month
-    if (available_month[0]>available_month[1] and available_month[0]!=12) or (available_month[0]==1 and available_month[1]==12) : 
-        date_of_assumption=datetime.strptime(str(available_month[0])+"/01/"+str(current_year),'%m/%d/%Y').date()
+            add_year[0]=today.year-1
+    # there are more than one month.
+    #month decending  , add_year[0]<today.month
+    elif (add_year[0]>add_year[1] and add_year[0]!=12) or (add_year[0]==1 and add_year[1]==12) : 
+        date_of_assumption=datetime.strptime(str(add_year[0])+"/01/"+str(current_year),'%m/%d/%Y').date()
         if date_of_assumption<today and date_of_assumption.month<today.month:
             report_year_start=current_year
         elif date_of_assumption>=today:
             report_year_start=last_year
-        for i in range(len(available_month)):
-            available_month[i]=report_year_start-year_change
-            if i<len(available_month)-1 and available_month[i+1]==12:
+        for i in range(len(add_year)):
+            add_year[i]=report_year_start-year_change
+            if i<len(add_year)-1 and add_year[i+1]==12:
                 year_change+=1
             
     # month ascending
-    elif (available_month[0]<available_month[1] and available_month[0]!=12) or (available_month[0]==12 and available_month[1]==1): #and int(available_month[-1])<today.month
-        date_of_assumption=datetime.strptime(str(available_month[-1])+"/01/"+str(current_year),'%m/%d/%Y').date()    
+    elif (add_year[0]<add_year[1] and add_year[0]!=12) or (add_year[0]==12 and add_year[1]==1): #and int(add_year[-1])<today.month
+        date_of_assumption=datetime.strptime(str(add_year[-1])+"/01/"+str(current_year),'%m/%d/%Y').date()    
         if date_of_assumption<today:
             report_year_start=current_year
         elif date_of_assumption>=today:
             report_year_start=last_year
-        for i in range(-1,len(available_month)*(-1)-1,-1):
+        for i in range(-1,len(add_year)*(-1)-1,-1):
    
-            available_month[i]=report_year_start-year_change
-            if i>len(available_month)*(-1) and available_month[i-1]==12:
+            add_year[i]=report_year_start-year_change
+            if i>len(add_year)*(-1) and add_year[i-1]==12:
                 year_change+=1
     else:
         return False
@@ -513,8 +512,9 @@ def Add_year_to_header(month_list):
     j=0
     for i in range(len(month_list)):
         if month_list[i]!=0:
-            month_list[i]=available_month[j]
+            month_list.iloc[year_row_index,i]=add_year[j]
             j+=1
+	
     return month_list  
 
 @st.cache_data
@@ -612,7 +612,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         st.stop()
         
     month_sort_index = np.argsort(np.array(month_count))
-    year_sort_index = np.argsort(np.array(year_count))
+    #year_sort_index = np.argsort(np.array(year_count))
     candidate_date=[]
     for month_index_i in range(-1,-10,-1): 
         #month_sort_index[-1] is the index number of month_count in which has max month count
@@ -620,8 +620,13 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         month_row_index=month_sort_index[month_index_i]
         if month_count[month_row_index]>1:   # if there are more than one month in header
             month_row=list(month_table.iloc[month_row_index,])
-            year_row=list(year_table.iloc[year_row_index,])
+            year_row=list(year_table.iloc[month_row_index,])
             year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]
+            while(len(year_match)==0): 
+                #look for above or below row to search year
+                if month_row_index>0:
+                    year_row=list(year_table.iloc[month_row_index,])
+                    year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]
             
            #year_check_bool=[year_row[i]==0 if month_row[i]==0 else year_row[i]!=0 for i in range(len(month_row))]
 
@@ -637,19 +642,33 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
             continuous_check_bool=[x in [1,-1,11,-11] for x in inv]
             len_of_continuous=sum(continuous_check_bool)
             len_of_non_continuous=len(continuous_check_bool)-len_of_continuous
-            if  len_of_continuous==len(continuous_check_bool) or len_of_continuous>=10:
+            if  len_of_continuous==len(continuous_check_bool)\ 
+		or len_of_continuous>=10\
+		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2)\
+		or ((len_of_continuous==2  and len_of_non_continuous==1):
 		#check corresponding year
-                if len(year_match)==month_len:#all(year_check_bool):
+                if len(year_match)==month_len:
                     PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                else len(year_match)==0:
+                    return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
+                elif len(year_match)==0:  # there is no year
 		    #add year to month
                     year_table.iloc[year_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
                     PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                     original_header=PL.iloc[month_row_index,]
                     PL_date_header_list=list(PL_date_header)
-                    if latest_month in PL_date_header_list:
-                        d_str = ''
+                    count_latest_month=PL_date_header_list.count(latest_month)
+
+                    if count_latest_month==0
+                        continue
+		    elif count_latest_month>1:
+                        st.write("There are more than one {}/{} headers in {}, please m". format(latest_month[4:6],latest_month[0:4],sheet_name))
+		    elif :  # there is only one and only one latest month in header
+                    my_list.count(A)
+
+		    else:
+				    
+                         d_str = ''
                         for i in range(len(PL_date_header_list)):
                             if PL_date_header_list[i]==0 or PL_date_header_list[i]=="0":
                                 continue
@@ -660,30 +679,11 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                         st.warning("Fail to identify **'Year'** in the date header for sheet '"+sheet_name+"'. Filled year as:")
                         st.markdown(d_str[1:])
                         return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
-                    else:
-                        continue
 
-		    
-                
-		if latest_month in list(PL_date_header):
-                        return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
-		    else:
-                        continue
-                if 
-
-		    # year_check_bool is the year that match with month [True, True, Flase...]
-                    year_check_bool=[year_row[i]==0 if month_row[i]==0 else year_row[i]!=0 for i in range(len(month_row))]
-                    if all(year_check_bool):
-                         PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
-                                                      month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-
-                         if latest_month in list(PL_date_header):
-                            return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
-                        else:
-                            continue
-				
-	     elif len_of_non_continuous<=9 and len_of_non_continuous>=3 and len_of_non_continuous<=1:  
+			
+	    elif len_of_continuous==1 and len_of_non_continuous==1: 
                  if 
+	    elif len_of_continuous<=2 and len_of_non_continuous==1: 
 		    
                 return True  # Months are all continous 
             elif len_of_non_continuous<10 and len_of_non_continuous>=4 and len_of_non_continuous<=1:
