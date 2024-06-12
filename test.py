@@ -175,7 +175,7 @@ def Save_as_CSV_Onedrive(df,path,file_name):
         return False
 
 
-# For updating account_mapping, entity_mapping, latest_month_data, only for operator use
+# For updating account_mapping, entity_mapping, reporting_month_data, only for operator use
 def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=[]):  # replace original data
 
     original_data=Read_CSV_From_Onedrive(path,file_name)
@@ -518,17 +518,17 @@ def Add_year_to_header(month_list):
     return month_list  
 
 @st.cache_data
-def Check_Available_Units(check_patient_days,latest_month):
-    month_days=monthrange(int(latest_month[:4]), int(latest_month[4:]))[1]
+def Check_Available_Units(check_patient_days,reporting_month):
+    month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
     problem_properties=[]
     zero_patient_days=[]
-    for property_i in latest_month_data["Property_Name"].unique():
+    for property_i in reporting_month_data["Property_Name"].unique():
         try:
-            patient_day_i=check_patient_days.loc[(property_i,"Patient Days"),latest_month]
+            patient_day_i=check_patient_days.loc[(property_i,"Patient Days"),reporting_month]
         except:
             patient_day_i=0
         try:
-            operating_beds_i=check_patient_days.loc[(property_i,"Operating Beds"),latest_month]
+            operating_beds_i=check_patient_days.loc[(property_i,"Operating Beds"),reporting_month]
         except:
             operating_beds_i=0
         if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
@@ -546,8 +546,8 @@ def Check_Available_Units(check_patient_days,latest_month):
             problem_properties.append(property_i) 
     miss_all_A_unit=False
     if len(problem_properties)>0:
-        check_patient_days_display=check_patient_days.loc[(problem_properties,slice(None)),latest_month].reset_index(drop=False)
-        check_patient_days_display=check_patient_days_display.pivot_table(index=["Property_Name"],columns="Category", values=latest_month,aggfunc='last')
+        check_patient_days_display=check_patient_days.loc[(problem_properties,slice(None)),reporting_month].reset_index(drop=False)
+        check_patient_days_display=check_patient_days_display.pivot_table(index=["Property_Name"],columns="Category", values=reporting_month,aggfunc='last')
         if "Operating Beds" not in check_patient_days_display.columns:
             check_patient_days_display["Operating Beds"]=0
             miss_all_A_unit=True
@@ -559,22 +559,22 @@ def Check_Available_Units(check_patient_days,latest_month):
 			    hide_index=True)
     if miss_all_A_unit==False:
         BPC_pull_temp=BPC_pull.reset_index(drop=False)
-        onemonth_before_latest_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)<str(latest_month),BPC_pull.columns)))
-        previous_available_unit=BPC_pull_temp.loc[BPC_pull_temp["Sabra_Account"].isin(availble_unit_accounts),["Property_Name",onemonth_before_latest_month]]  
-        previous_available_unit[["Property_Name",onemonth_before_latest_month]].groupby(["Property_Name"]).sum()
-        previous_available_unit=previous_available_unit.reset_index(drop=False)[["Property_Name",onemonth_before_latest_month]]
+        onemonth_before_reporting_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)<str(reporting_month),BPC_pull.columns)))
+        previous_available_unit=BPC_pull_temp.loc[BPC_pull_temp["Sabra_Account"].isin(availble_unit_accounts),["Property_Name",onemonth_before_reporting_month]]  
+        previous_available_unit[["Property_Name",onemonth_before_reporting_month]].groupby(["Property_Name"]).sum()
+        previous_available_unit=previous_available_unit.reset_index(drop=False)[["Property_Name",onemonth_before_reporting_month]]
         check_patient_days=check_patient_days.reset_index(drop=False)
-        Unit_changed=pd.merge(previous_available_unit, check_patient_days.loc[check_patient_days['Category'] == 'Operating Beds',["Property_Name",latest_month]],on=["Property_Name"], how='left')
-        Unit_changed["Delta"]=Unit_changed[onemonth_before_latest_month]-Unit_changed[latest_month]
-        Unit_changed=Unit_changed.loc[(Unit_changed["Delta"]!=0)&(Unit_changed[latest_month]!=0)&(pd.isna(Unit_changed[latest_month])),]
+        Unit_changed=pd.merge(previous_available_unit, check_patient_days.loc[check_patient_days['Category'] == 'Operating Beds',["Property_Name",reporting_month]],on=["Property_Name"], how='left')
+        Unit_changed["Delta"]=Unit_changed[onemonth_before_reporting_month]-Unit_changed[reporting_month]
+        Unit_changed=Unit_changed.loc[(Unit_changed["Delta"]!=0)&(Unit_changed[reporting_month]!=0)&(pd.isna(Unit_changed[reporting_month])),]
         if len(Unit_changed)>0:
             st.warning("The number of operating beds for the properties listed below have changed compared to the previous reporting month.")
             st.warning("Please double-check if these changes are accurate.")
             st.dataframe(Unit_changed.style.map(color_missing, subset=["Delta"]).format(precision=0, thousands=",").hide(axis="index"),
 		    column_config={
 			        "Property_Name": "Property",
-			        onemonth_before_latest_month:onemonth_before_latest_month+" Operating beds",
-		                 latest_month:latest_month+" Operating beds",
+			        onemonth_before_reporting_month:onemonth_before_reporting_month+" Operating beds",
+		                 reporting_month:reporting_month+" Operating beds",
 		                 "Delta": "Changed"},
 			    hide_index=True)
     
@@ -606,7 +606,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         month_count.append(len(valid_month))
         year_count.append(len(valid_year))
     # can't find month keyword in any rows
-    st.write("month_table",month_table,year_table)
+    #st.write("month_table",month_table,year_table)
     if all(map(lambda x:x==0,month_count)):
         st.error("Can't identify Month/Year header in sheet——'"+sheet_name+"'")   
         st.stop()
@@ -620,23 +620,19 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         month_row_index=month_sort_index[month_index_i]
         if month_count[month_row_index]>1:   # if there are more than one month in header
             month_row=list(month_table.iloc[month_row_index,])
-            year_row=list(year_table.iloc[month_row_index,])
-            year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]
-            while(len(year_match)==0): 
-                #look for above or below row to search year
-                if month_row_index>0:
-                    year_row=list(year_table.iloc[month_row_index,])
-                    year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]
-            
-           #year_check_bool=[year_row[i]==0 if month_row[i]==0 else year_row[i]!=0 for i in range(len(month_row))]
-
-        #check month continuous
-        inv=[]
-        month_list=list(filter(lambda x:x!=0,month_row))
-        month_len=len(month_list)
-        if month_len==0:
-            continue
-        else:	    
+            month_list=list(filter(lambda x:x!=0,month_row))
+            month_len=len(month_list)
+            for i in [0,1,-1]:
+                if month_row_index+i>=0 and month_row_index+i<year_table.shape[0]:
+                    year_row=list(year_table.iloc[month_row_index+i,])
+                    year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]    
+                    if len(year_match)==month_len:
+                        year_table.iloc[month_row_index,]=year_table.iloc[month_row_index+i,]
+                        year_table.iloc[month_row_index,:] = [year_table.iloc[month_row_index, i] if mask == 1 else 0 for i, mask in enumerate(month_row)]
+                        break
+		    else:
+                        continue
+                	    
 	    #check month continuous, there are at most two types of differences in the month list which are in 1,-1,11,-11 
             inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
             continuous_check_bool=[x in [1,-1,11,-11] for x in inv]
@@ -645,53 +641,44 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
             if  len_of_continuous==len(continuous_check_bool)\ 
 		or len_of_continuous>=10\
 		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2)\
-		or ((len_of_continuous==2  and len_of_non_continuous==1):
+		or ((len_of_continuous<=2 and len_of_continuous>=1 and len_of_non_continuous==1):
+
 		#check corresponding year
                 if len(year_match)==month_len:
                     PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                    return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
-                elif len(year_match)==0:  # there is no year
+                   
+                else:  # there is no year
 		    #add year to month
                     year_table.iloc[year_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
                     PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                     original_header=PL.iloc[month_row_index,]
                     PL_date_header_list=list(PL_date_header)
-                    count_latest_month=PL_date_header_list.count(latest_month)
-
-                    if count_latest_month==0
-                        continue
-		    elif count_latest_month>1:
-                        st.write("There are more than one {}/{} headers in {}, please m". format(latest_month[4:6],latest_month[0:4],sheet_name))
-		    elif :  # there is only one and only one latest month in header
-                    my_list.count(A)
-
-		    else:
-				    
-                         d_str = ''
-                        for i in range(len(PL_date_header_list)):
-                            if PL_date_header_list[i]==0 or PL_date_header_list[i]=="0":
-                                continue
-                            else:
-                                date=str(PL_date_header_list[i][4:6])+"/"+str(PL_date_header_list[i][0:4])
-                                d_str +=",  "+str(original_header[i])+" — "+ date
+                    
+                    d_str = ''
+                    for i in range(len(PL_date_header_list)):
+                        if PL_date_header_list[i]==0 or PL_date_header_list[i]=="0":
+                            continue
+                        else:
+                            date=str(PL_date_header_list[i][4:6])+"/"+str(PL_date_header_list[i][0:4])
+                            d_str +=",  "+str(original_header[i])+" — "+ date
                 
-                        st.warning("Fail to identify **'Year'** in the date header for sheet '"+sheet_name+"'. Filled year as:")
-                        st.markdown(d_str[1:])
-                        return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
-
+                    st.warning("Fail to identify **'Year'** for the date header in sheet '{}'. Filled year as:".format(sheet_name))
+                    st.markdown(d_str[1:])
+                count_reporting_month=list(PL_date_header).count(reporting_month)
+                if count_reporting_month==0: # there is no reporting_month
+                    continue
+		elif count_reporting_month>1:
+                    st.write("There are more than one {}/{} in {}, please remove one so we can identify the correct data column for {}/{}". format(reporting_month[4:6],reporting_month[0:4],sheet_name,reporting_month[4:6],reporting_month[0:4]))
+		else:  # there is only one reporting month in the header
+		    return PL_date_header,month_row_index,PL.iloc[month_row_index,:]	
 			
-	    elif len_of_continuous==1 and len_of_non_continuous==1: 
-                 if 
-	    elif len_of_continuous<=2 and len_of_non_continuous==1: 
-		    
-                return True  # Months are all continous 
-            elif len_of_non_continuous<10 and len_of_non_continuous>=4 and len_of_non_continuous<=1:
-            return True 
-        else:
-            return False # Month list is not continuous 
+            else:
+                continue
 
 		
+
+
 
 
 		
@@ -715,7 +702,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                          PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
 
-                         if latest_month in list(PL_date_header):
+                         if reporting_month in list(PL_date_header):
                             return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
                         else:
                             continue
@@ -725,28 +712,12 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                         PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
 
-                        if latest_month in list(PL_date_header):
+                        if reporting_month in list(PL_date_header):
                             return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
                         else:
                             continue
 
-		# all the year rows are not valid, add year to month
-                year_table.iloc[year_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
-                PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                original_header=PL.iloc[month_row_index,]
-                PL_date_header_list=list(PL_date_header)
-                if latest_month in PL_date_header_list:
-                    d_str = ''
-                    for i in range(len(PL_date_header_list)):
-                        if PL_date_header_list[i]==0 or PL_date_header_list[i]=="0":
-                            continue
-                        else:
-                            date=str(PL_date_header_list[i][4:6])+"/"+str(PL_date_header_list[i][0:4])
-                            d_str +=",  "+str(original_header[i])+" — "+ date
-                
-                    st.warning("Fail to identify **'Year'** in the date header for sheet '"+sheet_name+"'. Filled year as:")
-                    st.markdown(d_str[1:])
-                    return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
+		
                 else:
                     continue
                 
@@ -757,7 +728,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
 	    # find the col of first month
             while(month_table.iloc[month_row_index,col_month]==0):
                 col_month+=1
-            if month_table.iloc[month_row_index,col_month]!=int(latest_month[4:]):
+            if month_table.iloc[month_row_index,col_month]!=int(reporting_month[4:]):
                 continue
             #if there is no year in month row, check above row or next row
             if  year_table.iloc[month_row_index,col_month]==0:
@@ -961,7 +932,7 @@ def Map_PL_Sabra(PL,entity):
         PL["ENTITY"]=entity	    
          
     elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value" 
-        monthdays=monthrange(int(str(latest_month)[0:4]), int(str(latest_month)[4:6]))[1]
+        monthdays=monthrange(int(str(reporting_month)[0:4]), int(str(reporting_month)[4:6]))[1]
         for i in range(len(PL.index)):
             conversion=PL.loc[i,"Conversion"]
             if conversion!=conversion or pd.isna(conversion):
@@ -993,12 +964,12 @@ def Map_PL_Sabra(PL,entity):
     return PL   
     
 @st.cache_data
-def Compare_PL_Sabra(Total_PL,latest_month):
-#def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
+def Compare_PL_Sabra(Total_PL,reporting_month):
+#def Compare_PL_Sabra(Total_PL,PL_with_detail,reporting_month):
     #PL_with_detail=PL_with_detail.reset_index(drop=False)
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)","Diff_Percent"])
     #diff_BPC_PL_detail=pd.DataFrame(columns=["ENTITY","Sabra_Account","Tenant_Account","Month","Sabra","P&L Value","Diff (Sabra-P&L)",""])
-    month_list = list(filter(lambda x:x!=latest_month, Total_PL.columns))
+    month_list = list(filter(lambda x:x!=reporting_month, Total_PL.columns))
     for entity in entity_mapping.index:
         for timeid in month_list: 
 	    # if this entity don't have data for this timeid(new/transferred property), skip to next month
@@ -1055,90 +1026,90 @@ def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
 @st.cache_data(experimental_allow_widgets=True)
 def View_Summary():
-    global Total_PL,latest_month_data,latest_month
+    global Total_PL,reporting_month_data,reporting_month
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
 
 
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
-    latest_month_data=Total_PL[latest_month].reset_index(drop=False)
-    latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
-    latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
+    reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
+    reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
+    reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     # check patient days ( available days > patient days)	
-    check_patient_days=latest_month_data[(latest_month_data["Sabra_Account"].isin(availble_unit_accounts)) | (latest_month_data["Category"]=='Patient Days')]
+    check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].isin(availble_unit_accounts)) | (reporting_month_data["Category"]=='Patient Days')]
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
-    check_patient_days=check_patient_days[["Property_Name","Category",latest_month]].groupby(["Property_Name","Category"]).sum()
+    check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
 
     #check if available unit changed by previous month
-    Check_Available_Units(check_patient_days,latest_month)
+    Check_Available_Units(check_patient_days,reporting_month)
 	
     
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
-    entity_list=list(latest_month_data["ENTITY"].unique())
-    current_cagegory=latest_month_data[["Property_Name","Category","ENTITY",latest_month]][latest_month_data["Category"].\
+    entity_list=list(reporting_month_data["ENTITY"].unique())
+    current_cagegory=reporting_month_data[["Property_Name","Category","ENTITY",reporting_month]][reporting_month_data["Category"].\
 	    isin(category_list)].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
     full_category = pd.DataFrame(list(product(entity_list,category_list)), columns=['ENTITY', 'Category'])
     missing_category=full_category.merge(current_cagegory,on=['ENTITY', 'Category'],how="left")
-    missing_category=missing_category[(missing_category[latest_month]==0)|(missing_category[latest_month].isnull())]
-    missing_category[latest_month]="NA" 
+    missing_category=missing_category[(missing_category[reporting_month]==0)|(missing_category[reporting_month].isnull())]
+    missing_category[reporting_month]="NA" 
 	
     #if "Facility Information" in list(missing_category["Category"]):
         # fill the facility info with historical data
-        #Check_Available_Beds(missing_category,latest_month)
+        #Check_Available_Beds(missing_category,reporting_month)
         #missing_category=missing_category[missing_category["Category"]!="Facility Information"]
 
     if missing_category.shape[0]>0:
         st.write("No data detected for below properties and accounts: ")
-        missing_category=missing_category[["ENTITY",latest_month,"Category"]].merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-        st.dataframe(missing_category[["Property_Name","Category",latest_month]].style.map(color_missing, subset=[latest_month]),
+        missing_category=missing_category[["ENTITY",reporting_month,"Category"]].merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
+        st.dataframe(missing_category[["Property_Name","Category",reporting_month]].style.map(color_missing, subset=[reporting_month]),
 		    column_config={
 			        "Property_Name": "Property",
 			        "Category":"Account category",
-		                 latest_month:latest_month[4:6]+"/"+latest_month[0:4]},
+		                 reporting_month:reporting_month[4:6]+"/"+reporting_month[0:4]},
 			    hide_index=True)
 	     
 
-    #duplicates = latest_month_data[latest_month_data.duplicated(subset=["Sabra_Account_Full_Name", "Category"], keep=False)]
+    #duplicates = reporting_month_data[reporting_month_data.duplicated(subset=["Sabra_Account_Full_Name", "Category"], keep=False)]
 
-    latest_month_data =latest_month_data.pivot_table(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month,aggfunc='last')
-    latest_month_data.reset_index(drop=False,inplace=True)
+    reporting_month_data =reporting_month_data.pivot_table(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=reporting_month,aggfunc='last')
+    reporting_month_data.reset_index(drop=False,inplace=True)
 
-    latest_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
-    latest_month_data=latest_month_data.dropna(subset=["Sabra_Account"])
+    reporting_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
+    reporting_month_data=reporting_month_data.dropna(subset=["Sabra_Account"])
     sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet","Additional Statistical Information","Government Funds"]
-    sorter=list(filter(lambda x:x in latest_month_data["Category"].unique(),sorter))
-    latest_month_data.Category = latest_month_data.Category.astype("category")
-    latest_month_data.Category = latest_month_data.Category.cat.set_categories(sorter)
-    latest_month_data=latest_month_data.sort_values(["Category"]) 
+    sorter=list(filter(lambda x:x in reporting_month_data["Category"].unique(),sorter))
+    reporting_month_data.Category = reporting_month_data.Category.astype("category")
+    reporting_month_data.Category = reporting_month_data.Category.cat.set_categories(sorter)
+    reporting_month_data=reporting_month_data.sort_values(["Category"]) 
 
-    #latest_month_data = pd.concat([latest_month_data.groupby(by='Category',as_index=False).sum().assign(Sabra_Account="Total_Sabra"),latest_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns]     
-    #latest_month_data = pd.concat([latest_month_data.groupby(by='Category', as_index=False).sum().assign(Sabra_Account="Total_Sabra"), latest_month_data], observed=False).sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns]
-    latest_month_data = pd.concat([latest_month_data.groupby(by='Category', as_index=False,observed=False).sum().assign(Sabra_Account="Total_Sabra"), latest_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[latest_month_data.columns]
-    set_empty=list(latest_month_data.columns)
+    #reporting_month_data = pd.concat([reporting_month_data.groupby(by='Category',as_index=False).sum().assign(Sabra_Account="Total_Sabra"),reporting_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]     
+    #reporting_month_data = pd.concat([reporting_month_data.groupby(by='Category', as_index=False).sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data], observed=False).sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
+    reporting_month_data = pd.concat([reporting_month_data.groupby(by='Category', as_index=False,observed=False).sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
+    set_empty=list(reporting_month_data.columns)
     set_empty.remove("Category")
     set_empty.remove("Sabra_Account")
-    for i in range(latest_month_data.shape[0]):
-        if latest_month_data.loc[i,"Sabra_Account"]=="Total_Sabra":
-            latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
-            if latest_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
-                latest_month_data.loc[i,set_empty]=np.nan
+    for i in range(reporting_month_data.shape[0]):
+        if reporting_month_data.loc[i,"Sabra_Account"]=="Total_Sabra":
+            reporting_month_data.loc[i,"Sabra_Account"]="Total - "+reporting_month_data.loc[i,'Category']
+            if reporting_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
+                reporting_month_data.loc[i,set_empty]=np.nan
 		    
-    entity_columns=latest_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
-    if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
-        latest_month_data["Total"] = latest_month_data[entity_columns].sum(axis=1)
-        latest_month_data=latest_month_data[["Sabra_Account","Total"]+list(entity_columns)]
+    entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
+    if len(reporting_month_data.columns)>3:  # if there are more than one property, add total column
+        reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
+        reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
     else:
-        latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]   
+        reporting_month_data=reporting_month_data[["Sabra_Account"]+list(entity_columns)]   
 	
-    with st.expander("Summary of {}/{} reporting".format(latest_month[4:6],latest_month[0:4]) ,expanded=True):
-        ChangeWidgetFontSize("Summary of {}/{} reporting".format(latest_month[4:6],latest_month[0:4]), '25px')
-        download_report(latest_month_data,"{} {}-{} Report".format(operator,latest_month[4:6],latest_month[0:4]))
+    with st.expander("Summary of {}/{} reporting".format(reporting_month[4:6],reporting_month[0:4]) ,expanded=True):
+        ChangeWidgetFontSize("Summary of {}/{} reporting".format(reporting_month[4:6],reporting_month[0:4]), '25px')
+        download_report(reporting_month_data,"{} {}-{} Report".format(operator,reporting_month[4:6],reporting_month[0:4]))
 
-        latest_month_data=latest_month_data.fillna(0).infer_objects(copy=False)
-        latest_month_data=latest_month_data.replace(0,'')
-        styled_table = (latest_month_data.style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
+        reporting_month_data=reporting_month_data.fillna(0).infer_objects(copy=False)
+        reporting_month_data=reporting_month_data.replace(0,'')
+        styled_table = (reporting_month_data.style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
@@ -1146,21 +1117,21 @@ def View_Summary():
         
 # no cache
 def Submit_Upload_Latestmonth():
-    global Total_PL,latest_month   
-    upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
-    upload_latest_month["TIME"]=latest_month
-    upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
+    global Total_PL,reporting_month   
+    upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
+    upload_reporting_month["TIME"]=reporting_month
+    upload_reporting_month=upload_reporting_month.rename(columns={reporting_month:"Amount"})
     current_time = datetime.now(pytz.timezone('America/Los_Angeles')).strftime("%H:%M")
-    upload_latest_month["Latest_Upload_Time"]=str(today)+" "+current_time
-    upload_latest_month["Operator"]=operator
+    upload_reporting_month["Latest_Upload_Time"]=str(today)+" "+current_time
+    upload_reporting_month["Operator"]=operator
 
 
     if not st.session_state.clicked["submit_report"]:
         st.stop()
     else:
-         # save latest month data to OneDrive
-        if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_latest_month,operator):
-            st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
+         # save reporting month data to OneDrive
+        if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator):
+            st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,reporting_month[4:6]+"/"+reporting_month[0:4]))
             
         else:
             st.write(" ")  #----------record into error report------------------------	
@@ -1170,12 +1141,12 @@ def Submit_Upload_Latestmonth():
             Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,list(diff_BPC_PL["ENTITY"]))
         
 	# save original tenant P&L to OneDrive
-        if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
+        if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
             st.write("unsuccess ")  #----------record into error report------------------------	
 
         if BS_separate_excel=="Y":
             # save tenant BS to OneDrive
-            if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,latest_month[4:6],latest_month[0:4])):
+            if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
                 st.write(" unsuccess")  #----------record into error report------------------------	
 
 
@@ -1448,7 +1419,7 @@ def Identify_Reporting_Month(PL,entity_header_row_number):
 
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):  
-    global account_mapping,latest_month
+    global account_mapping,reporting_month
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
     sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if (not pd.isna(x))]
     sheet_name_list = list(set(sheet_name_list))
@@ -1520,16 +1491,16 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
 	# map sabra account with tenant account, groupby sabra account
         PL=Map_PL_Sabra(PL,entity_list) 
-        PL.rename(columns={"value":latest_month},inplace=True)
+        PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
     #return PL,PL_with_detail
     return PL
 	
 @st.cache_data
-def Get_Previous_Months(latest_month,full_date_header):
-    # Convert the latest_month string to a datetime object
-    latest_date = datetime.strptime(latest_month, "%Y%m")
-    month_list = [latest_month]
+def Get_Previous_Months(reporting_month,full_date_header):
+    # Convert the reporting_month string to a datetime object
+    latest_date = datetime.strptime(reporting_month, "%Y%m")
+    month_list = [reporting_month]
     for i in range(previous_monthes_comparison):
         # Subtract i months to get the previous month
         previous_date = latest_date - timedelta(days=latest_date.day, weeks=i*4)
@@ -1540,7 +1511,7 @@ def Get_Previous_Months(latest_month,full_date_header):
 
 #no cache    
 def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):  
-    global account_mapping,latest_month,tenant_account_col,date_header
+    global account_mapping,reporting_month,tenant_account_col,date_header
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
 
@@ -1567,7 +1538,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
             st.stop()  
 
         # select only two or one previous months for columns
-        month_select = Get_Previous_Months(latest_month,date_header[0])
+        month_select = Get_Previous_Months(reporting_month,date_header[0])
 	
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
@@ -1750,7 +1721,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.session_state.selected_year = current_year
         if 'selected_month' not in st.session_state:
             st.session_state.selected_month = '01'
-        global latest_month,reporting_month_label,tenant_account_col,date_header
+        global reporting_month,reporting_month_label,tenant_account_col,date_header
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
         reporting_month_label=True  
         tenant_account_col=10000
@@ -1788,7 +1759,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.clicked = button_initial_state
                     st.session_state.selected_year = selected_year
                     st.session_state.selected_month = selected_month
-                    latest_month=str(selected_year)+str(selected_month)
+                    reporting_month=str(selected_year)+str(selected_month)
         if uploaded_finance:
             with col3:
                 st.markdown("✔️ :green[P&L selected]")
@@ -1796,13 +1767,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.write("P&L wasn't upload.")
             st.stop()
 
-        latest_month=str(selected_year)+str(selected_month)
-        if latest_month>=current_date:
+        reporting_month=str(selected_year)+str(selected_month)
+        if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
             st.stop()
-        filtered_months =sorted([x for x in BPC_pull.columns if x <latest_month],reverse=True)
+        filtered_months =sorted([x for x in BPC_pull.columns if x <reporting_month],reverse=True)
         BPC_pull=BPC_pull[["Property_Name"]+filtered_months[:previous_monthes_comparison]]    
-        entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=latest_month) &((pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))| (entity_mapping["DATE_SOLD_PAYOFF"]>=latest_month))),]
+        entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=reporting_month) &((pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))| (entity_mapping["DATE_SOLD_PAYOFF"]>=reporting_month))),]
         if "Y" in entity_mapping["BS_separate_excel"][~pd.isna(entity_mapping["BS_separate_excel"])].values:                     
             BS_separate_excel="Y"
             if uploaded_BS:
@@ -1839,18 +1810,18 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             Total_PL=Total_PL.combine_first(Total_BL)
             #Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
         if len(Total_PL.columns)==1:
-            Total_PL.columns=[latest_month]
+            Total_PL.columns=[reporting_month]
 
         elif len(Total_PL.columns)>1:  # there are previous months in P&L
-            #diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month)
-            diff_BPC_PL=Compare_PL_Sabra(Total_PL,latest_month)
+            #diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail,reporting_month)
+            diff_BPC_PL=Compare_PL_Sabra(Total_PL,reporting_month)
 	    
 	# 1 Summary
         View_Summary()
        	
 
-        # upload latest month data to AWS
-        st.button("******Confirm and upload {} {}-{} reporting******".format(operator,latest_month[4:6],latest_month[0:4]),on_click=clicked, args=["submit_report"],key='latest_month')  
+        # upload reporting month data to AWS
+        st.button("******Confirm and upload {} {}-{} reporting******".format(operator,reporting_month[4:6],reporting_month[0:4]),on_click=clicked, args=["submit_report"],key='reporting_month')  
        
         # 2 Discrepancy of Historic Data
         with st.expander("Discrepancy for Historic Data",expanded=True):
