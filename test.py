@@ -580,7 +580,6 @@ def Check_Available_Units(check_patient_days,reporting_month):
     
 @st.cache_data
 def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header): 
-    st.write("PL",PL)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
@@ -618,21 +617,20 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         #month_sort_index[-1] is the index number of month_count in which has max month count
         #month_row_index is also the index/row number of PL
         month_row_index=month_sort_index[month_index_i]
-        if month_count[month_row_index]>1:   # if there are more than one month in header
-            month_row=list(month_table.iloc[month_row_index,])
-            month_list=list(filter(lambda x:x!=0,month_row))
-            month_len=len(month_list)
-            for i in [0,1,-1]:
+	month_row=list(month_table.iloc[month_row_index,])
+        month_list=list(filter(lambda x:x!=0,month_row))
+        month_len=len(month_list)
+        for i in [0,1,-1]:
                 if month_row_index+i>=0 and month_row_index+i<year_table.shape[0]:
                     year_row=list(year_table.iloc[month_row_index+i,])
                     year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]    
                     if len(year_match)==month_len:
-                        year_table.iloc[month_row_index,]=year_table.iloc[month_row_index+i,]
-                        year_table.iloc[month_row_index,:] = [year_table.iloc[month_row_index, i] if mask == 1 else 0 for i, mask in enumerate(month_row)]
+                        #year_table.iloc[month_row_index,]=year_table.iloc[month_row_index+i,]
+                        year_table.iloc[month_row_index,:] = [year_table.iloc[month_row_index, i] if month != 0 else 0 for i, month in enumerate(month_row)]
                         break
-		    else:
+                    else:
                         continue
-                	    
+        if month_count[month_row_index]>1:   # if there are more than one month in header	    
 	    #check month continuous, there are at most two types of differences in the month list which are in 1,-1,11,-11 
             inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
             continuous_check_bool=[x in [1,-1,11,-11] for x in inv]
@@ -643,7 +641,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
 		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2)\
 		or ((len_of_continuous<=2 and len_of_continuous>=1 and len_of_non_continuous==1):
 
-		#check corresponding year
+		#check the corresponding year
                 if len(year_match)==month_len:
                     PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
@@ -676,72 +674,19 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
             else:
                 continue
 
-		
-
-
-
-
-		
-            if not Month_continuity_check(month_row):   # month is not continuous, check next
-                continue
-            else:   # if Month_continuity_check is True, this is the correct month row. Then start to process year row
-                for year_index_i in range(0,-4,-1):
-                    if year_index_i==0:
-                        #in most case, year and month are in the same row, so first check month row
-                        year_row_index=month_row_index
-                    elif year_sort_index[year_index_i]!=month_row_index:  
-                        year_row_index=year_sort_index[year_index_i]
-                        #month row and year row is supposed to be adjacent
-                        if abs(year_row_index-month_row_index)>2:
-                            continue
-                    
-                    year_row=list(year_table.iloc[year_row_index,])
-		    # year_check_bool is the year that match with month [True, True, Flase...]
-                    year_check_bool=[year_row[i]==0 if month_row[i]==0 else year_row[i]!=0 for i in range(len(month_row))]
-                    if all(year_check_bool):
-                         PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
-                                                      month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-
-                         if reporting_month in list(PL_date_header):
-                            return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
-                        else:
-                            continue
-                        
-                    elif sum(year_check_bool)/month_count[month_row_index])>0.8:
-			#if Year_continuity_check(year_row) and year_count[year_row_index]==month_count[month_row_index]:
-                        PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
-                                                      month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-
-                        if reporting_month in list(PL_date_header):
-                            return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
-                        else:
-                            continue
-
-		
-                else:
-                    continue
-                
                 
         # only one month in header, all the rows that have multiple months were out
         elif month_count[month_row_index]==1:
             col_month=0      #col_month is the col number of month
-	    # find the col of first month
+	    # find the month column
             while(month_table.iloc[month_row_index,col_month]==0):
                 col_month+=1
             if month_table.iloc[month_row_index,col_month]!=int(reporting_month[4:]):
                 continue
             #if there is no year in month row, check above row or next row
             if  year_table.iloc[month_row_index,col_month]==0:
-                #check precede row
-                if month_row_index>0 and month_row_index<PL_row_size and year_table.iloc[month_row_index-1,col_month]!=0 and year_table.iloc[month_row_index+1,col_month]==0:
-                    year_table.iloc[month_row_index,col_month]=year_table.iloc[month_row_index-1,col_month]	
-
-		#check next row
-                elif month_row_index<PL_row_size and year_table.iloc[month_row_index+1,col_month]!=0 :
-                    year_table.iloc[month_row_index,col_month]=year_table.iloc[month_row_index+1,col_month]
-       
-                else:  # there is no year in precede or next row, add year to month. 
-                    year_table.iloc[month_row_index,col_month]=Add_year_to_header(list(month_table.iloc[month_row_index,]))	
+                # there is no year in precede or next row, add year to month. 
+                    year_table.iloc[month_row_index,col_month]=	int(reporting_month[0:4])
  
             count_num=count_str=count_non=0
             for row_month in range(month_row_index,PL.shape[0]):
