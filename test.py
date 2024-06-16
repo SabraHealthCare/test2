@@ -639,7 +639,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
             if  len_of_continuous==len(continuous_check_bool) \
 		or len_of_continuous>=10 \
 		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2) \
-		or ((len_of_continuous<=2 and len_of_continuous>=1 and len_of_non_continuous==1):
+		or (len_of_continuous<=2 and len_of_continuous>=1 and len_of_non_continuous==1):
 
 		#check the corresponding year
                 if len(year_match)==month_len:
