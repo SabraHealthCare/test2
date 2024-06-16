@@ -512,9 +512,8 @@ def Add_year_to_header(month_list):
     j=0
     for i in range(len(month_list)):
         if month_list[i]!=0:
-            month_list.iloc[year_row_index,i]=add_year[j]
+            month_list[i]=add_year[j]
             j+=1
-	
     return month_list  
 
 @st.cache_data
