@@ -612,7 +612,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         month_count.append(len(valid_month))
         year_count.append(len(valid_year))
     # can't find month keyword in any rows
-    #st.write("month_table",month_table,year_table)
     if all(map(lambda x:x==0,month_count)):
         st.error("Can't identify Month/Year header in sheet——'"+sheet_name+"'")   
         st.stop()
@@ -655,6 +654,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                    
                 else:  # there is no year
 		    #add year to month
+                    st.write("month_row_index","year_table",month_row_index,year_table)
                     year_table.iloc[month_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
                     PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                     original_header=PL.iloc[month_row_index,]
