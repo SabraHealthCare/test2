@@ -44,6 +44,13 @@ operator_list_filename="Operator_list.csv"
 BPC_account_filename="Sabra_account_list.csv"
 previous_monthes_comparison=2
 availble_unit_accounts=["A_ACH","A_IL","A_ALZ","A_SNF","A_ALF","A_BH","A_IRF","A_LTACH","A_SP_HOSP"]
+month_dic_word={10:["october","oct"],11:["november","nov"],12:["december","dec"],1:["january","jan"],\
+                   2:["february","feb"],3:["march","mar"],4:["april","apr"],\
+                   5:["may"],6:["june","jun"],7:["july","jul"],8:["august","aug"],9:["september","sep"]}
+month_dic_num={10:["10/","-10","/10","10"],11:["11/","-11","/11","11"],12:["12/","-12","/12","12"],1:["01/","1/","-1","-01","/1","/01"],\
+                   2:["02/","2/","-2","-02","/2","/02"],3:["03/","3/","-3","-03","/3","/03"],4:["04/","4/","-4","-04","/4","/04"],\
+                   5:["05/","5/","-5","-05","/5","/05"],6:["06/","6/","-06","-6","/6","/06"],\
+                   7:["07/","7/","-7","-07","/7","/07"],8:["08/","8/","-8","-08","/8","/08"],9:["09/","9/","-09","-9","/9","/09"]}
 
 #One drive authority. Set application details
 client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
@@ -404,18 +411,6 @@ def Get_Year(single_string):
 
 
 def Get_Month_Year(single_string):
-    month_dic_word={10:["october","oct"],11:["november","nov"],12:["december","dec"],1:["january","jan"],\
-                   2:["february","feb"],3:["march","mar"],4:["april","apr"],\
-                   5:["may"],6:["june","jun"],7:["july","jul"],8:["august","aug"],9:["september","sep"]}
-    month_dic_num={10:["10/","-10","/10","10"],11:["11/","-11","/11","11"],12:["12/","-12","/12","12"],1:["01/","1/","-1","-01","/1","/01"],\
-                   2:["02/","2/","-2","-02","/2","/02"],3:["03/","3/","-3","-03","/3","/03"],4:["04/","4/","-4","-04","/4","/04"],\
-                   5:["05/","5/","-5","-05","/5","/05"],6:["06/","6/","-06","-6","/6","/06"],\
-                   7:["07/","7/","-7","-07","/7","/07"],8:["08/","8/","-8","-08","/8","/08"],9:["09/","9/","-09","-9","/9","/09"]}
-    
-    month_dic={10:["october","oct","10/","-10","/10","10"],11:["november","nov","11/","-11","/11","11"],12:["december","dec","12/","-12","/12","12"],1:["january","jan","01/","1/","-1","-01","/1","/01"],\
-                   2:["february","feb","02/","2/","-2","-02","/2","/02"],3:["march","mar","03/","3/","-3","-03","/3","/03"],4:["april","apr","04/","4/","-4","-04","/4","/04"],\
-                   5:["may","05/","5/","-5","-05","/5","/05"],6:["june","jun","06/","6/","-06","-6","/6","/06"],\
-                   7:["july","jul","07/","7/","-7","-07","/7","/07"],8:["august","aug","08/","8/","-8","-08","/8","/08"],9:["september","sep","09/","9/","-09","-9","/9","/09"]}
     if single_string!=single_string or pd.isna(single_string):
         return 0,0
     if isinstance(single_string, datetime):
@@ -440,7 +435,7 @@ def Get_Month_Year(single_string):
                 year,year_num=Get_Year(single_string)
                 if year==0:
                     continue
-		else:		
+                else:		
                     remaining=single_string.replace(month_num,"").replace(year_num,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("as of","").replace("actual","")
                     #if there are more than 3 other char in the string, this string is not month 
                     if len(remaining)>=3:
