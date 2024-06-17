@@ -5,7 +5,7 @@ pyodbc
 xlrd>=2.0.1
 datetime
 openpyxl
-streamlit
+streamlit >=1.23.0
 #gcsfs
 #pyodbc
 s3fs
