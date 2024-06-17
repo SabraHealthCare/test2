@@ -404,6 +404,14 @@ def Get_Year(single_string):
 
 
 def Get_Month_Year(single_string):
+    month_dic_word={10:["october","oct"],11:["november","nov"],12:["december","dec"],1:["january","jan"],\
+                   2:["february","feb"],3:["march","mar"],4:["april","apr"],\
+                   5:["may"],6:["june","jun"],7:["july","jul"],8:["august","aug"],9:["september","sep"]}
+    month_dic_num={10:["10/","-10","/10","10"],11:[11/","-11","/11","11"],12:["12/","-12","/12","12"],1:["01/","1/","-1","-01","/1","/01"],\
+                   2:["02/","2/","-2","-02","/2","/02"],3:["03/","3/","-3","-03","/3","/03"],4:["04/","4/","-4","-04","/4","/04"],\
+                   5:["05/","5/","-5","-05","/5","/05"],6:["06/","6/","-06","-6","/6","/06"],\
+                   7:["07/","7/","-7","-07","/7","/07"],8:["08/","8/","-8","-08","/8","/08"],9:["09/","9/","-09","-9","/9","/09"]}
+    
     month_dic={10:["october","oct","10/","-10","/10","10"],11:["november","nov","11/","-11","/11","11"],12:["december","dec","12/","-12","/12","12"],1:["january","jan","01/","1/","-1","-01","/1","/01"],\
                    2:["february","feb","02/","2/","-2","-02","/2","/02"],3:["march","mar","03/","3/","-3","-03","/3","/03"],4:["april","apr","04/","4/","-4","-04","/4","/04"],\
                    5:["may","05/","5/","-5","-05","/5","/05"],6:["june","jun","06/","6/","-06","-6","/6","/06"],\
@@ -414,28 +422,33 @@ def Get_Month_Year(single_string):
         return int(single_string.month),int(single_string.year)
     if isinstance(single_string, (int,float)):
         return 0,0
-        
-    else:
-        single_string=str(single_string).lower()
-        Year,Year_keyword=Get_Year(single_string)	    
-    # remove year from string, remove days from string
-    single_string=single_string.replace(Year_keyword,"").replace("30","").replace("31","").replace("28","").replace("29","").replace("as of","").replace("actual","")
-    
-    for Month in month_dic.keys() :#[01,02,03...12]
-        for  Month_keyword in month_dic[Month]: #['december','dec','12',...]
-            if Month_keyword in single_string:
-                remaining=single_string.replace(Month_keyword,"").replace("/","").replace("-","").replace(" ","").replace("_","")
+    single_string=str(single_string).lower()
+
+    for month_i in month_dic_word.keys() :#[01,02,03...12]
+        for  month_word in month_dic_word[month_i]: #['december','dec',"nov",...]
+            if month_word in single_string:  # month is words ,like Jan Feb... year is optional
+                year,year_word=Get_Year(single_string)	
+                remaining=single_string.replace(month_word,"").replace(year_word,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("as of","").replace("actual","")
                 
                 #if there are more than 3 other char in the string, this string is not month 
                 if len(remaining)>=3:
                     return 0,0
                 else:   
-                    return Month,Year
-            # string doesn't contain month keyword, continue to next month keyword
-            else:
-                continue
+                    return month,year
+        for  month_num in month_dic_num[month_i]:   
+            if month_num in single_string:  # month is number ,like 01/, 02/,   year is Mandatory
+                year,year_num=Get_Year(single_string)
+                if year==0:
+                    continue
+		else:		
+                    remaining=single_string.replace(month_num,"").replace(year_num,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("as of","").replace("actual","")
+                    #if there are more than 3 other char in the string, this string is not month 
+                    if len(remaining)>=3:
+                        return 0,0
+                    else:   
+                        return month,year	
     # didn't find month. return month as 0
-    return 0,Year    
+    return 0,0   
 
 
 def Month_continuity_check(month_list):
