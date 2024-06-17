@@ -1288,6 +1288,7 @@ def View_Discrepancy():
         if edited_diff_BPC_PL.shape[0]>0:
             st.error("Below P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.")
             edited_diff_BPC_PL.loc[:, "Type comments below"] = ""
+            st.DataFrame(edited_diff_BPC_PL）
             edited_diff_BPC_PL = st.data_editor(
 	    edited_diff_BPC_PL,
 	    width = 1200,
