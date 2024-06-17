@@ -671,7 +671,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                     st.warning("Fail to identify **'Year'** for the date header in sheet '{}'. Filled year as:".format(sheet_name))
                     st.markdown(d_str[1:])
                 count_reporting_month=list(PL_date_header).count(reporting_month)
-                st.write("count_reporting_month",count_reporting_month)
                 if count_reporting_month==0: # there is no reporting_month
                     continue
                 elif count_reporting_month>1:
