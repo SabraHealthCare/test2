@@ -675,7 +675,8 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 if count_reporting_month==0: # there is no reporting_month
                     continue
                 elif count_reporting_month>1:
-                    st.error("""There are {} "{}/{}" header in sheet "{}". Only one is allowed to refer the data column of "{}/{}"""". format(count_reporting_month,reporting_month[4:6],reporting_month[0:4],sheet_name,reporting_month[4:6],reporting_month[0:4]))
+                    st.error("There are {} '{}/{}' header in sheet '{}'. Only one is allowed to identify the data column of '{}/{}'".\
+			     format(count_reporting_month,reporting_month[4:6],reporting_month[0:4],sheet_name,reporting_month[4:6],reporting_month[0:4]))
                 else:  # there is only one reporting month in the header
                     return PL_date_header,month_row_index,PL.iloc[month_row_index,:]	
 			
