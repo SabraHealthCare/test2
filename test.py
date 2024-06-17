@@ -429,7 +429,7 @@ def Get_Month_Year(single_string):
                 if len(remaining)>=3:
                     return 0,0
                 else:   
-                    return month,year
+                    return month_i,year
         for  month_num in month_dic_num[month_i]:   
             if month_num in single_string:  # month is number ,like 01/, 02/,   year is Mandatory
                 year,year_num=Get_Year(single_string)
@@ -441,7 +441,7 @@ def Get_Month_Year(single_string):
                     if len(remaining)>=3:
                         return 0,0
                     else:   
-                        return month,year	
+                        return month_i,year	
     # didn't find month. return month as 0
     return 0,0   
 
@@ -1358,18 +1358,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
         return max_match_row,mapped_entity
 
-def Identify_Reporting_Month(PL,entity_header_row_number):
-    header=["reporting_month_TBD"]
-    # search month above the header row
-    for row_i in range(entity_header_row_number):
-        for col_i in range(PL.shape[1]):
-            month,year=Get_Month_Year(PL.iloc[row_i,col_i])   
-            if month>0 and year>0:
-                if month<10:
-                    header=["{}0{}".format(year,month)]
-                else:
-                    header=["{}{}".format(year,month)]
-    return Check_Reporting_Month(header)
+
 
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):  
