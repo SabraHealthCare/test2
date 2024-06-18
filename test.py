@@ -769,7 +769,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 else:
                     PL_date_header=[0] * (PL_col_size-1)
                     PL_date_header.append(reporting_month)
-                    return PL_date_header,last_string_index,PL.iloc[last_string_index,:]]
+                    return PL_date_header,last_string_index,PL.iloc[last_string_index,:]
 	
         st.error("failed to identify Year/Month header for sheet: '{}', please fix and re-upload.".format(sheet_name))
         st.stop()
