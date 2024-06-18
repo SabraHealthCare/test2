@@ -733,7 +733,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         return candidate_date[0]
     elif len(candidate_date)==0:  
         # there is only two columns: tenant_account, data
-        if PL_col_size=tenantAccount_col_no+2:  
+        if PL_col_size==tenantAccount_col_no+2:  
             count_num=count_str=count_non=0
             for first_tenant_row in range(0,PL_row_size):
                 if pd.isna(PL.iloc[first_tenant_row,tenantAccount_col_no]) or PL.iloc[first_tenant_row,tenantAccount_col_no] not in account_mapping[account_mapping['Sabra_Account'] != 'NO NEED TO MAP']['Tenant_Account'].tolist():
