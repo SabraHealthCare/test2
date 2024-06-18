@@ -609,25 +609,21 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         # save the number of valid months of each row to month_count
         valid_month=list(filter(lambda x:x!=0,month_table.iloc[row_i,]))
         valid_year=list(filter(lambda x:x!=0,year_table.iloc[row_i,]))
-
+    
         month_count.append(len(valid_month))
         year_count.append(len(valid_year))
     # can't find month keyword in any rows
-    if all(map(lambda x:x==0,month_count)):
-        st.error("Can't identify Month/Year header in sheet——'"+sheet_name+"'")   
-        st.stop()
-        
-    month_sort_index = np.argsort(np.array(month_count))
-    #year_sort_index = np.argsort(np.array(year_count))
-    candidate_date=[]
-    for month_index_i in range(-1,-10,-1): 
-        #month_sort_index[-1] is the index number of month_count in which has max month count
-        #month_row_index is also the index/row number of PL
-        month_row_index=month_sort_index[month_index_i]
-        month_row=list(month_table.iloc[month_row_index,])
-        month_list=list(filter(lambda x:x!=0,month_row))
-        month_len=len(month_list)
-        for i in [0,1,-1]:
+    if not all(map(lambda x:x==0,month_count)):
+        month_sort_index = np.argsort(np.array(month_count))
+        candidate_date=[]
+        for month_index_i in range(-1,-10,-1): 
+            #month_sort_index[-1] is the index number of month_count in which has max month count
+            #month_row_index is also the index/row number of PL
+            month_row_index=month_sort_index[month_index_i]
+            month_row=list(month_table.iloc[month_row_index,])
+            month_list=list(filter(lambda x:x!=0,month_row))
+            month_len=len(month_list)
+            for i in [0,1,-1]:  # identify year in corresponding month
                 if month_row_index+i>=0 and month_row_index+i<year_table.shape[0]:
                     year_row=list(year_table.iloc[month_row_index+i,])
                     year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]    
@@ -637,83 +633,82 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                         break
                     else:
                         continue
-        if month_count[month_row_index]>1:   # if there are more than one month in header	    
-	    #check month continuous, there are at most two types of differences in the month list which are in 1,-1,11,-11 
-            inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
-            continuous_check_bool=[x in [1,-1,11,-11] for x in inv]
-            len_of_continuous=sum(continuous_check_bool)
-            len_of_non_continuous=len(continuous_check_bool)-len_of_continuous
-            if  len_of_continuous==len(continuous_check_bool) \
+            if month_count[month_row_index]>1:   # if there are more than one month in header	    
+	        #check month continuous, there are at most two types of differences in the month list which are in 1,-1,11,-11 
+                inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
+                continuous_check_bool=[x in [1,-1,11,-11] for x in inv]
+                len_of_continuous=sum(continuous_check_bool)
+                len_of_non_continuous=len(continuous_check_bool)-len_of_continuous
+                if  len_of_continuous==len(continuous_check_bool) \
 		or len_of_continuous>=10 \
 		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2) \
 		or (len_of_continuous<=2 and len_of_continuous>=1 and len_of_non_continuous==1):
 
-		#check the corresponding year
-                if len(year_match)==month_len:
-                    PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
+		    #check the corresponding year
+                    if len(year_match)==month_len:
+                        PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                    
-                else:  # there is no year
-		    #add year to month
-                    year_table.iloc[month_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
-                    PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                    original_header=PL.iloc[month_row_index,]
-                    PL_date_header_list=list(PL_date_header)
+                    else:  # there is no year
+		        #add year to month
+                        year_table.iloc[month_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
+                        PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
+                        original_header=PL.iloc[month_row_index,]
+                        PL_date_header_list=list(PL_date_header)
                     
-                    d_str = ''
-                    for i in range(len(PL_date_header_list)):
-                        if PL_date_header_list[i]==0 or PL_date_header_list[i]=="0":
-                            continue
-                        else:
-                            date=str(PL_date_header_list[i][4:6])+"/"+str(PL_date_header_list[i][0:4])
-                            d_str +=",  "+str(original_header[i])+" — "+ date
+                        d_str = ''
+                        for i in range(len(PL_date_header_list)):
+                            if PL_date_header_list[i]==0 or PL_date_header_list[i]=="0":
+                                continue
+                            else:
+                                date=str(PL_date_header_list[i][4:6])+"/"+str(PL_date_header_list[i][0:4])
+                                d_str +=",  "+str(original_header[i])+" — "+ date
                 
-                    st.warning("Fail to identify **'Year'** for the date header in sheet '{}'. Filled year as:".format(sheet_name))
-                    st.markdown(d_str[1:])
-                count_reporting_month=list(PL_date_header).count(reporting_month)
-                if count_reporting_month==0: # there is no reporting_month
-                    continue
-                elif count_reporting_month>1:
-                    st.error("There are {} '{}/{}' header in sheet '{}'. Only one is allowed to identify the data column of '{}/{}'".\
+                        st.warning("Fail to identify **'Year'** for the date header in sheet '{}'. Filled year as:".format(sheet_name))
+                        st.markdown(d_str[1:])
+                    count_reporting_month=list(PL_date_header).count(reporting_month)
+                    if count_reporting_month==0: # there is no reporting_month
+                       continue
+                    elif count_reporting_month>1:
+                        st.error("There are {} '{}/{}' header in sheet '{}'. Only one is allowed to identify the data column of '{}/{}'".\
 			     format(count_reporting_month,reporting_month[4:6],reporting_month[0:4],sheet_name,reporting_month[4:6],reporting_month[0:4]))
-                else:  # there is only one reporting month in the header
-                    return PL_date_header,month_row_index,PL.iloc[month_row_index,:]	
+                    else:  # there is only one reporting month in the header
+                        return PL_date_header,month_row_index,PL.iloc[month_row_index,:]	
 			
-            else:
-                continue
-
-                
-        # only one month in header, all the rows that have multiple months were out
-        elif month_count[month_row_index]==1:
-            col_month=0      #col_month is the col number of month
-	    # find the month column
-            while(month_table.iloc[month_row_index,col_month]==0):
-                col_month+=1
-            if month_table.iloc[month_row_index,col_month]!=int(reporting_month[4:]):
-                continue
-            #if there is no year in month row, check above row or next row
-            if  year_table.iloc[month_row_index,col_month]==0:
-                # there is no year in precede or next row, add year to month. 
-                year_table.iloc[month_row_index,col_month]=	int(reporting_month[0:4])
- 
-            count_num=count_str=count_non=0
-            for row_month in range(month_row_index,PL_row_size):
-                if pd.isna(PL.iloc[row_month,col_month]) or PL.iloc[row_month,col_month]==" ":
-                    count_non+=1
-                elif isinstance(PL.iloc[row_month,col_month], (int, float)):
-                    count_num+=1
                 else:
-                    count_str+=1
+                    continue
+        
+            # only one month in header, all the rows that have multiple months were out
+            elif month_count[month_row_index]==1:
+                col_month=0      #col_month is the col number of month
+	        # find the month column
+                while(month_table.iloc[month_row_index,col_month]==0):
+                    col_month+=1
+                if month_table.iloc[month_row_index,col_month]!=int(reporting_month[4:]):
+                    continue
+                #if there is no year in month row, check above row or next row
+                if  year_table.iloc[month_row_index,col_month]==0:
+                    # there is no year in precede or next row, add year to month. 
+                    year_table.iloc[month_row_index,col_month]=	int(reporting_month[0:4])
+ 
+                count_num=count_str=count_non=0
+                for row_month in range(month_row_index,PL_row_size):
+                    if pd.isna(PL.iloc[row_month,col_month]) or PL.iloc[row_month,col_month]==" ":
+                        count_non+=1
+                    elif isinstance(PL.iloc[row_month,col_month], (int, float)):
+                        count_num+=1
+                    else:
+                        count_str+=1
 			
-            # for a real month column, numeric data is supposed to be more than character data
-            if count_str>0 and (count_num/count_str)<0.8:
-                continue
-            elif count_num==0:
-                continue
-            else:
-                PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x))) 
-                candidate_date.append([PL_date_header,month_row_index,PL.iloc[month_row_index,:]] )
-                continue
+                # for a real month column, numeric data is supposed to be more than character data
+                if count_str>0 and (count_num/count_str)<0.8:
+                    continue
+                elif count_num==0:
+                    continue
+                else:
+                    PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x))) 
+                    candidate_date.append([PL_date_header,month_row_index,PL.iloc[month_row_index,:]] )
+                    continue
                 
 
     if len(candidate_date)>1:
@@ -728,7 +723,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         st.stop()
     elif len(candidate_date)==1:	    
         return candidate_date[0]
-    elif len(candidate_date)==0:  
+    elif len(candidate_date)==0: 
         # there is only two columns: tenant_account, data
         if PL_col_size==tenantAccount_col_no+2:  
             count_num=count_str=count_non=0
@@ -766,8 +761,8 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 else:
                     PL_date_header=[0] * (PL_col_size-1)
                     PL_date_header.append(reporting_month)
-                    return PL_date_header,last_string_index,PL.iloc[last_string_index,:]
-	
+                    return PL_date_header,last_string_index,PL.iloc[last_string_index,:] 
+    else:
         st.error("failed to identify Year/Month header for sheet: '{}', please fix and re-upload.".format(sheet_name))
         st.stop()
 
