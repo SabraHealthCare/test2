@@ -742,7 +742,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                     break
             if first_tenant_row==0:
                 st.write("Please add month/year header for sheet {}".format(sheet_name))
-	    else:
+            else:
                 # Extract the relevant slice of the DataFrame
                 slice_df = PL.iloc[0:first_tenant_row, tenantAccount_col_no+1]
                 # Find the row indices where values are strings
