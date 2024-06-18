@@ -747,7 +747,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                     last_string_index = 0
           
                 for row_i in range(last_string_index,PL_row_size):
-                    if pd.isna(PL.iloc[row_i,tenantAccount_col_no+1]) or PL.iloc[row_month,tenantAccount_col_no+1]==" ":
+                    if pd.isna(PL.iloc[row_i,tenantAccount_col_no+1]) or PL.iloc[row_i,tenantAccount_col_no+1]==" ":
                         count_non+=1
                     elif isinstance(PL.iloc[row_i,tenantAccount_col_no+1], (int, float)):
                         count_num+=1
