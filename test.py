@@ -522,8 +522,8 @@ def Add_year_to_header(month_list):
         if month_list[i]!=0:
             month_list[i]=add_year[j]
             j+=1
-    return month_list  
-
+    return month_list
+	
 @st.cache_data
 def Check_Available_Units(check_patient_days,reporting_month):
     month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
@@ -657,7 +657,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                     st.write("month_row_index","year_table",month_row_index,year_table)
                     st.write(list(month_table.iloc[month_row_index,]))
                     st.write("Add_year_to_header",Add_year_to_header(list(month_table.iloc[month_row_index,])))
-                    #year_table.iloc[month_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
+                    year_table.iloc[month_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
                     PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                     original_header=PL.iloc[month_row_index,]
                     PL_date_header_list=list(PL_date_header)
