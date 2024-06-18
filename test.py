@@ -763,7 +763,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                         count_str+=1
 			
                 # for a real month column, numeric data is supposed to be more than character data
-                if （count_str>0 and (count_num/count_str)<0.8) or count_num==0:
+                if (count_str>0 and (count_num/count_str)<0.8) or count_num==0:
                     st.error("failed to identify Year/Month header for sheet: '{}', please fix and re-upload.".format(sheet_name))
                     st.stop()
                 else:
