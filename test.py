@@ -594,6 +594,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
 		
     PL_row_size=PL.shape[0]
     PL_col_size=PL.shape[1]
+	
     search_row_size=min(40,PL_row_size)
     month_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
     year_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
@@ -696,10 +697,10 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
             #if there is no year in month row, check above row or next row
             if  year_table.iloc[month_row_index,col_month]==0:
                 # there is no year in precede or next row, add year to month. 
-                    year_table.iloc[month_row_index,col_month]=	int(reporting_month[0:4])
+                year_table.iloc[month_row_index,col_month]=	int(reporting_month[0:4])
  
             count_num=count_str=count_non=0
-            for row_month in range(month_row_index,PL.shape[0]):
+            for row_month in range(month_row_index,PL_row_size):
                 if pd.isna(PL.iloc[row_month,col_month]) or PL.iloc[row_month,col_month]==" ":
                     count_non+=1
                 elif isinstance(PL.iloc[row_month,col_month], (int, float)):
@@ -730,7 +731,46 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         st.stop()
     elif len(candidate_date)==1:	    
         return candidate_date[0]
-    else:
+    elif len(candidate_date)==0:  
+        # there is only two columns: tenant_account, data
+        if PL_col_size=tenantAccount_col_no+2:  
+            count_num=count_str=count_non=0
+            for first_tenant_row in range(0,PL_row_size):
+                if pd.isna(PL.iloc[first_tenant_row,tenantAccount_col_no]) or PL.iloc[first_tenant_row,tenantAccount_col_no] not in account_mapping[account_mapping['Sabra_Account'] != 'NO NEED TO MAP']['Tenant_Account'].tolist():
+                    continue
+		else:
+                    break
+            if first_tenant_row==0:
+                st.write("Please add month/year header for sheet {}".format(sheet_name))
+	    else:
+                # Extract the relevant slice of the DataFrame
+                slice_df = PL.iloc[0:first_tenant_row, tenantAccount_col_no+1]
+                # Find the row indices where values are strings
+                string_indices = slice_df[slice_df.apply(lambda x: isinstance(x, str) and not pd.isna(x) and x!='nan' and x!="")].index
+
+                # Get the last string index
+                if not string_indices.empty:
+                    last_string_index = string_indices[-1] 
+                else:
+                    last_string_index = 0
+          
+                for row_i in range(last_string_index,PL_row_size):
+                    if pd.isna(PL.iloc[row_i,tenantAccount_col_no+1]) or PL.iloc[row_month,tenantAccount_col_no+1]==" ":
+                    count_non+=1
+                elif isinstance(PL.iloc[row_i,tenantAccount_col_no+1], (int, float)):
+                    count_num+=1
+                else:
+                    count_str+=1
+			
+                # for a real month column, numeric data is supposed to be more than character data
+                if （count_str>0 and (count_num/count_str)<0.8) or count_num==0:
+                    st.error("failed to identify Year/Month header for sheet: '{}', please fix and re-upload.".format(sheet_name))
+                    st.stop()
+                else:
+                    PL_date_header=[0] * (PL_col_size-1)
+                    PL_date_header.append(reporting_month)
+                    return PL_date_header,last_string_index,PL.iloc[last_string_index,:]]
+	
         st.error("failed to identify Year/Month header for sheet: '{}', please fix and re-upload.".format(sheet_name))
         st.stop()
 
