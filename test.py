@@ -613,8 +613,9 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     
         month_count.append(len(valid_month))
         year_count.append(len(valid_year))
-    # can't find month keyword in any rows
+    st.write("month_table",month_table)
     if not all(map(lambda x:x==0,month_count)):
+	
         month_sort_index = np.argsort(np.array(month_count))
         for month_index_i in range(-1,-10,-1): 
             #month_sort_index[-1] is the index number of month_count in which has max month count
@@ -623,6 +624,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
             month_row=list(month_table.iloc[month_row_index,])
             month_list=list(filter(lambda x:x!=0,month_row))
             month_len=len(month_list)
+            st.write("month_table.iloc[month_row_index,]",month_table.iloc[month_row_index,)
             for i in [0,1,-1]:  # identify year in corresponding month
                 if month_row_index+i>=0 and month_row_index+i<year_table.shape[0]:
                     year_row=list(year_table.iloc[month_row_index+i,])
