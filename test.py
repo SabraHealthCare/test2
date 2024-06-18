@@ -756,11 +756,11 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
           
                 for row_i in range(last_string_index,PL_row_size):
                     if pd.isna(PL.iloc[row_i,tenantAccount_col_no+1]) or PL.iloc[row_month,tenantAccount_col_no+1]==" ":
-                    count_non+=1
-                elif isinstance(PL.iloc[row_i,tenantAccount_col_no+1], (int, float)):
-                    count_num+=1
-                else:
-                    count_str+=1
+                        count_non+=1
+                    elif isinstance(PL.iloc[row_i,tenantAccount_col_no+1], (int, float)):
+                        count_num+=1
+                    else:
+                        count_str+=1
 			
                 # for a real month column, numeric data is supposed to be more than character data
                 if （count_str>0 and (count_num/count_str)<0.8) or count_num==0:
