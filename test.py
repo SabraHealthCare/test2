@@ -613,7 +613,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     
         month_count.append(len(valid_month))
         year_count.append(len(valid_year))
-    st.write("month_table",month_table)
+   
     if not all(map(lambda x:x==0,month_count)):
 	
         month_sort_index = np.argsort(np.array(month_count))
@@ -1511,7 +1511,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         else:
             tenant_account_col=tenantAccount_col_no
         date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,date_header)
-        st.write("sheet_name",sheet_name,"date_header",date_header)
+ 
         if len(date_header[2])==0:
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()  
