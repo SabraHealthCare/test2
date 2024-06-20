@@ -629,7 +629,8 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
             for i in [0,1,-1]:  # identify year in corresponding month
                 if month_row_index+i>=0 and month_row_index+i<year_table.shape[0]:
                     year_row=list(year_table.iloc[month_row_index+i,])
-                    year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]    
+                    year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]  
+                    st.write("year_match",year_match,len(year_match),month_len)
                     if len(year_match)==month_len:
                         #year_table.iloc[month_row_index,]=year_table.iloc[month_row_index+i,]
                         year_table.iloc[month_row_index,:] = [year_table.iloc[month_row_index, i] if month != 0 else 0 for i, month in enumerate(month_row)]
@@ -652,7 +653,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                     if len(year_match)==month_len:
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                       
+		    elif  len(year_match)<month_len    
                     else:  # there is no year
 		        #add year to month
                         year_table.iloc[month_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
