@@ -614,7 +614,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
         month_count.append(len(valid_month))
         year_count.append(len(valid_year))
 	    
-    st.write("month_table",month_table)
+    
 	
     if not all(map(lambda x:x==0,month_count)):
         month_sort_index = np.argsort(np.array(month_count))
@@ -625,7 +625,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
             month_row=list(month_table.iloc[month_row_index,])
             month_list=list(filter(lambda x:x!=0,month_row))
             month_len=len(month_list)
-        
+            
             for i in [0,1,-1]:  # identify year in corresponding month
                 if month_row_index+i>=0 and month_row_index+i<year_table.shape[0]:
                     year_row=list(year_table.iloc[month_row_index+i,])
@@ -633,6 +633,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                     if len(year_match)==month_len:
                         #year_table.iloc[month_row_index,]=year_table.iloc[month_row_index+i,]
                         year_table.iloc[month_row_index,:] = [year_table.iloc[month_row_index, i] if month != 0 else 0 for i, month in enumerate(month_row)]
+                      
                         break
                     else:
                         continue
@@ -646,12 +647,12 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
 		or len_of_continuous>=10 \
 		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2) \
 		or (len_of_continuous<=2 and len_of_continuous>=1 and len_of_non_continuous==1):
-
+                    
 		    #check the corresponding year
                     if len(year_match)==month_len:
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                   
+                       
                     else:  # there is no year
 		        #add year to month
                         year_table.iloc[month_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
