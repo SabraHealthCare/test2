@@ -613,9 +613,10 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     
         month_count.append(len(valid_month))
         year_count.append(len(valid_year))
-   
-    if not all(map(lambda x:x==0,month_count)):
+	    
+    st.write("month_table",month_table)
 	
+    if not all(map(lambda x:x==0,month_count)):
         month_sort_index = np.argsort(np.array(month_count))
         for month_index_i in range(-1,-10,-1): 
             #month_sort_index[-1] is the index number of month_count in which has max month count
