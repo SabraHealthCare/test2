@@ -445,79 +445,72 @@ def Get_Month_Year(single_string):
     # didn't find month. return month as 0
     return 0,0   
 
-
-def Month_continuity_check(month_list):
-    inv=[]
-    month_list=list(filter(lambda x:x!=0,month_list))
-    month_len=len(month_list)
-    if month_len==0:
-        return False
-    else:	    
-	#there are at most two types of differences in the month list which are in 1,-1,11,-11 
-        inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
-        continuous_check_bool=[x in [1,-1,11,-11] for x in set(inv)]
-        len_of_continuous=sum(continuous_check_bool)
-        len_of_non_continuous=len(continuous_check_bool)-len_of_continuous
-        if  len_of_non_continuous==continuous_check_bool or len_of_continuous>=10:
-            return True  # Months are all continous 
-        elif len_of_non_continuous<10 and len_of_non_continuous>=4 and len_of_non_continuous<=1:
-            return True 
-        else:
-            return False # Month list is not continuous 
-
-
-def Year_continuity_check(year_list):
-    inv=[]
-    year_list=list(filter(lambda x:x!=0,year_list))
-    year_len=len(year_list)
-    if year_len==0:
-        return False
-    else:
-        inv=[int(year_list[year_i+1])-int(year_list[year_i]) for year_i in range(year_len-1)]
-        if len(set(inv))<=2 and all([x in [1,0,-1] for x in set(inv)]):
-            return True         #years are continous
-        else:
-            return False
-
 # add year to month_header: identify current year/last year giving a list of month
-def Fill_Year_To_Header(month_list):
-    month_list=list(filter(lambda x:x!=0,month_list))
+def Fill_Year_To_Header(full_month_header,sheet_name):
+    month_list=list(filter(lambda x:x!=0,full_month_header))
+    month_len=len(month_list)
     add_year=month_list
     last_year=current_year-1
     year_change=0  
 
-    #month decending  , month_list[0]<today.month
-    elif (month_list[0]>month_list[1] and month_list[0]!=12) or (month_list[0]==1 and month_list[1]==12) : 
+    inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
+    ascending_check=sum([x in [1,-11] for x in inv])
+    descending_check=sum([x in [-1,11] for x in inv])
+
+    #month decending  , month_list[0]<today.month 
+    if descending_check>0 and descending_check>ascending_check: 
         date_of_assumption=datetime.strptime(str(month_list[0])+"/01/"+str(current_year),'%m/%d/%Y').date()
         if date_of_assumption<today and date_of_assumption.month<today.month:
             report_year_start=current_year
         elif date_of_assumption>=today:
             report_year_start=last_year
-        for i in range(len(month_list)):
+        for i in range(month_len):
             add_year[i]=report_year_start-year_change
-            if i<len(add_year)-1 and add_year[i+1]==12:
+            if i<month_len-1 and add_year[i+1]==12:
                 year_change+=1
             
-    # month ascending
-    elif (add_year[0]<add_year[1] and add_year[0]!=12) or (add_year[0]==12 and add_year[1]==1): #and int(add_year[-1])<today.month
-        date_of_assumption=datetime.strptime(str(add_year[-1])+"/01/"+str(current_year),'%m/%d/%Y').date()    
+    # month ascending  
+    elif ascending_check>0 and ascending_check> descending_check: 
+        date_of_assumption=datetime.strptime(str(month_list[-1])+"/01/"+str(current_year),'%m/%d/%Y').date()    
         if date_of_assumption<today:
             report_year_start=current_year
         elif date_of_assumption>=today:
             report_year_start=last_year
-        for i in range(-1,len(add_year)*(-1)-1,-1):
+        for i in range(-1,month_len*(-1)-1,-1):
             add_year[i]=report_year_start-year_change
-            if i>len(add_year)*(-1) and add_year[i-1]==12:
+            if i>month_len*(-1) and add_year[i-1]==12:
+                year_change+=1
+    #month decending 	    
+    elif (month_list[0]>month_list[1] and month_list[0]!=12) or (month_list[0]==1 and month_list[1]==12):
+        date_of_assumption=datetime.strptime(str(month_list[0])+"/01/"+str(current_year),'%m/%d/%Y').date()
+        if date_of_assumption<today and date_of_assumption.month<today.month:
+            report_year_start=current_year
+        elif date_of_assumption>=today:
+            report_year_start=last_year
+        for i in range(month_len):
+            add_year[i]=report_year_start-year_change
+            if i<month_len-1 and add_year[i+1]==12:
+                year_change+=1
+     # month ascending
+    elif (month_list[0]<month_list[1] and month_list[0]!=12) or (month_list[0]==12 and month_list[1]==1): 
+        date_of_assumption=datetime.strptime(str(month_list[-1])+"/01/"+str(current_year),'%m/%d/%Y').date()    
+        if date_of_assumption<today:
+            report_year_start=current_year
+        elif date_of_assumption>=today:
+            report_year_start=last_year
+        for i in range(-1,month_len*(-1)-1,-1):
+            add_year[i]=report_year_start-year_change
+            if i>month_len*(-1) and add_year[i-1]==12:
                 year_change+=1
     else:
-        return False
- 
+        st.error("Fail to identify Year in sheet {}, please add the year for the month and re-upload.".format(sheet_name))
+        st.stop()
     j=0
-    for i in range(len(month_list)):
-        if month_list[i]!=0:
-            month_list[i]=add_year[j]
+    for i in range(len(full_month_header)):
+        if full_month_header[i]!=0:
+            full_month_header[i]=add_year[j]
             j+=1
-    return month_list
+    return full_month_header
 	
 @st.cache_data
 def Check_Available_Units(check_patient_days,reporting_month):
@@ -648,11 +641,11 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                         if reporting_month not in PL_date_header:
-                            year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]))
+                            year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name)
                             PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                     elif max_match_year==0:  # there is no year at all
 		        #fill year to month
-                        year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]))
+                        year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name)
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                         original_header=PL.iloc[month_row_index,]
                         PL_date_header_list=list(PL_date_header)
