@@ -481,23 +481,19 @@ def Year_continuity_check(year_list):
 
 # add year to month_header: identify current year/last year giving a list of month
 def Fill_Year_To_Header(month_list):
-    add_year=list(filter(lambda x:x!=0,month_list))
+    month_list=list(filter(lambda x:x!=0,month_list))
+    add_year=month_list
     last_year=current_year-1
     year_change=0  
-    if len(add_year)==1:
-        if datetime.strptime(str(add_year[0])+"/01/"+str(current_year),'%m/%d/%Y').date()<today:
-            add_year[0]=current_year
-        else:
-            add_year[0]=today.year-1
-    # there are more than one month.
-    #month decending  , add_year[0]<today.month
-    elif (add_year[0]>add_year[1] and add_year[0]!=12) or (add_year[0]==1 and add_year[1]==12) : 
-        date_of_assumption=datetime.strptime(str(add_year[0])+"/01/"+str(current_year),'%m/%d/%Y').date()
+
+    #month decending  , month_list[0]<today.month
+    elif (month_list[0]>month_list[1] and month_list[0]!=12) or (month_list[0]==1 and month_list[1]==12) : 
+        date_of_assumption=datetime.strptime(str(month_list[0])+"/01/"+str(current_year),'%m/%d/%Y').date()
         if date_of_assumption<today and date_of_assumption.month<today.month:
             report_year_start=current_year
         elif date_of_assumption>=today:
             report_year_start=last_year
-        for i in range(len(add_year)):
+        for i in range(len(month_list)):
             add_year[i]=report_year_start-year_change
             if i<len(add_year)-1 and add_year[i+1]==12:
                 year_change+=1
@@ -510,7 +506,6 @@ def Fill_Year_To_Header(month_list):
         elif date_of_assumption>=today:
             report_year_start=last_year
         for i in range(-1,len(add_year)*(-1)-1,-1):
-   
             add_year[i]=report_year_start-year_change
             if i>len(add_year)*(-1) and add_year[i-1]==12:
                 year_change+=1
