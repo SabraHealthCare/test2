@@ -629,8 +629,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
             for i in [0,1,-1]:  # identify year in corresponding month
                 if month_row_index+i>=0 and month_row_index+i<year_table.shape[0]:
                     year_row=list(year_table.iloc[month_row_index+i,])
-                    year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]  
-                    st.write("year_match1",year_match)    
+                    year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]     
                     if len(year_match)==month_len:
                         year_table.iloc[month_row_index,:] = [year_table.iloc[month_row_index+i,j] if month != 0 else 0 for j, month in enumerate(month_row)]
                         max_match=len(year_match)
@@ -650,8 +649,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
 		or len_of_continuous>=10 \
 		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2) \
 		or (len_of_continuous<=2 and len_of_continuous>=1 and len_of_non_continuous==1):
-                    st.write("year_match",year_match)
-                    st.write("year_table",year_table)
+
 		    #check the corresponding year
                     if max_match>0:
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
