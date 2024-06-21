@@ -1,6 +1,6 @@
 import pandas as pd 
 pd.set_option('future.no_silent_downcasting', True)
-import numpy as np
+import numpy as np 
 from datetime import datetime, timedelta,date
 from openpyxl import load_workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
@@ -649,7 +649,8 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
 		or len_of_continuous>=10 \
 		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2) \
 		or (len_of_continuous<=2 and len_of_continuous>=1 and len_of_non_continuous==1):
-                    
+                    st.write("year_match",year_match)
+                    st.write("year_table",year_table)
 		    #check the corresponding year
                     if len(year_match)>0:
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
