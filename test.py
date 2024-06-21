@@ -750,14 +750,14 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
 			
                 # for a real month column, numeric data is supposed to be more than character data
                 if (count_str>0 and (count_num/count_str)<0.8) or count_num==0:
-                    st.error("failed to identify Year/Month header for sheet: '{}', please fix and re-upload.".format(sheet_name))
+                    st.error("Failed to identify Year/Month header for sheet: '{}', please fix and re-upload.".format(sheet_name))
                     st.stop()
                 else:
                     PL_date_header=[0] * (PL_col_size-1)
                     PL_date_header.append(reporting_month)
                     return PL_date_header,last_string_index,PL.iloc[last_string_index,:] 
         else:
-            st.error("failed to identify {}/{} header for sheet: '{}', please add the month/year header and re-upload.".format(int(reporting_month[4:6]),reporting_month[0:4],sheet_name))
+            st.error("Failed to identify {}/{} header for sheet: '{}', please add the month/year header and re-upload.".format(int(reporting_month[4:6]),reporting_month[0:4],sheet_name))
             st.stop()
 
 # manage entity mapping in "Manage Mapping" 
