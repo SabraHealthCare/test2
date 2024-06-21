@@ -480,7 +480,7 @@ def Year_continuity_check(year_list):
             return False
 
 # add year to month_header: identify current year/last year giving a list of month
-def Add_year_to_header(month_list):
+def Fill_Year_To_Header(month_list):
     add_year=list(filter(lambda x:x!=0,month_list))
     last_year=current_year-1
     year_change=0  
@@ -625,17 +625,18 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
             month_row=list(month_table.iloc[month_row_index,])
             month_list=list(filter(lambda x:x!=0,month_row))
             month_len=len(month_list)
-            
+            max_match=0
             for i in [0,1,-1]:  # identify year in corresponding month
                 if month_row_index+i>=0 and month_row_index+i<year_table.shape[0]:
                     year_row=list(year_table.iloc[month_row_index+i,])
                     year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]  
-                    st.write("year_match",year_match,len(year_match),month_len)
+                   
                     if len(year_match)==month_len:
-                        #year_table.iloc[month_row_index,]=year_table.iloc[month_row_index+i,]
-                        year_table.iloc[month_row_index,:] = [year_table.iloc[month_row_index, i] if month != 0 else 0 for i, month in enumerate(month_row)]
-                      
+                        year_table.iloc[month_row_index,:] = [year_table.iloc[month_row_index+i,j] if month != 0 else 0 for j, month in enumerate(month_row)]
                         break
+		    elif len(year_match)<month_len and len(year_match)>max_match:
+                        year_table.iloc[month_row_index,:] = [year_table.iloc[month_row_index+i,j] if month != 0 else 0 for j, month in enumerate(month_row)]
+                        max_match=len(year_match)
                     else:
                         continue
             if month_count[month_row_index]>1:   # if there are more than one month in header	    
@@ -650,13 +651,15 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
 		or (len_of_continuous<=2 and len_of_continuous>=1 and len_of_non_continuous==1):
                     
 		    #check the corresponding year
-                    if len(year_match)==month_len:
+                    if len(year_match)>0:
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-		    #elif  len(year_match)<month_len    
-                    else:  # there is no year
-		        #add year to month
-                        year_table.iloc[month_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
+			if reporting_month not in PL_date_header:
+                            year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]))
+                            PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
+                    elif len(year_match)==0:  # there is no year at all
+		        #fill year to month
+                        year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]))
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                         original_header=PL.iloc[month_row_index,]
                         PL_date_header_list=list(PL_date_header)
@@ -1478,7 +1481,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):
     return PL
 	
 @st.cache_data
-def Get_Previous_Months(reporting_month,full_date_header):
+def Get_Previous_Months(reporting_month):
     # Convert the reporting_month string to a datetime object
     latest_date = datetime.strptime(reporting_month, "%Y%m")
     month_list = [reporting_month]
@@ -1487,8 +1490,8 @@ def Get_Previous_Months(reporting_month,full_date_header):
         previous_date = latest_date - timedelta(days=latest_date.day, weeks=i*4)
         # Format the date back to the desired string format and append to the list
         month_list.append(previous_date.strftime("%Y%m"))
-    month_column=list(filter(lambda x: x in month_list,full_date_header))
-    return month_column
+    month_select=list(filter(lambda x: x in month_list,date_header[0]))	
+    return month_select
 
 #no cache    
 def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):  
@@ -1513,15 +1516,17 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
             st.stop()   
         else:
             tenant_account_col=tenantAccount_col_no
+
+
+	    
         date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,date_header)
  
         if len(date_header[2])==0:
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()  
-
+		
         # select only two or one previous months for columns
-        month_select = Get_Previous_Months(reporting_month,date_header[0])
-	
+        month_select = Get_Previous_Months(reporting_month,date_header[0]) 
         #set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
         #remove row above date
