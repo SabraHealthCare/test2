@@ -613,8 +613,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     
         month_count.append(len(valid_month))
         year_count.append(len(valid_year))
-	    
-    
 	
     if not all(map(lambda x:x==0,month_count)):
         month_sort_index = np.argsort(np.array(month_count))
@@ -625,18 +623,18 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
             month_row=list(month_table.iloc[month_row_index,])
             month_list=list(filter(lambda x:x!=0,month_row))
             month_len=len(month_list)
-            max_match=0
+            max_match_year=0
             for i in [0,1,-1]:  # identify year in corresponding month
                 if month_row_index+i>=0 and month_row_index+i<year_table.shape[0]:
                     year_row=list(year_table.iloc[month_row_index+i,])
                     year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]     
                     if len(year_match)==month_len:
                         year_table.iloc[month_row_index,:] = [year_table.iloc[month_row_index+i,j] if month != 0 else 0 for j, month in enumerate(month_row)]
-                        max_match=len(year_match)
+                        max_match_year=len(year_match)
                         break
-                    elif len(year_match)<month_len and len(year_match)>max_match:
+                    elif len(year_match)<month_len and len(year_match)>max_match_year:
                         year_table.iloc[month_row_index,:] = [year_table.iloc[month_row_index+i,j] if month != 0 else 0 for j, month in enumerate(month_row)]
-                        max_match=len(year_match)
+                        max_match_year=len(year_match)
                     else:
                         continue
             if month_count[month_row_index]>1:   # if there are more than one month in header	    
@@ -651,13 +649,13 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
 		or (len_of_continuous<=2 and len_of_continuous>=1 and len_of_non_continuous==1):
 
 		    #check the corresponding year
-                    if max_match>0:
+                    if max_match_year>0:
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                         if reporting_month not in PL_date_header:
                             year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]))
                             PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                    elif max_match==0:  # there is no year at all
+                    elif max_match_year==0:  # there is no year at all
 		        #fill year to month
                         year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]))
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
@@ -680,7 +678,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                     elif count_reporting_month>1:
                         st.error("There are {} '{}/{}' header in sheet '{}'. Only one is allowed to identify the data column of '{}/{}'".\
 			     format(count_reporting_month,reporting_month[4:6],reporting_month[0:4],sheet_name,reporting_month[4:6],reporting_month[0:4]))
-                    else:  # there is only one reporting month in the header
+		    elif count_reporting_month==1:  # there is only one reporting month in the header
                         return PL_date_header,month_row_index,PL.iloc[month_row_index,:]	
 			
                 else:
@@ -770,9 +768,9 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                     PL_date_header=[0] * (PL_col_size-1)
                     PL_date_header.append(reporting_month)
                     return PL_date_header,last_string_index,PL.iloc[last_string_index,:] 
-    else:
-        st.error("failed to identify Year/Month header for sheet: '{}', please fix and re-upload.".format(sheet_name))
-        st.stop()
+        else:
+            st.error("failed to identify {}/{} header for sheet: '{}', please add the month/year header and re-upload.".format(int(reporting_month[4:6]),reporting_month[0:4],sheet_name))
+            st.stop()
 
 # manage entity mapping in "Manage Mapping" 
 def Manage_Entity_Mapping(operator):
