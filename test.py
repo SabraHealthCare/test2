@@ -630,7 +630,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 if month_row_index+i>=0 and month_row_index+i<year_table.shape[0]:
                     year_row=list(year_table.iloc[month_row_index+i,])
                     year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]  
-                   
+                    st.write("year_match1",year_match)    
                     if len(year_match)==month_len:
                         year_table.iloc[month_row_index,:] = [year_table.iloc[month_row_index+i,j] if month != 0 else 0 for j, month in enumerate(month_row)]
                         break
