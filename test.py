@@ -1481,7 +1481,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):
     return PL
 	
 @st.cache_data
-def Get_Previous_Months(reporting_month):
+def Get_Previous_Months(reporting_month,date_header[0]):
     # Convert the reporting_month string to a datetime object
     latest_date = datetime.strptime(reporting_month, "%Y%m")
     month_list = [reporting_month]
