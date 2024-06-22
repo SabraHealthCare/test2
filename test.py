@@ -266,7 +266,6 @@ def Initial_Mapping(operator):
     entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename)
     entity_mapping=entity_mapping.reset_index(drop=True)
     entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
-    #entity_mapping = entity_mapping.dropna(subset=['Property_in_separate_sheets'])	
     entity_mapping=entity_mapping.set_index("ENTITY")
     entity_mapping['DATE_ACQUIRED'] = entity_mapping['DATE_ACQUIRED'].astype(str)
     entity_mapping['DATE_SOLD_PAYOFF'] = entity_mapping['DATE_SOLD_PAYOFF'].astype(str)
@@ -1582,7 +1581,7 @@ def Upload_And_Process(uploaded_file,file_type):
                     PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
 
                     # check if census data in another sheet
-                    if not pd.isna(sheet_name_occupancy) and sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy is not None and sheet_name_occupancy!=" "\
+                    if not pd.isna(sheet_name_occupancy) and sheet_name_occupancy!='nan' and sheet_name_occupancy is not None and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
                         #PL_occ,PL_with_detail_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
                         PL_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
