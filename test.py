@@ -1162,20 +1162,20 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
     PL_sheet_list=load_workbook(uploaded_file).sheetnames	
     if sheet_type=="Finance":
         missing_PL_sheet_property = entity_mapping[(~entity_mapping["Sheet_Name_Finance"].isin(PL_sheet_list))|(pd.isna(entity_mapping["Sheet_Name_Finance"]))|(entity_mapping["Sheet_Name_Finance"]=="nan")]
-        missing_PL_sheet_property_Y=missing_PL_sheet_property.loc[missing_PL_sheet_property["Property_in_separate_sheets"]=="Y",:]
-        missing_PL_sheet_property_N=missing_PL_sheet_property.loc[missing_PL_sheet_property["Property_in_separate_sheets"]=="N",:]
+        missing_PL_sheet_property_Y=missing_PL_sheet_property.loc[missing_PL_sheet_property["Finance_in_separate_sheets"]=="Y",:]
+        missing_PL_sheet_property_N=missing_PL_sheet_property.loc[missing_PL_sheet_property["Finance_in_separate_sheets"]=="N",:]
         missing_occ_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Occupancy"].isin(PL_sheet_list)==False) & (~pd.isna(entity_mapping["Sheet_Name_Occupancy"]))& (entity_mapping["Sheet_Name_Finance"] != entity_mapping["Sheet_Name_Occupancy"])&(entity_mapping["Sheet_Name_Occupancy"]!="nan")]
-        missing_occ_sheet_property_Y=missing_occ_sheet_property.loc[missing_occ_sheet_property["Property_in_separate_sheets"]=="Y",:]
-        missing_occ_sheet_property_N=missing_occ_sheet_property.loc[missing_occ_sheet_property["Property_in_separate_sheets"]=="N",:]
+        missing_occ_sheet_property_Y=missing_occ_sheet_property.loc[missing_occ_sheet_property["Finance_in_separate_sheets"]=="Y",:]
+        missing_occ_sheet_property_N=missing_occ_sheet_property.loc[missing_occ_sheet_property["Finance_in_separate_sheets"]=="N",:]
         missing_BS_sheet_property = entity_mapping[(entity_mapping["BS_separate_excel"]=="N") &(~pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))& (entity_mapping["Sheet_Name_Finance"] != entity_mapping["Sheet_Name_Balance_Sheet"])&(entity_mapping["Sheet_Name_Balance_Sheet"].isin(PL_sheet_list)==False)& (entity_mapping["Sheet_Name_Balance_Sheet"]!="nan")]		
-        missing_BS_sheet_property_Y=missing_BS_sheet_property.loc[missing_BS_sheet_property["Property_in_separate_sheets"]=="Y",:]
-        missing_BS_sheet_property_N=missing_BS_sheet_property.loc[missing_BS_sheet_property["Property_in_separate_sheets"]=="N",:]    
+        missing_BS_sheet_property_Y=missing_BS_sheet_property.loc[missing_BS_sheet_property["Finance_in_separate_sheets"]=="Y",:]
+        missing_BS_sheet_property_N=missing_BS_sheet_property.loc[missing_BS_sheet_property["Finance_in_separate_sheets"]=="N",:]    
         total_missing_Y=missing_PL_sheet_property_Y.shape[0]+missing_occ_sheet_property_Y.shape[0]+missing_BS_sheet_property_Y.shape[0]
         total_missing_N=missing_PL_sheet_property_N.shape[0]+missing_occ_sheet_property_N.shape[0]+missing_BS_sheet_property_N.shape[0]
     elif sheet_type=="BS": # BS in another excel file
         missing_BS_sheet_property = entity_mapping[(entity_mapping["BS_separate_excel"]=="Y") & (entity_mapping["Sheet_Name_Balance_Sheet"].isin(PL_sheet_list)==False)&(~pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))&(entity_mapping["Sheet_Name_Balance_Sheet"]!="nan")]
-        missing_BS_sheet_property_Y=missing_BS_sheet_property.loc[missing_BS_sheet_property["Property_in_separate_sheets"]=="Y",:]
-        missing_BS_sheet_property_N=missing_BS_sheet_property.loc[missing_BS_sheet_property["Property_in_separate_sheets"]=="N",:]  
+        missing_BS_sheet_property_Y=missing_BS_sheet_property.loc[missing_BS_sheet_property["Finance_in_separate_sheets"]=="Y",:]
+        missing_BS_sheet_property_N=missing_BS_sheet_property.loc[missing_BS_sheet_property["Finance_in_separate_sheets"]=="N",:]  
         total_missing_Y=missing_BS_sheet_property_Y.shape[0]
         total_missing_N=missing_BS_sheet_property_N.shape[0]
 
@@ -1390,7 +1390,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):  
     global account_mapping,reporting_month
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
-    sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Property_in_separate_sheets"]=="N",sheet_type].tolist() if (not pd.isna(x))]
+    sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Finance_in_separate_sheets"]=="N",sheet_type].tolist() if (not pd.isna(x))]
     sheet_name_list = list(set(sheet_name_list))
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
 	
@@ -1574,7 +1574,7 @@ def Upload_And_Process(uploaded_file,file_type):
             sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
             property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
 	    # properties in seperate sheet 	
-            if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
+            if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     #PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
@@ -1609,8 +1609,8 @@ def Upload_And_Process(uploaded_file,file_type):
                     PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
                 total_entity_list.remove(entity_i) 
             # All the properties are in one sheet		
-            elif entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="N":
-                entity_list=entity_mapping.index[entity_mapping["Property_in_separate_sheets"]=="N"].tolist()	
+            elif entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="N":
+                entity_list=entity_mapping.index[entity_mapping["Finance_in_separate_sheets"]=="N"].tolist()	
 		# ****Finance and BS in one excel****
                 if file_type=="Finance" and BS_separate_excel=="N": 
                     #PL,PL_with_detail=Read_Clean_PL_Multiple(entity_list,"Sheet_Name_Finance",uploaded_file,account_pool_full)	
