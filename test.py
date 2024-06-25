@@ -1374,20 +1374,18 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
 
 
 # no cache
-def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool):  
+def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,sheet_name):  
     global account_mapping,reporting_month
     property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
-    sheet_name_list=[x for x in entity_mapping.loc[entity_mapping["Finance_in_separate_sheets"]=="N",sheet_type].tolist() if (not pd.isna(x))]
-    sheet_name_list = list(set(sheet_name_list))
+
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
-	
     if sheet_type=="Sheet_Name_Finance":  
         sheet_type_name="P&L"
     elif sheet_type=="Sheet_Name_Occupancy":
         sheet_type_name="Occupancy"
     elif sheet_type=="Sheet_Name_Balance_Sheet":
         sheet_type_name="Balance Sheet"
-    sheet_name=sheet_name_list[0]
+
     # read data from uploaded file
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
 	
@@ -1598,7 +1596,7 @@ def Upload_And_Process(uploaded_file,file_type):
         if len(sheet_list_finance_in_onesheet)>0:
             for sheet_name_finance_in_onesheet in sheet_list_finance_in_onesheet:
                 entity_list_finance_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_in_onesheet].tolist()	
-                PL=Read_Clean_PL_Multiple(entity_list_finance_in_onesheet,"Sheet_Name_Finance",uploaded_file,account_pool_full)
+                PL=Read_Clean_PL_Multiple(entity_list_finance_in_onesheet,"Sheet_Name_Finance",uploaded_file,account_pool_full,sheet_name_finance_in_onesheet)
                 if Total_PL.shape[0]==0:
                     Total_PL=PL
                 else:
@@ -1609,7 +1607,7 @@ def Upload_And_Process(uploaded_file,file_type):
         if len(sheet_list_occupancy_in_onesheet)>0:
             for sheet_name_occupancy_in_onesheet in sheet_list_occupancy_in_onesheet:
                 entity_list_occupancy_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Occupancy"]==sheet_name_occupancy_in_onesheet].tolist()	
-                PL_Occ=Read_Clean_PL_Multiple(entity_list_occupancy_in_onesheet,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days)
+                PL_Occ=Read_Clean_PL_Multiple(entity_list_occupancy_in_onesheet,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days,sheet_name_occupancy_in_onesheet)
                 Total_PL=Total_PL.combine_first(PL_Occ)
 		    
 	# balance sheet
@@ -1617,7 +1615,7 @@ def Upload_And_Process(uploaded_file,file_type):
         if len(sheet_list_bs_in_onesheet)>0:
             for sheet_name_bs_in_onesheet in sheet_list_bs_in_onesheet:
                 entity_list_bs_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Balance_Sheet"]==sheet_name_bs_in_onesheet].tolist()	
-                PL_BS=Read_Clean_PL_Multiple(entity_list_bs_in_onesheet,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
+                PL_BS=Read_Clean_PL_Multiple(entity_list_bs_in_onesheet,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet,sheet_name_bs_in_onesheet)
                 Total_PL=Total_PL.combine_first(PL_BS)
 		    
     elif file_type=="BS":
@@ -1633,7 +1631,7 @@ def Upload_And_Process(uploaded_file,file_type):
         if len(sheet_list_bs_in_onesheet)>0:
             for sheet_name_bs_in_onesheet in sheet_list_bs_in_onesheet:
                 entity_list_bs_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Balance_Sheet"]==sheet_name_bs_in_onesheet].tolist()	
-                PL_BS=Read_Clean_PL_Multiple(entity_list_bs_in_onesheet,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
+                PL_BS=Read_Clean_PL_Multiple(entity_list_bs_in_onesheet,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet,sheet_name_bs_in_onesheet)
                 if Total_PL.shape[0]==0:
                     Total_PL=PL_BS
                 else:
