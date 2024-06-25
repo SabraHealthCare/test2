@@ -52,6 +52,7 @@ month_dic_num={10:["10/","-10","/10","10"],11:["11/","-11","/11","11"],12:["12/"
                    5:["05/","5/","-5","-05","/5","/05"],6:["06/","6/","-06","-6","/6","/06"],\
                    7:["07/","7/","-7","-07","/7","/07"],8:["08/","8/","-8","-08","/8","/08"],9:["09/","9/","-09","-9","/9","/09"]}
 
+
 #One drive authority. Set application details
 client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
 client_secret = '1h28Q~Tw-xwTMPW9w0TqjbeaOhkYVDrDQ8VHcbkd'
@@ -76,6 +77,8 @@ token_response = app.acquire_token_for_client(scopes=["https://graph.microsoft.c
 access_token = token_response['access_token']
 headers = {'Authorization': 'Bearer ' + access_token,}    
 
+account_mapping_str_col=["Tenant_Account","Tenant_Formated_Account"]
+entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Property_Name_Finance"]
 #directly save the uploaded (.xlsx) file to onedrive
 def Upload_to_Onedrive(uploaded_file,path,file_name):
     # Set the API endpoint and headers
@@ -106,7 +109,10 @@ def detect_encoding(file_content):
     result = chardet.detect(file_content)
     return result['encoding']
 
-def Read_CSV_From_Onedrive(path, file_name):
+def Read_CSV_From_Onedrive(path, file_name,str_col_list=None):
+    if str_col_list is None:
+        str_col_list = []
+    
     # Set the API endpoint and headers for file download
     api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/root:/{path}/{file_name}:/content'
     
@@ -119,19 +125,19 @@ def Read_CSV_From_Onedrive(path, file_name):
         try:
             file_content = response.content
             detected_encoding = detect_encoding(file_content)
-            
+            dtype_dict = {col: str for col in str_col_list}
             if file_name.lower().endswith(".csv"):
                 # Try reading the CSV with the detected encoding
                 try:
-                    df = pd.read_csv(BytesIO(file_content), encoding=detected_encoding, on_bad_lines='skip')
+                    df = pd.read_csv(BytesIO(file_content), encoding=detected_encoding, on_bad_lines='skip',dtype=dtype_dict)
                 except UnicodeDecodeError:
                     # If detected encoding fails, try common fallback encodings
                     try:
-                        df = pd.read_csv(BytesIO(file_content), encoding='utf-8', on_bad_lines='skip')
+                        df = pd.read_csv(BytesIO(file_content), encoding='utf-8', on_bad_lines='skip',dtype=dtype_dict)
                     except UnicodeDecodeError:
-                        df = pd.read_csv(BytesIO(file_content), encoding='latin1', on_bad_lines='skip')
+                        df = pd.read_csv(BytesIO(file_content), encoding='latin1', on_bad_lines='skip',dtype=dtype_dict)
             elif file_name.lower().endswith(".xlsx"):
-                df = pd.read_excel(BytesIO(file_content))
+                df = pd.read_excel(BytesIO(file_content),dtype=dtype_dict)
             return df
         except EmptyDataError:
             return False
@@ -144,26 +150,6 @@ def Read_CSV_From_Onedrive(path, file_name):
         st.write(f"Response content: {response.content}")
         return False
 
-def Read_CSV_From_Onedrive1(path,file_name):
-    # Set the API endpoint and headers for file download
-    api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/root:/{path}/{file_name}:/content'
-    # Make the request to download the file
-    response = requests.get(api_url, headers=headers)
-
-    # Check the status code
-    if response.status_code == 200 or response.status_code == 201:
-	# Content of the file is available in response.content
-        try:
-            if file_name[-3:].lower()=="csv":
-                df = pd.read_csv(BytesIO(response.content),encoding='windows-1254')
-            elif file_name[-4:].lower()=="xlsx":
-                df = pd.read_excel(BytesIO(response.content))
-            return df
-        except EmptyDataError:
-            return None
-
-    else:
-        return False
 
 # no cache, save a dataframe to OneDrive 
 def Save_as_CSV_Onedrive(df,path,file_name):   
@@ -183,9 +169,10 @@ def Save_as_CSV_Onedrive(df,path,file_name):
 
 
 # For updating account_mapping, entity_mapping, reporting_month_data, only for operator use
-def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=[]):  # replace original data
-
-    original_data=Read_CSV_From_Onedrive(path,file_name)
+def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=None,str_col_list=None):  # replace original data
+    if entity_list==None:
+        entity_lis[]    
+    original_data=Read_CSV_From_Onedrive(path,file_name,str_col_list)
     if  isinstance(original_data, pd.DataFrame):
         if "TIME" in original_data.columns and "TIME" in new_data.columns:
             original_data.TIME = original_data.TIME.astype(str)
@@ -253,7 +240,7 @@ def Initial_Mapping(operator):
     BPC_pull=BPC_pull.set_index(["ENTITY","Sabra_Account"])
     BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
 	
-    account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename)
+    account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename,account_mapping_str_col)
     account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]==operator]
     if account_mapping.shape[0]==1:# and account_mapping.loc[:,"Sabra_Account"][0]=='Template':
         account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]=="Template"]
@@ -263,7 +250,7 @@ def Initial_Mapping(operator):
     account_mapping.loc[:, "Tenant_Formated_Account"] = account_mapping["Tenant_Account"].apply(lambda x: x.upper().strip() if pd.notna(x) else x)
     account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
 
-    entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename)
+    entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename,entity_mapping_str_col)
     entity_mapping=entity_mapping.reset_index(drop=True)
     entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
     entity_mapping=entity_mapping.set_index("ENTITY")
@@ -803,7 +790,7 @@ def Manage_Entity_Mapping(operator):
 
         download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
         # update entity_mapping in Onedrive    
-        Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator)
+        Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,None,entity_mapping_str_col)
         return entity_mapping
 
 # no cache 
@@ -864,7 +851,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
 	
         #new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[0],new_tenant_account_list[0].upper(),"N"]            
         account_mapping=pd.concat([account_mapping, new_accounts_df],ignore_index=True)
-        Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator)
+        Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator,None,account_mapping_str_col)
         st.success("New accounts mapping were successfully saved.")    
     return account_mapping
 
@@ -1110,7 +1097,7 @@ def Submit_Upload_Latestmonth():
         st.stop()
     else:
          # save reporting month data to OneDrive
-        if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator):
+        if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,None,None):
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,reporting_month[4:6]+"/"+reporting_month[0:4]))
             
         else:
@@ -1118,7 +1105,7 @@ def Submit_Upload_Latestmonth():
          # save discrepancy data to OneDrive
         if len(Total_PL.columns)>1 and diff_BPC_PL.shape[0]>0:
             download_report(diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy")
-            Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,list(diff_BPC_PL["ENTITY"]))
+            Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,list(diff_BPC_PL["ENTITY"]),None)
         
 	# save original tenant P&L to OneDrive
         if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
@@ -1256,7 +1243,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
         else:
             st.stop()
     # update entity_mapping in onedrive  
-    Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,list(entity_mapping.index))
+    Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,list(entity_mapping.index),entity_mapping_str_col)
     return entity_mapping
 
 def View_Discrepancy_Detail():
@@ -1836,7 +1823,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     if len(new_tenant_account_list)==0:
                         st.stop()
                     account_mapping=Manage_Account_Mapping(new_tenant_account_list)
-                    Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator,[])
+                    Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator,None,account_mapping_str_col)
 			
     elif choice=='Instructions':
         # insert Video
@@ -1883,7 +1870,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     elif choice=="Review New Mapping":
         with st.expander("Review new mapping" ,expanded=True):
             ChangeWidgetFontSize('Review new mapping', '25px')
-            account_mapping =Read_CSV_From_Onedrive(mapping_path,account_mapping_filename)
+            account_mapping =Read_CSV_From_Onedrive(mapping_path,account_mapping_filename,account_mapping_str_col)
             un_confirmed_account=account_mapping[account_mapping["Confirm"]=="N"]
             if un_confirmed_account.shape[0]==0:
                 st.write("There is no new mapping.")
