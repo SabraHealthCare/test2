@@ -1639,7 +1639,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 PL_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
                 if Total_PL.shape[0]==0:
                     Total_PL=PL_BS
-		else:
+                else:
                     Total_PL=Total_PL.combine_first(PL_BS)
 
         sheet_list_bs_in_onesheet = entity_mapping[(entity_mapping["Balance_in_separate_sheets"]=="N")&(not pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))]["Sheet_Name_Balance_Sheet"].unique()
@@ -1649,7 +1649,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 PL_BS=Read_Clean_PL_Multiple(entity_list_bs_in_onesheet,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
                 if Total_PL.shape[0]==0:
                     Total_PL=PL_BS
-		else:
+                else:
                     Total_PL=Total_PL.combine_first(PL_BS)
   
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
