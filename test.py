@@ -1575,7 +1575,6 @@ def Upload_And_Process(uploaded_file,file_type):
         for entity_i in total_entity_list:   # entity_i is the entity code S number
 	    # properties in seperate sheet 	
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
-                #PL,PL_with_detail=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                 if Total_PL.shape[0]==0:
                     Total_PL=PL
@@ -1589,6 +1588,7 @@ def Upload_And_Process(uploaded_file,file_type):
             if not pd.isna(sheet_name_occupancy) \
                 and sheet_name_occupancy is not None \
                 and sheet_name_occupancy!=" "\
+                and sheet_name_occupancy!="nan" \		
                 and sheet_name_occupancy!=sheet_name_finance \
                 and entity_mapping.loc[entity_i,"Occupancy_in_separate_sheets"]=="Y":
                 PL_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
@@ -1600,6 +1600,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
                 if not pd.isna(sheet_name_balance) \
                        and sheet_name_balance!=" " \
+                       and sheet_name_balance!="nan" \
                        and sheet_name_balance!=sheet_name_finance \
                        and entity_mapping.loc[entity_i,"Balance_in_separate_sheets"]=="Y":
                     PL_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
@@ -1618,7 +1619,7 @@ def Upload_And_Process(uploaded_file,file_type):
                     Total_PL=Total_PL.combine_first(PL)
 	
 	# census
-        sheet_list_occupancy_in_onesheet = entity_mapping[(entity_mapping["Occupancy_in_separate_sheets"]=="N")&(not pd.isna(entity_mapping["Sheet_Name_Occupancy"]))]["Sheet_Name_Occupancy"].unique()
+        sheet_list_occupancy_in_onesheet = entity_mapping[(entity_mapping["Occupancy_in_separate_sheets"]=="N")&(not pd.isna(entity_mapping["Sheet_Name_Occupancy"]))&(entity_mapping["Sheet_Name_Occupancy"]!="nan")]["Sheet_Name_Occupancy"].unique()
         if len(sheet_list_occupancy_in_onesheet)>0:
             for sheet_name_occupancy_in_onesheet in sheet_list_occupancy_in_onesheet:
                 entity_list_occupancy_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Occupancy"]==sheet_name_occupancy_in_onesheet].tolist()	
@@ -1626,7 +1627,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 Total_PL=Total_PL.combine_first(PL_Occ)
 		    
 	# balance sheet
-        sheet_list_bs_in_onesheet = entity_mapping[(entity_mapping["Balance_in_separate_sheets"]=="N")&(not pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))]["Sheet_Name_Balance_Sheet"].unique()
+        sheet_list_bs_in_onesheet = entity_mapping[(entity_mapping["Balance_in_separate_sheets"]=="N")&(not pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))&(entity_mapping["Sheet_Name_Balance_Sheet"]!="nan")]["Sheet_Name_Balance_Sheet"].unique()
         if len(sheet_list_bs_in_onesheet)>0:
             for sheet_name_bs_in_onesheet in sheet_list_bs_in_onesheet:
                 entity_list_bs_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Balance_Sheet"]==sheet_name_bs_in_onesheet].tolist()	
@@ -1642,7 +1643,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 else:
                     Total_PL=Total_PL.combine_first(PL_BS)
 
-        sheet_list_bs_in_onesheet = entity_mapping[(entity_mapping["Balance_in_separate_sheets"]=="N")&(not pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))]["Sheet_Name_Balance_Sheet"].unique()
+        sheet_list_bs_in_onesheet = entity_mapping[(entity_mapping["Balance_in_separate_sheets"]=="N")&(not pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))&(entity_mapping["Sheet_Name_Balance_Sheet"]!="nan")]["Sheet_Name_Balance_Sheet"].unique()
         if len(sheet_list_bs_in_onesheet)>0:
             for sheet_name_bs_in_onesheet in sheet_list_bs_in_onesheet:
                 entity_list_bs_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Balance_Sheet"]==sheet_name_bs_in_onesheet].tolist()	
