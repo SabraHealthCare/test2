@@ -1592,7 +1592,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 Total_PL=Total_PL.combine_first(PL_occ)
         #BS
         for entity_i in total_entity_list: 
-	    if  entity_mapping.loc[entity_i,"BS_separate_excel"]=="N": 
+            if  entity_mapping.loc[entity_i,"BS_separate_excel"]=="N": 
                 sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
                 sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
                 if not pd.isna(sheet_name_balance) \
