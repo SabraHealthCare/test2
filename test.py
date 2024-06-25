@@ -1588,8 +1588,7 @@ def Upload_And_Process(uploaded_file,file_type):
             if not pd.isna(sheet_name_occupancy) \
                 and sheet_name_occupancy is not None \
                 and sheet_name_occupancy!=" " \
-                and sheet_name_occupancy!="nan" \		
-                and sheet_name_occupancy!=sheet_name_finance \
+                and sheet_name_occupancy!="nan"	and sheet_name_occupancy!=sheet_name_finance \
                 and entity_mapping.loc[entity_i,"Occupancy_in_separate_sheets"]=="Y":
                 PL_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
                 Total_PL=Total_PL.combine_first(PL_occ)
