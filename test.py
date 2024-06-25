@@ -1004,7 +1004,7 @@ def Compare_PL_Sabra(Total_PL,reporting_month):
 	
 def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
-@st.cache_data(experimental_allow_widgets=True)
+@st.cache_data
 def View_Summary():
     global Total_PL,reporting_month_data,reporting_month
     def highlight_total(df):
