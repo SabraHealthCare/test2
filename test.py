@@ -1587,7 +1587,7 @@ def Upload_And_Process(uploaded_file,file_type):
             sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
             if not pd.isna(sheet_name_occupancy) \
                 and sheet_name_occupancy is not None \
-                and sheet_name_occupancy!=" "\
+                and sheet_name_occupancy!=" " \
                 and sheet_name_occupancy!="nan" \		
                 and sheet_name_occupancy!=sheet_name_finance \
                 and entity_mapping.loc[entity_i,"Occupancy_in_separate_sheets"]=="Y":
