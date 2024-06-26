@@ -572,7 +572,11 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     search_row_size=min(40,PL_row_size)
     month_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
     year_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
+    if sheet_name=='0660':
+        st.write("sheet_name",sheet_name)
+        st.write("month_table",month_table)
 
+	
     for row_i in range(search_row_size):
         for col_i in range(PL_col_size):
             month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i])   
