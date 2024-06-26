@@ -404,8 +404,7 @@ def Get_Month_Year(single_string,search_row_size):
     if isinstance(single_string, (int,float)):
         return 0,0
     single_string=str(single_string).lower()
-    if search_row_size==32:
-        st.write("search_row_size",search_row_size,"single_string",single_string)
+    st.write("search_row_size",search_row_size,"single_string",single_string)
     for month_i in month_dic_word.keys() :#[01,02,03...12]
         for  month_word in month_dic_word[month_i]: #['december','dec',"nov",...]
             if month_word in single_string:  # month is words ,like Jan Feb... year is optional
