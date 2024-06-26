@@ -396,12 +396,18 @@ def Get_Year(single_string):
     return 0,""
 
 
-def Get_Month_Year(single_string,row_i):
+def Get_Month_Year(single_string,row_i,col_i):
     if single_string!=single_string or pd.isna(single_string):
+        if row_i==32:
+            st.write("1row_i,col_i",row_i,col_i)
         return 0,0
     if isinstance(single_string, datetime):
+        if row_i==32:
+            st.write("2row_i,col_i",row_i,col_i)
         return int(single_string.month),int(single_string.year)
     if isinstance(single_string, (int,float)):
+        if row_i==32:
+            st.write("3row_i,col_i",row_i,col_i)
         return 0,0
     single_string=str(single_string).lower()
     st.write("row_i",row_i,"single_string",single_string)
@@ -577,10 +583,8 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
 	
     for row_i in range(search_row_size):
         for col_i in range(PL_col_size):
-            month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i],row_i)   
-    if sheet_name=='0660':
-        st.write("sheet_name",sheet_name)
-        st.write("month_table",month_table)
+            month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i],row_i,col_i)   
+
     year_count=[]        
     month_count=[]
     max_len=0
