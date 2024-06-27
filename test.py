@@ -1366,6 +1366,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         st.error("Can't identify any property name in sheet {}. The property name are supposed to be:{}. Please add and re-upload.".format(sheet_name,",".join(property_name_list_inmapping)))
         st.stop()
     elif len(max_match)>=1:
+        st.write("max_match",max_match, "property_name_list_in_mapping",property_name_list_in_mapping)
         not_match_names = [item.capitalize() for item in property_name_list_in_mapping  if item not in max_match]	         
         st.error("Missing property: **{}** in sheet {}. Please add and re-upload.".format(",".join(not_match_names),sheet_name))
         mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
