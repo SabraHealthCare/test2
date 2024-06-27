@@ -1353,7 +1353,8 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
     max_match=[]
     for row_i in range(PL.shape[0]):
         canditate_row=list(map(lambda x: x.upper().strip() if (not pd.isna(x)) and isinstance(x, str)  else x,list(PL.iloc[row_i,:])))        
-        match_names = [item for item in canditate_row if item in property_name_list_in_mapping]	
+        match_names = [item for item in canditate_row if item in property_name_list_in_mapping]
+        st.write("row_i",row_i,"match_names",match_names,"len(match_names)",len(match_names))
         if len(match_names)==len(property_name_list_in_mapping): # find the property name header row, transfer them into entity id
             mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
             mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in canditate_row]
@@ -1366,7 +1367,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         st.error("Can't identify any property name in sheet {}. The property name are supposed to be:{}. Please add and re-upload.".format(sheet_name,",".join(property_name_list_inmapping)))
         st.stop()
     elif len(max_match)>=1:
-        st.write("max_match",max_match, "property_name_list_in_mapping",property_name_list_in_mapping)
+        st.write("max_match",max_match, "len(max_match)",property_name_list_in_mapping)
         not_match_names = [item.capitalize() for item in property_name_list_in_mapping  if item not in max_match]	         
         st.error("Missing property: **{}** in sheet {}. Please add and re-upload.".format(",".join(not_match_names),sheet_name))
         mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
