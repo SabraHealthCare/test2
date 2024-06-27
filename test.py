@@ -1358,7 +1358,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         if len(match_names)==len(property_name_list_in_mapping): # find the property name header row, transfer them into entity id
             mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
             mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in canditate_row]
-            st.write("match_names",match_names, "property_name_list_in_mapping",property_name_list_in_mapping)
+            st.write("match_names",match_names, "mapped_entity",mapped_entity)
             return row_i,mapped_entity
         elif len(match_names)>len(max_match):
             max_match=match_names
