@@ -1347,7 +1347,9 @@ def View_Discrepancy():
 def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties are in one sheet
     # return the row number of property header and mapped_entity, for example: ["0","0",Sxxxx,Sxxxx,"0",Sxxxx,"0"...]
     #	Property_Name_Finance and entity_list has same order
-    property_name_list_in_mapping = entity_mapping.loc[entity_list]["Property_Name_Finance"].tolist()    
+    property_name_list_in_mapping = entity_mapping.loc[entity_list]["Property_Name_Finance"].tolist()   
+    st.write("property_name_list_in_mapping",property_name_list_in_mapping)
+    st.write("PL",PL)
     property_name_list_in_mapping=list(map(lambda x: x.upper().strip() if (not pd.isna(x)) and isinstance(x, str)  else x,property_name_list_in_mapping))     
     max_match=[]
     for row_i in range(PL.shape[0]):
