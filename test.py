@@ -1348,8 +1348,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
     # return the row number of property header and mapped_entity, for example: ["0","0",Sxxxx,Sxxxx,"0",Sxxxx,"0"...]
     #	Property_Name_Finance and entity_list has same order
     property_name_list_in_mapping = entity_mapping.loc[entity_list]["Property_Name_Finance"].tolist()   
-    st.write("property_name_list_in_mapping",property_name_list_in_mapping)
-    st.write("PL",PL)
+
     property_name_list_in_mapping=list(map(lambda x: x.upper().strip() if (not pd.isna(x)) and isinstance(x, str)  else x,property_name_list_in_mapping))     
     max_match=[]
     for row_i in range(PL.shape[0]):
@@ -1371,6 +1370,8 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         st.error("Missing property: **{}** in sheet {}. Please add and re-upload.".format(",".join(not_match_names),sheet_name))
         mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
         mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
+        st.write("max_match_row",max_match_row,"mapped_entity",mapped_entity)
+   
         return max_match_row,mapped_entity
 
 
