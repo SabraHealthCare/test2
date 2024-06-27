@@ -1350,7 +1350,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
     property_name_list_in_mapping = entity_mapping.loc[entity_list]["Property_Name_Finance"].tolist()   
     property_name_list_in_mapping = [x for x in property_name_list_in_mapping if not pd.isna(x) and x!=" "]
     property_name_list_in_mapping=list(map(lambda x: x.upper().strip() if (not pd.isna(x)) and isinstance(x, str)  else x,property_name_list_in_mapping))  
-    st.write("property_name_list_in_mapping",property_name_list_in_mapping)
+   
     max_match=[]
     for row_i in range(PL.shape[0]):
         canditate_row=list(map(lambda x: x.upper().strip() if (not pd.isna(x)) and isinstance(x, str)  else x,list(PL.iloc[row_i,:])))        
@@ -1367,13 +1367,12 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         st.error("Can't identify any property name in sheet {}. The property name are supposed to be:{}. Please add and re-upload.".format(sheet_name,",".join(property_name_list_inmapping)))
         st.stop()
     elif len(max_match)>=1:
-        st.write("max_match",max_match, "len(max_match)",property_name_list_in_mapping)
+	
+        st.write("max_match",max_match, "property_name_list_in_mapping",property_name_list_in_mapping)
         not_match_names = [item.capitalize() for item in property_name_list_in_mapping  if item not in max_match]	         
         st.error("Missing property: **{}** in sheet {}. Please add and re-upload.".format(",".join(not_match_names),sheet_name))
         mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
         mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
-        st.write("max_match_row",max_match_row,"mapped_entity",mapped_entity)
-   
         return max_match_row,mapped_entity
 
 
@@ -1449,7 +1448,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         # Map PL accounts and Sabra account
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
 	# map sabra account with tenant account, groupby sabra account
-        st.write("entity_list",entity_list,"PL",PL)
         PL=Map_PL_Sabra(PL,entity_list) # index are ('ENTITY',"Sabra_Account")
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
