@@ -1349,7 +1349,8 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
     #	Property_Name_Finance and entity_list has same order
     property_name_list_in_mapping = entity_mapping.loc[entity_list]["Property_Name_Finance"].tolist()   
 
-    property_name_list_in_mapping=list(map(lambda x: x.upper().strip() if (not pd.isna(x)) and isinstance(x, str)  else x,property_name_list_in_mapping))     
+    property_name_list_in_mapping=list(map(lambda x: x.upper().strip() if (not pd.isna(x)) and isinstance(x, str)  else x,property_name_list_in_mapping))  
+    st.write("property_name_list_in_mapping",property_name_list_in_mapping)
     max_match=[]
     for row_i in range(PL.shape[0]):
         canditate_row=list(map(lambda x: x.upper().strip() if (not pd.isna(x)) and isinstance(x, str)  else x,list(PL.iloc[row_i,:])))        
