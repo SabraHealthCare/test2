@@ -1348,14 +1348,13 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
     # return the row number of property header and mapped_entity, for example: ["0","0",Sxxxx,Sxxxx,"0",Sxxxx,"0"...]
     #	Property_Name_Finance and entity_list has same order
     property_name_list_in_mapping = entity_mapping.loc[entity_list]["Property_Name_Finance"].tolist()   
-
+    property_name_list_in_mapping = [x for x in property_name_list_in_mapping if not pd.isna(x) and x!=" "]
     property_name_list_in_mapping=list(map(lambda x: x.upper().strip() if (not pd.isna(x)) and isinstance(x, str)  else x,property_name_list_in_mapping))  
     st.write("property_name_list_in_mapping",property_name_list_in_mapping)
     max_match=[]
     for row_i in range(PL.shape[0]):
         canditate_row=list(map(lambda x: x.upper().strip() if (not pd.isna(x)) and isinstance(x, str)  else x,list(PL.iloc[row_i,:])))        
         match_names = [item for item in canditate_row if item in property_name_list_in_mapping]
-        st.write("row_i",row_i,"match_names",match_names,"len(match_names)",len(match_names))
         if len(match_names)==len(property_name_list_in_mapping): # find the property name header row, transfer them into entity id
             mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
             mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in canditate_row]
