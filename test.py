@@ -1236,7 +1236,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                             entity_mapping.loc[:,"Sheet_Name_Finance"]=PL_sheet
                         if missing_occ_sheet_property_N.shape[0]>0:
                             entity_mapping.loc[:,"Sheet_Name_Occupancy"]=occ_sheet
-               elif missing_BS_sheet_property_N.shape[0]>0:
+                elif missing_BS_sheet_property_N.shape[0]>0:
                     if BS_sheet.isna():
                         st.error("Please complete Balance Sheet mapping.")
                         st.stop()
