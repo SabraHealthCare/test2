@@ -1388,7 +1388,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
             if (miss_column_mapping["Sheet_Name_Finance"].isna().any()):
                 st.error("Please complete all the mapping.")
                 st.stop()
-	    else:
+            else:
                 duplicated_sheet_name=False
                 for sheet_name_finance_i in miss_column_mapping["Sheet_Name_Finance"]:
                     if sheet_name_finance_i in property_name_list_in_mapping:
