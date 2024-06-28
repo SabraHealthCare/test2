@@ -1595,7 +1595,8 @@ def Upload_And_Process(uploaded_file,file_type):
     # ****Finance and BS in one excel****
     if file_type=="Finance":
         for entity_i in total_entity_list:   # entity_i is the entity code S number
-	    # properties in seperate sheet 	
+	    # properties in seperate sheet 
+            st.write("1",entity_mapping.index, entity_mapping.loc[entity_i,"Finance_in_separate_sheets"])
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                 if Total_PL.shape[0]==0:
