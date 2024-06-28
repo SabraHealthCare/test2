@@ -1395,7 +1395,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
                         st.error("{} was the column name for '{}', please select a different name for '{}'".format(sheet_name_finance_i,entity_mapping.loc[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_i,"Property_Name"][0],miss_column_mapping.loc[miss_column_mapping["Sheet_Name_Finance"]==sheet_name_finance_i,"Property_Name"][0]))
                         duplicated_sheet_name=True
 			
-                if duplicated_sheet_name：
+                if duplicated_sheet_name:
                     st.stop()
             
             for entity_i in miss_column_mapping.index: 
