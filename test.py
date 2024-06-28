@@ -1218,7 +1218,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
             if sheet_type=="Finance":	    
                 if missing_PL_sheet_property_N.shape[0]>0:
                     st.warning("Please provide P&L sheet name for properties: {}".format(",".join(list(missing_PL_sheet_property_N["Property_Name"]))))
-                    PL_sheet=st.selectbox("",[""]+PL_sheet_list,key="P&L_N")
+                    PL_sheet.loc[:,"Sheet_Name_Finance"]=st.selectbox("",[""]+PL_sheet_list,key="P&L_N")
                 if missing_occ_sheet_property_N.shape[0]>0:
                     st.warning("Please provide sheet name for Occupancy:")
                     occ_sheet.loc[:,"Sheet_Name_Occupancy"]=st.selectbox("",[""]+PL_sheet_list,key="occ_N")
@@ -1228,7 +1228,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
             submitted = st.form_submit_button("Submit")
         if submitted:
             if sheet_type=="Finance":
-                if (missing_PL_sheet_property_N.shape[0]>0 and PL_sheet.isna()) or (missing_occ_sheet_property_N.shape[0]>0 and occ_sheet.isna().any()) or (Sheet_Name_Balance_Sheet_N.shape[0]>0 and BS_sheet.isna()):
+                if (missing_PL_sheet_property_N.shape[0]>0 and PL_sheet.isna().any()) or (missing_occ_sheet_property_N.shape[0]>0 and occ_sheet.isna().any()) or (Sheet_Name_Balance_Sheet_N.shape[0]>0 and BS_sheet.isna()):
                     st.error("Please complete above mapping.")
                     st.stop()
                 else:
