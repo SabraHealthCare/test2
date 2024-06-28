@@ -173,6 +173,7 @@ def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=None,str_c
     if entity_list==None:
         entity_list=[]    
     original_data=Read_CSV_From_Onedrive(path,file_name,str_col_list)
+    new_data=new_data.reset_index(drop=False)
     if  isinstance(original_data, pd.DataFrame):
         if "TIME" in original_data.columns and "TIME" in new_data.columns:
             original_data.TIME = original_data.TIME.astype(str)
@@ -180,9 +181,10 @@ def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=None,str_c
             if len(entity_list)==0:
                 # remove original data by operator and month
                 original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))].index)
-            elif len(entity_list)>0:
+            elif len(entity_list)>0:  # only updated data for given entity_list
             	# remove original data by operator and month and entity
                 original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))&(original_data['ENTITY'].isin(entity_list))].index)
+                new_data=new_data.loc[new_data["ENTITY"].isin(entity_list),:]
         elif "TIME" not in original_data.columns and "TIME" not in new_data.columns:
             if len(entity_list)==0:
                 original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
@@ -191,7 +193,6 @@ def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=None,str_c
                 original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['ENTITY'].isin(entity_list))].index)
 	    		
         # append new data to original data
-        new_data=new_data.reset_index(drop=False)
         new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns))
         updated_data = pd.concat([original_data,new_data])
         updated_data=updated_data[new_columns_name]
@@ -1369,7 +1370,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
             break
 		
     if len(max_match)==0:
-        st.error("Fail to identify below facility column name in sheet '{}'. Please add and re-upload.".format(sheet_name))
+        st.error("Fail to identify facility column names as below in sheet '{}'. Please add and re-upload.".format(sheet_name))
         st.dataframe(pd.DataFrame(property_name_list_inmapping).transpose())
         st.stop()
     elif len(max_match)>0: # only part of entities have property name in P&L
@@ -1402,7 +1403,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
                     st.stop()
             
             for entity_i in miss_column_mapping.index: 
-                entity_mapping.loc[entity_i,"Sheet_Name_Finance"]=miss_column_mapping.loc[entity_i,"Sheet_Name_Finance"]     
+                entity_mapping.loc[entity_i,"Column_Name"]=miss_column_mapping.loc[entity_i,"Column_Name"]     
             property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"]]
             mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
             mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
