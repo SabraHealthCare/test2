@@ -1174,7 +1174,6 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
         with st.form(key=sheet_type+"_Y"):
             if sheet_type=="Finance":
                 if missing_PL_sheet_property_Y.shape[0]>0:
-                    st.write("missing_PL_sheet_property_Y",missing_PL_sheet_property_Y)
                     for entity_i in missing_PL_sheet_property_Y.index:
                         st.warning("Please provide P&L sheet name for {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
                         missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"]=st.selectbox("Original P&L sheet name: {}".format(entity_mapping.loc[entity_i,"Sheet_Name_Finance"]),[""]+PL_sheet_list,key=entity_i+"PL_Y")
@@ -1218,17 +1217,17 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
             if sheet_type=="Finance":	    
                 if missing_PL_sheet_property_N.shape[0]>0:
                     st.warning("Please provide P&L sheet name for properties: {}".format(",".join(list(missing_PL_sheet_property_N["Property_Name"]))))
-                    PL_sheet.loc[:,"Sheet_Name_Finance"]=st.selectbox("",[""]+PL_sheet_list,key="P&L_N")
+                    PL_sheet=st.selectbox("",[""]+PL_sheet_list,key="P&L_N")
                 if missing_occ_sheet_property_N.shape[0]>0:
                     st.warning("Please provide sheet name for Occupancy:")
-                    occ_sheet.loc[:,"Sheet_Name_Occupancy"]=st.selectbox("",[""]+PL_sheet_list,key="occ_N")
+                    occ_sheet=st.selectbox("",[""]+PL_sheet_list,key="occ_N")
             if missing_BS_sheet_property_N.shape[0]>0:
                 st.warning("Please provide sheet name for Balance Sheet:")
-                BS_sheet.loc[:,"Sheet_Name_Balance_Sheet"]=st.selectbox("",[""]+PL_sheet_list,key="BS_N")         
+                BS_sheet=st.selectbox("",[""]+PL_sheet_list,key="BS_N")         
             submitted = st.form_submit_button("Submit")
             if submitted:
                 if sheet_type=="Finance":
-                    if (missing_PL_sheet_property_N.shape[0]>0 and PL_sheet.isna().any()) or (missing_occ_sheet_property_N.shape[0]>0 and occ_sheet.isna().any()) or (Sheet_Name_Balance_Sheet_N.shape[0]>0 and BS_sheet.isna()):
+                    if (missing_PL_sheet_property_N.shape[0]>0 and (PL_sheet== "" or np.isna(PL_sheet))) or (missing_occ_sheet_property_N.shape[0]>0 and (occ_sheet== "" or np.isna(occ_sheet))) or (Sheet_Name_Balance_Sheet_N.shape[0]>0 and (BS_sheet== "" or np.isna(BS_sheet))):
                         st.error("Please complete above mapping.")
                         st.stop()
                     else:
@@ -1384,7 +1383,8 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         with st.form(key="miss_match_column_name"):
             for entity_i in total_missed_entities:
                 st.warning("Column name for facility {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
-                miss_column_mapping.loc[entity_i,"Sheet_Name_Finance"]=st.selectbox("Original column name: {}".format(entity_mapping.loc[entity_i,"Property_Name_Finance"]),[""]+column_names,key=entity_i+"miss_column")
+                miss_column_mapping.loc[entity_i,"Sheet_Name_Finance"]=st.selectbox("Original column name: {}".format(\
+			entity_mapping.loc[entity_i,"Property_Name_Finance"]),[""]+column_names,key=entity_i+"miss_column")
             submitted = st.form_submit_button("Submit")
            
         if submitted:
