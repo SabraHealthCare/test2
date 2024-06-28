@@ -78,7 +78,7 @@ access_token = token_response['access_token']
 headers = {'Authorization': 'Bearer ' + access_token,}    
 
 account_mapping_str_col=["Tenant_Account","Tenant_Formated_Account"]
-entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Property_Name_Finance"]
+entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
 #directly save the uploaded (.xlsx) file to onedrive
 def Upload_to_Onedrive(uploaded_file,path,file_name):
     # Set the API endpoint and headers
@@ -750,7 +750,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
 def Manage_Entity_Mapping(operator):
     global entity_mapping
     #all the properties are supposed to be in entity_mapping. 
-    entity_mapping_updation=pd.DataFrame(columns=["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Property_Name_Finance"])
+    entity_mapping_updation=pd.DataFrame(columns=["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"])
     number_of_property=entity_mapping.shape[0]
     with st.form(key="Mapping Properties"):
         col1,col2,col3,col4=st.columns([4,3,3,3])
@@ -1347,9 +1347,9 @@ def View_Discrepancy():
 
 def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties are in one sheet
     # return the row number of property header and mapped_entity, for example: ["0","0",Sxxxx,Sxxxx,"0",Sxxxx,"0"...]
-    #	Property_Name_Finance and entity_list has same order
-    entity_without_propertynamefinance=entity_mapping[(entity_mapping['Property_Name_Finance'].isna()) | (entity_mapping['Property_Name_Finance'].str.strip() == "")].index.tolist()
-    property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Property_Name_Finance"] if pd.notna(x) and str(x).strip()]
+    #	Column_Name and entity_list has same order
+    entity_without_propertynamefinance=entity_mapping[(entity_mapping['Column_Name'].isna()) | (entity_mapping['Column_Name'].str.strip() == "")].index.tolist()
+    property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"] if pd.notna(x) and str(x).strip()]
     max_match=[]
     for row_i in range(PL.shape[0]):
         canditate_row=list(map(lambda x: x.upper().strip() if (not pd.isna(x)) and isinstance(x, str)  else x,list(PL.iloc[row_i,:])))        
@@ -1372,30 +1372,30 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         st.error("Fail to identify below facility column name in sheet '{}'. Please add and re-upload.".format(sheet_name))
         st.dataframe(pd.DataFrame(property_name_list_inmapping).transpose())
         st.stop()
-    elif len(max_match)>0: # only part of entities have propert name in P&L
+    elif len(max_match)>0: # only part of entities have property name in P&L
         miss_match_names = [item for item in property_name_list_in_mapping  if item not in max_match]
-
-        total_missed_entities=entity_mapping[entity_mapping["Property_Name_Finance"].str.upper().str.strip().isin(miss_match_names)].index.tolist()+entity_without_propertynamefinance
-        st.write("miss_match_names",miss_match_names,"total_missed_entities",total_missed_entities)
+        total_missed_entities=entity_mapping[entity_mapping["Column_Name"].str.upper().str.strip().isin(miss_match_names)].index.tolist()+entity_without_propertynamefinance
         miss_column_mapping=entity_mapping.loc[total_missed_entities]
         column_names=[x for x in PL.iloc[max_match_row,:] if pd.notna(x)]
         st.error("Please map the column names for following facilities in sheet {}.".format(sheet_name))
         with st.form(key="miss_match_column_name"):
             for entity_i in total_missed_entities:
                 st.warning("Column name for facility {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
-                miss_column_mapping.loc[entity_i,"Sheet_Name_Finance"]=st.selectbox("Original column name: {}".format(\
-			entity_mapping.loc[entity_i,"Property_Name_Finance"]),[""]+column_names,key=entity_i+"miss_column")
+                miss_column_mapping.loc[entity_i,"Column_Name"]=st.selectbox("Original column name: {}".format(\
+			entity_mapping.loc[entity_i,"Column_Name"]),[""]+column_names,key=entity_i+"miss_column")
             submitted = st.form_submit_button("Submit")
            
         if submitted:
-            if (miss_column_mapping["Sheet_Name_Finance"].isna().any()):
+            if (miss_column_mapping["Column_Name"] == "").any():
                 st.error("Please complete all the mapping.")
                 st.stop()
             else:
                 duplicated_sheet_name=False
-                for sheet_name_finance_i in miss_column_mapping["Sheet_Name_Finance"]:
-                    if sheet_name_finance_i in property_name_list_in_mapping:
-                        st.error("{} was the column name for '{}', please select a different name for '{}'".format(sheet_name_finance_i,entity_mapping.loc[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_i,"Property_Name"][0],miss_column_mapping.loc[miss_column_mapping["Sheet_Name_Finance"]==sheet_name_finance_i,"Property_Name"][0]))
+                for column_name_i in miss_column_mapping["Column_Name"]:
+                    if column_name_i in property_name_list_in_mapping:
+                        st.error("{} was the column name for '{}', please select a different name for '{}'".\
+				 format(column_name_i,entity_mapping.loc[entity_mapping["Column_Name"].str.upper().str.strip()==column_name_i.upper().strip(),"Property_Name"][0],\
+					miss_column_mapping.loc[miss_column_mapping["Column_Name"]==column_name_i,"Property_Name"][0]))
                         duplicated_sheet_name=True
 			
                 if duplicated_sheet_name:
@@ -1403,7 +1403,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
             
             for entity_i in miss_column_mapping.index: 
                 entity_mapping.loc[entity_i,"Sheet_Name_Finance"]=miss_column_mapping.loc[entity_i,"Sheet_Name_Finance"]     
-            property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Property_Name_Finance"]]
+            property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"]]
             mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
             mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
             # update entity_mapping in onedrive  
@@ -1596,7 +1596,6 @@ def Upload_And_Process(uploaded_file,file_type):
     if file_type=="Finance":
         for entity_i in total_entity_list:   # entity_i is the entity code S number
 	    # properties in seperate sheet 
-            st.write("1",entity_mapping.index, entity_mapping.loc[entity_i,"Finance_in_separate_sheets"])
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                 if Total_PL.shape[0]==0:
