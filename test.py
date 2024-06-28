@@ -1379,7 +1379,8 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         total_missed_entities=entity_mapping[entity_mapping["Column_Name"].str.upper().str.strip().isin(miss_match_names)].index.tolist()+entity_without_propertynamefinance
         miss_column_mapping=entity_mapping.loc[total_missed_entities]
         st.write("total_missed_entities",total_missed_entities,"miss_column_mapping",miss_column_mapping)
-        column_names=[x for x in PL.iloc[max_match_row,:] if pd.notna(x)]
+        column_names=[x for x in PL.iloc[max_match_row,:] if pd.notna(x) and x.upper().strip() not in property_name_list_in_mapping]
+        st.write("column_names",column_names)
         st.error("Please map the column names for following facilities in sheet {}.".format(sheet_name))
         with st.form(key="miss_match_column_name"):
             for entity_i in total_missed_entities:
