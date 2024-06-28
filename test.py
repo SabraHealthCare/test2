@@ -1400,7 +1400,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
             
             for entity_i in miss_column_mapping.index: 
                 entity_mapping.loc[entity_i,"Sheet_Name_Finance"]=miss_column_mapping.loc[entity_i,"Sheet_Name_Finance"]     
-	    property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Property_Name_Finance"]]
+            property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Property_Name_Finance"]]
             mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
             mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
             # update entity_mapping in onedrive  
