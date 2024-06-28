@@ -920,6 +920,7 @@ def Map_PL_Sabra(PL,entity):
   
         #property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
         PL=PL.drop(["Tenant_Formated_Account","Conversion"], axis=1)
+        st.write("PL",PL)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='ENTITY')     
         PL=PL.drop(["Tenant_Account"], axis=1)
     #PL_with_detail=copy.copy(PL)
