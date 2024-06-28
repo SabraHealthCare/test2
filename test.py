@@ -1226,24 +1226,24 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                 st.warning("Please provide sheet name for Balance Sheet:")
                 BS_sheet.loc[:,"Sheet_Name_Balance_Sheet"]=st.selectbox("",[""]+PL_sheet_list,key="BS_N")         
             submitted = st.form_submit_button("Submit")
-        if submitted:
-            if sheet_type=="Finance":
-                if (missing_PL_sheet_property_N.shape[0]>0 and PL_sheet.isna().any()) or (missing_occ_sheet_property_N.shape[0]>0 and occ_sheet.isna().any()) or (Sheet_Name_Balance_Sheet_N.shape[0]>0 and BS_sheet.isna()):
-                    st.error("Please complete above mapping.")
-                    st.stop()
-                else:
-                    if missing_PL_sheet_property_N.shape[0]>0:
-                        entity_mapping.loc[:,"Sheet_Name_Finance"]=PL_sheet
-                    if missing_occ_sheet_property_N.shape[0]>0:
-                        entity_mapping.loc[:,"Sheet_Name_Occupancy"]=occ_sheet
-            elif missing_BS_sheet_property_N.shape[0]>0:
-                if BS_sheet.isna():
-                    st.error("Please complete Balance Sheet mapping.")
-                    st.stop()
-                else:
-                    entity_mapping.loc[:,"Sheet_Name_Balance_Sheet"]=BS_sheet
-        else:
-            st.stop()
+            if submitted:
+                if sheet_type=="Finance":
+                    if (missing_PL_sheet_property_N.shape[0]>0 and PL_sheet.isna().any()) or (missing_occ_sheet_property_N.shape[0]>0 and occ_sheet.isna().any()) or (Sheet_Name_Balance_Sheet_N.shape[0]>0 and BS_sheet.isna()):
+                        st.error("Please complete above mapping.")
+                        st.stop()
+                    else:
+                        if missing_PL_sheet_property_N.shape[0]>0:
+                            entity_mapping.loc[:,"Sheet_Name_Finance"]=PL_sheet
+                        if missing_occ_sheet_property_N.shape[0]>0:
+                            entity_mapping.loc[:,"Sheet_Name_Occupancy"]=occ_sheet
+               elif missing_BS_sheet_property_N.shape[0]>0:
+                    if BS_sheet.isna():
+                        st.error("Please complete Balance Sheet mapping.")
+                        st.stop()
+                    else:
+                        entity_mapping.loc[:,"Sheet_Name_Balance_Sheet"]=BS_sheet
+            else:
+                st.stop()
     # update entity_mapping in onedrive  
     Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,list(entity_mapping.index),entity_mapping_str_col)
     return entity_mapping
