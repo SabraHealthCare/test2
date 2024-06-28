@@ -1372,15 +1372,14 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         st.dataframe(pd.DataFrame(property_name_list_inmapping).transpose())
         st.stop()
     elif len(max_match)>0: # only part of entities have propert name in P&L
-        
         miss_match_names = [item.capitalize() for item in property_name_list_in_mapping  if item not in max_match]
-        total_missed_entities=entity_mapping[entity_mapping["Property_Name_Finance"].isin(miss_match_names)].index.tolist()+entity_without_propertynamefinance
+        total_missed_entities=entity_mapping[entity_mapping["Property_Name_Finance"].str.lower().str.strip().isin(miss_match_names)].index.tolist()+entity_without_propertynamefinance
         miss_column_mapping=entity_mapping.loc[total_missed_entities]
         column_names=[x for x in PL.iloc[max_match_row,:] if pd.notna(x)]
-        st.error("Please map following facilities with the column names in sheet {}. please note these column names are shared by ".format(sheet_name))
+        st.error("Please map the column names for following facilities in sheet {}.".format(sheet_name))
         with st.form(key="miss_match_column_name"):
             for entity_i in total_missed_entities:
-                st.warning("Please provide column name for facility {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                st.warning("Column name for facility {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
                 miss_column_mapping.loc[entity_i,"Sheet_Name_Finance"]=st.selectbox("Original column name: {}".format(entity_mapping.loc[entity_i,"Sheet_Name_Finance"]),[""]+column_names,key=entity_i+"miss_column")
             submitted = st.form_submit_button("Submit")
            
