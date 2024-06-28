@@ -1146,6 +1146,7 @@ def EPM_Formula(data,value_name): # make sure there is no col on index for data
 	
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
+    st.write("entity_mapping",entity_mapping)
     PL_sheet_list=load_workbook(uploaded_file).sheetnames	
     if sheet_type=="Finance":
         missing_PL_sheet_property = entity_mapping[(~entity_mapping["Sheet_Name_Finance"].isin(PL_sheet_list))|(pd.isna(entity_mapping["Sheet_Name_Finance"]))]
@@ -1173,6 +1174,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
         with st.form(key=sheet_type+"_Y"):
             if sheet_type=="Finance":
                 if missing_PL_sheet_property_Y.shape[0]>0:
+                    st.write("missing_PL_sheet_property_Y",missing_PL_sheet_property_Y)
                     for entity_i in missing_PL_sheet_property_Y.index:
                         st.warning("Please provide P&L sheet name for {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
                         missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"]=st.selectbox("Original P&L sheet name: {}".format(entity_mapping.loc[entity_i,"Sheet_Name_Finance"]),[""]+PL_sheet_list,key=entity_i+"PL_Y")
