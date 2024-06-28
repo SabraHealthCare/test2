@@ -1227,7 +1227,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
             submitted = st.form_submit_button("Submit")
             if submitted:
                 if sheet_type=="Finance":
-                    if (missing_PL_sheet_property_N.shape[0]>0 and (PL_sheet== "" or np.isnan(PL_sheet))) or (missing_occ_sheet_property_N.shape[0]>0 and (occ_sheet== "" or np.isnan(occ_sheet))) or (Sheet_Name_Balance_Sheet_N.shape[0]>0 and (BS_sheet== "" or np.isnan(BS_sheet))):
+                    if (missing_PL_sheet_property_N.shape[0]>0 and PL_sheet== "") or (missing_occ_sheet_property_N.shape[0]>0 and occ_sheet== "") or (Sheet_Name_Balance_Sheet_N.shape[0]>0 and BS_sheet== ""):
                         st.error("Please complete above mapping.")
                         st.stop()
                     else:
