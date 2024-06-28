@@ -1382,7 +1382,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         with st.form(key="miss_match_column_name"):
             for entity_i in total_missed_entities:
                 st.warning("Column name for facility {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
-                miss_column_mapping.loc[entity_i,"Sheet_Name_Finance"]=st.selectbox("Original column name: {}".format(entity_mapping.loc[entity_i,"Sheet_Name_Finance"]),[""]+column_names,key=entity_i+"miss_column")
+                miss_column_mapping.loc[entity_i,"Sheet_Name_Finance"]=st.selectbox("Original column name: {}".format(entity_mapping.loc[entity_i,"Property_Name_Finance"]),[""]+column_names,key=entity_i+"miss_column")
             submitted = st.form_submit_button("Submit")
            
         if submitted:
