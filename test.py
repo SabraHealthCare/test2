@@ -1411,7 +1411,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
             mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
             mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
             # update entity_mapping in onedrive  
-            Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,total_missed_entities,entity_mapping_str_col)
+            Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,None,entity_mapping_str_col)
         
             return row_i,mapped_entity
 
