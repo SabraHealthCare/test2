@@ -1343,37 +1343,68 @@ def View_Discrepancy():
     else:
             st.success("All previous data in P&L ties with Sabra data")
 
-@st.cache_data
+
 def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties are in one sheet
     # return the row number of property header and mapped_entity, for example: ["0","0",Sxxxx,Sxxxx,"0",Sxxxx,"0"...]
     #	Property_Name_Finance and entity_list has same order
-    property_name_list_in_mapping = entity_mapping.loc[entity_list]["Property_Name_Finance"].tolist()   
-    property_name_list_in_mapping = [x for x in property_name_list_in_mapping if not pd.isna(x) and x!=" "]
-    property_name_list_in_mapping=list(map(lambda x: x.upper().strip() if (not pd.isna(x)) and isinstance(x, str)  else x,property_name_list_in_mapping))  
-   
+    entity_without_propertynamefinance=entity_mapping[(entity_mapping['Property_Name_Finance'].isna()) | (entity_mapping['Property_Name_Finance'].str.strip() == ""]['ENTITY'].tolist()
+    property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Property_Name_Finance"] if pd.notna(x) and str(x).strip()]
     max_match=[]
     for row_i in range(PL.shape[0]):
         canditate_row=list(map(lambda x: x.upper().strip() if (not pd.isna(x)) and isinstance(x, str)  else x,list(PL.iloc[row_i,:])))        
         match_names = [item for item in canditate_row if item in property_name_list_in_mapping]
-        if len(match_names)==len(property_name_list_in_mapping): # find the property name header row, transfer them into entity id
+        if len(match_names)==len(property_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: # find the property name header row, transfer them into entity id
             mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
             mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in canditate_row]
             return row_i,mapped_entity
+	
         elif len(match_names)>len(max_match):
             max_match=match_names
             header_row=canditate_row
             max_match_row=row_i
+            if len(match_names)==len(property_name_list_in_mapping):
+                break
+        if len(max_match)>2:
+            break
+		
     if len(max_match)==0:
         st.error("Can't identify any property name in sheet {}. The property name are supposed to be:{}. Please add and re-upload.".format(sheet_name,",".join(property_name_list_inmapping)))
         st.stop()
-    elif len(max_match)>=1:
-        not_match_names = [item.capitalize() for item in property_name_list_in_mapping  if item not in max_match]	         
-        st.error("Missing property: **{}** in sheet {}. Please add and re-upload.".format(",".join(not_match_names),sheet_name))
-        mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
-        mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
-        return max_match_row,mapped_entity
-
-
+    elif len(max_match)>0: # only part of entities have propert name in P&L
+        
+        miss_match_names = [item.capitalize() for item in property_name_list_in_mapping  if item not in max_match]
+        total_missed_entities=entity_mapping[entity_mapping["Property_Name_Finance"].isin(miss_match_names)].index.tolist()+entity_without_propertynamefinance
+        miss_column_mapping=entity_mapping.loc[total_missed_entities]
+        column_names=[x for x in PL.iloc[max_match_row,:] if pd.notna(x)]
+        st.error("Please map following facilities with the column names in sheet {}. please note these column names are shared by ".format(sheet_name))
+        with st.form(key="miss_match_column_name"):
+            for entity_i in total_missed_entities:
+                st.warning("Please provide column name for facility {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                miss_column_mapping.loc[entity_i,"Sheet_Name_Finance"]=st.selectbox("Original column name: {}".format(entity_mapping.loc[entity_i,"Sheet_Name_Finance"]),[""]+column_names,key=entity_i+"miss_column")
+            submitted = st.form_submit_button("Submit")
+           
+        if submitted:
+            if (miss_column_mapping["Sheet_Name_Finance"].isna().any()):
+                st.error("Please complete all the mapping.")
+                st.stop()
+	    else:
+                duplicated_sheet_name=False
+                for sheet_name_finance_i in miss_column_mapping["Sheet_Name_Finance"]:
+                    if sheet_name_finance_i in property_name_list_in_mapping:
+                        st.error("{} was the column name for '{}', please select a different name for '{}'".format(sheet_name_finance_i,entity_mapping.loc[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_i,"Property_Name"][0],miss_column_mapping.loc[miss_column_mapping["Sheet_Name_Finance"]==sheet_name_finance_i,"Property_Name"][0]))
+                        duplicated_sheet_name=True
+			
+                if duplicated_sheet_name：
+                    st.stop()
+            
+            for entity_i in miss_column_mapping.index: 
+                entity_mapping.loc[entity_i,"Sheet_Name_Finance"]=miss_column_mapping.loc[entity_i,"Sheet_Name_Finance"]     
+	    property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Property_Name_Finance"]]
+            mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
+            mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
+            # update entity_mapping in onedrive  
+            Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,total_missed_entities,entity_mapping_str_col)
+            return row_i,mapped_entity
 
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,sheet_name):  
