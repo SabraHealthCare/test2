@@ -1415,7 +1415,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
             Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,None,entity_mapping_str_col)
         
             return row_i,mapped_entity
-	else:
+        else:
             st.stop()
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,sheet_name):  
