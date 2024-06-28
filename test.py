@@ -184,7 +184,8 @@ def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=None,str_c
             elif len(entity_list)>0:  # only updated data for given entity_list
             	# remove original data by operator and month and entity
                 original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))&(original_data['ENTITY'].isin(entity_list))].index)
-                new_data=new_data.loc[new_data["ENTITY"].isin(entity_list),:]
+                new_data=new_data[new_data["ENTITY"].isin(entity_list)]
+                st.write("new data",new_data) 
         elif "TIME" not in original_data.columns and "TIME" not in new_data.columns:
             if len(entity_list)==0:
                 original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
