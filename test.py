@@ -1368,7 +1368,8 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
             break
 		
     if len(max_match)==0:
-        st.error("Can't identify any property name in sheet {}. The property name are supposed to be:{}. Please add and re-upload.".format(sheet_name,",".join(property_name_list_inmapping)))
+        st.error("Fail to identify below facility column name in sheet '{}'. Please add and re-upload.".format(sheet_name))
+        st.dataframe(pd.DataFrame(property_name_list_inmapping).transpose())
         st.stop()
     elif len(max_match)>0: # only part of entities have propert name in P&L
         
