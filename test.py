@@ -1459,7 +1459,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         PL.index=map(lambda x:str(x).strip(),PL.index)
         PL=PL.map(lambda x: 0 if x!=x or pd.isna(x) or isinstance(x, str) or x==" " else x)	    
         # remove columns with all nan/0
-        PL=PL.loc[:,(PL!= 0).any(axis=0)]
+        #PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
         PL=PL.loc[(PL!= 0).any(axis=1),:]
         # mapping new tenant accounts
