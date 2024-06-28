@@ -1374,7 +1374,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
     elif len(max_match)>0: # only part of entities have propert name in P&L
         miss_match_names = [item for item in property_name_list_in_mapping  if item not in max_match]
 
-        total_missed_entities=entity_mapping[entity_mapping["Property_Name_Finance"].str.lower().str.strip().isin(miss_match_names)].index.tolist()+entity_without_propertynamefinance
+        total_missed_entities=entity_mapping[entity_mapping["Property_Name_Finance"].str.upper().str.strip().isin(miss_match_names)].index.tolist()+entity_without_propertynamefinance
         st.write("miss_match_names",miss_match_names,"total_missed_entities",total_missed_entities)
         miss_column_mapping=entity_mapping.loc[total_missed_entities]
         column_names=[x for x in PL.iloc[max_match_row,:] if pd.notna(x)]
