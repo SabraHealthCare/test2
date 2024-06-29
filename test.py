@@ -1108,7 +1108,7 @@ def Submit_Upload_Latestmonth():
          # save discrepancy data to OneDrive
         if len(Total_PL.columns)>1 and diff_BPC_PL.shape[0]>0:
             download_report(diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy")
-            Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,list(diff_BPC_PL["ENTITY"]),None)
+            Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,None,None)
         
 	# save original tenant P&L to OneDrive
         if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
@@ -1247,7 +1247,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
             else:
                 st.stop()
     # update entity_mapping in onedrive  
-    Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,list(entity_mapping.index),entity_mapping_str_col)
+    Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,None,entity_mapping_str_col)
     return entity_mapping
 
 def View_Discrepancy_Detail():
@@ -1358,9 +1358,14 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         canditate_row=list(map(lambda x: x.upper().strip() if (not pd.isna(x)) and isinstance(x, str)  else x,list(PL.iloc[row_i,:])))        
         match_names = [item for item in canditate_row if item in property_name_list_in_mapping]
         if len(match_names)==len(property_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: # find the property name header row, transfer them into entity id
-            mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
-            mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in canditate_row]
-            return row_i,mapped_entity
+            duplicate_check = [name for name in set(match_names) if match_names.count(name) > 1]
+            if len(duplicate_check)>0:
+                st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(",".join(duplicate_check)))
+                st.stop()
+	    else:
+                mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
+                mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in canditate_row]
+                return row_i,mapped_entity
 	
         elif len(match_names)>len(max_match):
             max_match=match_names
@@ -1394,21 +1399,16 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
             if (miss_column_mapping["Column_Name"] == "").any():
                 st.error("Please complete all the mapping.")
                 st.stop()
-            else:
-                duplicated_sheet_name=False
-                for column_name_i in miss_column_mapping["Column_Name"]:
-                    if column_name_i in property_name_list_in_mapping:
-                        st.error("{} was the column name for '{}', please select a different name for '{}'".\
-				 format(column_name_i,entity_mapping.loc[entity_mapping["Column_Name"].str.upper().str.strip()==column_name_i.upper().strip(),"Property_Name"][0],\
-					miss_column_mapping.loc[miss_column_mapping["Column_Name"]==column_name_i,"Property_Name"][0]))
-                        duplicated_sheet_name=True
-			
-                if duplicated_sheet_name:
-                    st.stop()
             
             for entity_i in miss_column_mapping.index: 
                 entity_mapping.loc[entity_i,"Column_Name"]=miss_column_mapping.loc[entity_i,"Column_Name"]     
             property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"]]
+            duplicate_check = [name for name in set(property_name_list_in_mapping) if property_name_list_in_mapping.count(name) > 1]
+            if len(duplicate_check)>0:
+                st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(",".join(duplicate_check)))
+                st.stop()
+
+		
             mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
             mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
             # update entity_mapping in onedrive  
