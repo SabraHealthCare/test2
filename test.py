@@ -920,7 +920,6 @@ def Map_PL_Sabra(PL,entity):
   
         #property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
         PL=PL.drop(["Tenant_Formated_Account","Conversion"], axis=1)
-        st.write("PL",PL)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='ENTITY')     
         PL=PL.drop(["Tenant_Account"], axis=1)
     #PL_with_detail=copy.copy(PL)
@@ -1149,7 +1148,6 @@ def EPM_Formula(data,value_name): # make sure there is no col on index for data
 	
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
-    st.write("entity_mapping",entity_mapping)
     PL_sheet_list=load_workbook(uploaded_file).sheetnames	
     if sheet_type=="Finance":
         missing_PL_sheet_property = entity_mapping[(~entity_mapping["Sheet_Name_Finance"].isin(PL_sheet_list))|(pd.isna(entity_mapping["Sheet_Name_Finance"]))]
