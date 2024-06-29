@@ -1362,7 +1362,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
             if len(duplicate_check)>0:
                 st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(",".join(duplicate_check)))
                 st.stop()
-	    else:
+            else:
                 mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
                 mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in canditate_row]
                 return row_i,mapped_entity
