@@ -1379,43 +1379,46 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         st.dataframe(pd.DataFrame(property_name_list_inmapping).transpose())
         st.stop()
     elif len(max_match)>0: # only part of entities have property name in P&L
+        duplicate_check = [name for name in set(match_names) if match_names.count(name) > 1]
+        if len(duplicate_check)>0:
+            st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check)))
+            st.stop()
         miss_match_names = [item for item in property_name_list_in_mapping  if item not in max_match]
         total_missed_entities=entity_mapping[entity_mapping["Column_Name"].str.upper().str.strip().isin(miss_match_names)].index.tolist()+entity_without_propertynamefinance
         miss_column_mapping=entity_mapping.loc[total_missed_entities]
-        
         column_names=[x for x in PL.iloc[max_match_row,:] if pd.notna(x) and x.upper().strip() not in property_name_list_in_mapping]
-       
-        st.error("Please map the column names for following facilities in sheet {}.".format(sheet_name))
-        with st.form(key="miss_match_column_name"):
-            for entity_i in total_missed_entities:
-                st.warning("Column name for facility {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
-                miss_column_mapping.loc[entity_i,"Column_Name"]=st.selectbox("Original column name: {}".format(\
+        if len(total_missed_entities)>0:
+            st.error("Please map the column names for following facilities in sheet {}.".format(sheet_name))
+            with st.form(key="miss_match_column_name"):
+                for entity_i in total_missed_entities:
+                    st.warning("Column name for facility {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                    miss_column_mapping.loc[entity_i,"Column_Name"]=st.selectbox("Original column name: {}".format(\
 			entity_mapping.loc[entity_i,"Column_Name"]),[""]+column_names,key=entity_i+"miss_column")
-            submitted = st.form_submit_button("Submit")
+                submitted = st.form_submit_button("Submit")
            
-        if submitted:
-            if (miss_column_mapping["Column_Name"] == "").any():
-                st.error("Please complete all the mapping.")
-                st.stop()
+            if submitted:
+                if (miss_column_mapping["Column_Name"] == "").any():
+                    st.error("Please complete all the mapping.")
+                    st.stop()
             
-            for entity_i in miss_column_mapping.index: 
-                entity_mapping.loc[entity_i,"Column_Name"]=miss_column_mapping.loc[entity_i,"Column_Name"]     
+                for entity_i in miss_column_mapping.index: 
+                    entity_mapping.loc[entity_i,"Column_Name"]=miss_column_mapping.loc[entity_i,"Column_Name"]     
 
-            property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"]]
-            duplicate_check = [name for name in set(property_name_list_in_mapping) if property_name_list_in_mapping.count(name) > 1]
+                property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"]]
+                duplicate_check = [name for name in set(property_name_list_in_mapping) if property_name_list_in_mapping.count(name) > 1]
 
-            if len(duplicate_check)>0:
-                st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
-                st.stop()
+                if len(duplicate_check)>0:
+                    st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
+                    st.stop()
 
-            mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
-            mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
-            # update entity_mapping in onedrive  
-            Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,None,entity_mapping_str_col)
+                mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
+                mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
+                # update entity_mapping in onedrive  
+                Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,None,entity_mapping_str_col)
         
-            return row_i,mapped_entity
-        else:
-            st.stop()
+                return row_i,mapped_entity
+            else:
+                st.stop()
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,sheet_name):  
     global account_mapping,reporting_month
