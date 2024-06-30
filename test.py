@@ -1358,7 +1358,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         if len(match_names)==len(property_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: # find the property name header row, transfer them into entity id
             duplicate_check = [name for name in set(match_names) if match_names.count(name) > 1]
             if len(duplicate_check)>0:
-                st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(",".join(duplicate_check)))
+                st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check)))
                 st.stop()
             else:
                 mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
@@ -1384,7 +1384,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         miss_column_mapping=entity_mapping.loc[total_missed_entities]
         
         column_names=[x for x in PL.iloc[max_match_row,:] if pd.notna(x) and x.upper().strip() not in property_name_list_in_mapping]
-        st.write("column_names",column_names)
+       
         st.error("Please map the column names for following facilities in sheet {}.".format(sheet_name))
         with st.form(key="miss_match_column_name"):
             for entity_i in total_missed_entities:
@@ -1405,7 +1405,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
             duplicate_check = [name for name in set(property_name_list_in_mapping) if property_name_list_in_mapping.count(name) > 1]
 
             if len(duplicate_check)>0:
-                st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(",".join(duplicate_check),sheet_name))
+                st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
                 st.stop()
 
             mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
