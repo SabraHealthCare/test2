@@ -1403,10 +1403,9 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
 
             property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"]]
             duplicate_check = [name for name in set(property_name_list_in_mapping) if property_name_list_in_mapping.count(name) > 1]
-            st.write("property_name_list_in_mapping",property_name_list_in_mapping)
-            st.write("duplicate_check",duplicate_check)
+
             if len(duplicate_check)>0:
-                st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(",".join(duplicate_check)))
+                st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(",".join(duplicate_check),sheet_name))
                 st.stop()
 
             mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
