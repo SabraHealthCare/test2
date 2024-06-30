@@ -1382,7 +1382,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
         miss_match_names = [item for item in property_name_list_in_mapping  if item not in max_match]
         total_missed_entities=entity_mapping[entity_mapping["Column_Name"].str.upper().str.strip().isin(miss_match_names)].index.tolist()+entity_without_propertynamefinance
         miss_column_mapping=entity_mapping.loc[total_missed_entities]
-        st.write("total_missed_entities",total_missed_entities,"miss_column_mapping",miss_column_mapping)
+        
         column_names=[x for x in PL.iloc[max_match_row,:] if pd.notna(x) and x.upper().strip() not in property_name_list_in_mapping]
         st.write("column_names",column_names)
         st.error("Please map the column names for following facilities in sheet {}.".format(sheet_name))
@@ -1400,13 +1400,15 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
             
             for entity_i in miss_column_mapping.index: 
                 entity_mapping.loc[entity_i,"Column_Name"]=miss_column_mapping.loc[entity_i,"Column_Name"]     
+
             property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"]]
             duplicate_check = [name for name in set(property_name_list_in_mapping) if property_name_list_in_mapping.count(name) > 1]
+            st.write("property_name_list_in_mapping",property_name_list_in_mapping)
+            st.write("duplicate_check",duplicate_check)
             if len(duplicate_check)>0:
                 st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(",".join(duplicate_check)))
                 st.stop()
 
-		
             mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
             mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
             # update entity_mapping in onedrive  
