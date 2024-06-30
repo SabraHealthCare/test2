@@ -1409,7 +1409,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
 
                 if len(duplicate_check)>0:
                     st.error( "Each of the following items has been mapped to two different facilities in sheet '{}'. Please fix and re-upload:".format(sheet_name)
-	            st.error(", ".join(f"'{item}'" for item in duplicate_check))
+                    st.error(", ".join(f"'{item}'" for item in duplicate_check))
                     st.stop()
 
                 mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
