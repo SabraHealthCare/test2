@@ -1014,7 +1014,7 @@ def View_Summary():
     global Total_PL,reporting_month_data,reporting_month
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
-    st.write("Total_PL",Total_PL)
+    st.write("reporting_month_data",reporting_month_data)
 
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
@@ -1039,7 +1039,7 @@ def View_Summary():
     missing_category=full_category.merge(current_cagegory,on=['ENTITY', 'Category'],how="left")
     missing_category=missing_category[(missing_category[reporting_month]==0)|(missing_category[reporting_month].isnull())]
     missing_category[reporting_month]="NA" 
-    st.write("Total_PL2",Total_PL)
+
 
     #if "Facility Information" in list(missing_category["Category"]):
         # fill the facility info with historical data
@@ -1081,7 +1081,7 @@ def View_Summary():
             reporting_month_data.loc[i,"Sabra_Account"]="Total - "+reporting_month_data.loc[i,'Category']
             if reporting_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 reporting_month_data.loc[i,set_empty]=np.nan
-    st.write("Total_PL3",Total_PL)
+
 	    
     entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     if len(reporting_month_data.columns)>3:  # if there are more than one property, add total column
@@ -1089,7 +1089,7 @@ def View_Summary():
         reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
     else:
         reporting_month_data=reporting_month_data[["Sabra_Account"]+list(entity_columns)]   
-    st.write("Total_PL4",Total_PL)
+
 
     with st.expander("Summary of {}/{} reporting".format(reporting_month[4:6],reporting_month[0:4]) ,expanded=True):
         ChangeWidgetFontSize("Summary of {}/{} reporting".format(reporting_month[4:6],reporting_month[0:4]), '25px')
@@ -1101,7 +1101,7 @@ def View_Summary():
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
-    st.write("Total_PL5",Total_PL)
+
 
         
 # no cache
