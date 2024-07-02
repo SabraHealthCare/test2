@@ -933,6 +933,7 @@ def Map_PL_Sabra(PL,entity):
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.astype(int)    
     PL=PL.replace(0,None)
+    st.write("PL",PL)
     #return PL,PL_with_detail   
     return PL   
     
@@ -1814,6 +1815,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             with st.spinner('Wait for P&L processing'):
                 #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
                 Total_PL=Upload_And_Process(uploaded_finance,"Finance")
+                st.write("22PL",PL)
 	    # process BS 
             with st.spinner('Wait for Balance Sheet processing'):
                 #Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
@@ -1829,6 +1831,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             diff_BPC_PL=Compare_PL_Sabra(Total_PL,reporting_month)
 	    
 	# 1 Summary
+        st.write("33PL",PL)
         View_Summary()
        	
 
