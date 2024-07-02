@@ -604,7 +604,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                 if month_row_index+i>=0 and month_row_index+i<year_table.shape[0]:
                     year_row=list(year_table.iloc[month_row_index+i,])
                     year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]
-                    st.write("year_match",year_match)
+                  
                     if len(year_match)==month_len:
                         year_table.iloc[month_row_index,:] = [year_table.iloc[month_row_index+i,j] if month != 0 else 0 for j, month in enumerate(month_row)]
                         max_match_year=len(year_match)
@@ -630,8 +630,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                     if max_match_year>0:
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                        st.write("PL_date_header",PL_date_header)
-                        st.write("reporting_month not in PL_date_header",reporting_month not in list(PL_date_header))
+                        
                         if reporting_month not in list(PL_date_header):
                             year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name)
                             PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
@@ -653,7 +652,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                         st.warning("Fail to identify **'Year'** for the date header in sheet '{}'. Filled year as:".format(sheet_name))
                         st.markdown(d_str[1:])
                     count_reporting_month=list(PL_date_header).count(reporting_month)
-                    st.write("count_reporting_month",count_reporting_month)
+                   
                     if count_reporting_month==0: # there is no reporting_month
                        continue
                     elif count_reporting_month>1:
