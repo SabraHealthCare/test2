@@ -1530,7 +1530,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 
     # read data from uploaded file
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
-    st.write("0",PL)
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
@@ -1555,7 +1554,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         # filter columns with month_select
         selected_columns = [val in month_select for val in date_header[0]]
         PL = PL.loc[:,selected_columns]   
-        st.write("1",PL)
         PL.columns= [value for value in date_header[0] if value in month_select]
   
         #remove rows with nan tenant account
@@ -1591,7 +1589,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
                 st.error("Duplicated accounts detected in {} sheet '{}'. Please rectify them to avoid repeated calculations: **{}** ".format(sheet_type_name,sheet_name,", ".join(dup_tenant_account)))
         # Map PL accounts and Sabra account
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
-        st.write("2",PL)
         PL=Map_PL_Sabra(PL,entity_i) 
     #return PL,PL_with_detail
     return PL
@@ -1691,6 +1688,7 @@ def Upload_And_Process(uploaded_file,file_type):
                     Total_PL=Total_PL.combine_first(PL_BS)
   
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
+    st.write("Total_PL",Total_PL)
     return Total_PL
 #----------------------------------website widges------------------------------------
 config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
