@@ -582,8 +582,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     month_count=[]
     max_len=0
     candidate_date=[]
-    st.write("month_table",month_table)
-    st.write("year_table",year_table)
     for row_i in range(search_row_size):
         # save the number of valid months of each row to month_count
         valid_month=list(filter(lambda x:x!=0,month_table.iloc[row_i,]))
@@ -608,7 +606,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                     year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]
                     st.write("year_match",year_match)
                     if len(year_match)==month_len:
-                        st.write("year_match)==month_len")
                         year_table.iloc[month_row_index,:] = [year_table.iloc[month_row_index+i,j] if month != 0 else 0 for j, month in enumerate(month_row)]
                         max_match_year=len(year_match)
                         break
@@ -631,13 +628,11 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
 
 		    #check the corresponding year
                     if max_match_year>0:
-                        st.write("max_match_year>0",max_match_year)
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                         st.write("PL_date_header",PL_date_header)
-                        st.write("isinstance(reporting_month, (int, float)",isinstance(reporting_month, (int, float)))
-                        st.write("reporting_month in PL_date_header",reporting_month in PL_date_header)
-                        if reporting_month not in PL_date_header:
+                        st.write("reporting_month not in PL_date_header",reporting_month not in list(PL_date_header))
+                        if reporting_month not in list(PL_date_header):
                             year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name)
                             PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                     elif max_match_year==0:  # there is no year at all
