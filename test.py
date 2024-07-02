@@ -230,7 +230,18 @@ def Upload_File_toS3(uploaded_file, bucket, key):
     except:
         return False  
 
-
+def Format_Value(x):
+    if pd.isna(x) or x is None or x==" ":
+        return None
+    elif x == 0:
+        return None
+    elif isinstance(x, float):
+        if x.is_integer():
+            return int(x)
+        else:
+            return round(x, 1)
+    return x
+	
 # Function to update the value in session state
 def clicked(button_name):
     st.session_state.clicked[button_name] = True
@@ -931,12 +942,12 @@ def Map_PL_Sabra(PL,entity):
 
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
-    PL= PL.astype(int)    
-    PL=PL.replace(0,None)
-
+    PL= PL.applymap(Format_Value)
     #return PL,PL_with_detail   
     return PL   
-    
+
+
+	
 @st.cache_data
 def Compare_PL_Sabra(Total_PL,reporting_month):
 #def Compare_PL_Sabra(Total_PL,PL_with_detail,reporting_month):
@@ -1590,7 +1601,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         # Map PL accounts and Sabra account
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
         PL=Map_PL_Sabra(PL,entity_i) 
-    st.write("000",PL)
+
     #return PL,PL_with_detail
     return PL
        
