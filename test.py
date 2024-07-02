@@ -1013,7 +1013,6 @@ def View_Summary():
     global Total_PL,reporting_month_data,reporting_month
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
-    st.write("Total_PL",Total_PL)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
@@ -1023,7 +1022,6 @@ def View_Summary():
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
     check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
-    st.write("reporting_month_data",reporting_month_data)
     #check if available unit changed by previous month
     Check_Available_Units(check_patient_days,reporting_month)
 	
@@ -1697,7 +1695,7 @@ def Upload_And_Process(uploaded_file,file_type):
                     Total_PL=PL_BS
                 else:
                     Total_PL=Total_PL.combine_first(PL_BS)
-  
+    st.write("Total_PL0",Total_PL) 
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
     return Total_PL
 #----------------------------------website widges------------------------------------
@@ -1837,7 +1835,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         elif len(Total_PL.columns)>1:  # there are previous months in P&L
             #diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail,reporting_month)
             diff_BPC_PL=Compare_PL_Sabra(Total_PL,reporting_month)
-        st.write("Total_PL",Total_PL)    
+   
 	# 1 Summary
         View_Summary()
        	
