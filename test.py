@@ -583,6 +583,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     max_len=0
     candidate_date=[]
     st.write("month_table",month_table)
+    st.write("year_table",year_table)
     for row_i in range(search_row_size):
         # save the number of valid months of each row to month_count
         valid_month=list(filter(lambda x:x!=0,month_table.iloc[row_i,]))
@@ -604,8 +605,10 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
             for i in [0,1,-1]:  # identify year in corresponding month
                 if month_row_index+i>=0 and month_row_index+i<year_table.shape[0]:
                     year_row=list(year_table.iloc[month_row_index+i,])
-                    year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]     
+                    year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]
+                    st.write("year_match",year_match)
                     if len(year_match)==month_len:
+                        st.write("year_match)==month_len")
                         year_table.iloc[month_row_index,:] = [year_table.iloc[month_row_index+i,j] if month != 0 else 0 for j, month in enumerate(month_row)]
                         max_match_year=len(year_match)
                         break
@@ -614,6 +617,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                         max_match_year=len(year_match)
                     else:
                         continue
+                
             if month_count[month_row_index]>1:   # if there are more than one month in header	    
 	        #check month continuous, there are at most two types of differences in the month list which are in 1,-1,11,-11 
                 inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
@@ -624,7 +628,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
 		or len_of_continuous>=10 \
 		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2) \
 		or (len_of_continuous<=2 and len_of_continuous>=1 and len_of_non_continuous==1):
-
+                    st.write("year_match",year_match)
 		    #check the corresponding year
                     if max_match_year>0:
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
