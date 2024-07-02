@@ -236,10 +236,7 @@ def Format_Value(x):
     elif x == 0:
         return None
     elif isinstance(x, float):
-        if x.is_integer():
-            return int(x)
-        else:
-            return round(x, 1)
+        return round(x, 1)
     return x
 	
 # Function to update the value in session state
@@ -1076,7 +1073,6 @@ def View_Summary():
             if reporting_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 reporting_month_data.loc[i,set_empty]=np.nan
 
-	    
     entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     if len(reporting_month_data.columns)>3:  # if there are more than one property, add total column
         reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
@@ -1085,7 +1081,6 @@ def View_Summary():
         reporting_month_data=reporting_month_data[["Sabra_Account"]+list(entity_columns)]   
 
     with st.expander("Summary of {}/{} reporting".format(reporting_month[4:6],reporting_month[0:4]) ,expanded=True):
-        
         ChangeWidgetFontSize("Summary of {}/{} reporting".format(reporting_month[4:6],reporting_month[0:4]), '25px')
         download_report(reporting_month_data,"{} {}-{} Report".format(operator,reporting_month[4:6],reporting_month[0:4]))
         reporting_month_data=reporting_month_data.applymap(Format_Value)
@@ -1095,8 +1090,6 @@ def View_Summary():
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
-       
-
         
 # no cache
 def Submit_Upload_Latestmonth():
