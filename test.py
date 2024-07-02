@@ -1,4 +1,4 @@
-import pandas as pd 
+import pandas as pd  
 pd.set_option('future.no_silent_downcasting', True)
 import numpy as np 
 from datetime import datetime, timedelta,date
@@ -635,7 +635,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                         st.write("PL_date_header",PL_date_header)
-                        st.write("reporting_month",reporting_month)
+                        st.write("instance(reporting_month, (int, float)",instance(reporting_month, (int, float))
                         st.write("reporting_month not in PL_date_header",reporting_month in PL_date_header)
                         if reporting_month not in PL_date_header:
                             year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name)
