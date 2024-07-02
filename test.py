@@ -933,7 +933,7 @@ def Map_PL_Sabra(PL,entity):
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.astype(int)    
     PL=PL.replace(0,None)
-    st.write("PL",PL)
+
     #return PL,PL_with_detail   
     return PL   
     
@@ -1530,6 +1530,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 
     # read data from uploaded file
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
+    st.write("0",PL)
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
@@ -1539,8 +1540,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         else:
             tenant_account_col=tenantAccount_col_no
 
-
-	    
         date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,date_header)
  
         if len(date_header[2])==0:
@@ -1556,6 +1555,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         # filter columns with month_select
         selected_columns = [val in month_select for val in date_header[0]]
         PL = PL.loc[:,selected_columns]   
+        st.write("1",PL)
         PL.columns= [value for value in date_header[0] if value in month_select]
   
         #remove rows with nan tenant account
@@ -1591,6 +1591,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
                 st.error("Duplicated accounts detected in {} sheet '{}'. Please rectify them to avoid repeated calculations: **{}** ".format(sheet_type_name,sheet_name,", ".join(dup_tenant_account)))
         # Map PL accounts and Sabra account
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
+        st.write("2",PL)
         PL=Map_PL_Sabra(PL,entity_i) 
     #return PL,PL_with_detail
     return PL
