@@ -942,7 +942,7 @@ def Map_PL_Sabra(PL,entity):
 
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
-    PL= PL.applymap(Format_value)    # do these two step, so Total_PL can use combine.first
+    PL= PL.applymap(Format_Value)    # do these two step, so Total_PL can use combine.first
     #return PL,PL_with_detail   
     return PL   
 
@@ -1089,8 +1089,8 @@ def View_Summary():
         ChangeWidgetFontSize("Summary of {}/{} reporting".format(reporting_month[4:6],reporting_month[0:4]), '25px')
         download_report(reporting_month_data,"{} {}-{} Report".format(operator,reporting_month[4:6],reporting_month[0:4]))
         reporting_month_data=reporting_month_data.applymap(Format_Value)
-        #reporting_month_data=reporting_month_data.fillna(0).infer_objects(copy=False)
-        #reporting_month_data=reporting_month_data.replace(0,'')
+        reporting_month_data=reporting_month_data.fillna(0).infer_objects(copy=False)
+        reporting_month_data=reporting_month_data.replace(0,'')
         styled_table = (reporting_month_data.style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
