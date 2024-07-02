@@ -232,9 +232,9 @@ def Upload_File_toS3(uploaded_file, bucket, key):
 
 def Format_Value(x):
     if pd.isna(x) or x is None or x==" ":
-        return ""
+        return None
     elif x == 0:
-        return ""
+        return None
     elif isinstance(x, float):
         if x.is_integer():
             return int(x)
