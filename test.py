@@ -232,9 +232,9 @@ def Upload_File_toS3(uploaded_file, bucket, key):
 
 def Format_Value(x):
     if pd.isna(x) or x is None or x==" ":
-        return None
+        return ""
     elif x == 0:
-        return None
+        return ""
     elif isinstance(x, float):
         if x.is_integer():
             return int(x)
@@ -942,7 +942,6 @@ def Map_PL_Sabra(PL,entity):
 
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
-    PL= PL.applymap(Format_Value)
     #return PL,PL_with_detail   
     return PL   
 
@@ -1069,9 +1068,6 @@ def View_Summary():
     reporting_month_data.Category = reporting_month_data.Category.astype("category")
     reporting_month_data.Category = reporting_month_data.Category.cat.set_categories(sorter)
     reporting_month_data=reporting_month_data.sort_values(["Category"]) 
-
-    #reporting_month_data = pd.concat([reporting_month_data.groupby(by='Category',as_index=False).sum().assign(Sabra_Account="Total_Sabra"),reporting_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]     
-    #reporting_month_data = pd.concat([reporting_month_data.groupby(by='Category', as_index=False).sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data], observed=False).sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
     reporting_month_data = pd.concat([reporting_month_data.groupby(by='Category', as_index=False,observed=False).sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
     set_empty=list(reporting_month_data.columns)
     set_empty.remove("Category")
@@ -1090,13 +1086,13 @@ def View_Summary():
     else:
         reporting_month_data=reporting_month_data[["Sabra_Account"]+list(entity_columns)]   
 
-
     with st.expander("Summary of {}/{} reporting".format(reporting_month[4:6],reporting_month[0:4]) ,expanded=True):
+        
         ChangeWidgetFontSize("Summary of {}/{} reporting".format(reporting_month[4:6],reporting_month[0:4]), '25px')
         download_report(reporting_month_data,"{} {}-{} Report".format(operator,reporting_month[4:6],reporting_month[0:4]))
-
-        reporting_month_data=reporting_month_data.fillna(0).infer_objects(copy=False)
-        reporting_month_data=reporting_month_data.replace(0,'')
+        reporting_month_data=reporting_month_data.applymap(Format_Value)
+        #reporting_month_data=reporting_month_data.fillna(0).infer_objects(copy=False)
+        #reporting_month_data=reporting_month_data.replace(0,'')
         styled_table = (reporting_month_data.style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
@@ -1113,7 +1109,7 @@ def Submit_Upload_Latestmonth():
     current_time = datetime.now(pytz.timezone('America/Los_Angeles')).strftime("%H:%M")
     upload_reporting_month["Latest_Upload_Time"]=str(today)+" "+current_time
     upload_reporting_month["Operator"]=operator
-
+    upload_reporting_month=upload_reporting_month.applymap(Format_Value)
 
     if not st.session_state.clicked["submit_report"]:
         st.stop()
@@ -1829,7 +1825,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             with st.spinner('Wait for P&L processing'):
                 #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
                 Total_PL=Upload_And_Process(uploaded_finance,"Finance")
-                st.write("Total_PL",Total_PL)
 	    # process BS 
             with st.spinner('Wait for Balance Sheet processing'):
                 #Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
