@@ -231,7 +231,7 @@ def Upload_File_toS3(uploaded_file, bucket, key):
         return False  
 
 def Format_Value(x):
-    if pd.isna(x) or x is None or x==" ":
+    if pd.isna(x) or x==None or x==" ":
         return None
     elif x == 0:
         return None
@@ -942,6 +942,7 @@ def Map_PL_Sabra(PL,entity):
 
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
+    PL= PL.applymap(Format_value)    # do these two step, so Total_PL can use combine.first
     #return PL,PL_with_detail   
     return PL   
 
@@ -1599,7 +1600,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         # Map PL accounts and Sabra account
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
         PL=Map_PL_Sabra(PL,entity_i) 
-    st.write("PL3",PL)
     #return PL,PL_with_detail
     return PL
        
