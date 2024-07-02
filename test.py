@@ -1014,7 +1014,7 @@ def View_Summary():
     global Total_PL,reporting_month_data,reporting_month
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
-    st.write("reporting_month_data",reporting_month_data)
+   
 
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
@@ -1101,7 +1101,7 @@ def View_Summary():
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
-
+        st.write("reporting_month_data",reporting_month_data)
 
         
 # no cache
