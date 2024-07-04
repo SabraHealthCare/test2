@@ -441,7 +441,7 @@ def Get_Month_Year(single_string):
     return 0,0   
 
 # add year to month_header: identify current year/last year giving a list of month
-def Fill_Year_To_Header(full_month_header,sheet_name):
+def Fill_Year_To_Header(full_month_header,sheet_name,count_reporting_month):
     month_list=list(filter(lambda x:x!=0,full_month_header))
     month_len=len(month_list)
     add_year=month_list
@@ -451,11 +451,13 @@ def Fill_Year_To_Header(full_month_header,sheet_name):
     inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
     ascending_check=sum([x in [1,-11] for x in inv])
     descending_check=sum([x in [-1,11] for x in inv])
-
+    reporting_month_date=datetime.strptime(str(reporting_month[4:6])+"/01/"+str(reporting_month[0:4]),'%m/%d/%Y').date()   
     #month decending  , month_list[0]<today.month 
     if descending_check>0 and descending_check>ascending_check: 
         date_of_assumption=datetime.strptime(str(month_list[0])+"/01/"+str(current_year),'%m/%d/%Y').date()
-        if date_of_assumption<today and date_of_assumption.month<today.month:
+        if date_of_assumption==reporting_month_date:	
+            report_year_start=current_year
+        elif date_of_assumption<today and date_of_assumption.month<today.month:
             report_year_start=current_year
         elif date_of_assumption>=today:
             report_year_start=last_year
@@ -466,8 +468,10 @@ def Fill_Year_To_Header(full_month_header,sheet_name):
             
     # month ascending  
     elif ascending_check>0 and ascending_check> descending_check: 
-        date_of_assumption=datetime.strptime(str(month_list[-1])+"/01/"+str(current_year),'%m/%d/%Y').date()    
-        if date_of_assumption<today:
+        date_of_assumption=datetime.strptime(str(month_list[-1])+"/01/"+str(current_year),'%m/%d/%Y').date() 
+	if date_of_assumption==reporting_month_date:
+            report_year_start=current_year
+        elif date_of_assumption<today:
             report_year_start=current_year
         elif date_of_assumption>=today:
             report_year_start=last_year
@@ -567,14 +571,21 @@ def Check_Available_Units(check_patient_days,reporting_month):
 		                 reporting_month:reporting_month+" Operating beds",
 		                 "Delta": "Changed"},
 			    hide_index=True)
-    
+
 @st.cache_data
 def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header): 
+    
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
             return pre_date_header
 		
+   # PL=PL.map(lambda x: 0 if pd.isna(x) or isinstance(x, str) or x==" " else x)	 
+    #columns_to_modify = [col for col in PL.columns if all((val == 0 or isinstance(val, str)) for val in PL[col]]
+
+    # Set all values in the identified columns to 0
+    #PL[columns_to_modify] = 0
+	
     PL_row_size=PL.shape[0]
     PL_col_size=PL.shape[1]
 	
@@ -640,11 +651,11 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                         
                         if reporting_month not in list(PL_date_header):
-                            year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name)
+                            year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                             PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                     elif max_match_year==0:  # there is no year at all
 		        #fill year to month
-                        year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name)
+                        year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                         original_header=PL.iloc[month_row_index,]
                         PL_date_header_list=list(PL_date_header)
@@ -1541,7 +1552,15 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
             st.stop()   
         else:
             tenant_account_col=tenantAccount_col_no
+        #set tenant_account as index of PL
+        PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
 
+        #remove rows with nan tenant account
+        nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x!=x or x==0 ,PL.index))
+        PL.drop(nan_index, inplace=True)
+        #set index as str ,strip
+        PL.index=map(lambda x:str(x).strip(),PL.index)
+        
         date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,date_header)
  
         if len(date_header[2])==0:
@@ -1550,8 +1569,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 		
         # select only two or one previous months for columns
         month_select = Get_Previous_Months(reporting_month,date_header[0]) 
-        #set tenant_account as index of PL
-        PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
+        
         #remove row above date
         PL=PL.iloc[date_header[1]+1:,:]
         # filter columns with month_select
@@ -1559,12 +1577,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         PL = PL.loc[:,selected_columns]   
         PL.columns= [value for value in date_header[0] if value in month_select]
   
-        #remove rows with nan tenant account
-        nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x!=x ,PL.index))
-        PL.drop(nan_index, inplace=True)
-        #set index as str ,strip
-        PL.index=map(lambda x:str(x).strip(),PL.index)
-        PL=PL.map(lambda x: 0 if (x!=x) or pd.isna(x) or isinstance(x, str) or x==" " else x)	    
+        
+           
         # remove columns with all nan/0
         #PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
