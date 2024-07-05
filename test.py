@@ -647,7 +647,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
 		or len_of_continuous>=10 \
 		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2) \
 		or (len_of_continuous<=2 and len_of_continuous>=1 and len_of_non_continuous==1):
-
+                    st.write("month_table",month_table)
 		    #check the corresponding year
                     if max_match_year>0:
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
@@ -656,7 +656,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                         if reporting_month not in list(PL_date_header):
                             #year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                             PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
-                           
+                            st.write("PL_date_header",PL_date_header)         
                     elif max_match_year==0:  # there is no year at all
 		        #fill year to month
                         PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
