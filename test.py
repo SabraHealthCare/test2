@@ -442,7 +442,10 @@ def Get_Month_Year(single_string):
 
 # add year to month_header: identify current year/last year giving a list of month
 #def Fill_Year_To_Header(full_month_header,sheet_name,reporting_month):
-def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reporting_month):		
+def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reporting_month):
+    #remove rows with nan tenant account
+    nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x!=x or x==0 ,PL.index))
+    PL.drop(nan_index, inplace=True)
     column_mask = [(all(val == 0 or isinstance(val, str) or pd.isna(val) for val in PL.iloc[month_row_index:, i])) for i in range(PL.shape[1])]
 
     # Apply the mask to set these columns to NaN in the row specified by month_row_index
@@ -581,7 +584,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
 			    hide_index=True)
 
 @st.cache_data
-def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header): 
+def Identify_Month_Row(PL,sheet_name,pre_date_header): 
     st.write("PL",PL)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
@@ -1554,16 +1557,11 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
             st.stop()   
         else:
             tenant_account_col=tenantAccount_col_no
+		
         #set tenant_account as index of PL
-        PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
+        PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=True)
 
-        #remove rows with nan tenant account
-        nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x!=x or x==0 ,PL.index))
-        PL.drop(nan_index, inplace=True)
-        #set index as str ,strip
-        PL.index=map(lambda x:str(x).strip(),PL.index)
-        
-        date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,date_header)
+        date_header=Identify_Month_Row(PL,sheet_name,date_header)
  
         if len(date_header[2])==0:
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
@@ -1572,6 +1570,12 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         # select only two or one previous months for columns
         month_select = Get_Previous_Months(reporting_month,date_header[0]) 
         
+	#remove rows with nan tenant account
+        nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x!=x or x==0 ,PL.index))
+        PL.drop(nan_index, inplace=True)
+        #set index as str ,strip
+        PL.index=map(lambda x:str(x).strip(),PL.index)
+	    
         #remove row above date
         PL=PL.iloc[date_header[1]+1:,:]
         # filter columns with month_select
