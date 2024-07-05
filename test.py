@@ -441,13 +441,22 @@ def Get_Month_Year(single_string):
     return 0,0   
 
 # add year to month_header: identify current year/last year giving a list of month
-def Fill_Year_To_Header(full_month_header,sheet_name,count_reporting_month):
+#def Fill_Year_To_Header(full_month_header,sheet_name,reporting_month):
+def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reporting_month)		
+    column_mask = [(all(val == 0 or isinstance(val, str) or pd.isna(val) for val in PL.iloc[month_row_index:, i])) for i in range(PL.shape[1])]
+
+    # Apply the mask to set these columns to NaN in the row specified by month_row_index
+    full_month_header=[0 if column_mask[i] else full_month_header[i] for i in range(len(full_month_header))]
+
     month_list=list(filter(lambda x:x!=0,full_month_header))
     month_len=len(month_list)
     add_year=month_list
     last_year=current_year-1
     year_change=0  
 
+
+
+	
     inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
     ascending_check=sum([x in [1,-11] for x in inv])
     descending_check=sum([x in [-1,11] for x in inv])
@@ -505,11 +514,14 @@ def Fill_Year_To_Header(full_month_header,sheet_name,count_reporting_month):
         st.error("Fail to identify Year in sheet {}, please add the year for the month and re-upload.".format(sheet_name))
         st.stop()
     j=0
+    full_year_header=full_month_header
     for i in range(len(full_month_header)):
         if full_month_header[i]!=0:
             full_month_header[i]=add_year[j]
             j+=1
-    return full_month_header
+		
+    PL_date_header= [f"{year}{month:02d}" for year, month in zip(full_year_header, full_month_header)]
+    return PL_date_header
 	
 @st.cache_data
 def Check_Available_Units(check_patient_days,reporting_month):
@@ -579,13 +591,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
             return pre_date_header
-		
-   # PL=PL.map(lambda x: 0 if pd.isna(x) or isinstance(x, str) or x==" " else x)	 
-    #columns_to_modify = [col for col in PL.columns if all((val == 0 or isinstance(val, str)) for val in PL[col]]
 
-    # Set all values in the identified columns to 0
-    #PL[columns_to_modify] = 0
-	
     PL_row_size=PL.shape[0]
     PL_col_size=PL.shape[1]
 	
@@ -651,21 +657,21 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name,pre_date_header):
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                         
                         if reporting_month not in list(PL_date_header):
-                            year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
-                            PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
+                            #year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
+                            PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
+                           
                     elif max_match_year==0:  # there is no year at all
 		        #fill year to month
-                        year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
-                        PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
+                        PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                         original_header=PL.iloc[month_row_index,]
                         PL_date_header_list=list(PL_date_header)
                     
                         d_str = ''
-                        for i in range(len(PL_date_header_list)):
-                            if PL_date_header_list[i]==0 or PL_date_header_list[i]=="0":
+                        for i in range(len(PL_date_header)):
+                            if PL_date_header[i]==0 or PL_date_header[i]=="0":
                                 continue
                             else:
-                                date=str(PL_date_header_list[i][4:6])+"/"+str(PL_date_header_list[i][0:4])
+                                date=str(PL_date_header[i][4:6])+"/"+str(PL_date_header[i][0:4])
                                 d_str +=",  "+str(original_header[i])+" — "+ date
                 
                         st.warning("Fail to identify **'Year'** for the date header in sheet '{}'. Filled year as:".format(sheet_name))
