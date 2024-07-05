@@ -453,9 +453,6 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
     add_year=month_list
     last_year=current_year-1
     year_change=0  
-
-
-
 	
     inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
     ascending_check=sum([x in [1,-11] for x in inv])
