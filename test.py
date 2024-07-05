@@ -514,6 +514,7 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
         st.error("Fail to identify Year in sheet {}, please add the year for the month and re-upload.".format(sheet_name))
         st.stop()
     j=0
+    st.write("full_month_header", full_month_header)
     full_year_header=full_month_header
     for i in range(len(full_month_header)):
         if full_month_header[i]!=0:
@@ -650,7 +651,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header):
 		or len_of_continuous>=10 \
 		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2) \
 		or (len_of_continuous<=2 and len_of_continuous>=1 and len_of_non_continuous==1):
-                    st.write("month_table",month_table)
+
 		    #check the corresponding year
                     if max_match_year>0:
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
