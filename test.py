@@ -517,7 +517,7 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
     full_year_header=full_month_header
     for i in range(len(full_month_header)):
         if full_month_header[i]!=0:
-            full_month_header[i]=add_year[j]
+            full_year_header[i]=add_year[j]
             j+=1
     PL_date_header= [f"{year}{month:02d}" for year, month in zip(full_year_header, full_month_header)]
     return PL_date_header
