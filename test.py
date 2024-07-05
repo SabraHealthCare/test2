@@ -475,7 +475,7 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
     # month ascending  
     elif ascending_check>0 and ascending_check> descending_check: 
         date_of_assumption=datetime.strptime(str(month_list[-1])+"/01/"+str(current_year),'%m/%d/%Y').date() 
-	if date_of_assumption==reporting_month_date:
+        if date_of_assumption==reporting_month_date:
             report_year_start=current_year
         elif date_of_assumption<today:
             report_year_start=current_year
