@@ -514,8 +514,8 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
         st.error("Fail to identify Year in sheet {}, please add the year for the month and re-upload.".format(sheet_name))
         st.stop()
     j=0
-    st.write("full_month_header", full_month_header)
-    full_year_header=full_month_header
+  
+    full_year_header=[0] * len(full_month_header)
     for i in range(len(full_month_header)):
         if full_month_header[i]!=0:
             full_year_header[i]=add_year[j]
