@@ -601,7 +601,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header):
     for row_i in range(search_row_size):
         for col_i in range(PL_col_size):
             month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i])   
-    st.write("month_table",month_table)
+
     year_count=[]        
     month_count=[]
     max_len=0
@@ -638,7 +638,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header):
                         max_match_year=len(year_match)
                     else:
                         continue
-            st.write("month_count",month_count,month_row_index,month_count[month_row_index])   
+  
             if month_count[month_row_index]>1:   # if there are more than one month in header	    
 	        #check month continuous, there are at most two types of differences in the month list which are in 1,-1,11,-11 
                 inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
@@ -664,7 +664,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header):
                         PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                         original_header=PL.iloc[month_row_index,]
                         PL_date_header_list=list(PL_date_header)
-                    
+                        st.write("PL_date_header_list",PL_date_header_list,"original_header",original_header)
                         d_str = ''
                         for i in range(len(PL_date_header)):
                             if PL_date_header[i]==0 or PL_date_header[i]=="0":
