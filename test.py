@@ -521,7 +521,7 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
             full_year_header[i]=add_year[j]
             j+=1
     st.write("full_year_header, full_month_header",full_year_header, full_month_header)
-    PL_date_header= [f"{year}{month:02d}" for year, month in zip(full_year_header, full_month_header)]
+    PL_date_header= [f"{year}{month:02d}" if year!=0 else 0 for year, month in zip(full_year_header, full_month_header)]
     return PL_date_header
 	
 @st.cache_data
