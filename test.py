@@ -587,7 +587,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
 
 @st.cache_data
 def Identify_Month_Row(PL,sheet_name,pre_date_header): 
-    st.write("PL",PL)
+    st.write("PL0",PL)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
@@ -662,9 +662,10 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header):
                             PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                             st.write("PL_date_header",PL_date_header)         
                     elif max_match_year==0:  # there is no year at all
+                        st.write("PL1",PL)
 		        #fill year to month
                         PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
-                        st.write("PL",PL)
+                        st.write("PL2",PL)
                         original_header=PL.iloc[month_row_index,]
                         PL_date_header_list=list(PL_date_header)
                         st.write("PL_date_header_list",PL_date_header_list,"original_header",original_header)
