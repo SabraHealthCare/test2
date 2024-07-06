@@ -442,11 +442,11 @@ def Get_Month_Year(single_string):
 
 # add year to month_header: identify current year/last year giving a list of month
 #def Fill_Year_To_Header(full_month_header,sheet_name,reporting_month):
-def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reporting_month):
+def Fill_Year_To_Header(PL_,month_row_index,full_month_header,sheet_name,reporting_month):
     #remove rows with nan tenant account
-    nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x!=x or x==0 ,PL.index))
-    PL.drop(nan_index, inplace=True)
-    column_mask = [(all(val == 0 or isinstance(val, str) or pd.isna(val) for val in PL.iloc[month_row_index:, i])) for i in range(PL.shape[1])]
+    nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x!=x or x==0 ,PL_.index))
+    PL_.drop(nan_index, inplace=True)
+    column_mask = [(all(val == 0 or isinstance(val, str) or pd_.isna(val) for val in PL_.iloc[month_row_index:, i])) for i in range(PL_.shape[1])]
 
     # Apply the mask to set these columns to NaN in the row specified by month_row_index
     full_month_header=[0 if column_mask[i] else full_month_header[i] for i in range(len(full_month_header))]
