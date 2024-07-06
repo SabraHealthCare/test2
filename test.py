@@ -664,6 +664,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header):
                     elif max_match_year==0:  # there is no year at all
 		        #fill year to month
                         PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
+	                st.write("PL",PL)
                         original_header=PL.iloc[month_row_index,]
                         PL_date_header_list=list(PL_date_header)
                         st.write("PL_date_header_list",PL_date_header_list,"original_header",original_header)
