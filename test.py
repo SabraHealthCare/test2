@@ -675,7 +675,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header):
                                 continue
                             else:
                                 date=str(PL_date_header[i][4:6])+"/"+str(PL_date_header[i][0:4])
-                                d_str +=",  "+str(original_header[i])+" — "+ date
+                                d_str +=",  "+str(PL.iloc[month_row_index,i])+" — "+ date
                 
                         st.warning("Fail to identify **'Year'** for the date header in sheet '{}'. Filled year as:".format(sheet_name))
                         st.markdown(d_str[1:])
