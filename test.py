@@ -974,12 +974,13 @@ def Compare_PL_Sabra(Total_PL,reporting_month):
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)","Diff_Percent"])
     #diff_BPC_PL_detail=pd.DataFrame(columns=["ENTITY","Sabra_Account","Tenant_Account","Month","Sabra","P&L Value","Diff (Sabra-P&L)",""])
     month_list = list(filter(lambda x:x!=reporting_month, Total_PL.columns))
-    st.write(Total_PL,Total_PL.index)
-    for entity in Total_PL.index:
+   
+    for entity in entity_mapping.index:
         for timeid in month_list: 
-            
+            if entity not in Total_PL.index.get_level_values('ENTITY'):
+                break	
 	    # if this entity don't have data for this timeid(new/transferred property), skip to next month
-            if all(list(map(lambda x:pd.isna(x) or x!=x,Total_PL.loc[entity,][timeid]))):
+            elif Total_PL.loc[entity][timeid].apply(pd.isna).all():
                 break
             for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
             #for matrix in BPC_Account["BPC_Account_Name"]: 
