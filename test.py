@@ -55,7 +55,7 @@ month_dic_num={10:["10/","-10","/10","10"],11:["11/","-11","/11","11"],12:["12/"
 #client_secret = '1h28Q~Tw-xwTMPW9w0TqjbeaOhkYVDrDQ8VHcbkd'
 #One drive authority. Set application details
 client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
-client_secret="PgR8Q~HZE2q-dmOb2w_9_0VuxfT9VMLt_Lp3Jbce"
+client_secret='PgR8Q~HZE2q-dmOb2w_9_0VuxfT9VMLt_Lp3Jbce'
 tenant_id = '71ffff7c-7e53-4daa-a503-f7b94631bd53'
 authority = 'https://login.microsoftonline.com/' + tenant_id
 user_id= '62d4a23f-e25f-4da2-9b52-7688740d9d48'  # shali's user id of onedrive
