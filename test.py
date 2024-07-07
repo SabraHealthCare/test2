@@ -74,7 +74,6 @@ app = ConfidentialClientApplication(
     client_credential=client_secret)
 
 token_response = app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
-st.write(token_response)
 access_token = token_response['access_token']
 headers = {'Authorization': 'Bearer ' + access_token,}    
 
