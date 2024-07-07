@@ -447,7 +447,7 @@ def Fill_Year_To_Header(PL_,month_row_index,full_month_header,sheet_name,reporti
     nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x!=x or x==0 ,PL_.index))
     st.write("PL4",PL_)
     column_mask = [all(val == 0 or isinstance(val, str) or pd.isna(val) for val in PL_.drop(nan_index).iloc[month_row_index:, i]) for i in range(PL_.drop(nan_index).shape[1])]
-    st.write("PL5",PL_)
+   
     # Apply the mask to set these columns to NaN in the row specified by month_row_index
     full_month_header=[0 if column_mask[i] else full_month_header[i] for i in range(len(full_month_header))]
 
@@ -520,7 +520,6 @@ def Fill_Year_To_Header(PL_,month_row_index,full_month_header,sheet_name,reporti
         if full_month_header[i]!=0:
             full_year_header[i]=add_year[j]
             j+=1
-    st.write("full_year_header, full_month_header",full_year_header, full_month_header)
     PL_date_header= [f"{year}{month:02d}" if year!=0 else 0 for year, month in zip(full_year_header, full_month_header)]
     return PL_date_header
 	
@@ -662,13 +661,13 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header):
                             PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                             st.write("PL_date_header",PL_date_header)         
                     elif max_match_year==0:  # there is no year at all
-                        st.write("PL1",PL)
+                     
 		        #fill year to month
                         PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
-                        st.write("PL2",PL)
+                     
                         original_header=PL.iloc[month_row_index,]
                         PL_date_header_list=list(PL_date_header)
-                        st.write("PL_date_header_list",PL_date_header_list,"original_header",original_header)
+                   
                         d_str = ''
                         for i in range(len(PL_date_header)):
                             if PL_date_header[i]==0 or PL_date_header[i]=="0":
