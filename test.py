@@ -586,7 +586,6 @@ def Check_Available_Units(check_patient_days,reporting_month):
 
 @st.cache_data
 def Identify_Month_Row(PL,sheet_name,pre_date_header): 
-    st.write("PL0",PL)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
@@ -891,7 +890,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
 
 @st.cache_data 
 def Map_PL_Sabra(PL,entity):
-    
+ 
     # remove no need to map from account_mapping
     main_account_mapping=account_mapping.loc[list(map(lambda x:x==x and x.upper()!='NO NEED TO MAP',account_mapping["Sabra_Account"])),:]
 
@@ -960,6 +959,8 @@ def Map_PL_Sabra(PL,entity):
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.applymap(Format_Value)    # do these two step, so Total_PL can use combine.first
     #return PL,PL_with_detail   
+    if entity=="S09066":
+        st.write("PLS09066",PL) 
     return PL   
 
 
