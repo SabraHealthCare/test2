@@ -974,7 +974,7 @@ def Compare_PL_Sabra(Total_PL,reporting_month):
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)","Diff_Percent"])
     #diff_BPC_PL_detail=pd.DataFrame(columns=["ENTITY","Sabra_Account","Tenant_Account","Month","Sabra","P&L Value","Diff (Sabra-P&L)",""])
     month_list = list(filter(lambda x:x!=reporting_month, Total_PL.columns))
-    st.write(PL,Total_PL.index)
+    st.write(Total_PL,Total_PL.index)
     for entity in Total_PL.index:
         for timeid in month_list: 
             
