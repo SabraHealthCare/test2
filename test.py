@@ -1541,6 +1541,8 @@ def Get_Previous_Months(reporting_month,full_date_header):
 
 #no cache    
 def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):  
+    if entity_i=="S09066":
+        st.write("PL0",PL)
     global account_mapping,reporting_month,tenant_account_col,date_header
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
@@ -1566,10 +1568,12 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 		
         #set tenant_account as index of PL
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=True)
-
+        if entity_i=="S09066":
+            st.write("PL1date_headerbefore",PL)
         date_header=Identify_Month_Row(PL,sheet_name,date_header)
- 
-        if len(date_header[2])==0:
+        if entity_i=="S09066":
+            st.write("PL2date_headerafter",PL)
+	if len(date_header[2])==0:
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()  
 		
@@ -1581,22 +1585,25 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         PL.drop(nan_index, inplace=True)
         #set index as str ,strip
         PL.index=map(lambda x:str(x).strip(),PL.index)
-	    
+        if entity_i=="S09066":
+            st.write("PL3",PL)   
         #remove row above date
         PL=PL.iloc[date_header[1]+1:,:]
         # filter columns with month_select
         selected_columns = [val in month_select for val in date_header[0]]
         PL = PL.loc[:,selected_columns]   
         PL.columns= [value for value in date_header[0] if value in month_select]
-  
+        if entity_i=="S09066":
+            st.write("PL4",PL) 
         
            
         # remove columns with all nan/0
         #PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
         PL=PL.loc[(PL!= 0).any(axis=1),:]
-
-        # mapping new tenant accounts
+        if entity_i=="S09066":
+            st.write("PL5",PL)         
+	# mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
