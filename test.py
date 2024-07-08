@@ -1580,15 +1580,16 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         # select only two or one previous months for columns
         month_select = Get_Previous_Months(reporting_month,date_header[0]) 
         
+        if entity_i=="S09066":
+            st.write("PL3",PL)   
+        #remove row above date
+        PL=PL.iloc[date_header[1]+1:,:]
 	#remove rows with nan tenant account
         nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x!=x or x==0 ,PL.index))
         PL.drop(nan_index, inplace=True)
         #set index as str ,strip
         PL.index=map(lambda x:str(x).strip(),PL.index)
-        if entity_i=="S09066":
-            st.write("PL3",PL)   
-        #remove row above date
-        PL=PL.iloc[date_header[1]+1:,:]
+	    
         # filter columns with month_select
         selected_columns = [val in month_select for val in date_header[0]]
         PL = PL.loc[:,selected_columns]   
