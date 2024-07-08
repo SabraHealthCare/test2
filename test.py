@@ -889,6 +889,8 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
 
 @st.cache_data 
 def Map_PL_Sabra(PL,entity):
+    if entity=='S09066':
+        st.write("PLbeforemap",PL)
     # remove no need to map from account_mapping
     main_account_mapping=account_mapping.loc[list(map(lambda x:x==x and x.upper()!='NO NEED TO MAP',account_mapping["Sabra_Account"])),:]
 
@@ -944,7 +946,8 @@ def Map_PL_Sabra(PL,entity):
                         PL.loc[i,entity_j]= before_conversion*monthdays
                     elif conversion[0]=="*":
                         PL.loc[i,entity_j]= before_conversion*float(conversion.split("*")[1])
-  
+        if entity=='S09066':
+            st.write("PLaftermap",PL)
         #property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
         PL=PL.drop(["Tenant_Formated_Account","Conversion"], axis=1)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='ENTITY')     
@@ -956,6 +959,7 @@ def Map_PL_Sabra(PL,entity):
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.applymap(Format_Value)    # do these two step, so Total_PL can use combine.first
     #return PL,PL_with_detail   
+
     return PL   
 
 
