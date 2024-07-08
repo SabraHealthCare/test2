@@ -1378,7 +1378,7 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
     property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"] if pd.notna(x) and str(x).strip()]
     max_match=[]
     for row_i in range(PL.shape[0]):
-        canditate_row=list(map(lambda x: int(x).upper().strip() if (not pd.isna(x))  else x,list(PL.iloc[row_i,:])))  
+        canditate_row=list(map(lambda x: str(x).upper().strip() if (not pd.isna(x))  else x,list(PL.iloc[row_i,:])))  
         match_names = [item for item in canditate_row if item in property_name_list_in_mapping]
         if len(match_names)==len(property_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: # find the property name header row, transfer them into entity id
             duplicate_check = [name for name in set(match_names) if match_names.count(name) > 1]
