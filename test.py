@@ -1541,8 +1541,7 @@ def Get_Previous_Months(reporting_month,full_date_header):
 
 #no cache    
 def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):  
-    if entity_i=="S09066":
-        st.write("PL0",PL)
+
     global account_mapping,reporting_month,tenant_account_col,date_header
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
@@ -1556,7 +1555,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 
     # read data from uploaded file
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
-
+    if entity_i=="S09066":
+        st.write("PL0",PL)
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
