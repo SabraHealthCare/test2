@@ -1573,7 +1573,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         date_header=Identify_Month_Row(PL,sheet_name,date_header)
         if entity_i=="S09066":
             st.write("PL2date_headerafter",PL)
-	if len(date_header[2])==0:
+        if len(date_header[2])==0:
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()  
 		
