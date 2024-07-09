@@ -1471,7 +1471,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
   
 	#remove row above property header
-        #PL=PL.iloc[entity_header_row_number+1:,:]
+        PL=PL.iloc[entity_header_row_number+1:,:]
 
         # remove column without column name, (value in property header that equal to 0)
         non_zero_columns = [val !="0" for val in new_entity_header]
