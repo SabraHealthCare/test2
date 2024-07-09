@@ -1469,17 +1469,16 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,entity_list,sheet_name) 
 	#set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
-	# find the reporting month from 0th row to property header row    
   
 	#remove row above property header
-        PL=PL.iloc[entity_header_row_number+1:,:]
+        #PL=PL.iloc[entity_header_row_number+1:,:]
 
-        # remove column without property name, (value in property header that equal to 0)
+        # remove column without column name, (value in property header that equal to 0)
         non_zero_columns = [val !="0" for val in new_entity_header]
         PL = PL.loc[:,non_zero_columns]    
         PL.columns= [value for value in new_entity_header if value != "0"]
 	    
-        #remove rows with nan tenant account
+        #remove rows without tenant account
         nan_index=list(filter(lambda x: pd.isna(x) or x=="" or x==" " or x!=x or x=="nan",PL.index))
         PL.drop(nan_index, inplace=True)
         #set index as str ,strip
@@ -1514,7 +1513,9 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         # Map PL accounts and Sabra account
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
 	# map sabra account with tenant account, groupby sabra account
+        st.write("PL1",PL)
         PL=Map_PL_Sabra(PL,entity_list) # index are ('ENTITY',"Sabra_Account")
+        st.write("PL2",PL)
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
     #return PL,PL_with_detail
