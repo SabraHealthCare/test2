@@ -1371,22 +1371,22 @@ def View_Discrepancy():
             st.success("All previous data in P&L ties with Sabra data")
 
 
-def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties are in one sheet
-    # return the row number of property header and mapped_entity, for example: ["0","0",Sxxxx,Sxxxx,"0",Sxxxx,"0"...]
+def Identify_Column_Name_Header(PL,entity_list,sheet_name):  # all properties are in one sheet
+    # return the row number of property header and mapped_entity, for example: 1, ["0","0",Sxxxx,Sxxxx,"0",Sxxxx,"0"...]
     #	Column_Name and entity_list has same order
     entity_without_propertynamefinance=entity_mapping[(entity_mapping['Column_Name'].isna()) | (entity_mapping['Column_Name'].str.strip() == "")].index.tolist()
-    property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"] if pd.notna(x) and str(x).strip()]
+    column_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"] if pd.notna(x) and str(x).strip()]
     max_match=[]
     for row_i in range(PL.shape[0]):
-        canditate_row=list(map(lambda x: str(x).upper().strip() if (not pd.isna(x))  else x,list(PL.iloc[row_i,:])))  
-        match_names = [item for item in canditate_row if item in property_name_list_in_mapping]
-        if len(match_names)==len(property_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: # find the property name header row, transfer them into entity id
+        canditate_row=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[row_i,:])))  
+        match_names = [item for item in canditate_row if item in column_name_list_in_mapping]
+        if len(match_names)==len(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: # find the property name header row, transfer them into entity id
             duplicate_check = [name for name in set(match_names) if match_names.count(name) > 1]
             if len(duplicate_check)>0:
                 st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
                 st.stop()
             else:
-                mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(property_name_list_in_mapping))}
+                mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(column_name_list_in_mapping))}
                 mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in canditate_row]
                 return row_i,mapped_entity
 	
@@ -1394,24 +1394,24 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
             max_match=match_names
             header_row=canditate_row
             max_match_row=row_i
-            if len(match_names)==len(property_name_list_in_mapping):
+            if len(match_names)==len(column_name_list_in_mapping):
                 break
         if len(max_match)>2:
             break
 		
     if len(max_match)==0:
         st.error("Fail to identify facility column names as below in sheet '{}'. Please add and re-upload.".format(sheet_name))
-        st.dataframe(pd.DataFrame(property_name_list_inmapping).transpose())
+        st.dataframe(pd.DataFrame(column_name_list_in_mapping).transpose())
         st.stop()
     elif len(max_match)>0: # only part of entities have property name in P&L
         duplicate_check = [name for name in set(match_names) if match_names.count(name) > 1]
         if len(duplicate_check)>0:
             st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
             st.stop()
-        miss_match_names = [item for item in property_name_list_in_mapping  if item not in max_match]
+        miss_match_names = [item for item in column_name_list_in_mapping  if item not in max_match]
         total_missed_entities=entity_mapping[entity_mapping["Column_Name"].str.upper().str.strip().isin(miss_match_names)].index.tolist()+entity_without_propertynamefinance
         miss_column_mapping=entity_mapping.loc[total_missed_entities]
-        column_names=[str(x) for x in PL.iloc[max_match_row,:] if pd.notna(x) and str(x).upper().strip() not in property_name_list_in_mapping]
+        column_names=[str(x) for x in PL.iloc[max_match_row,:] if pd.notna(x) and str(x).upper().strip() not in column_name_list_in_mapping]
         if len(total_missed_entities)>0:
             st.error("Please map the column names for following facilities in sheet {}.".format(sheet_name))
             with st.form(key="miss_match_column_name"):
@@ -1429,15 +1429,15 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
                 for entity_i in miss_column_mapping.index: 
                     entity_mapping.loc[entity_i,"Column_Name"]=miss_column_mapping.loc[entity_i,"Column_Name"]     
 
-                property_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"]]
-                duplicate_check = [name for name in set(property_name_list_in_mapping) if property_name_list_in_mapping.count(name) > 1]
+                column_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"]]
+                duplicate_check = [name for name in set(column_name_list_in_mapping) if column_name_list_in_mapping.count(name) > 1]
 
                 if len(duplicate_check)>0:
                     st.error( "The following column has been mapped to more than one facility in sheet '{}'. Please fix and re-upload:".format(sheet_name))
                     st.error(", ".join(f"'{item}'" for item in duplicate_check))
                     st.stop()
 
-                mapping_dict = {property_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
+                mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
                 mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
                 # update entity_mapping in onedrive  
                 Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,None,entity_mapping_str_col)
@@ -1448,8 +1448,6 @@ def Identify_Property_Name_Header(PL,entity_list,sheet_name):  # all properties 
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,sheet_name):  
     global account_mapping,reporting_month
-    property_name_list=entity_mapping.loc[entity_mapping.index.isin(entity_list)]["Property_Name"].tolist()
-
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
     if sheet_type=="Sheet_Name_Finance":  
         sheet_type_name="P&L"
@@ -1468,7 +1466,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
 
-        entity_header_row_number,new_entity_header=Identify_Property_Name_Header(PL,entity_list,sheet_name) 
+        entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,entity_list,sheet_name) 
 	#set tenant_account as index of PL
         PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
 	# find the reporting month from 0th row to property header row    
