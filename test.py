@@ -1400,8 +1400,8 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name):  # all properties ar
             break
 		
     if len(max_match)==0:
-        st.error("Fail to identify facility column names in sheet '{}'. They are supposed to be as below. Please add and re-upload.".format(sheet_name))
-        st.write(' '.join(column_name_list_in_mapping))
+        st.error("Fail to identify facility column names in sheet '{}'. The previous column names are as below. Please add and re-upload.".format(sheet_name))
+        st.write('    '.join(column_name_list_in_mapping))
         st.stop()
     elif len(max_match)>0: # only part of entities have property name in P&L
         duplicate_check = [name for name in set(match_names) if match_names.count(name) > 1]
