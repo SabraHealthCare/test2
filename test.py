@@ -428,12 +428,15 @@ def Get_Month_Year(single_string):
         # didn't detect month words in above code, check number format: 3/31/2024, 3/2023...
 	# if there is no year , skip
         year,year_num=Get_Year(single_string)
+        st.write("single_string0",single_string)
         if year==0:
             continue
         else:
             single_string=single_string.replace(year_num,"")
+            st.write("single_string1",single_string)
         for  month_num in month_dic_num[month_i]:   
             if month_num in single_string:  # month is number ,like 01/, 02/,   year is Mandatory
+                st.write("month_num in string: ",month_num)
                 remaining=single_string.replace(month_num,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("as of","").replace("actual","")
                 #if there are more than 3 other char in the string, this string is not month 
                 if len(remaining)>=3:
