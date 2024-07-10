@@ -421,7 +421,7 @@ def Get_Month_Year(single_string):
     for month_i in month_dic_word.keys() :#[01,02,03...12]
         for  month_word in month_dic_word[month_i]: #['december','dec',"nov",...]
             if month_word in single_string:  # month is words ,like Jan Feb... year is optional
-                remaining=single_string.replace(month_word,"").replace(year_word,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("as of","").replace("actual","")
+                remaining=single_string.replace(month_word,"").replace(year_num,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("as of","").replace("actual","")
                 
                 #if there are more than 3 other char in the string, this string is not month 
                 if len(remaining)>=3:
