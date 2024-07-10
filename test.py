@@ -433,9 +433,9 @@ def Get_Month_Year(single_string):
         if year==0:
             continue        
         for  month_num in month_dic_num[month_i]: 
-            st.write("month_num",month_num,"month_num in single_string",  month_num in single_string)
-            if month_num in single_string.replace(year_num,""):  # month is number ,like 01/, 02/,   year is Mandatory
-                remaining=single_string.replace(month_num,"").replace(year_num,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("as of","").replace("actual","")
+           
+            if month_num in single_string:  # month is number ,like 01/, 02/,   year is Mandatory
+                remaining=single_string.replace(month_num,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("as of","").replace("actual","")
                 #if there are more than 3 other char in the string, this string is not month 
                 if len(remaining)>=3:
                     return 0,0
@@ -605,7 +605,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     for row_i in range(search_row_size):
         for col_i in range(PL_col_size):
             month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i])   
-
+    st.write("month_table",month_table)
     year_count=[]        
     month_count=[]
     max_len=0
