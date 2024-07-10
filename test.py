@@ -696,6 +696,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
 			
                 else:
                     continue
+			
         
             # only one month in header, all the rows that have multiple months were out
             elif month_count[month_row_index]==1:
