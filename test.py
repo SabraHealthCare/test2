@@ -415,6 +415,9 @@ def Get_Month_Year(single_string):
         return 0,0
     single_string=str(single_string).lower()
     year,year_num=Get_Year(single_string)
+    if year!=0:
+        single_string=single_string.replace(year_num,"")
+    single_string=single_string.replace("30","").replace("31","").replace("29","").replace("28","")
     for month_i in month_dic_word.keys() :#[01,02,03...12]
         st.write("month_i",month_i)
         for  month_word in month_dic_word[month_i]: #['december','dec',"nov",...]
@@ -430,7 +433,7 @@ def Get_Month_Year(single_string):
 	# if there is no year , skip
         if year==0:
             continue        
-        for  month_num in month_dic_num[month_i]:   
+        for  month_num in month_dic_num[month_i]: 
             st.write("month_num",month_num,"month_num in single_string",  month_num in single_string)
             if month_num in single_string.replace(year_num,""):  # month is number ,like 01/, 02/,   year is Mandatory
                 st.write("month_num in string: ",month_num)
