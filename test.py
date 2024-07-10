@@ -435,6 +435,7 @@ def Get_Month_Year(single_string):
             single_string=single_string.replace(year_num,"")
             st.write("single_string1",single_string)
         for  month_num in month_dic_num[month_i]:   
+            st.write("month_num",month_num,"month_num in single_string",  month_num in single_string)
             if month_num in single_string:  # month is number ,like 01/, 02/,   year is Mandatory
                 st.write("month_num in string: ",month_num)
                 remaining=single_string.replace(month_num,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("as of","").replace("actual","")
