@@ -430,7 +430,7 @@ def Get_Month_Year(single_string):
         year,year_num=Get_Year(single_string)
         if year==0:
             continue
-	else:
+        else:
             single_string=single_string.replace(year_num,"")
         for  month_num in month_dic_num[month_i]:   
             if month_num in single_string:  # month is number ,like 01/, 02/,   year is Mandatory
