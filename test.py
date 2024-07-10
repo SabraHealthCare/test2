@@ -420,8 +420,8 @@ def Get_Month_Year(single_string):
     single_string=single_string.replace("30","").replace("31","").replace("29","").replace("28","")
     for month_i in month_dic_word.keys() :#[01,02,03...12]
         for  month_word in month_dic_word[month_i]: #['december','dec',"nov",...]
-            st.write("single_string",single_string)
-            st.write("month_word in single_string",month_word in single_string)
+            #st.write("single_string",single_string)
+            #st.write("month_word in single_string",month_word in single_string)
             if month_word in single_string:  # month is words ,like Jan Feb... year is optional
 
                 remaining=single_string.replace(month_word,"").replace(year_num,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("as of","").replace("actual","")
