@@ -1,4 +1,4 @@
-import pandas as pd  
+import pandas as pd
 pd.set_option('future.no_silent_downcasting', True)
 import numpy as np 
 from datetime import datetime, timedelta,date
@@ -584,7 +584,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
 			    hide_index=True)
 
 @st.cache_data
-def Identify_Month_Row(PL,sheet_name,pre_date_header): 
+def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no): 
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
@@ -1560,8 +1560,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
             tenant_account_col=tenantAccount_col_no
 		
         #set tenant_account as index of PL
-        PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=True)
-        date_header=Identify_Month_Row(PL,sheet_name,date_header)
+        PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
+        date_header=Identify_Month_Row(PL,sheet_name,date_header,tenantAccount_col_no)
 
         if len(date_header[2])==0:
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
