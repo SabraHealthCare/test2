@@ -414,7 +414,6 @@ def Get_Month_Year(single_string):
     if isinstance(single_string, (int,float)):
         return 0,0
     single_string=str(single_string).lower()
-    st.write("single_string",single_string)
     for month_i in month_dic_word.keys() :#[01,02,03...12]
         for  month_word in month_dic_word[month_i]: #['december','dec',"nov",...]
             if month_word in single_string:  # month is words ,like Jan Feb... year is optional
@@ -426,20 +425,21 @@ def Get_Month_Year(single_string):
                     return 0,0
                 else:   
                     return month_i,year
+        # didn't detect month words in above code, check number format: 3/31/2024, 3/2023...
+	# if there is no year , skip
+        year,year_num=Get_Year(single_string)
+        if year==0:
+            continue
+	else:
+            single_string=single_string.replace(year_num,"")
         for  month_num in month_dic_num[month_i]:   
             if month_num in single_string:  # month is number ,like 01/, 02/,   year is Mandatory
-                st.write("month_num in single_string",month_num)
-                year,year_num=Get_Year(single_string)
-                st.write("year ",year)
-                if year==0:
-                    continue
-                else:		
-                    remaining=single_string.replace(month_num,"").replace(year_num,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("as of","").replace("actual","")
-                    #if there are more than 3 other char in the string, this string is not month 
-                    if len(remaining)>=3:
-                        return 0,0
-                    else:   
-                        return month_i,year	
+                remaining=single_string.replace(month_num,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("as of","").replace("actual","")
+                #if there are more than 3 other char in the string, this string is not month 
+                if len(remaining)>=3:
+                    return 0,0
+                else:   
+                    return month_i,year	
     # didn't find month. return month as 0
     return 0,0   
 
