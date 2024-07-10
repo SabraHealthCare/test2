@@ -47,7 +47,7 @@ availble_unit_accounts=["A_ACH","A_IL","A_ALZ","A_SNF","A_ALF","A_BH","A_IRF","A
 month_dic_word={10:["october","oct"],11:["november","nov"],12:["december","dec"],1:["january","jan"],\
                    2:["february","feb"],3:["march","mar"],4:["april","apr"],\
                    5:["may"],6:["june","jun"],7:["july","jul"],8:["august","aug"],9:["september","sep"]}
-month_dic_num={10:["10/","-10","/10","10"],11:["11/","-11","/11","11"],12:["12/","-12","/12","12"],1:["01/","1/","-1","-01","/1","/01"],\
+month_dic_num={10:["10/","-10","/10","10","_10"],11:["11/","-11","/11","11","_11"],12:["12/","-12","/12","12"],1:["01/","1/","-1","-01","/1","/01"],\
                    2:["02/","2/","-2","-02","/2","/02"],3:["03/","3/","-3","-03","/3","/03"],4:["04/","4/","-4","-04","/4","/04"],\
                    5:["05/","5/","-5","-05","/5","/05"],6:["06/","6/","-06","-6","/6","/06"],\
                    7:["07/","7/","-7","-07","/7","/07"],8:["08/","8/","-8","-08","/8","/08"],9:["09/","9/","-09","-9","/9","/09"]}
@@ -415,6 +415,7 @@ def Get_Month_Year(single_string):
         return 0,0
     single_string=str(single_string).lower()
     for month_i in month_dic_word.keys() :#[01,02,03...12]
+        st.write("month_i",month_i)
         for  month_word in month_dic_word[month_i]: #['december','dec',"nov",...]
             if month_word in single_string:  # month is words ,like Jan Feb... year is optional
                 year,year_word=Get_Year(single_string)	
