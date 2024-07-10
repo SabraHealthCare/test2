@@ -418,6 +418,7 @@ def Get_Month_Year(single_string):
     if year!=0:
         single_string=single_string.replace(year_num,"")
     single_string=single_string.replace("30","").replace("31","").replace("29","").replace("28","")
+    st.write("single_string",single_string)
     for month_i in month_dic_word.keys() :#[01,02,03...12]
         st.write("month_i",month_i)
         for  month_word in month_dic_word[month_i]: #['december','dec',"nov",...]
@@ -607,7 +608,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     for row_i in range(search_row_size):
         for col_i in range(PL_col_size):
             month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i])   
-    st.write("PL",PL,"month_table",month_table,year_table)
+
     year_count=[]        
     month_count=[]
     max_len=0
