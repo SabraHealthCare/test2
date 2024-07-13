@@ -436,13 +436,10 @@ def Get_Month_Year(single_string):
         if year==0:
             continue   
         
-        st.write("single_string",year,single_string)
         for  month_num in month_dic_num[month_i]: 
             if month_num in single_string:  # month is number ,like 01/, 02/,   year is Mandatory
                 remaining=single_string.replace(month_num,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("asof","").replace("actual","")
                 #if there are more than 3 other char in the string, this string is not month 
-
-                st.write("remaining",remaining)
                 if len(remaining)>=3:
                     return 0,0
                 else:   
@@ -595,7 +592,6 @@ def Check_Available_Units(check_patient_days,reporting_month):
 
 @st.cache_data
 def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no): 
-    st.write("PL",PL)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
@@ -1042,7 +1038,7 @@ def View_Summary():
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
-    st.write("Total_PL",Total_PL)
+
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
