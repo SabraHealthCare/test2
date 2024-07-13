@@ -435,14 +435,14 @@ def Get_Month_Year(single_string):
 	# if there is no year , skip
         if year==0:
             continue   
-        if sheet_name=="HBO Balance Sheet":
-            st.write(year,single_string)
+        
+        st.write("single_string",year,single_string)
         for  month_num in month_dic_num[month_i]: 
             if month_num in single_string:  # month is number ,like 01/, 02/,   year is Mandatory
                 remaining=single_string.replace(month_num,"").replace(year_num,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("as of","").replace("actual","")
                 #if there are more than 3 other char in the string, this string is not month 
-                if sheet_name=="HBO Balance Sheet":
-                    st.write(remaining)
+
+                st.write("remaining",remaining)
                 if len(remaining)>=3:
                     return 0,0
                 else:   
