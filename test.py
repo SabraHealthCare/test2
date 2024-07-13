@@ -1521,9 +1521,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         # Map PL accounts and Sabra account
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
 	# map sabra account with tenant account, groupby sabra account
-        st.write("PL1",PL)
         PL=Map_PL_Sabra(PL,entity_list) # index are ('ENTITY',"Sabra_Account")
-        st.write("PL2",PL)
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
     #return PL,PL_with_detail
@@ -1595,7 +1593,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         # remove columns with all nan/0
         #PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
-        PL=PL.loc[(PL!= 0).any(axis=1),:]        
+        #PL=PL.loc[(PL!= 0).any(axis=1),:]  
+        PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
 	# mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
         new_tenant_account_list=list(set(new_tenant_account_list))    
