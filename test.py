@@ -607,7 +607,6 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     for row_i in range(search_row_size):
         for col_i in range(PL_col_size):
             month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i])   
-    st.write("month_table",sheet_name,month_table)
     year_count=[]        
     month_count=[]
     max_len=0
