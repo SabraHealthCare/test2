@@ -448,11 +448,10 @@ def Get_Month_Year(single_string):
     return 0,0   
 
 # add year to month_header: identify current year/last year giving a list of month
-#def Fill_Year_To_Header(full_month_header,sheet_name,reporting_month):
-def Fill_Year_To_Header(PL_,month_row_index,full_month_header,sheet_name,reporting_month):
+def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reporting_month):
     #remove rows with nan tenant account
-    nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x!=x or x==0 ,PL_.index))
-    column_mask = [all(val == 0 or isinstance(val, str) or pd.isna(val) for val in PL_.drop(nan_index).iloc[month_row_index:, i]) for i in range(PL_.drop(nan_index).shape[1])]
+    nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x==0 ,PL.index))
+    column_mask = [all(val == 0 or isinstance(val, str) or pd.isna(val) for val in PL.drop(nan_index).iloc[month_row_index:, i]) for i in range(PL.drop(nan_index).shape[1])]
    
     # Apply the mask to set these columns to NaN in the row specified by month_row_index
     full_month_header=[0 if column_mask[i] else full_month_header[i] for i in range(len(full_month_header))]
@@ -599,14 +598,23 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
 
     PL_row_size=PL.shape[0]
     PL_col_size=PL.shape[1]
-	
+
+    #nan_index is the nan or 0 in tenant account column 
+    nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x==0 ,PL.index))
+    # nan_num_column is the column whose value is nan or 0 for PL.drop(nan_index)
+    nan_num_column = [all(val == 0 or isinstance(val, str) or pd.isna(val) for val in PL.drop(nan_index).iloc[:, i]) for i in range(PL.drop(nan_index).shape[1])]
+   
     search_row_size=min(40,PL_row_size)
     month_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
     year_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
 
     for row_i in range(search_row_size):
         for col_i in range(PL_col_size):
-            month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i])   
+            if nan_num_column[col_i]:
+                month_table.iloc[row_i,col_i]=0
+                year_table.iloc[row_i,col_i]=0
+	    else:
+                month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i])   
     year_count=[]        
     month_count=[]
     max_len=0
@@ -1492,10 +1500,11 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         #set index as str ,strip
         PL.index=map(lambda x:str(x).strip(),PL.index)
         PL=PL.map(lambda x: 0 if x!=x or pd.isna(x) or isinstance(x, str) or x==" " else x)	    
-        # remove columns with all nan/0
+        # don't removes with all nan/0, because some property may have no data and need to keep empty
         #PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
-        PL=PL.loc[(PL!= 0).any(axis=1),:]
+        #PL=PL.loc[(PL!= 0).any(axis=1),:]
+        PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
         # mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
         # remove duplicate new account
@@ -1542,7 +1551,6 @@ def Get_Previous_Months(reporting_month,full_date_header):
 
 #no cache    
 def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):  
-
     global account_mapping,reporting_month,tenant_account_col,date_header
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
@@ -1590,10 +1598,9 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         PL = PL.loc[:,selected_columns]   
         PL.columns= [value for value in date_header[0] if value in month_select]        
            
-        # remove columns with all nan/0
+        # remove columns with all nan/0 or a combinationof nan and 0
         #PL=PL.loc[:,(PL!= 0).any(axis=0)]
-        # remove rows with all nan/0 value
-        #PL=PL.loc[(PL!= 0).any(axis=1),:]  
+        # remove rows with all nan/0 value or a combinationof nan and 0
         PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
 	# mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
