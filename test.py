@@ -613,7 +613,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
             if nan_num_column[col_i]:
                 month_table.iloc[row_i,col_i]=0
                 year_table.iloc[row_i,col_i]=0
-	    else:
+            else:
                 month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i])   
     year_count=[]        
     month_count=[]
