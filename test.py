@@ -424,7 +424,7 @@ def Get_Month_Year(single_string):
             #st.write("month_word in single_string",month_word in single_string)
             if month_word in single_string:  # month is words ,like Jan Feb... year is optional
 
-                remaining=single_string.replace(month_word,"").replace(year_num,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("as of","").replace("actual","")
+                remaining=single_string.replace(month_word,"").replace(year_num,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("asof","").replace("actual","")
                 
                 #if there are more than 3 other char in the string, this string is not month 
                 if len(remaining)>=3:
