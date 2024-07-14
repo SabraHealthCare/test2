@@ -2,7 +2,7 @@ import pandas as pd
 pd.set_option('future.no_silent_downcasting', True)
 import numpy as np 
 from datetime import datetime, timedelta,date
-from openpyxl import load_workbook
+from openpyxl import load_workbookf
 from openpyxl.utils.dataframe import dataframe_to_rows
 import streamlit as st             
 import boto3
@@ -746,17 +746,12 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
 
     if len(candidate_date)>1:
         #st.write(candidate_date)
-        st.error("We detected {} date headers in sheet——'{}' as below. Please ensure there's only one date header for the data column. Otherwise, it will be confusing to determine the correct column for the data.".format(len(candidate_date),sheet_name))
-        try:
-            display_list=[]
-            for i in range(len(candidate_date)):
-                display_list.append(PL.iloc[candidate_date[i][1],list(map(lambda x: x!="0", candidate_date[i][0]))].iloc[0])
-            st.write(",".join(display_list))
-        except:
-            st.stop()
+        st.error("We detected {} date headers on the columns {} respectively in sheet——'{}' as below. Please ensure there's only one date header for the data column.\
+	             Otherwise, it will be confusing to determine the correct column for the data.".format(len(candidate_date),",".join([sublist[-1]+1 for sublist in candidate_date]),sheet_name))
+
         st.stop()
     elif len(candidate_date)==1:	    
-        return candidate_date[0]
+        return candidate_date[0][0:3]
     elif len(candidate_date)==0: 
         # there is only two columns: tenant_account, data
         if PL_col_size==tenantAccount_col_no+2:  
