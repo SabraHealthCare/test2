@@ -604,7 +604,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     # nan_num_column is the column whose value is nan or 0 for PL.drop(nan_index)
     nan_num_column = [all(val == 0 or pd.isna(val) or isinstance(val, (str, bool, pd.Timestamp, pd.Timedelta))  for val in PL.drop(nan_index).iloc[:, i]) for i in range(PL.drop(nan_index).shape[1])]
     st.write("PL",PL,"nan_num_column",nan_num_column)   
-    st.write(PL.applymap(lambda x: type(x).__name__))
+    st.write(PL.applymap(lambda x: "Na" if pd.isna(x) else type(x).__name__))
     search_row_size=min(40,PL_row_size)
     month_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
     year_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
