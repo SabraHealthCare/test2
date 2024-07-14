@@ -708,11 +708,13 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
         
             # only one month in header, all the rows that have multiple months were out
             elif month_count[month_row_index]==1:
-                col_month=0      #col_month is the col number of month
-	        # find the month column
-                while(month_table.iloc[month_row_index,col_month]==0):
-                    col_month+=1
+	        # #col_month is the col number of month
+                #while(month_table.iloc[month_row_index,col_month]==0):
+                    #col_month+=1
+                col_month = next((col_no for col_no, val_month in enumerate(month_table.iloc[month_row_index, :]) if val_month != 0), 0)
                 if month_table.iloc[month_row_index,col_month]!=int(reporting_month[4:]):
+                    continue
+                if candidate_date!=[] and any(col_month == candidate_date_i[-1] for candidate_date_i in candidate_date):
                     continue
                 #if there is no year in month row, check above row or next row
                 if  year_table.iloc[month_row_index,col_month]==0:
@@ -735,11 +737,12 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                     continue
                 else:
                     PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x))) 
-                    candidate_date.append([PL_date_header,month_row_index,PL.iloc[month_row_index,:]] )
+                    candidate_date.append([PL_date_header,month_row_index,PL.iloc[month_row_index,:],col_month] )
                     continue
                 
 
     if len(candidate_date)>1:
+        #st.write(candidate_date)
         st.error("We detected {} date headers in sheet——'{}' as below. Please ensure there's only one date header for the data column. Otherwise, it will be confusing to determine the correct column for the data.".format(len(candidate_date),sheet_name))
         try:
             display_list=[]
