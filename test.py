@@ -451,7 +451,7 @@ def Get_Month_Year(single_string):
 def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reporting_month):
     #remove rows with nan tenant account
     nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x==0 ,PL.index))
-    column_mask = [all(val == 0 or isinstance(val, str) or pd.isna(val) for val in PL.drop(nan_index).iloc[month_row_index:, i]) for i in range(PL.drop(nan_index).shape[1])]
+    column_mask = [all(val == 0 or not isinstance(val, (int, float)) or pd.isna(val) for val in PL.drop(nan_index).iloc[month_row_index:, i]) for i in range(PL.drop(nan_index).shape[1])]
    
     # Apply the mask to set these columns to NaN in the row specified by month_row_index
     full_month_header=[0 if column_mask[i] else full_month_header[i] for i in range(len(full_month_header))]
