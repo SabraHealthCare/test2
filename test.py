@@ -759,7 +759,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     elif len(candidate_date)==1:	    
         return candidate_date[0][0:3]
     elif len(candidate_date)==0: 
-        st.write("candidate_date",candidate_date)
+        #st.write("candidate_date",candidate_date)
         # there is only two columns: tenant_account, data
         if PL_col_size==tenantAccount_col_no+2:  
             count_num=count_str=count_non=0
