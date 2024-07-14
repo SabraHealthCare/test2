@@ -230,15 +230,19 @@ def Upload_File_toS3(uploaded_file, bucket, key):
     except:
         return False  
 
-def Format_Value(x):
-    if pd.isna(x) or x==None or x==" ":
-        return None
-    elif x == 0:
-        return None
-    elif isinstance(x, float):
-        return round(x, 1)
-    return x
-	
+def Format_Value(column):
+    def format_value(x):
+        if pd.isna(x) or x == None or x == " ":
+            return None
+        elif x == 0:
+            return None
+        elif isinstance(x, float):
+            return round(x, 1)
+        return x
+    
+    return column.apply(format_value)
+
+
 # Function to update the value in session state
 def clicked(button_name):
     st.session_state.clicked[button_name] = True
@@ -971,9 +975,8 @@ def Map_PL_Sabra(PL,entity):
 
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
-    PL= PL.applymap(Format_Value)    # do these two step, so Total_PL can use combine.first
+    PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first
     #return PL,PL_with_detail   
-
     return PL   
 
 
@@ -1120,7 +1123,7 @@ def View_Summary():
     with st.expander("Summary of {}/{} reporting".format(reporting_month[4:6],reporting_month[0:4]) ,expanded=True):
         ChangeWidgetFontSize("Summary of {}/{} reporting".format(reporting_month[4:6],reporting_month[0:4]), '25px')
         download_report(reporting_month_data,"{} {}-{} Report".format(operator,reporting_month[4:6],reporting_month[0:4]))
-        reporting_month_data=reporting_month_data.applymap(Format_Value)
+        reporting_month_data=reporting_month_data.apply(Format_Value)
         reporting_month_data=reporting_month_data.fillna(0).infer_objects(copy=False)
         reporting_month_data=reporting_month_data.replace(0,'')
         styled_table = (reporting_month_data.style.set_table_styles(styles).apply(highlight_total, axis=1).format(precision=0, thousands=",").hide(axis="index").to_html(escape=False)) # Use escape=False to allow HTML tags
@@ -1137,7 +1140,7 @@ def Submit_Upload_Latestmonth():
     current_time = datetime.now(pytz.timezone('America/Los_Angeles')).strftime("%H:%M")
     upload_reporting_month["Latest_Upload_Time"]=str(today)+" "+current_time
     upload_reporting_month["Operator"]=operator
-    upload_reporting_month=upload_reporting_month.applymap(Format_Value)
+    upload_reporting_month=upload_reporting_month.apply(Format_Value)
 
     if not st.session_state.clicked["submit_report"]:
         st.stop()
