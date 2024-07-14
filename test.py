@@ -453,17 +453,22 @@ def Get_Month_Year(single_string):
 
 # add year to month_header: identify current year/last year giving a list of month
 def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reporting_month):
-    st.write("full_month_header",full_month_header)
+
     #remove rows with nan tenant account
     nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x==0 ,PL.index))
     column_mask = [all(val == 0 or not isinstance(val, (int, float)) or pd.isna(val) for val in PL.drop(nan_index).iloc[month_row_index:, i]) for i in range(PL.drop(nan_index).shape[1])]
    
     # Apply the mask to set these columns to NaN in the row specified by month_row_index
     full_month_header=[0 if column_mask[i] else full_month_header[i] for i in range(len(full_month_header))]
-    st.write("full_month_header1",full_month_header)
     month_list=list(filter(lambda x:x!=0,full_month_header))
-    st.write("month_list",month_list)
     month_len=len(month_list)
+    full_year_header=[0] * len(full_month_header)
+    if month_len==1:
+        year=reporting_month[0:4]
+        PL_date_header= [f"{year}{month:02d}" if month!=0 else 0 for month in full_month_header]
+    return PL_date_header
+
+	    
     add_year=month_list
     last_year=current_year-1
     year_change=0  
@@ -526,7 +531,7 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
         st.stop()
     j=0
   
-    full_year_header=[0] * len(full_month_header)
+ 
     for i in range(len(full_month_header)):
         if full_month_header[i]!=0:
             full_year_header[i]=add_year[j]
