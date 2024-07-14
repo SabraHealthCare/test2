@@ -619,7 +619,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                 year_table.iloc[row_i,col_i]=0
             else:
                 month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i]) 
-    #st.write("month_table",month_table,"year_table",year_table)
+    st.write("month_table",month_table,"year_table",year_table)
     year_count=[]        
     month_count=[]
     max_len=0
@@ -753,6 +753,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     elif len(candidate_date)==1:	    
         return candidate_date[0][0:3]
     elif len(candidate_date)==0: 
+        st.write("candidate_date",candidate_date)
         # there is only two columns: tenant_account, data
         if PL_col_size==tenantAccount_col_no+2:  
             count_num=count_str=count_non=0
