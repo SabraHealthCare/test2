@@ -460,7 +460,7 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
    
     # Apply the mask to set these columns to NaN in the row specified by month_row_index
     full_month_header=[0 if column_mask[i] else full_month_header[i] for i in range(len(full_month_header))]
-
+    st.write("full_month_header1",full_month_header)
     month_list=list(filter(lambda x:x!=0,full_month_header))
     st.write("month_list",month_list)
     month_len=len(month_list)
