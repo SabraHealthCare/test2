@@ -602,7 +602,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     #nan_index is the nan or 0 in tenant account column 
     nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x==0 ,PL.index))
     # nan_num_column is the column whose value is nan or 0 for PL.drop(nan_index)
-    nan_num_column = [all(val == 0 or pd.isna(val) or not isinstance(val, (int, float)))  for val in PL.drop(nan_index).iloc[:, i]) for i in range(PL.drop(nan_index).shape[1])]
+    nan_num_column = [all(val == 0 or pd.isna(val) or not isinstance(val, (int, float)) for val in PL.drop(nan_index).iloc[:, i]) for i in range(PL.drop(nan_index).shape[1])]
     st.write("PL",PL,"nan_num_column",nan_num_column)   
     st.write(PL.applymap(lambda x: "Na" if pd.isna(x) else type(x).__name__))
     search_row_size=min(40,PL_row_size)
