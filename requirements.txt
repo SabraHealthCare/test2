@@ -4,7 +4,7 @@ xlwt
 pyodbc
 xlrd>=2.0.1
 datetime
-openpyxl
+openpyxl>=3.0.6
 streamlit >=1.23.0
 #gcsfs
 #pyodbc
