@@ -657,7 +657,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                     else:
                         continue
   
-            if month_count[month_row_index]>1:   # if there are more than one month in header	    
+            if month_count[month_row_index]>1:   # if there are more than one month in the header	    
 	        #check month continuous, there are at most two types of differences in the month list which are in 1,-1,11,-11 
                 inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
                 continuous_check_bool=[x in [1,-1,11,-11] for x in inv]
@@ -666,8 +666,8 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                 if  len_of_continuous==len(continuous_check_bool) \
 		or len_of_continuous>=10 \
 		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2) \
-		or (len_of_continuous<=2 and len_of_continuous>=1 and len_of_non_continuous==1):
-
+		or (len_of_continuous<=2 and len_of_continuous>=1 and len_of_non_continuous==1)
+                or all(x == 0 for x in inv) :
 		    #check the corresponding year
                     if max_match_year>0:
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
@@ -676,9 +676,8 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                         if reporting_month not in list(PL_date_header):
                             #year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                             PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
-                            st.write("PL_date_header",PL_date_header)         
-                    elif max_match_year==0:  # there is no year at all
-                     
+                            #st.write("PL_date_header",PL_date_header)         
+                    elif max_match_year==0:  # there is no year for all the months
 		        #fill year to month
                         PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                      
@@ -704,7 +703,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
 			     format(reporting_month[4:6],reporting_month[0:4],sheet_name,reporting_month[4:6],reporting_month[0:4]))
                     elif count_reporting_month==1:  # there is only one reporting month in the header
                         return PL_date_header,month_row_index,PL.iloc[month_row_index,:]	
-			
+		
                 else:
                     continue
 			
