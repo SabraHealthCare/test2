@@ -1199,6 +1199,13 @@ def EPM_Formula(data,value_name): # make sure there is no col on index for data
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
     st.write(uploaded_file,sheet_type)
+
+    try:
+        PL_sheet_list = load_workbook(uploaded_file, data_only=True).sheetnames
+        st.write(PL_sheet_list)
+    except TypeError as e:
+        st.write(f"Error: {e}")
+	
     PL_sheet_list=load_workbook(uploaded_file).sheetnames
     st.write(PL_sheet_list)
     if sheet_type=="Finance":
