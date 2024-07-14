@@ -1198,7 +1198,9 @@ def EPM_Formula(data,value_name): # make sure there is no col on index for data
 	
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
-    PL_sheet_list=load_workbook(uploaded_file).sheetnames	
+    st.write(uploaded_file,sheet_type)
+    PL_sheet_list=load_workbook(uploaded_file).sheetnames
+    st.write(PL_sheet_list)
     if sheet_type=="Finance":
         missing_PL_sheet_property = entity_mapping[(~entity_mapping["Sheet_Name_Finance"].isin(PL_sheet_list))|(pd.isna(entity_mapping["Sheet_Name_Finance"]))]
         missing_PL_sheet_property_Y=missing_PL_sheet_property.loc[missing_PL_sheet_property["Finance_in_separate_sheets"]=="Y",:]
