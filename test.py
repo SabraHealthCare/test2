@@ -51,7 +51,7 @@ month_dic_num={10:["10/","-10","/10","10","_10"],11:["11/","-11","/11","11","_11
                    2:["02/","2/","-2","-02","/2","/02"],3:["03/","3/","-3","-03","/3","/03"],4:["04/","4/","-4","-04","/4","/04"],\
                    5:["05/","5/","-5","-05","/5","/05"],6:["06/","6/","-06","-6","/6","/06"],\
                    7:["07/","7/","-7","-07","/7","/07"],8:["08/","8/","-8","-08","/8","/08"],9:["09/","9/","-09","-9","/9","/09"]}
-
+year_dic={2023:["2023","23"],2024:["2024","24"],2025:["2025","25"],2026:["2026","26"]} 	    
 #client_secret = '1h28Q~Tw-xwTMPW9w0TqjbeaOhkYVDrDQ8VHcbkd'
 #One drive authority. Set application details
 client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
@@ -400,17 +400,14 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,pre_m
 def download_report(df,button_display):
     download_file=df.to_csv(index=False).encode('utf-8')
     return st.download_button(label="Download "+button_display,data=download_file,file_name=button_display+".csv",mime="text/csv")
-
-year_dic={2023:["2023","23"],2024:["2024","24"],2025:["2025","25"],2026:["2026","26"]} 	    
+ 
 def Get_Year(single_string):
-    st.write("single_string",single_string,isinstance(single_string, str))
     for Year in year_dic.keys():
         for Year_keyword in year_dic[Year]:
-            st.write("Year_keyword",Year_keyword,"Year_keyword in single_string",Year_keyword in single_string)
             if Year_keyword in single_string:
+                st.write("single_string",single_string,"return",Year,Year_keyword)
                 return Year,Year_keyword
     return 0,""
-
 
 def Get_Month_Year(single_string):
     if single_string!=single_string or pd.isna(single_string):
@@ -419,11 +416,15 @@ def Get_Month_Year(single_string):
         return int(single_string.month),int(single_string.year)
     
     year,year_num=Get_Year(str(single_string))
+    st.write("single_string","year","year_num",single_string,year,year_num)
     if isinstance(single_string, (int,float)) and year==0:
+        st.write("single_string",single_string,"return 0,0")
         return 0,0
     single_string=str(single_string).lower()
     if year!=0:
         single_string=single_string.replace(year_num,"")
+        if single_string=="":
+            return 0,year
     single_string=single_string.replace("30","").replace("31","").replace("29","").replace("28","")
     for month_i in month_dic_word.keys() :#[01,02,03...12]
         for  month_word in month_dic_word[month_i]: #['december','dec',"nov",...]
