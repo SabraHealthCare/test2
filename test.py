@@ -474,6 +474,7 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
     year_change=0  
 	
     inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
+    st.write("inv",inv)
     ascending_check=sum([x in [1,-11] for x in inv])
     descending_check=sum([x in [-1,11] for x in inv])
     reporting_month_date=datetime.strptime(str(reporting_month[4:6])+"/01/"+str(reporting_month[0:4]),'%m/%d/%Y').date()   
@@ -626,7 +627,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                 year_table.iloc[row_i,col_i]=0
             else:
                 month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i]) 
-    #st.write("month_table",month_table,"year_table",year_table)
+    st.write("month_table",month_table,"year_table",year_table)
     year_count=[]        
     month_count=[]
     max_len=0
@@ -663,7 +664,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                         max_match_year=len(year_match)
                     else:
                         continue
-  
+            st.write("year_table",year_table)   
             if month_count[month_row_index]>1:   # if there are more than one month in the header	    
 	        #check month continuous, there are at most two types of differences in the month list which are in 1,-1,11,-11 
                 inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
