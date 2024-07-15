@@ -632,7 +632,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
             else:
                 month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i]) 
     if sheet_name=='LV Census':
-        st.write("month_table",month_table,"year_table",year_table)
+        st.write("PL",PL,"month_table",month_table,"year_table",year_table)
     year_count=[]        
     month_count=[]
     max_len=0
