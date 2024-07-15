@@ -415,10 +415,11 @@ def Get_Month_Year(single_string):
         return 0,0
     if isinstance(single_string, datetime):
         return int(single_string.month),int(single_string.year)
-    if isinstance(single_string, (float)):
-        return 0,0
+    
     single_string=str(single_string).lower()
     year,year_num=Get_Year(single_string)
+    if isinstance(single_string, (int,float)) and year==0:
+        return 0,0
     if year!=0:
         single_string=single_string.replace(year_num,"")
     single_string=single_string.replace("30","").replace("31","").replace("29","").replace("28","")
