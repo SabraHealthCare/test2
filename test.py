@@ -631,7 +631,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                 year_table.iloc[row_i,col_i]=0
             else:
                 month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i]) 
-    st.write("month_table",month_table,"year_table",year_table)
+    #st.write("month_table",month_table,"year_table",year_table)
     year_count=[]        
     month_count=[]
     max_len=0
@@ -640,7 +640,6 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
         # save the number of valid months of each row to month_count
         valid_month=list(filter(lambda x:x!=0,month_table.iloc[row_i,]))
         valid_year=list(filter(lambda x:x!=0,year_table.iloc[row_i,]))
-    
         month_count.append(len(valid_month))
         year_count.append(len(valid_year))
 	
@@ -668,7 +667,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                         max_match_year=len(year_match)
                     else:
                         continue
-            st.write("year_table",year_table)   
+  
             if month_count[month_row_index]>1:   # if there are more than one month in the header	    
 	        #check month continuous, there are at most two types of differences in the month list which are in 1,-1,11,-11 
                 inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
@@ -691,7 +690,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                             #st.write("PL_date_header",PL_date_header)         
                     elif max_match_year==0:  # there is no year for all the months
 		        #fill year to month
-                        st.write("PL",PL,"month_row_index",month_row_index,"list(month_table.iloc[month_row_index,])",list(month_table.iloc[month_row_index,]),"sheet_name",sheet_name)
+                        #st.write("PL",PL,"month_row_index",month_row_index,"list(month_table.iloc[month_row_index,])",list(month_table.iloc[month_row_index,]),"sheet_name",sheet_name)
                         PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                      
                         original_header=PL.iloc[month_row_index,]
