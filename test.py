@@ -418,7 +418,7 @@ def Get_Month_Year(single_string):
     year,year_num=Get_Year(str(single_string))
     st.write("single_string","year","year_num",single_string,year,year_num)
     if isinstance(single_string, (int,float)) and year==0:
-        st.write("single_string",single_string,"return 0,0")
+        #st.write("single_string",single_string,"return 0,0")
         return 0,0
     single_string=str(single_string).lower()
     if year!=0:
