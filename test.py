@@ -400,9 +400,9 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,pre_m
 def download_report(df,button_display):
     download_file=df.to_csv(index=False).encode('utf-8')
     return st.download_button(label="Download "+button_display,data=download_file,file_name=button_display+".csv",mime="text/csv")
-    
+
+year_dic={2023:["2023","23"],2024:["2024","24"],2025:["2025","25"],2026:["2026","26"]} 	    
 def Get_Year(single_string):
-    year_dic={2023:["2023","23"],2024:["2024","24"],2025:["2025","25"],2026:["2026","26"]} 	
     for Year in year_dic.keys():
         for Year_keyword in year_dic[Year]:
             if Year_keyword in single_string:
@@ -416,10 +416,10 @@ def Get_Month_Year(single_string):
     if isinstance(single_string, datetime):
         return int(single_string.month),int(single_string.year)
     
-    single_string=str(single_string).lower()
-    year,year_num=Get_Year(single_string)
+    year,year_num=Get_Year(str(single_string))
     if isinstance(single_string, (int,float)) and year==0:
         return 0,0
+    single_string=str(single_string).lower()
     if year!=0:
         single_string=single_string.replace(year_num,"")
     single_string=single_string.replace("30","").replace("31","").replace("29","").replace("28","")
