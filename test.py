@@ -405,7 +405,7 @@ def Get_Year(single_string):
     for Year in year_dic.keys():
         for Year_keyword in year_dic[Year]:
             if Year_keyword in single_string:
-                st.write("single_string",single_string,"return",Year,Year_keyword)
+                #st.write("single_string",single_string,"return",Year,Year_keyword)
                 return Year,Year_keyword
     return 0,""
 
@@ -478,7 +478,7 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
     year_change=0  
 	
     inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
-    st.write("inv",inv)
+    #st.write("inv",inv)
     ascending_check=sum([x in [1,-11] for x in inv])
     descending_check=sum([x in [-1,11] for x in inv])
     reporting_month_date=datetime.strptime(str(reporting_month[4:6])+"/01/"+str(reporting_month[0:4]),'%m/%d/%Y').date()   
@@ -690,7 +690,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                             #st.write("PL_date_header",PL_date_header)         
                     elif max_match_year==0:  # there is no year for all the months
 		        #fill year to month
-                        st.write("PL",PL,"month_row_index",month_row_index,"list(month_table.iloc[month_row_index,])",list(month_table.iloc[month_row_index,]),"sheet_name",sheet_name)
+                        #st.write("PL",PL,"month_row_index",month_row_index,"list(month_table.iloc[month_row_index,])",list(month_table.iloc[month_row_index,]),"sheet_name",sheet_name)
                         PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                      
                         original_header=PL.iloc[month_row_index,]
