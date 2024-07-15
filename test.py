@@ -414,9 +414,9 @@ def Get_Month_Year(single_string):
         return 0,0
     if isinstance(single_string, datetime):
         return int(single_string.month),int(single_string.year)
-    
+
     year,year_num=Get_Year(str(single_string))
-    st.write("single_string","year","year_num",single_string,year,year_num)
+    #st.write("single_string","year","year_num",single_string,year,year_num)
     if isinstance(single_string, (int,float)) and year==0:
         #st.write("single_string",single_string,"return 0,0")
         return 0,0
@@ -690,7 +690,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                             #st.write("PL_date_header",PL_date_header)         
                     elif max_match_year==0:  # there is no year for all the months
 		        #fill year to month
-                        #st.write("PL",PL,"month_row_index",month_row_index,"list(month_table.iloc[month_row_index,])",list(month_table.iloc[month_row_index,]),"sheet_name",sheet_name)
+                        st.write("PL",PL,"month_row_index",month_row_index,"list(month_table.iloc[month_row_index,])",list(month_table.iloc[month_row_index,]),"sheet_name",sheet_name)
                         PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                      
                         original_header=PL.iloc[month_row_index,]
