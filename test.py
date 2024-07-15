@@ -1202,12 +1202,16 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
 
     try:
         PL_sheet_list = load_workbook(uploaded_file, data_only=True).sheetnames
-        st.write(PL_sheet_list)
     except TypeError as e:
-        st.write(f"Error: {e}")
-	
-    PL_sheet_list=load_workbook(uploaded_file).sheetnames
-    st.write(PL_sheet_list)
+        # Check if the specific TypeError message matches
+        error_message = str(e)
+        if "<class 'openpyxl.styles.named_styles._NamedCellStyle'>.name should be <class 'str'> but value is <class 'NoneType'>" in error_message:
+            st.write("Error: The Excel file is corrupted or has invalid styles. Please open the file and re-save it, which sometimes resolves such issues.")
+        else:
+            st.write(f"Error: {e}")
+    except Exception as e:
+        st.write(f"An error occurred: {e}")
+
     if sheet_type=="Finance":
         missing_PL_sheet_property = entity_mapping[(~entity_mapping["Sheet_Name_Finance"].isin(PL_sheet_list))|(pd.isna(entity_mapping["Sheet_Name_Finance"]))]
         missing_PL_sheet_property_Y=missing_PL_sheet_property.loc[missing_PL_sheet_property["Finance_in_separate_sheets"]=="Y",:]
