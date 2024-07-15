@@ -686,6 +686,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                             #st.write("PL_date_header",PL_date_header)         
                     elif max_match_year==0:  # there is no year for all the months
 		        #fill year to month
+                        st.write("PL",PL,"month_row_index",month_row_index,"list(month_table.iloc[month_row_index,])",list(month_table.iloc[month_row_index,]),"sheet_name",sheet_name)
                         PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                      
                         original_header=PL.iloc[month_row_index,]
@@ -1198,7 +1199,6 @@ def EPM_Formula(data,value_name): # make sure there is no col on index for data
 	
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
-    st.write(uploaded_file,sheet_type)
 
     try:
         PL_sheet_list = load_workbook(uploaded_file, data_only=True).sheetnames
