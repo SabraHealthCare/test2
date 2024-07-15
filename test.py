@@ -403,8 +403,10 @@ def download_report(df,button_display):
 
 year_dic={2023:["2023","23"],2024:["2024","24"],2025:["2025","25"],2026:["2026","26"]} 	    
 def Get_Year(single_string):
+    st.write("single_string",single_string,type(single_string))
     for Year in year_dic.keys():
         for Year_keyword in year_dic[Year]:
+            st.write("Year_keyword",Year_keyword,"Year_keyword in single_string",Year_keyword in single_string)
             if Year_keyword in single_string:
                 return Year,Year_keyword
     return 0,""
