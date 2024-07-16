@@ -1799,7 +1799,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         reporting_month_label=True  
         tenant_account_col=10000
         date_header=[[0],0,[]]
-        col1,col2=st.columns(2)
+        col1,col2=st.columns([2,1])
         # Calculate the list of years and their indices
         years_range = list(range(current_year, current_year - 2, -1))
         # Calculate the list of months and their indices
