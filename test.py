@@ -777,7 +777,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
         if len(numeric_columns) > 1 or len(numeric_columns) ==0:
             st.error("Failed to identify any month/year header in sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
             st.stop()
-	elif len(numeric_columns) == 1:  # there is only one column contain numeric data
+        elif len(numeric_columns) == 1:  # there is only one column contain numeric data
             # count the value in numeric column
             for value in PL_temp[numeric_columns[0]]:
                 if pd.isna(value) or value==" ":
@@ -793,7 +793,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                 st.stop()
             else:
                 PL_date_header=[reporting_month if x else 0 for x in numeric_col_mask]
-                return PL_date_header,last_string_index,PL.iloc[last_string_index,:] 
+                return PL_date_header,0,[]
         else:
             st.error("Failed to identify {}/{} header for sheet: '{}', please add the month/year header and re-upload.".format(int(reporting_month[4:6]),reporting_month[0:4],sheet_name))
             st.stop()
