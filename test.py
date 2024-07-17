@@ -765,45 +765,35 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     elif len(candidate_date)==1:	    
         return candidate_date[0][0:3]
     elif len(candidate_date)==0: 
-        #st.write("candidate_date",candidate_date)
-        # there is only two columns: tenant_account, data
-        if PL_col_size==tenantAccount_col_no+2:  
-            count_num=count_str=count_non=0
-            for first_tenant_row in range(0,PL_row_size):
-                if pd.isna(PL.iloc[first_tenant_row,tenantAccount_col_no]) or PL.iloc[first_tenant_row,tenantAccount_col_no] not in account_mapping[account_mapping['Sabra_Account'] != 'NO NEED TO MAP']['Tenant_Account'].tolist():
-                    continue
-                else:
-                    break
-            if first_tenant_row==0:
-                st.write("Please add month/year header for sheet {}".format(sheet_name))
-            else:
-                # Extract the relevant slice of the DataFrame
-                slice_df = PL.iloc[0:first_tenant_row, tenantAccount_col_no+1]
-                # Find the row indices where values are strings
-                string_indices = slice_df[slice_df.apply(lambda x: isinstance(x, str) and not pd.isna(x) and x!='nan' and x!="")].index
 
-                # Get the last string index
-                if not string_indices.empty:
-                    last_string_index = string_indices[-1] 
+        tenant_account_row_mask = PL.index.str.upper().str.strip().isin(list(account_mapping['Tenant_Formated_Account']))
+        PL_temp=PL.loc[tenant_account_row_mask]
+        
+        #find all the columns which contain numeric value 
+        numeric_col_mask = PL_temp.apply(lambda x: pd.to_numeric(x, errors='coerce').notna().any())
+  
+        # Get the list of columns that contain numeric values
+        numeric_columns = numeric_col_mask[numeric_col_mask].index.tolist()
+        if len(numeric_columns) > 1 or len(numeric_columns) ==0:
+            st.error("Failed to identify any month/year header in sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
+            st.stop()
+	elif len(numeric_columns) == 1:  # there is only one column contain numeric data
+            # count the value in numeric column
+            for value in PL_temp[numeric_columns[0]]:
+                if pd.isna(value) or value==" ":
+                    count_non+=1
+                elif isinstance(value,(int, float)):
+                    count_num+=1
                 else:
-                    last_string_index = 0
-                st.write("last_string_index",last_string_index,"PL_row_size",PL_row_size)
-                for row_i in range(last_string_index,PL_row_size):
-                    if pd.isna(PL.iloc[row_i,tenantAccount_col_no+1]) or PL.iloc[row_i,tenantAccount_col_no+1]==" ":
-                        count_non+=1
-                    elif isinstance(PL.iloc[row_i,tenantAccount_col_no+1], (int, float)):
-                        count_num+=1
-                    else:
-                        count_str+=1
-			
-                # for a real month column, numeric data is supposed to be more than character data
-                if (count_str>0 and (count_num/count_str)<0.8) or count_num==0:
-                    st.error("Failed to identify Year/Month header for sheet: '{}', please fix and re-upload.".format(sheet_name))
-                    st.stop()
-                else:
-                    PL_date_header=[0] * (PL_col_size-1)
-                    PL_date_header.append(reporting_month)
-                    return PL_date_header,last_string_index,PL.iloc[last_string_index,:] 
+                    count_str+=1
+		
+            # for a real month column, numeric data is supposed to be more than character data
+            if (count_str>0 and (count_num/count_str)<0.8) or count_num==0:
+                st.error("Failed to identify Year/Month header for sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
+                st.stop()
+            else:
+                PL_date_header=[reporting_month if x else 0 for x in numeric_col_mask]
+                return PL_date_header,last_string_index,PL.iloc[last_string_index,:] 
         else:
             st.error("Failed to identify {}/{} header for sheet: '{}', please add the month/year header and re-upload.".format(int(reporting_month[4:6]),reporting_month[0:4],sheet_name))
             st.stop()
@@ -1617,20 +1607,20 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 	#remove rows with nan tenant account
         nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x!=x or x==0 ,PL.index))
         PL.drop(nan_index, inplace=True)
-        #set index as str ,strip
-        PL.index=map(lambda x:str(x).strip(),PL.index)
+        #set index as str ,strip,upper
+        PL.index=map(lambda x:str(x).strip().upper(),PL.index)
 	    
         # filter columns with month_select
         selected_columns = [val in month_select for val in date_header[0]]
         PL = PL.loc[:,selected_columns]   
         PL.columns= [value for value in date_header[0] if value in month_select]        
            
-        # remove columns with all nan/0 or a combinationof nan and 0
+        # remove columns with all nan/0 or a combination of nan and 0
         #PL=PL.loc[:,(PL!= 0).any(axis=0)]
-        # remove rows with all nan/0 value or a combinationof nan and 0
+        # remove rows with all nan/0 value or a combination of nan and 0
         PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
 	# mapping new tenant accounts
-        new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
+        new_tenant_account_list=list(filter(lambda x: x not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
             account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name)        
