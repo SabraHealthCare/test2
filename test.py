@@ -1808,11 +1808,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     selected_month = st.selectbox("Month", months_range,index=months_range.index(st.session_state.selected_month))
    
                 with col3:
-                    st.subheader("Upload P&L:")
+                    st.markdown("<p style='font-size:20px;'>Upload P&L:</p>", unsafe_allow_html=True)
+                    #st.subheader("Upload P&L:")
                     uploaded_finance=st.file_uploader(":star: :red[Only XLSX accepted] :star:",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
                 with col4:
                     if BS_separate_excel=="Y":
-                        st.subheader("Upload Balance Sheet:")
+                        #st.subheader("Upload Balance Sheet:")
+                        st.markdown("<p style='font-size:20px;'>Upload Balance Sheet:</p>", unsafe_allow_html=True)
                         uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
                 submitted = st.form_submit_button("Upload")
                 if submitted:
