@@ -1599,7 +1599,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
         date_header=Identify_Month_Row(PL,sheet_name,date_header,tenantAccount_col_no)
         st.write("date_header[0]",date_header[0])
-        if (date_header[0] == '0').all():
+        if any(x==0 for x in date_header[0]):
+            st.write("Yes")
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()  
 		
