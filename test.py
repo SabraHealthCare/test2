@@ -793,6 +793,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                 st.error("Failed to identify Year/Month header for sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
                 st.stop()
             else:
+                st.write("tenant_account_row_mask.idxmax()",tenant_account_row_mask.idxmax())
 		# first_tenant_account_row -1 is the header row No. (used to remove the above rows, prevent map new accounts)
                 first_tenant_account_row = PL.index.get_loc(tenant_account_row_mask.idxmax())
                 st.write("first_tenant_account_row",first_tenant_account_row,PL.iloc[first_tenant_account_row,:])
