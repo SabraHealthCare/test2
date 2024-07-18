@@ -763,14 +763,13 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
         st.stop()
     elif len(candidate_date)==1:	    
         return candidate_date[0][0:3]
-    elif len(candidate_date)==0: 
-
+    elif len(candidate_date)==0: # there is no month/year in PL
+        #filter row which only contain tenant account 
         tenant_account_row_mask = PL.index.str.upper().str.strip().isin([account for account in account_mapping['Tenant_Formated_Account'] if account != 'NO NEED TO MAP'])
-        # Find the first row index of tenant account, by minus 1, get the header row no.
         PL_temp=PL.loc[tenant_account_row_mask]
         
         #find all the columns which contain numeric value 
-        numeric_col_mask = PL_temp.apply(lambda x: pd.to_numeric(x, errors='coerce').notna().any())
+        numeric_col_mask = PL_temp.apply(lambda x: pd.to_numeric(x, errors='coerce').notna().any() if PL_temp.columns.get_loc(x.name)>tenantAccount_col_no else False)
   
         # Get the list of columns that contain numeric values
         numeric_columns = numeric_col_mask[numeric_col_mask].index.tolist()
