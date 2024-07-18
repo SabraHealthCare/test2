@@ -766,7 +766,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
         return candidate_date[0][0:3]
     elif len(candidate_date)==0: 
 
-        tenant_account_row_mask = PL.index.str.upper().str.strip().isin(list(account_mapping['Tenant_Formated_Account']))
+        tenant_account_row_mask = PL.index.str.upper().str.strip().isin([account for account in account_mapping['Tenant_Formated_Account'] if account != 'NO NEED TO MAP'])
         PL_temp=PL.loc[tenant_account_row_mask]
         
         #find all the columns which contain numeric value 
@@ -779,6 +779,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
             st.stop()
         elif len(numeric_columns) == 1:  # there is only one column contain numeric data
             # count the value in numeric column
+            count_non=count_num=count_str=0
             for value in PL_temp[numeric_columns[0]]:
                 if pd.isna(value) or value==" ":
                     count_non+=1
