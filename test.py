@@ -1151,7 +1151,7 @@ def Submit_Upload_Latestmonth():
         if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,None,None):
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,reporting_month[4:6]+"/"+reporting_month[0:4]))
             
-        else:
+        else: 
             st.write(" ")  #----------record into error report------------------------	
          # save discrepancy data to OneDrive
         if len(Total_PL.columns)>1 and diff_BPC_PL.shape[0]>0:
