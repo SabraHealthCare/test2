@@ -794,7 +794,10 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                 st.stop()
             else:
 		# first_tenant_account_row -1 is the header row No. (used to remove the above rows, prevent map new accounts)
-                first_tenant_account_row = PL.index.get_loc(tenant_account_row_mask.tolist().index(max(tenant_account_row_mask.tolist())))
+                tenant_account_row_mask=tenant_account_row_mask.tolist()
+                st.write("tenant_account_row_mask.tolist()",tenant_account_row_mask)
+                st.write("tenant_account_row_mask.index(max(tenant_account_row_mask))",tenant_account_row_mask.index(max(tenant_account_row_mask)))
+                first_tenant_account_row = PL.index.get_loc(tenant_account_row_mask.index(max(tenant_account_row_mask)))
                 st.write("first_tenant_account_row",first_tenant_account_row,PL.iloc[first_tenant_account_row,:])
                 PL_date_header=[reporting_month if x else 0 for x in numeric_col_mask]
                 return PL_date_header,first_tenant_account_row-1,[]
