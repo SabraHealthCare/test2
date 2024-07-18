@@ -757,7 +757,6 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                 
 
     if len(candidate_date)>1:
-        #st.write(candidate_date)
         st.error("We detected {} date headers on the columns {} respectively in sheet——'{}' as below. Please ensure there's only one date header for the data column.\
 	             Otherwise, it will be confusing to determine the correct column for the data.".format(len(candidate_date),",".join([sublist[-1]+1 for sublist in candidate_date]),sheet_name))
 
@@ -767,6 +766,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     elif len(candidate_date)==0: 
 
         tenant_account_row_mask = PL.index.str.upper().str.strip().isin([account for account in account_mapping['Tenant_Formated_Account'] if account != 'NO NEED TO MAP'])
+        # Find the first row index of tenant account, by minus 1, get the header row no.
         PL_temp=PL.loc[tenant_account_row_mask]
         
         #find all the columns which contain numeric value 
@@ -778,7 +778,6 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
             st.error("Failed to identify any month/year header in sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
             st.stop()
         elif len(numeric_columns) == 1:  # there is only one column contain numeric data
-            st.write("numeric_columns",numeric_columns)
             # count the value in numeric column
             count_non=count_num=count_str=0
             for value in PL_temp[numeric_columns[0]]:
@@ -788,17 +787,16 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                     count_num+=1
                 else:
                     count_str+=1
-            st.write(count_non,count_num,count_str)
-            st.write("count_str>0 and (count_num/count_str)<0.8",count_str>0 and (count_num/count_str)<0.8)
-            st.write("count_num==0",count_num==0)
+            
             # for a real month column, numeric data is supposed to be more than character data
-            st.write("(count_str>0 and (count_num/count_str)<0.8) or count_num==0",(count_str>0 and (count_num/count_str)<0.8) or count_num==0)
             if (count_str>0 and (count_num/count_str)<0.8) or count_num==0:
-                st.error("111Failed to identify Year/Month header for sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
+                st.error("Failed to identify Year/Month header for sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
                 st.stop()
             else:
+		# first_tenant_account_row -1 is the header row No. (used to remove the above rows, prevent map new accounts)
+                first_tenant_account_row = PL.index.get_loc(tenant_account_row_mask.idxmax())
                 PL_date_header=[reporting_month if x else 0 for x in numeric_col_mask]
-                return PL_date_header,0,[]
+                return PL_date_header,first_tenant_account_row-1,[]
         else:
             st.error("Failed to identify {}/{} header for sheet: '{}', please add the month/year header and re-upload.".format(int(reporting_month[4:6]),reporting_month[0:4],sheet_name))
             st.stop()
@@ -1599,7 +1597,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
         date_header=Identify_Month_Row(PL,sheet_name,date_header,tenantAccount_col_no)
 
-        if len(date_header[2])==0:
+        if (date_header[0] == '0').all():
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()  
 		
@@ -1607,7 +1605,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         month_select = Get_Previous_Months(reporting_month,date_header[0]) 
         
  
-        #remove row above date
+        #remove row above date, to prevent to map these value as new accounts
         PL=PL.iloc[date_header[1]+1:,:]
 	#remove rows with nan tenant account
         nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x!=x or x==0 ,PL.index))
