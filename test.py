@@ -415,12 +415,11 @@ def Get_Month_Year(single_string):
     if isinstance(single_string, datetime):
         return int(single_string.month),int(single_string.year)
 
-    year,year_num=Get_Year(str(single_string))
-    #st.write("single_string","year","year_num",single_string,year,year_num)
-    if isinstance(single_string, (int,float)) and year==0:
+    if isinstance(single_string, (int,float)) and str(single_string) not in ("2024","2025","2026"):
         #st.write("single_string",single_string,"return 0,0")
         return 0,0
     single_string=str(single_string).lower()
+    year,year_num=Get_Year(single_string)
     if year!=0:
         single_string=single_string.replace(year_num,"")
         if single_string=="":
@@ -631,8 +630,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                 year_table.iloc[row_i,col_i]=0
             else:
                 month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i]) 
-    if sheet_name=='LV Census':
-        st.write("PL",PL,"month_table",month_table,"year_table",year_table)
+    
     year_count=[]        
     month_count=[]
     max_len=0
@@ -757,8 +755,8 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                 
 
     if len(candidate_date)>1:
-        st.write(",".join([sublist[-1]+1 for sublist in candidate_date]))
-        st.error("We detected {} date headers on the columns {} respectively in sheet——'{}'. Please ensure there's only one date header for the data column.".format(len(candidate_date),",".join([sublist[-1]+1 for sublist in candidate_date]),sheet_name))
+        #st.write(",".join([sublist[-1]+1 for sublist in candidate_date]))
+        st.error("We detected {} date headers in sheet——'{}'. Please ensure there's only one date header for the data column.".format(len(candidate_date),sheet_name))
 
         st.stop()
     elif len(candidate_date)==1:	    
