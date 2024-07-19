@@ -757,6 +757,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                 
 
     if len(candidate_date)>1:
+        st.write(candidate_date)
         st.error("We detected {} date headers on the columns {} respectively in sheet——'{}' as below. Please ensure there's only one date header for the data column.Otherwise, it will be confusing to determine the correct column for the data.".format(len(candidate_date),",".join([sublist[-1]+1 for sublist in candidate_date]),sheet_name))
 
         st.stop()
