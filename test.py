@@ -415,7 +415,7 @@ def Get_Month_Year(single_string):
     if isinstance(single_string, datetime):
         return int(single_string.month),int(single_string.year)
 
-    if isinstance(single_string, (int,float)) and str(single_string) not in ("2024","2025","2026"):
+    if isinstance(single_string, (int,float)) and single_string not in year_dic.keys():
         #st.write("single_string",single_string,"return 0,0")
         return 0,0
     single_string=str(single_string).lower()
