@@ -622,7 +622,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
 	#1. on the right of tenantAccount_col_no 
 	#2.contain numeric value 
 	#3. not all 0 or nan in tenant_account_row. return[False, False, True,...]
-    st.write("PL_temp",PL_temp)
+
 
     valid_col_mask = PL_temp.apply(\
     lambda x: ( pd.to_numeric(x, errors='coerce').notna().any() and \
@@ -746,7 +746,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
 	# search "current month" as reporting month
 
         if len(valid_col_index) > 1 or len(valid_col_index) ==0:
-            st.write("valid_col_index",valid_col_index,"valid_col_mask",valid_col_mask)
+            #st.write("valid_col_index",valid_col_index,"valid_col_mask",valid_col_mask)
             st.error("Failed to identify any month/year header in sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
             st.stop()
         elif len(valid_col_index) == 1:  #  only one column contain numeric data
