@@ -765,10 +765,9 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     elif len(candidate_date)==0: 
 	# 1. if there is only one column contain numeric data, identify this column as reporting month     
 	# search "current month" as reporting month
-        #filter row which only contain tenant account 
-       
-        # Get the list of columns that contain numeric values
+
         numeric_columns = numeric_col_mask[numeric_col_mask].index.tolist()
+        st.write(numeric_columns)
         if len(numeric_columns) > 1 or len(numeric_columns) ==0:
             st.error("Failed to identify any month/year header in sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
             st.stop()
