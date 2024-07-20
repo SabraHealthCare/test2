@@ -633,18 +633,12 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
         for col_i in valid_col_index:  # only search the columns that contain numberic data and on the right of tenantAccount_col_no
             month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i]) 
     
-    year_count=[]        
-    month_count=[]
     max_len=0
     candidate_date=[]
-    for row_i in range(first_tenant_account_row):
-        # save the number of valid months of each row to month_count
-        valid_month=list(filter(lambda x:x!=0,month_table.iloc[row_i,]))
-        valid_year=list(filter(lambda x:x!=0,year_table.iloc[row_i,]))
-        month_count.append(len(valid_month))
-        year_count.append(len(valid_year))
-	
-    if not all(map(lambda x:x==0,month_count)):
+    month_count = month_table.apply(lambda row: (row != 0).sum(), axis=1).tolist()
+    year_count = year_count.apply(lambda col: (col != 0).sum(), axis=0).tolist()
+
+    if not all(x==0 for x in month_count):
         month_sort_index = np.argsort(np.array(month_count))
         for month_index_i in range(-1,-10,-1): 
             #month_sort_index[-1] is the index number of month_count in which has max month count
@@ -654,7 +648,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
             month_list=list(filter(lambda x:x!=0,month_row))
             month_len=len(month_list)
             max_match_year=0
-            for i in [0,1,-1]:  # identify year in corresponding month
+            for i in [0,1,-1]:  # identify year in corresponding month row
                 if month_row_index+i>=0 and month_row_index+i<year_table.shape[0]:
                     year_row=list(year_table.iloc[month_row_index+i,])
                     year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]
@@ -726,71 +720,46 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                 col_month = next((col_no for col_no, val_month in enumerate(month_table.iloc[month_row_index, :]) if val_month != 0), 0)
                 if month_table.iloc[month_row_index,col_month]!=int(reporting_month[4:]):
                     continue
+		#if there are two month headers in the same column, conintue	
                 if candidate_date!=[] and any(col_month == candidate_date_i[-1] for candidate_date_i in candidate_date):
                     continue
-                #if there is no year in month row, check above row or next row
-                if  year_table.iloc[month_row_index,col_month]==0:
-                    # there is no year in precede or next row, add year to month. 
-                    year_table.iloc[month_row_index,col_month]=	int(reporting_month[0:4])
- 
-                count_num=count_str=count_non=0
-                for row_month in range(month_row_index,PL.shape[0]):
-                    if pd.isna(PL.iloc[row_month,col_month]) or PL.iloc[row_month,col_month]==" ":
-                        count_non+=1
-                    elif isinstance(PL.iloc[row_month,col_month], (int, float)):
-                        count_num+=1
-                    else:
-                        count_str+=1
 			
-                # for a real month column, numeric data is supposed to be more than character data
-                if count_str>0 and (count_num/count_str)<0.8:
-                    continue
-                elif count_num==0:
-                    continue
-                else:
-                    PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x))) 
-                    candidate_date.append([PL_date_header,month_row_index,PL.iloc[month_row_index,:],col_month] )
-                    continue
-                
+                PL_date_header= [reporting_month if x!=0 else 0 for x in month_table.iloc[month_row_index,:]]
+                candidate_date.append([PL_date_header,month_row_index,PL.iloc[month_row_index,:],col_month] )
+                continue
 
     if len(candidate_date)>1:
         #st.write(",".join([sublist[-1]+1 for sublist in candidate_date]))
         st.error("We detected {} date headers in sheet——'{}'. Please ensure there's only one date header for the data column.".format(len(candidate_date),sheet_name))
-
         st.stop()
     elif len(candidate_date)==1:	    
         return candidate_date[0][0:3]
 
     # there is no month/year in PL
     elif len(candidate_date)==0: 
-	# 1. if there is only one column contain numeric data, identify this column as reporting month     
+	# 1. if there is only one column contains numeric data, identify this column as reporting month     
 	# search "current month" as reporting month
 
-        numeric_columns = numeric_col_mask[numeric_col_mask].index.tolist()
-        st.write(numeric_columns)
-        if len(numeric_columns) > 1 or len(numeric_columns) ==0:
+        if len(valid_col_index) > 1 or len(valid_col_index) ==0:
             st.error("Failed to identify any month/year header in sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
             st.stop()
-        elif len(numeric_columns) == 1:  # tonly one column contain numeric data
+        elif len(valid_col_index) == 1:  #  only one column contain numeric data
+            only_numeric_column_value=PL_temp.iloc[:,valid_col_index[0]]
             # count the value in numeric column
-            count_non=count_num=count_str=0
-            for value in PL_temp[numeric_columns[0]]:
-                if pd.isna(value) or value==" ":
-                    count_non+=1
-                elif isinstance(value,(int, float)):
-                    count_num+=1
-                else:
-                    count_str+=1
-            
-            # for a real month column, numeric data is supposed to be more than character data
-            if (count_str>0 and (count_num/count_str)<0.8) or count_num==0:
+            count_non = only_numeric_column_value.isna().sum()
+            # Count string values
+            count_str = only_numeric_column_value.apply(lambda x: isinstance(x, str)).sum()
+            # Count numeric values
+            count_num = only_numeric_column_value.apply(lambda x: pd.to_numeric(x, errors='coerce')).notna().sum()
+
+            # numeric data is supposed to be more than character data
+            if (count_str>0 and (count_num/count_str)<0.7):
                 st.error("Failed to identify Year/Month header for sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
                 st.stop()
             else:
-		# first_tenant_account_row -1 is the header row No. (used to remove the above rows, prevent map new accounts)
-                first_tenant_account_row=tenant_account_row_mask.tolist().index(max(tenant_account_row_mask.tolist()))
+		# first_tenant_account_row -1 is the header row No. (used to remove the above rows, and prevent map new accounts)
                 #st.write("first_tenant_account_row",first_tenant_account_row,PL.iloc[first_tenant_account_row,:])
-                PL_date_header=[reporting_month if x else 0 for x in numeric_col_mask]
+                PL_date_header=[reporting_month if x else 0 for x in valid_col_mask]
                 return PL_date_header,first_tenant_account_row-1,[]
         else:
             st.error("Failed to identify {}/{} header for sheet: '{}', please add the month/year header and re-upload.".format(int(reporting_month[4:6]),reporting_month[0:4],sheet_name))
