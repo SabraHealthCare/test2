@@ -611,31 +611,33 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
             return pre_date_header
-
-    PL_row_size=PL.shape[0]
     PL_col_size=PL.shape[1]
+    tenant_account_row_mask = PL.index.str.upper().str.strip().isin([account for account in account_mapping['Tenant_Formated_Account'] if account != 'NO NEED TO MAP'])
+    tenant_account_row_mask=tenant_account_row_mask.tolist()
+    #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
+    first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
 
-    #nan_index is the nan or 0 in tenant account column 
-    nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x==0 ,PL.index))
+    PL_temp=PL.loc[tenant_account_row_mask]
+    #valid_col_mask labels all the columns that:1. on the right of tenantAccount_col_no 2.contain numeric value 3. not all 0 or nan in tenant_account_row. return[False, False, True,...]
+    valid_col_mask = PL_temp.apply(\
+    lambda x: ( pd.to_numeric(x, errors='coerce').notna().any() and \
+           not all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)\
+         ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
+    valid_col_index=[i for i, mask in enumerate(valid_col_mask) if mask]
     # nan_num_column is the column whose value is nan or 0 for PL.drop(nan_index)
-    nan_num_column = [all(val == 0 or pd.isna(val) or not isinstance(val, (int, float)) for val in PL.drop(nan_index).iloc[:, i]) for i in range(PL.drop(nan_index).shape[1])]
-    search_row_size=min(40,PL_row_size)
-    month_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
-    year_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
+    #nan_num_column = [all(val == 0 or pd.isna(val) or not isinstance(val, (int, float)) for val in PL.drop(nan_index).iloc[:, i]) for i in range(PL.drop(nan_index).shape[1])]
+    month_table=pd.DataFrame(0,index=range(first_tenant_account_row), columns=range(PL_col_size))
+    year_table=pd.DataFrame(0,index=range(first_tenant_account_row), columns=range(PL_col_size))
 
-    for row_i in range(search_row_size):
-        for col_i in range(PL_col_size):
-            if nan_num_column[col_i]:
-                month_table.iloc[row_i,col_i]=0
-                year_table.iloc[row_i,col_i]=0
-            else:
-                month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i]) 
+    for row_i in range(first_tenant_account_row): # only search month/year above the first tenant account row
+        for col_i in valid_col_index:  # only search the columns that contain numberic data and on the right of tenantAccount_col_no
+            month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i]) 
     
     year_count=[]        
     month_count=[]
     max_len=0
     candidate_date=[]
-    for row_i in range(search_row_size):
+    for row_i in range(first_tenant_account_row):
         # save the number of valid months of each row to month_count
         valid_month=list(filter(lambda x:x!=0,month_table.iloc[row_i,]))
         valid_year=list(filter(lambda x:x!=0,year_table.iloc[row_i,]))
@@ -721,9 +723,6 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
         
             # only one month in header, all the rows that have multiple months were out
             elif month_count[month_row_index]==1:
-	        # #col_month is the col number of month
-                #while(month_table.iloc[month_row_index,col_month]==0):
-                    #col_month+=1
                 col_month = next((col_no for col_no, val_month in enumerate(month_table.iloc[month_row_index, :]) if val_month != 0), 0)
                 if month_table.iloc[month_row_index,col_month]!=int(reporting_month[4:]):
                     continue
@@ -735,7 +734,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                     year_table.iloc[month_row_index,col_month]=	int(reporting_month[0:4])
  
                 count_num=count_str=count_non=0
-                for row_month in range(month_row_index,PL_row_size):
+                for row_month in range(month_row_index,PL.shape[0]):
                     if pd.isna(PL.iloc[row_month,col_month]) or PL.iloc[row_month,col_month]==" ":
                         count_non+=1
                     elif isinstance(PL.iloc[row_month,col_month], (int, float)):
@@ -761,20 +760,19 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
         st.stop()
     elif len(candidate_date)==1:	    
         return candidate_date[0][0:3]
-    elif len(candidate_date)==0: # there is no month/year in PL
+
+    # there is no month/year in PL
+    elif len(candidate_date)==0: 
+	# 1. if there is only one column contain numeric data, identify this column as reporting month     
+	# search "current month" as reporting month
         #filter row which only contain tenant account 
-        tenant_account_row_mask = PL.index.str.upper().str.strip().isin([account for account in account_mapping['Tenant_Formated_Account'] if account != 'NO NEED TO MAP'])
-        PL_temp=PL.loc[tenant_account_row_mask]
-        
-        #find all the columns which contain numeric value 
-        numeric_col_mask = PL_temp.apply(lambda x: pd.to_numeric(x, errors='coerce').notna().any() if PL_temp.columns.get_loc(x.name)>tenantAccount_col_no else False)
-  
+       
         # Get the list of columns that contain numeric values
         numeric_columns = numeric_col_mask[numeric_col_mask].index.tolist()
         if len(numeric_columns) > 1 or len(numeric_columns) ==0:
             st.error("Failed to identify any month/year header in sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
             st.stop()
-        elif len(numeric_columns) == 1:  # there is only one column contain numeric data
+        elif len(numeric_columns) == 1:  # tonly one column contain numeric data
             # count the value in numeric column
             count_non=count_num=count_str=0
             for value in PL_temp[numeric_columns[0]]:
