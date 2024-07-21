@@ -618,10 +618,10 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
 
     PL_temp=PL.loc[tenant_account_row_mask]
-    #valid_col_mask labels all the columns that:
+    #valid_col_mask labels all the columns that ([False, False, True,...])
 	#1. on the right of tenantAccount_col_no 
 	#2.contain numeric value 
-	#3. not all 0 or nan in tenant_account_row. return[False, False, True,...]
+	#3. not all 0 or nan in tenant_account_row. 
 
     valid_col_mask = PL_temp.apply(\
     lambda x: ( pd.to_numeric(x, errors='coerce').notna().any() and \
@@ -742,13 +742,26 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
 
     # there is no month/year in PL
     elif len(candidate_date)==0: 
-	# 1. if there is only one column contains numeric data, identify this column as reporting month     
+	# if there is only one column contains numeric data, identify this column as reporting month     
 	# search "current month" as reporting month
 
         if len(valid_col_index) > 1 or len(valid_col_index) ==0:
-            st.write("valid_col_index",valid_col_index,"valid_col_mask",valid_col_mask)
-            st.error("Failed to identify any month/year header in sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
-            st.stop()
+	    # search "current month" as reporting month
+            current_month_cols=[]
+
+            for col_i in valid_col_index:
+                column = PL.iloc[0:first_tenant_account_row, col_i]
+                if column.astype(str).str.contains('current month', case=False, na=False).any():
+                    current_month_cols.append(col_i)
+                    current_month_rows = column.index[column.astype(str).str.contains('current month', case=False, na=False)].tolist()
+            if len(current_month_cols)==1:
+                PL_date_header = [0] * PL.shape[1]
+                PL_date_header[current_month_cols[0]] = reporting_month
+                return PL_date_header,current_month_rows,PL.iloc[current_month_rows,:]
+	    else:
+                #st.write("valid_col_index",valid_col_index,"valid_col_mask",valid_col_mask)
+                st.error("Failed to identify any month/year header in sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
+                st.stop()
         elif len(valid_col_index) == 1:  #  only one column contain numeric data
             only_numeric_column_value=PL_temp.iloc[:,valid_col_index[0]]
             # count the value in numeric column
