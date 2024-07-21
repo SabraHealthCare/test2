@@ -751,7 +751,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
 
             for col_i in valid_col_index:
                 st.write(PL,valid_col_index)
-                column = PL.iloc[0:first_tenant_account_row, col_i]
+                column = PL.iloc[0:first_tenant_account_row, col_i].reset_index(drop=True)
                 st.write("column",column)
                 if column.astype(str).str.contains('current month', case=False, na=False).any():
                     current_month_cols.append(col_i)
