@@ -169,6 +169,7 @@ def Save_as_CSV_Onedrive(df,path,file_name):
 
 
 # For updating account_mapping, entity_mapping, reporting_month_data, only for operator use
+# if entity_list is provided,
 def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=None,str_col_list=None):  # replace original data
     if entity_list==None:
         entity_list=[]    
@@ -788,9 +789,10 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
 # manage entity mapping in "Manage Mapping" 
 def Manage_Entity_Mapping(operator):
     global entity_mapping
-    #all the properties are supposed to be in entity_mapping. 
-    entity_mapping_updation=pd.DataFrame(columns=["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"])
-    number_of_property=entity_mapping.shape[0]
+    entity_mapping_updation=pd.DataFrame(\
+	    columns=["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]\
+            index=entity_mapping.index)
+	
     with st.form(key="Mapping Properties"):
         col1,col2,col3,col4=st.columns([4,3,3,3])
         with col1:
@@ -817,15 +819,16 @@ def Manage_Entity_Mapping(operator):
         submitted = st.form_submit_button("Submit")
             
     if submitted:
-        i=0
-        for entity in entity_mapping.index:
-            if entity_mapping_updation.loc[i,"Sheet_Name_Finance"]:
-                entity_mapping.loc[entity,"Sheet_Name_Finance"]=entity_mapping_updation.loc[i,"Sheet_Name_Finance"] 
-            if entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]:
-                entity_mapping.loc[entity,"Sheet_Name_Occupancy"]=entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]
-            if  entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"]:
-                entity_mapping.loc[entity,"Sheet_Name_Balance_Sheet"]=entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"] 
-            i+=1
+        entity_mapping.update(entity_mapping_updation)
+        #i=0
+        #for entity in entity_mapping.index:
+            #if entity_mapping_updation.loc[i,"Sheet_Name_Finance"]:
+                #entity_mapping.loc[entity,"Sheet_Name_Finance"]=entity_mapping_updation.loc[i,"Sheet_Name_Finance"] 
+            #if entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]:
+               #entity_mapping.loc[entity,"Sheet_Name_Occupancy"]=entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]
+            #if  entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"]:
+               # entity_mapping.loc[entity,"Sheet_Name_Balance_Sheet"]=entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"] 
+           # i+=1
 
         download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
         # update entity_mapping in Onedrive    
@@ -1390,14 +1393,20 @@ def View_Discrepancy():
     else:
             st.success("All previous data in P&L ties with Sabra data")
 
+# all properties are in one sheet
+#return the row number of property header and mapped_entity, Column_Name and entity_list has same order 
+# return example: 4, ["0","0","Sxxxx","Sxxxx","0","Sxxxx","0"...]
 
-def Identify_Column_Name_Header(PL,entity_list,sheet_name):  # all properties are in one sheet
-    # return the row number of property header and mapped_entity, for example: 1, ["0","0",Sxxxx,Sxxxx,"0",Sxxxx,"0"...]
-    #	Column_Name and entity_list has same order
+def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):  
     entity_without_propertynamefinance=entity_mapping[(entity_mapping['Column_Name'].isna()) | (entity_mapping['Column_Name'].str.strip() == "")].index.tolist()
     column_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"] if pd.notna(x) and str(x).strip()]
     max_match=[]
-    for row_i in range(PL.shape[0]):
+
+    tenant_account_row_mask = PL.index.str.upper().str.strip().isin([account for account in account_mapping['Tenant_Formated_Account'] if account != 'NO NEED TO MAP']).tolist()
+    #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
+    first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
+	
+    for row_i in range(first_tenant_account_row):
         canditate_row=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[row_i,:])))  
         match_names = [item for item in canditate_row if item in column_name_list_in_mapping]
         if len(match_names)==len(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: # find the property name header row, transfer them into entity id
@@ -1420,7 +1429,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name):  # all properties ar
             break
 		
     if len(max_match)==0:
-        st.error("Fail to identify facility column names in sheet '{}'. The previous column names are as below. Please add and re-upload.".format(sheet_name))
+        st.error("Fail to identify facility name header in sheet '{}'. The previous header names are as below. Please add and re-upload.".format(sheet_name))
         st.write('    '.join(column_name_list_in_mapping))
         st.stop()
     elif len(max_match)>0: # only part of entities have property name in P&L
@@ -1485,10 +1494,10 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         if tenantAccount_col_no==None:
             st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
             st.stop()    
-
-        entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,entity_list,sheet_name) 
-	#set tenant_account as index of PL
-        PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)	
+		
+        #set tenant_account as index of PL
+        PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
+        entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no) 
   
 	#remove row above property header
         PL=PL.iloc[entity_header_row_number+1:,:]
