@@ -623,12 +623,11 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
 	#2.contain numeric value 
 	#3. not all 0 or nan in tenant_account_row. return[False, False, True,...]
 
-    st.write("PL_temp",PL_temp)
     valid_col_mask = PL_temp.apply(\
     lambda x: ( pd.to_numeric(x, errors='coerce').notna().any() and \
            not all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)\
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
-    st.write("valid_col_mask",valid_col_mask,"tenantAccount_col_no",tenantAccount_col_no)
+
     valid_col_index=[i for i, mask in enumerate(valid_col_mask) if mask]
     # nan_num_column is the column whose value is nan or 0 for PL.drop(nan_index)
     #nan_num_column = [all(val == 0 or pd.isna(val) or not isinstance(val, (int, float)) for val in PL.drop(nan_index).iloc[:, i]) for i in range(PL.drop(nan_index).shape[1])]
