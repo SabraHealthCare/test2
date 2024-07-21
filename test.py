@@ -757,6 +757,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
             if len(current_month_cols)==1:
                 PL_date_header = [0] * PL.shape[1]
                 PL_date_header[current_month_cols[0]] = reporting_month
+                st.write("PL_date_header,current_month_rows",PL_date_header,current_month_rows)
                 return PL_date_header,current_month_rows,PL.iloc[current_month_rows,:]
             else:
                 #st.write("valid_col_index",valid_col_index,"valid_col_mask",valid_col_mask)
