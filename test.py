@@ -789,7 +789,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
 def Manage_Entity_Mapping(operator):
     global entity_mapping
     entity_mapping_updation=pd.DataFrame(\
-	    columns=["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]\
+	    columns=["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"],\
             index=entity_mapping.index)
 	
     with st.form(key="Mapping Properties"):
