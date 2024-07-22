@@ -637,14 +637,10 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     for row_i in range(first_tenant_account_row): # only search month/year above the first tenant account row
         for col_i in valid_col_index:  # only search the columns that contain numberic data and on the right of tenantAccount_col_no
             month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i]) 
-    st.write("month_table",month_table)
     max_len=0
     candidate_date=[]
     month_count = month_table.apply(lambda row: (row != 0).sum(), axis=1).tolist()
     year_count = year_table.apply(lambda col: (col != 0).sum(), axis=0).tolist()
-    #month_sort_index[-1] is the index number of month_count in which has max month count
-    #month_row_index is also the index/row number of PL
-    #st.write("month_count",month_count )
     if not all(x==0 for x in month_count):
        # month_sort_index is the index(row number) which contain month/year, and sorted desc. month_sort_index[0] is the row number that contrain most months in PL
         non_zero_indices = [(index, month_c) for index, month_c in enumerate(month_count) if month_c!= 0]
@@ -652,14 +648,12 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
         month_sort_index = [index for index, month_c in sorted_non_zero_indices]
 	    
         for month_row_index in month_sort_index: 
-            st.write("month_sort_index",month_sort_index)
-            st.write("month_sort_index[0]",month_sort_index[0])
-            #month_row_index=month_sort_index[-1]
+            #st.write("month_sort_index",month_sort_index)
             month_row=list(month_table.iloc[month_row_index,])
             month_list=list(filter(lambda x:x!=0,month_row))
             month_len=len(month_list)
             max_match_year=0
-            for i in [0,1,-1]:  # identify year in corresponding month row
+            for i in [0,1,-1]:  # identify year in corresponding month row, or above(-1) or below (+1) month row
                 if month_row_index+i>=0 and month_row_index+i<year_table.shape[0]:
                     year_row=list(year_table.iloc[month_row_index+i,])
                     year_match = [year for month, year in zip(month_row, year_row) if month!= 0 and year!=0]
