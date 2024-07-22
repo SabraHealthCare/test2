@@ -612,7 +612,8 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
             return pre_date_header
     PL_col_size=PL.shape[1]
-    tenant_account_row_mask = PL.index.str.upper().str.strip().isin([account for account in account_mapping['Tenant_Formated_Account'] if account != 'NO NEED TO MAP'])
+    tenant_account_row_mask = PL.index.str.upper().str.strip().isin(\
+        [account for account, sabra_account in zip(account_mapping['Tenant_Formated_Account'], account_mapping['Sabra_Account']) if sabra_account != 'NO NEED TO MAP'])
     tenant_account_row_mask=tenant_account_row_mask.tolist()
     st.write("tenant_account_row_mask",tenant_account_row_mask)
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
