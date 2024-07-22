@@ -643,12 +643,11 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     candidate_date=[]
     month_count = month_table.apply(lambda row: (row != 0).sum(), axis=1).tolist()
     year_count = year_table.apply(lambda col: (col != 0).sum(), axis=0).tolist()
-
+    #month_sort_index[-1] is the index number of month_count in which has max month count
+    #month_row_index is also the index/row number of PL
     if not all(x==0 for x in month_count):
         month_sort_index = np.argsort(np.array(month_count))
         for month_index_i in range(-1,-10,-1): 
-            #month_sort_index[-1] is the index number of month_count in which has max month count
-            #month_row_index is also the index/row number of PL
             month_row_index=month_sort_index[month_index_i]
             month_row=list(month_table.iloc[month_row_index,])
             month_list=list(filter(lambda x:x!=0,month_row))
