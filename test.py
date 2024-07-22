@@ -614,9 +614,10 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     PL_col_size=PL.shape[1]
     tenant_account_row_mask = PL.index.str.upper().str.strip().isin([account for account in account_mapping['Tenant_Formated_Account'] if account != 'NO NEED TO MAP'])
     tenant_account_row_mask=tenant_account_row_mask.tolist()
+    st.write("tenant_account_row_mask",tenant_account_row_mask)
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
-
+    st.write("first_tenant_account_row",first_tenant_account_row)
     PL_temp=PL.loc[tenant_account_row_mask]
     #valid_col_mask labels all the columns that ([False, False, True,...])
 	#1. on the right of tenantAccount_col_no 
