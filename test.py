@@ -651,7 +651,8 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
         for month_index_i in range(-1,-10,-1): 
             st.write("month_sort_index",month_sort_index)
             st.write("month_sort_index[-1]",month_sort_index[-1])
-            month_row_index=month_sort_index[month_index_i]
+            #month_row_index=month_sort_index[month_index_i]
+            month_row_index=0
             month_row=list(month_table.iloc[month_row_index,])
             month_list=list(filter(lambda x:x!=0,month_row))
             month_len=len(month_list)
