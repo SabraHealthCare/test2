@@ -613,8 +613,8 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
             return pre_date_header
     PL_col_size=PL.shape[1]
     tenant_account_row_mask = PL.index.str.upper().str.strip().isin(\
-        [account for account, sabra_account in zip(account_mapping['Tenant_Formated_Account'], account_mapping['Sabra_Account']) if sabra_account != 'NO NEED TO MAP'])
-    tenant_account_row_mask=tenant_account_row_mask.tolist()
+        [account for account, sabra_account in zip(account_mapping['Tenant_Formated_Account'], account_mapping['Sabra_Account']) \
+	 if sabra_account != 'NO NEED TO MAP']).tolist()
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
     PL_temp=PL.loc[tenant_account_row_mask]
@@ -1408,7 +1408,8 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
     max_match=[]
 
     tenant_account_row_mask = PL.index.str.upper().str.strip().isin(\
-	    [account for account, sabra_account in zip(account_mapping['Tenant_Formated_Account'], account_mapping['Sabra_Account']) if sabra_account != 'NO NEED TO MAP'].tolist()
+	    [account for account, sabra_account in zip(account_mapping['Tenant_Formated_Account'], account_mapping['Sabra_Account'])\
+	     if sabra_account != 'NO NEED TO MAP']).tolist()
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
 	
