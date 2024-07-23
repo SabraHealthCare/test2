@@ -1185,17 +1185,14 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
 
     try:
-        PL_sheet_list = load_workbook(uploaded_file, data_only=True).sheetnames
-        if PL_sheet_list:
-            st.write("Not a excel")
-        
+        PL_sheet_list = load_workbook(uploaded_file, data_only=True).sheetnames        
     except TypeError as e:
         # Check if the specific TypeError message matches
         error_message = str(e)
         if "<class 'openpyxl.styles.named_styles._NamedCellStyle'>.name should be <class 'str'> but value is <class 'NoneType'>" in error_message:
             st.write("Error: The Excel file is corrupted or has invalid styles. Please open the file and re-save it, which sometimes resolves such issues.")
         else:
-            st.write(f"Error: {e}")
+            st.write("Fail to get the sheet names in {}. Please save the file as 'xlsx' and re-upload.".format(sheet_type))
     except Exception as e:
         st.write(f"An error occurred: {e}")
 
