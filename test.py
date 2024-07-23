@@ -1409,10 +1409,12 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
     for row_i in range(first_tenant_account_row):
         canditate_row=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[row_i,:])))  
         match_names = [item for item in canditate_row if item in column_name_list_in_mapping]
-        if len(match_names)==len(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: # find the property name header row, transfer them into entity id
+	
+	# found the property name header row, transfer them into entity id
+        if len(match_names)==len(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: 
             duplicate_check = [name for name in set(match_names) if match_names.count(name) > 1]
             if len(duplicate_check)>0:
-                st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
+                st.error("11Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
                 st.stop()
             else:
                 mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(column_name_list_in_mapping))}
@@ -1435,7 +1437,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
     elif len(max_match)>0: # only part of entities have property name in P&L
         duplicate_check = [name for name in set(match_names) if match_names.count(name) > 1]
         if len(duplicate_check)>0:
-            st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
+            st.error("22Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
             st.stop()
         miss_match_names = [item for item in column_name_list_in_mapping  if item not in max_match]
         total_missed_entities=entity_mapping[entity_mapping["Column_Name"].str.upper().str.strip().isin(miss_match_names)].index.tolist()+entity_without_propertynamefinance
