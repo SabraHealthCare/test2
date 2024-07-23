@@ -1196,7 +1196,6 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
         st.write("Fail to get the sheet names in {}. Please save the file as 'xlsx' and re-upload.".format(sheet_type))
 
     if sheet_type=="Finance":
-        st.write("PL_sheet_list",PL_sheet_list)
         missing_PL_sheet_property = entity_mapping[(~entity_mapping["Sheet_Name_Finance"].isin(PL_sheet_list))|(pd.isna(entity_mapping["Sheet_Name_Finance"]))]
         missing_PL_sheet_property_Y=missing_PL_sheet_property.loc[missing_PL_sheet_property["Finance_in_separate_sheets"]=="Y",:]
         missing_PL_sheet_property_N=missing_PL_sheet_property.loc[missing_PL_sheet_property["Finance_in_separate_sheets"]=="N",:]
