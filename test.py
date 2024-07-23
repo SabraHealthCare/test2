@@ -1186,6 +1186,9 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
 
     try:
         PL_sheet_list = load_workbook(uploaded_file, data_only=True).sheetnames
+        if PL_sheet_list:
+            st.write("Not a excel")
+        
     except TypeError as e:
         # Check if the specific TypeError message matches
         error_message = str(e)
