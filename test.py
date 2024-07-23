@@ -1183,7 +1183,6 @@ def EPM_Formula(data,value_name): # make sure there is no col on index for data
 	
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
-
     try:
         PL_sheet_list = load_workbook(uploaded_file, data_only=True).sheetnames        
     except TypeError as e:
@@ -1194,7 +1193,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
         else:
             st.write("Fail to get the sheet names in {}. Please save the file as 'xlsx' and re-upload.".format(sheet_type))
     except Exception as e:
-        st.write(f"An error occurred: {e}")
+        st.write("Fail to get the sheet names in {}. Please save the file as 'xlsx' and re-upload.".format(sheet_type))
 
     if sheet_type=="Finance":
         st.write("PL_sheet_list",PL_sheet_list)
