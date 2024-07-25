@@ -1498,10 +1498,11 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
         miss_column_mapping=entity_mapping.loc[total_missed_entities]
         if len(total_missed_entities)>0:
             if len(total_missed_entities)==1:
-                st.error("Can't identify the data column for facility: {} in sheet {}. Please add its column name and re-upload. If its column name has been updated, please re-map it as indicated below.".format(entity_mapping.loc[total_missed_entities[0],"Property_Name"],sheet_name))
+                st.error("Can't identify the data column for facility: {} in sheet {}. Please add its column name and re-upload.".format(entity_mapping.loc[total_missed_entities[0],"Property_Name"],sheet_name))
+                st.error("If this facility has a new column name, please re-map it as indicated below.")		    
             elif len(total_missed_entities)>1:
                 st.error("Can't identify the data columns for facilities: {} in sheet {}. Please add their column names and re-upload. If their column name has been updated, please re-map it as indicated below.".format( ",".join(entity_mapping.loc[total_missed_entities, "Property_Name"]),sheet_name))
-            st.write("total_missed_entities",total_missed_entities,"column_name_list_in_mapping",column_name_list_in_mapping)            
+                st.error("If these facilities have new column names, please re-map them as indicated below.")         
             with st.form(key="miss_match_column_name"):
                 for entity_i in total_missed_entities:
                     st.warning("Column name for facility {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
@@ -1518,7 +1519,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                     entity_mapping.loc[entity_i,"Column_Name"]=miss_column_mapping.loc[entity_i,"Column_Name"]     
 
                 column_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"]]
-                duplicate_check = [item for item in set(column_name_list_in_mapping) if column_name_list_in_mapping.count(name) > 1]
+                duplicate_check = [item for item in set(column_name_list_in_mapping) if column_name_list_in_mapping.count(item) > 1]
 
                 if len(duplicate_check)>0:
                     st.error( "The following column has been mapped to more than one facility in sheet '{}'. Please fix and re-upload:".format(sheet_name))
