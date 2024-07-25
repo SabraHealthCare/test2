@@ -1533,7 +1533,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 if len(duplicate_check)>0:
                     st.error("Detected duplicated column names —— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
                     st.stop()
-		elif len(header_row)==len(column_name_list_in_mapping):  # property name column header is unique and match with entity mapping
+                elif len(header_row)==len(column_name_list_in_mapping):  # property name column header is unique and match with entity mapping
                     mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
                     mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
                     Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,None,entity_mapping_str_col)
