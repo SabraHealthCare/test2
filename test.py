@@ -1482,7 +1482,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 return max_match_row,mapped_entity
 
             # after apply month_mask, the column_name still doesn't match with that in entity_mapping	
-	    elif len(duplicate_check)>0: # there is still duplicate property name
+            elif len(duplicate_check)>0: # there is still duplicate property name
                 st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
                 st.stop()		    
             elif len(duplicate_check)==0:  # miss some property name              
