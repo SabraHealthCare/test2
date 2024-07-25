@@ -1458,11 +1458,8 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
 		######################################################################################################
 	    # there may has more than one months data in P&L, only select reporting month data
             # Check reporting month above first_tenant_account_row
-            st.write("first_tenant_account_row",first_tenant_account_row)
-            month_counts = PL.iloc[0:first_tenant_account_row-1,:].applymap(Is_Reporting_Month)
-            st.write("month_counts",month_counts)
-            month_count1 = np.sum(month_counts.values, axis=1)
-            st.write("month_count",month_count1)
+            month_counts = np.sum(PL.iloc[0:first_tenant_account_row-1,:].applymap(Is_Reporting_Month).values, axis=1)
+            st.write("month_count",month_counts)
             if all(month_count==0 for month_count in month_counts): # there is no month
                 st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
                 st.stop()
