@@ -1510,7 +1510,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in filter_header_row]
                 # update entity_mapping in onedrive  
                 Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,None,entity_mapping_str_col)
-                return row_i,mapped_entity
+                return max_match_row,mapped_entity
             else:
                 st.stop()
 # no cache
