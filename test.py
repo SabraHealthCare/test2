@@ -1471,7 +1471,6 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
             column_name=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[max_match_row,:])))
             filter_header_row =[item if item in column_name_list_in_mapping else 0 for item in column_name]
             filter_header_row = [property_name if is_month else 0 for property_name, is_month in zip(filter_header_row, month_mask)]
-            st.write("filter_header_row",filter_header_row)
             st.write(set(filter_header_row) == set(column_name_list_in_mapping))
             duplicate_check=[column_name for column_name in set(filter_header_row) if filter_header_row.count(column_name) > 1 and column_name!=0]		
             # after apply month_mask, the column_name match with that in entity_mapping		
@@ -1488,6 +1487,8 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 st.stop()		    
             elif len(duplicate_check)==0:  # miss some property names              
                 max_match=[x for x in filter_header_row if x!=0]
+                st.write("max_match",max_match)
+                st.write("filter_header_row",filter_header_row)
                 rest_column_names=[str(x) for x in PL.iloc[max_match_row,:][month_mask] if pd.notna(x) and str(x).upper().strip() not in column_name_list_in_mapping]
         miss_match_column_names = [item for item in column_name_list_in_mapping  if item not in max_match]
 	# total missed entities include: missing from P&L, missing(empty) in entity_mapping["column_name"]
