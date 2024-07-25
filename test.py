@@ -1466,23 +1466,27 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 st.stop()
             # month_row_index is the row having most reporting month
             max_month_index = month_counts.idxmax()
-            mask = mask_table.iloc[max_month_index,:]
+            month_mask = mask_table.iloc[max_month_index,:]
             column_name=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[max_match_row,:])))
-            st.write("column_name",column_name)
             filter_header_row =[item if item in column_name_list_in_mapping else 0 for item in column_name]
-            st.write("mask",mask)
-            st.write("filter_header_row",filter_header_row)
-            filter_header_row = [property_name if is_month else 0 for property_name, is_month in zip(filter_header_row, mask)]
-            
+            filter_header_row = [property_name if is_month else 0 for property_name, is_month in zip(filter_header_row, month_mask)]
             st.write("filter_header_row",filter_header_row)
             st.write(set(filter_header_row) == set(column_name_list_in_mapping))
-            if sorted([x for x in filter_header_row if x != 0]) == sorted(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0:
+            duplicate_check=[column_name for column_name in set(filter_header_row) if filter_header_row.count(column_name) > 1]		
+            # after apply month_mask, the column_name match with that in entity_mapping		
+            if len(duplicate_check)==0 and sorted([x for x in filter_header_row if x != 0]) == sorted(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0:
                 # This is the true column name  
                 mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(column_name_list_in_mapping))}
                 mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in filter_header_row]
                 st.write("max_match_row  mapped_entity",max_match_row,mapped_entity)
                 return max_match_row,mapped_entity
 
+            # after apply month_mask, the column_name still doesn't match with that in entity_mapping	
+	    elif len(duplicate_check)>0: # there is still duplicate property name
+                st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
+                st.stop()		    
+            elif len(duplicate_check)==0:  # miss some property name              
+                max_match=[x for x in filter_header_row if x!=0]
         miss_match_column_names = [item for item in column_name_list_in_mapping  if item not in max_match]
 	# total missed entities include: missing from P&L, missing(empty) in entity_mapping["column_name"]
         total_missed_entities=entity_mapping[entity_mapping["Column_Name"].str.upper().str.strip().isin(miss_match_column_names)].index.tolist()+entity_without_propertynamefinance
