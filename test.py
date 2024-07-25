@@ -1472,7 +1472,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
             filter_header_row = [property_name if is_month else 0 for property_name, is_month in zip(filter_header_row, month_mask)]
             st.write("filter_header_row",filter_header_row)
             st.write(set(filter_header_row) == set(column_name_list_in_mapping))
-            duplicate_check=[column_name for column_name in set(filter_header_row) if filter_header_row.count(column_name) > 1]		
+            duplicate_check=[column_name for column_name in set(filter_header_row) if filter_header_row.count(column_name) > 1 and column_name!=0]		
             # after apply month_mask, the column_name match with that in entity_mapping		
             if len(duplicate_check)==0 and sorted([x for x in filter_header_row if x != 0]) == sorted(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0:
                 # This is the true column name  
