@@ -1471,7 +1471,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
             st.write("column_name",column_name)
             filter_header_row =[item if item in column_name_list_in_mapping else 0 for item in column_name]
             st.write("filter_header_row",filter_header_row)
-            filter_header_row = [property_name if is_month else 0 for property_name, is_month in zip(filter_header_row, mask)]
+            filter_header_row = [property_name if is_month for property_name, is_month in zip(filter_header_row, mask)]
             st.write("filter_header_row",filter_header_row)
             st.write(set(filter_header_row) == set(column_name_list_in_mapping))
             if set(filter_header_row) == set(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0:
