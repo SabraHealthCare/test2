@@ -1459,7 +1459,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
 	    # there may has more than one months data in P&L, only select reporting month data
             # Check reporting month above first_tenant_account_row
             mask_table = PL.iloc[0:first_tenant_account_row-1,:].applymap(Is_Reporting_Month)
-            month_counts=np.sum(mask_table.values, axis=1).tolist()		
+            month_counts=pd.Series(np.sum(mask_table.values, axis=1))		
             st.write("month_counts", month_counts)
            
             if all(month_count==0 for month_count in month_counts): # there is no month
