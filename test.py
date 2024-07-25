@@ -425,8 +425,8 @@ def Get_Month_Year(single_string):
         if single_string=="":
             return 0,year
     single_string=single_string.replace("30","").replace("31","").replace("29","").replace("28","")
-    for month_i in month_dic_word.keys() :#[01,02,03...12]
-        for  month_word in month_dic_word[month_i]: #['december','dec',"nov",...]
+    for month_i in month_dic_word.keys() :#[10,11,3...12]
+        for  month_word in month_dic_word[month_i]: #month_word is element of ['december','dec',"nov",...]
             #st.write("single_string",single_string)
             #st.write("month_word in single_string",month_word in single_string)
             if month_word in single_string:  # month is words ,like Jan Feb... year is optional
@@ -640,7 +640,6 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     max_len=0
     candidate_date=[]
     month_count = month_table.apply(lambda row: (row != 0).sum(), axis=1).tolist()
-    year_count = year_table.apply(lambda col: (col != 0).sum(), axis=0).tolist()
     if not all(x==0 for x in month_count):
        # month_sort_index is the index(row number) which contain month/year, and sorted desc. month_sort_index[0] is the row number that contrain most months in PL
         non_zero_indices = [(index, month_c) for index, month_c in enumerate(month_count) if month_c!= 0]
@@ -1395,6 +1394,24 @@ def View_Discrepancy():
 #return the row number of property header and mapped_entity, Column_Name and entity_list has same order 
 # return example: 4, ["0","0","Sxxxx","Sxxxx","0","Sxxxx","0"...]
 
+def Is_Reporting_Month(single_string,reporting_month):
+    month=reporting_month[4:6]
+    year=reporting_month[0:4]
+    if single_string!=single_string or pd.isna(single_string):
+        return False
+    if isinstance(single_string, datetime) and int(single_string.month)==int(month)
+        return True
+    if isinstance(single_string, (int,float)):
+        return False
+    single_string=str(single_string).lower()
+    if single_string in month_dic_word[int(month)]:
+        return True
+    if year in single_string or year[2:4] in single_string:    
+	single_string=single_string.replace(year,"").replace(year[2:4],"").replace("30","").replace("31","").replace("29","").replace("28","")
+        if any(month_i in single_string for month_i in month_dic_num[int(month)]):
+        return True
+    return False
+
 def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):  
     entity_without_propertynamefinance=entity_mapping[(entity_mapping['Column_Name'].isna()) | (entity_mapping['Column_Name'].str.strip() == "")].index.tolist()
     column_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"] if pd.notna(x) and str(x).strip()]
@@ -1414,7 +1431,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
         if len(match_names)==len(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: 
             duplicate_check = [name for name in set(match_names) if match_names.count(name) > 1]
             if len(duplicate_check)>0:
-                st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
+                st.error("Detected duplicated column names —— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
                 st.stop()
             else:
                 mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(column_name_list_in_mapping))}
@@ -1436,11 +1453,28 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
         st.write('    '.join(column_name_list_in_mapping))
         st.stop()
     elif len(max_match)>0: # only part of entities have column name in P&L
-        duplicate_check = [name for name in set(match_names) if match_names.count(name) > 1]
-        if len(duplicate_check)>0:
+        duplicate_column_name = [name for name in set(max_match) if max_match.count(name) > 1]
+        if len(duplicate_column_name)>0:
 		######################################################################################################
-            st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
-            st.stop()
+	    # there may has more than one months data in P&L, only select reporting month data
+
+            # Check reporting month above first_tenant_account_row
+            month_counts = PL.iloc[0:first_tenant_account_row-1].applymap(Is_Reporting_Month).sum()
+            if all(month_count==0 for month_count in month_counts): # there is no month
+                st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
+                st.stop()
+            # month_row_index is the row having most reporting month
+            month_row_index = month_counts.idxmax()
+            mask=PL.iloc[month_row_index].apply(lambda x: [Is_Reporting_Month(value) for value in x], axis=1)
+            column_name=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[max_match_row,:])))  
+            filter_header_row = [item for item in column_name if item in column_name_list_in_mapping else 0]
+            filter_header_row = [property_name if is_month else 0 for property_name, is_month in zip(filter_header_row, mask)]
+            if set(filter_header_row) == set(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: :
+                # this is the true column name  
+                mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(column_name_list_in_mapping))}
+                mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in filter_header_row]
+                return max_match_row,mapped_entity
+
         miss_match_column_names = [item for item in column_name_list_in_mapping  if item not in max_match]
 	# total missed entities include: missing from P&L, missing(empty) in entity_mapping["column_name"]
         total_missed_entities=entity_mapping[entity_mapping["Column_Name"].str.upper().str.strip().isin(miss_match_column_names)].index.tolist()+entity_without_propertynamefinance
@@ -1472,10 +1506,9 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                     st.stop()
 
                 mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
-                mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
+                mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in filter_header_row]
                 # update entity_mapping in onedrive  
                 Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,None,entity_mapping_str_col)
-        
                 return row_i,mapped_entity
             else:
                 st.stop()
@@ -1601,7 +1634,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         # select only two or one previous months for columns
         month_select = Get_Previous_Months(reporting_month,date_header[0]) 
         
- 
         #remove row above date, to prevent to map these value as new accounts
         PL=PL.iloc[date_header[1]+1:,:]
 	#remove rows with nan tenant account
