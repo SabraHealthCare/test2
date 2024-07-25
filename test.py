@@ -1458,17 +1458,16 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
 		######################################################################################################
 	    # there may has more than one months data in P&L, only select reporting month data
             # Check reporting month above first_tenant_account_row
-            mask_talbe = PL.iloc[0:first_tenant_account_row-1,:].applymap(Is_Reporting_Month)
-	    max_month_index = np.sum(mask_talbe.values, axis=1).tolist().idxmax()
-            st.write("max_month_index", max_month_index)
+            mask_table = PL.iloc[0:first_tenant_account_row-1,:].applymap(Is_Reporting_Month)
+            month_counts=np.sum(mask_table.values, axis=1).tolist()		
+            st.write("month_counts", month_counts)
            
-            if max_month_index==0: # there is no month
+            if all(month_count==0 for month_count in month_counts): # there is no month
                 st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
                 st.stop()
             # month_row_index is the row having most reporting month
-            st.write(type(month_counts))
-            month_row_index = month_counts.idxmax()
-            mask = PL.iloc[month_row_index].apply(Is_Reporting_Month)
+            max_month_index = month_counts.idxmax()
+            mask = mask_table.iloc[month_row_index]
             column_name=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[max_match_row,:])))  
             filter_header_row =[item if item in column_name_list_in_mapping else 0 for item in column_name]
             filter_header_row = [property_name if is_month else 0 for property_name, is_month in zip(filter_header_row, mask)]
