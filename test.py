@@ -1430,15 +1430,11 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
         match_names = [item for item in canditate_row if item in column_name_list_in_mapping]
 		    
 	# found the property name header row, transfer them into entity id
-        if len(match_names)==len(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: 
-            duplicate_check = [name for name in set(match_names) if match_names.count(name) > 1]
-            if len(duplicate_check)>0:
-                st.error("Detected duplicated column names —— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
-                st.stop()
-            else: # property name column header is unique and match with entity mapping
-                mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(column_name_list_in_mapping))}
-                mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in canditate_row]
-                return row_i,mapped_entity
+        if sort(match_names)==sort(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: 
+           # property name column header is unique and match with entity mapping
+            mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(column_name_list_in_mapping))}
+            mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in canditate_row]
+            return row_i,mapped_entity
 	
         elif len(match_names)>len(max_match):
             max_match=match_names
