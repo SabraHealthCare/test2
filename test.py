@@ -1527,8 +1527,9 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 header_row = [item if item in column_name_list_in_mapping else 0 for item in raw_header_row ]
                 st.write("header_row",header_row)
                 if len(month_mask)>0: # filter if there are month mask
+			
                     header_row=[item for item, m in zip(header_row, month_mask) if m]
-                    st.write("header_row",header_row)
+                    st.write("header_row,month_mask",header_row,month_mask)
                 duplicate_check = [item for item in set(header_row) if header_row.count(item) > 1 and item!=0]
                 st.write("duplicate_check",duplicate_check)		    
                 if len(duplicate_check)>0:
