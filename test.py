@@ -1394,7 +1394,7 @@ def View_Discrepancy():
 #return the row number of property header and mapped_entity, Column_Name and entity_list has same order 
 # return example: 4, ["0","0","Sxxxx","Sxxxx","0","Sxxxx","0"...]
 
-def Is_Reporting_Month(single_string,reporting_month):
+def Is_Reporting_Month(single_string):
     month=reporting_month[4:6]
     year=reporting_month[0:4]
     if single_string!=single_string or pd.isna(single_string):
