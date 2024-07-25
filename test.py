@@ -1422,18 +1422,20 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
 	     if sabra_account != 'NO NEED TO MAP']).tolist()
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
-	
+    month_mask=[]
+
+    # find the row with property column names	
     for row_i in range(first_tenant_account_row):
         canditate_row=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[row_i,:])))  
         match_names = [item for item in canditate_row if item in column_name_list_in_mapping]
-	
+		    
 	# found the property name header row, transfer them into entity id
         if len(match_names)==len(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: 
             duplicate_check = [name for name in set(match_names) if match_names.count(name) > 1]
             if len(duplicate_check)>0:
                 st.error("Detected duplicated column names —— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
                 st.stop()
-            else:
+            else: # property name column header is unique and match with entity mapping
                 mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(column_name_list_in_mapping))}
                 mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in canditate_row]
                 return row_i,mapped_entity
@@ -1448,14 +1450,15 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
         if len(max_match)>2:
             break
 		
+
     if len(max_match)==0: # there is no any column name header at all
         st.error("Fail to identify facility name header in sheet '{}'. The previous header names are as below. Please add and re-upload.".format(sheet_name))
         st.write('    '.join(column_name_list_in_mapping))
         st.stop()
     elif len(max_match)>0: # only part of entities have column name in P&L 
         rest_column_names=[str(x) for x in PL.iloc[max_match_row,:] if pd.notna(x) and str(x).upper().strip() not in column_name_list_in_mapping]
-        duplicate_column_name = [name for name in set(max_match) if max_match.count(name) > 1]
-        if len(duplicate_column_name)>0:
+        duplicate_check = [name for name in set(max_match) if max_match.count(name) > 1]
+        if len(duplicate_check)>0:
 		######################################################################################################
 	    # there may has more than one months data in P&L, only select reporting month data
             # Check reporting month above first_tenant_account_row
@@ -1468,15 +1471,14 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
             # month_row_index is the row having most reporting month
             max_month_index = month_counts.idxmax()
             month_mask = mask_table.iloc[max_month_index,:]
-            column_name=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[max_match_row,:])))
-            filter_header_row =[item if item in column_name_list_in_mapping else 0 for item in column_name]
-            filter_header_row = [property_name if is_month else 0 for property_name, is_month in zip(filter_header_row, month_mask)]
-            st.write(set(filter_header_row) == set(column_name_list_in_mapping))
-            duplicate_check=[column_name for column_name in set(filter_header_row) if filter_header_row.count(column_name) > 1 and column_name!=0]		
+            filter_header_row =[item if item in column_name_list_in_mapping else 0 for item in header_row]
+            filter_header_row = [item if is_month else 0 for item, is_month in zip(filter_header_row, month_mask)]
+
+            duplicate_check=[item for item in set(filter_header_row) if filter_header_row.count(column_name) > 1 and item!=0]		
             # after apply month_mask, the column_name match with that in entity_mapping		
             if len(duplicate_check)==0 and sorted([x for x in filter_header_row if x != 0]) == sorted(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0:
                 # This is the true column name  
-                mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(column_name_list_in_mapping))}
+                mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
                 mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in filter_header_row]
                 st.write("max_match_row  mapped_entity",max_match_row,mapped_entity)
                 return max_match_row,mapped_entity
@@ -1487,10 +1489,9 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 st.stop()		    
             elif len(duplicate_check)==0:  # miss some property names              
                 max_match=[x for x in filter_header_row if x!=0]
-
-                st.write("filter_header_row",filter_header_row)
+                header_row=filter_header_row
                 rest_column_names=[str(x) for x in PL.iloc[max_match_row,:][month_mask] if pd.notna(x) and str(x).upper().strip() not in column_name_list_in_mapping]
-        st.write("max_match",max_match)
+
         miss_match_column_names = [item for item in column_name_list_in_mapping  if item not in max_match]
 	# total missed entities include: missing from P&L, missing(empty) in entity_mapping["column_name"]
         total_missed_entities=entity_mapping[entity_mapping["Column_Name"].str.upper().str.strip().isin(miss_match_column_names)].index.tolist()+entity_without_propertynamefinance
@@ -1523,13 +1524,20 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                     st.error( "The following column has been mapped to more than one facility in sheet '{}'. Please fix and re-upload:".format(sheet_name))
                     st.error(", ".join(f"'{item}'" for item in duplicate_check))
                     st.stop()
-
-                mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
-                #st.write("mapping_dict",mapping_dict,"",)
-                mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in max_match]
-                # update entity_mapping in onedrive  
-                Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,None,entity_mapping_str_col)
-                return max_match_row,mapped_entity
+		#update header_row
+                raw_header_row=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[max_match_row,:])))  
+                header_row = [item if item in column_name_list_in_mapping else 0 for item in raw_header_row ]
+                if len(month_mask)>0: # filter if there are month mask
+                    header_row=[item for item, m in zip(header_row, month_mask) if m]
+                duplicate_check = [item for item in set(header_row) if header_row.count(item) > 1]
+                if len(duplicate_check)>0:
+                    st.error("Detected duplicated column names —— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
+                    st.stop()
+		elif len(header_row)==len(column_name_list_in_mapping):  # property name column header is unique and match with entity mapping
+                    mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
+                    mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
+                    Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,None,entity_mapping_str_col)
+                    return max_match_row,mapped_entity
             else:
                 st.stop()
 # no cache
