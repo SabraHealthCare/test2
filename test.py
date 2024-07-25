@@ -1487,9 +1487,10 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 st.stop()		    
             elif len(duplicate_check)==0:  # miss some property names              
                 max_match=[x for x in filter_header_row if x!=0]
-                st.write("max_match",max_match)
+
                 st.write("filter_header_row",filter_header_row)
                 rest_column_names=[str(x) for x in PL.iloc[max_match_row,:][month_mask] if pd.notna(x) and str(x).upper().strip() not in column_name_list_in_mapping]
+        st.write("max_match",max_match)
         miss_match_column_names = [item for item in column_name_list_in_mapping  if item not in max_match]
 	# total missed entities include: missing from P&L, missing(empty) in entity_mapping["column_name"]
         total_missed_entities=entity_mapping[entity_mapping["Column_Name"].str.upper().str.strip().isin(miss_match_column_names)].index.tolist()+entity_without_propertynamefinance
@@ -1499,7 +1500,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 st.error("Can't identify the data column for facility: {} in sheet {}. Please add its column name and re-upload. If its column name has been updated, please re-map it as indicated below.".format(entity_mapping.loc[total_missed_entities[0],"Property_Name"],sheet_name))
             elif len(total_missed_entities)>1:
                 st.error("Can't identify the data columns for facilities: {} in sheet {}. Please add their column names and re-upload. If their column name has been updated, please re-map it as indicated below.".format( ",".join(entity_mapping.loc[total_missed_entities, "Property_Name"]),sheet_name))
-            st.write("total_missed_entities",total_missed_entities)            
+            st.write("total_missed_entities",total_missed_entities,"column_name_list_in_mapping",column_name_list_in_mapping)            
             with st.form(key="miss_match_column_name"):
                 for entity_i in total_missed_entities:
                     st.warning("Column name for facility {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
