@@ -1430,7 +1430,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
         match_names = [item for item in canditate_row if item in column_name_list_in_mapping]
         st.write(match_names,column_name_list_in_mapping)  
 	# found the property name header row, transfer them into entity id
-        if sort(match_names)==sort(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: 
+        if len(match_names)>0 and sort(match_names)==sort(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: 
            # property name column header is unique and match with entity mapping
             mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(column_name_list_in_mapping))}
             mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in canditate_row]
