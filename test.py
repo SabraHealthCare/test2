@@ -1453,6 +1453,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
         st.write('    '.join(column_name_list_in_mapping))
         st.stop()
     elif len(max_match)>0: # only part of entities have column name in P&L 
+        rest_column_names=[str(x) for x in PL.iloc[max_match_row,:] if pd.notna(x) and str(x).upper().strip() not in column_name_list_in_mapping]
         duplicate_column_name = [name for name in set(max_match) if max_match.count(name) > 1]
         if len(duplicate_column_name)>0:
 		######################################################################################################
@@ -1485,20 +1486,24 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
             elif len(duplicate_check)>0: # there is still duplicate property name
                 st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
                 st.stop()		    
-            elif len(duplicate_check)==0:  # miss some property name              
+            elif len(duplicate_check)==0:  # miss some property names              
                 max_match=[x for x in filter_header_row if x!=0]
+                rest_column_names=[str(x) for x in PL.iloc[max_match_row,:][month_mask] if pd.notna(x) and str(x).upper().strip() not in column_name_list_in_mapping]
         miss_match_column_names = [item for item in column_name_list_in_mapping  if item not in max_match]
 	# total missed entities include: missing from P&L, missing(empty) in entity_mapping["column_name"]
         total_missed_entities=entity_mapping[entity_mapping["Column_Name"].str.upper().str.strip().isin(miss_match_column_names)].index.tolist()+entity_without_propertynamefinance
         miss_column_mapping=entity_mapping.loc[total_missed_entities]
-        column_names=[str(x) for x in PL.iloc[max_match_row,:] if pd.notna(x) and str(x).upper().strip() not in column_name_list_in_mapping]
         if len(total_missed_entities)>0:
-            st.error("Missing facility column name for facility: {} in sheet {}. Please add the column name and re-upload the sheet. If the column name has been updated, please re-map it as indicated below.".format(sheet_name))
+            if len(total_missed_entities)==1:
+                st.error("Can't identify the data column for facility: {} in sheet {}. Please add its column name and re-upload. If its column name has been updated, please re-map it as indicated below.".format(entity_mapping.loc[total_missed_entities[0],"Property_Name"],sheet_name))
+            elif len(total_missed_entities)>1:
+                st.error("Can't identify the data columns for facilities: {} in sheet {}. Please add their column names and re-upload. If their column name has been updated, please re-map it as indicated below.".format( ",".join(entity_mapping.loc[total_missed_entities, "Property_Name"]),sheet_name))
+            
             with st.form(key="miss_match_column_name"):
                 for entity_i in total_missed_entities:
                     st.warning("Column name for facility {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
                     miss_column_mapping.loc[entity_i,"Column_Name"]=st.selectbox("Original facility column name: {}".format(\
-			entity_mapping.loc[entity_i,"Column_Name"]),[""]+column_names,key=entity_i+"miss_column")
+			entity_mapping.loc[entity_i,"Column_Name"]),[""]+rest_column_names,key=entity_i+"miss_column")
                 submitted = st.form_submit_button("Submit")
            
             if submitted:
