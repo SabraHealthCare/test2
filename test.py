@@ -1428,7 +1428,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
     for row_i in range(first_tenant_account_row):
         canditate_row=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[row_i,:])))  
         match_names = [item for item in canditate_row if item in column_name_list_in_mapping]
-		    
+        st.write(match_names,column_name_list_in_mapping)  
 	# found the property name header row, transfer them into entity id
         if sort(match_names)==sort(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: 
            # property name column header is unique and match with entity mapping
