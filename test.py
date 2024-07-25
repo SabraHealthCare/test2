@@ -1467,7 +1467,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
             month_row_index = month_counts.idxmax()
             mask=PL.iloc[month_row_index].apply(lambda x: [Is_Reporting_Month(value) for value in x], axis=1)
             column_name=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[max_match_row,:])))  
-            filter_header_row = [item for item in column_name if item in column_name_list_in_mapping else 0]
+            filter_header_row =[item if item in column_name_list_in_mapping else 0 for item in column_name]
             filter_header_row = [property_name if is_month else 0 for property_name, is_month in zip(filter_header_row, mask)]
             if set(filter_header_row) == set(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: :
                 # this is the true column name  
