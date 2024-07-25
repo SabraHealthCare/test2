@@ -1458,16 +1458,11 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
 		######################################################################################################
 	    # there may has more than one months data in P&L, only select reporting month data
             # Check reporting month above first_tenant_account_row
-            month_counts = PL.iloc[0:first_tenant_account_row-1,:].applymap(Is_Reporting_Month)#np.sum(.values, axis=1)
-
-            month_counts = month_counts.astype(int)
-            st.write("month_count index:", month_counts.index)
-            st.write("month_counts",month_counts)
-		# Step 3: Sum the values across each row using apply
-            month_count = month_counts.apply(lambda row: row.sum(), axis=1)
-            st.write("month_count index:", month_counts.index)
-            st.write("month_count",month_count)
-            if all(month_count==0 for month_count in month_counts): # there is no month
+            mask_talbe = PL.iloc[0:first_tenant_account_row-1,:].applymap(Is_Reporting_Month)
+	    max_month_index = np.sum(mask_talbe.values, axis=1).tolist().idxmax()
+            st.write("max_month_index", max_month_index)
+           
+            if max_month_index==0: # there is no month
                 st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
                 st.stop()
             # month_row_index is the row having most reporting month
