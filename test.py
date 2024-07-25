@@ -1474,7 +1474,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
             filter_header_row =[item if item in column_name_list_in_mapping else 0 for item in header_row]
             filter_header_row = [item if is_month else 0 for item, is_month in zip(filter_header_row, month_mask)]
 
-            duplicate_check=[item for item in set(filter_header_row) if filter_header_row.count(column_name) > 1 and item!=0]		
+            duplicate_check=[item for item in set(filter_header_row) if filter_header_row.count(item) > 1 and item!=0]		
             # after apply month_mask, the column_name match with that in entity_mapping		
             if len(duplicate_check)==0 and sorted([x for x in filter_header_row if x != 0]) == sorted(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0:
                 # This is the true column name  
@@ -1518,7 +1518,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                     entity_mapping.loc[entity_i,"Column_Name"]=miss_column_mapping.loc[entity_i,"Column_Name"]     
 
                 column_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"]]
-                duplicate_check = [name for name in set(column_name_list_in_mapping) if column_name_list_in_mapping.count(name) > 1]
+                duplicate_check = [item for item in set(column_name_list_in_mapping) if column_name_list_in_mapping.count(name) > 1]
 
                 if len(duplicate_check)>0:
                     st.error( "The following column has been mapped to more than one facility in sheet '{}'. Please fix and re-upload:".format(sheet_name))
@@ -1529,7 +1529,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 header_row = [item if item in column_name_list_in_mapping else 0 for item in raw_header_row ]
                 if len(month_mask)>0: # filter if there are month mask
                     header_row=[item for item, m in zip(header_row, month_mask) if m]
-                duplicate_check = [item for item in set(header_row) if header_row.count(item) > 1]
+                duplicate_check = [item for item in set(header_row) if header_row.count(item) > 1 and item!=0]
                 if len(duplicate_check)>0:
                     st.error("Detected duplicated column names —— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
                     st.stop()
