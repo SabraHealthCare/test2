@@ -1464,6 +1464,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
                 st.stop()
             # month_row_index is the row having most reporting month
+            st.write(type(month_counts))
             month_row_index = month_counts.idxmax()
             mask = PL.iloc[month_row_index].apply(Is_Reporting_Month)
             column_name=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[max_match_row,:])))  
