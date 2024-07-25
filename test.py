@@ -1493,7 +1493,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
         miss_column_mapping=entity_mapping.loc[total_missed_entities]
         column_names=[str(x) for x in PL.iloc[max_match_row,:] if pd.notna(x) and str(x).upper().strip() not in column_name_list_in_mapping]
         if len(total_missed_entities)>0:
-            st.error("Missing facility column name for facilti: {}.Please map the column names for following facilities in sheet {}.".format(sheet_name))
+            st.error(Missing facility column name for facility: {} in sheet {}. Please add the column name and re-upload the sheet. If the column name has been updated, please re-map it as indicated below.".format(sheet_name))
             with st.form(key="miss_match_column_name"):
                 for entity_i in total_missed_entities:
                     st.warning("Column name for facility {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
