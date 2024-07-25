@@ -1466,11 +1466,13 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 st.stop()
             # month_row_index is the row having most reporting month
             max_month_index = month_counts.idxmax()
-		
             mask = mask_table.iloc[max_month_index,:]
-            column_name=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[max_match_row,:])))  
+            column_name=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[max_match_row,:])))
+            st.write("column_name",column_name)
             filter_header_row =[item if item in column_name_list_in_mapping else 0 for item in column_name]
+            st.write("filter_header_row",filter_header_row)
             filter_header_row = [property_name if is_month else 0 for property_name, is_month in zip(filter_header_row, mask)]
+            st.write("filter_header_row",filter_header_row)
             if set(filter_header_row) == set(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0:
                 # this is the true column name  
                 mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(column_name_list_in_mapping))}
