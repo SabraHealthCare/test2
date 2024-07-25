@@ -1399,7 +1399,7 @@ def Is_Reporting_Month(single_string,reporting_month):
     year=reporting_month[0:4]
     if single_string!=single_string or pd.isna(single_string):
         return False
-    if isinstance(single_string, datetime) and int(single_string.month)==int(month)
+    if isinstance(single_string, datetime) and int(single_string.month)==int(month):
         return True
     if isinstance(single_string, (int,float)):
         return False
