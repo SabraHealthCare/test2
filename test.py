@@ -1148,7 +1148,7 @@ st.markdown(
         animation: blink 1s infinite;
         padding: 10px 20px;
         font-size: 16px;
-        color: white;
+        color: white!important;
         background-color: #eeeeef;
         border: none;
         cursor: pointer;
