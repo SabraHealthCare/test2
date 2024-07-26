@@ -2000,7 +2000,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
      
         if not st.session_state.clicked['submit_report']:
-    # HTML for the blinking button
+           # HTML for the blinking button
             button_html = f"""
         <div class="blink-button-wrapper">
             <button id="blinkButton" class="blink-button" onclick="fetch('/update_state?submit_report=True').then(() => window.location.reload());">
@@ -2014,10 +2014,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
         # Handle state update from JavaScript fetch request
         if st.experimental_get_query_params().get('submit_report', [''])[0] == 'True':
-    	    st.session_state['clicked']['submit_report'] = True
+    	    st.session_state.'clicked'['submit_report'] = True
     	    st.experimental_set_query_params(submit_report=None)
 
-# Display appropriate message
+        # Display appropriate message
         if st.session_state.clicked['submit_report']:
     	    st.write("Data uploaded")
         else:
