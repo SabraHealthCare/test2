@@ -820,7 +820,7 @@ def Manage_Entity_Mapping(operator):
         if submitted:
             entity_mapping.update(entity_mapping_updation)
 		
-    entity_mapping_same_sheet= entity_mapping[entity_mapping["DATE_SOLD_PAYOFF"].notna() and entity_mapping["Finance_in_separate_sheets"]=="N"]
+    entity_mapping_same_sheet= entity_mapping[(entity_mapping["DATE_SOLD_PAYOFF"].notna())&(entity_mapping["Finance_in_separate_sheets"]=="N")]
     if entity_mapping_same_sheet.shape[0]>0:
         with st.form(key="Mapping Property mapping"):
             col1,col2,col3,col4,col5=st.columns([4,3,3,3,4])
