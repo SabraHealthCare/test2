@@ -1139,7 +1139,25 @@ def View_Summary():
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
 
-
+st.markdown(
+        f"""
+        <style>
+        #reporting_month button {{
+            animation: blink 1s infinite;
+            color: black !important;
+            background-color: #a6c8ff !important; /* Low-saturation blue background */
+            border: none;
+            cursor: pointer;
+        }}
+        @keyframes blink {{
+            0% {{ background-color: #a6c8ff; }}
+            50% {{ background-color: #8fb3e9; }}
+            100% {{ background-color: #a6c8ff; }}
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
 
 # no cache
@@ -1977,40 +1995,16 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.write("Data uploaded")
         if not st.session_state.clicked['submit_report']:
             st.markdown(
-        """
+        f"""
         <style>
-        .custom-blink-button {
+        .stButton button {{
             animation: blink 1s infinite;
-            color: black !important;
-            background-color: #a6c8ff !important; /* Low-saturation blue background */
-            border: none;
-            cursor: pointer;
-            padding: 10px 20px;
-            font-size: 16px;
-        }
-
-        @keyframes blink {
-            0% { background-color: #a6c8ff; }
-            50% { background-color: #8fb3e9; }
-            100% { background-color: #a6c8ff; }
-        }
+        }}
         </style>
         """,
         unsafe_allow_html=True
     )
 
-    # Display the button with the custom class
-            if st.markdown(
-        f"""
-        <button class="custom-blink-button" onclick="window.location.href='/?stop_blinking=true'">
-            Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting
-        </button>
-        """,
-        unsafe_allow_html=True
-    ):
-                st.session_state.clicked['submit_report']=True
-            else:
-                st.write("Data uploaded")
         	    
         #st.button("******Confirm and upload {} {}-{} reporting******".format(operator, reporting_month[4:6], reporting_month[0:4]), on_click=clicked, args=["submit_report"], key='reporting_month'):
  
