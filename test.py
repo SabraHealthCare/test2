@@ -32,6 +32,86 @@ st.set_page_config(
    initial_sidebar_state="expanded",  layout="wide")
 placeholder = st.empty()
 st.title("Sabra HealthCare Monthly Reporting App")
+
+
+
+
+# Define CSS for a blinking button
+st.markdown(
+    """
+    <style>
+    .blink-button {
+        animation: blink 1s infinite;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        background-color: #007bff;
+        border: none;
+        cursor: pointer;
+    }
+
+    @keyframes blink {
+        0% { background-color: #007bff; }
+        50% { background-color: #0056b3; }
+        100% { background-color: #007bff; }
+    }
+
+    .blink-button-wrapper {
+        display: inline-block;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# JavaScript to stop blinking effect when button is clicked
+stop_blinking_js = """
+    <script>
+    function stopBlinking() {
+        var button = document.getElementById('blinkButton');
+        button.classList.remove('blink-button');
+        fetch('/stop_blinking', {method: 'POST'});
+    }
+    </script>
+"""
+
+# Add JavaScript to the Streamlit app
+st.markdown(stop_blinking_js, unsafe_allow_html=True)
+
+# Add a button with an onclick event to stop the blinking
+st.markdown(
+    '<div class="blink-button-wrapper">'
+    '<button id="blinkButton" class="blink-button" onclick="stopBlinking()">Click Me!</button>'
+    '</div>',
+    unsafe_allow_html=True
+)
+
+# Placeholder to show the button status
+if 'button_clicked' not in st.session_state:
+    st.session_state['button_clicked'] = False
+
+# Define a function to handle button click
+def stop_blinking():
+    st.session_state['button_clicked'] = True
+
+# Display appropriate message
+if st.session_state['button_clicked']:
+    st.write("Button clicked! Blinking stopped.")
+else:
+    st.write("Button is blinking. Click to stop.")
+
+
+
+
+
+
+
+
+
+
+
+
+
 sheet_name_discrepancy="Discrepancy_Review"
 bucket_mapping="sabramapping"
 bucket_PL="operatorpl"
