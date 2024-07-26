@@ -882,12 +882,11 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
             with col2:
                 st.write("Sabra second account")
                 Sabra_second_account_list[i]= streamlit_tree_select.tree_select(parent_hierarchy_second,only_leaf_checkboxes=True,key=str(new_tenant_account_list[i])+"1")
-        col1,col2=st.columns([1,7])
-        with col1:	    
-            submitted = st.form_submit_button("Submit111")    
-        with col2:	    
-            st.write("If you need to apply a conversion (such as multiplying by -1) to the account, please email sli@sabrahealth.com. We'll apply it on our backend.")
 
+	    
+            submitted = st.form_submit_button("Submit111")    	    
+            #st.write("If you need to apply a conversion (such as multiplying by -1) to some accounts, please email sli@sabrahealth.com. We'll apply it on our backend.")
+            st.markdown('<p class="small-font">If you need to apply transformation (such as multiplying by -1) to some accounts, please email sli@sabrahealth.com.</p>', unsafe_allow_html=True)
         if submitted:
             for i in range(count):
                 if len(Sabra_main_account_list[i]['checked'])==1:
