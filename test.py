@@ -790,44 +790,69 @@ def Manage_Entity_Mapping(operator):
     entity_mapping_updation=pd.DataFrame(\
 	    columns=["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"],\
             index=entity_mapping.index)
-	
-    with st.form(key="Mapping Properties"):
-        col1,col2,col3,col4=st.columns([4,3,3,3])
-        with col1:
-            st.write("Property")
-        with col2:
-            st.write("P&L Sheetname")    
-        with col3: 
-            st.write("Occupancy Sheetname")    
-        with col4:
-            st.write("Balance sheet Sheetname")  
-        i=0
-        for entity in entity_mapping.index:
+ 
+    entity_mapping_different_sheet= entity_mapping[entity_mapping["DATE_SOLD_PAYOFF"].notna() and entity_mapping["Finance_in_separate_sheets"]=="Y"]
+    if entity_mapping_different_sheet.shape[0]>0:
+        with st.form(key="Mapping Property mapping"):
             col1,col2,col3,col4=st.columns([4,3,3,3])
             with col1:
-                st.write("")
-                st.write(entity_mapping.loc[entity,"Property_Name"])
+                st.write("Property")
             with col2:
-                entity_mapping_updation.loc[i,"Sheet_Name_Finance"]=st.text_input("",placeholder =entity_mapping.loc[entity,"Sheet_Name_Finance"],key="P&L"+entity)    
+                st.write("P&L Sheetname")    
             with col3: 
-                entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping.loc[entity,"Sheet_Name_Occupancy"],key="Census"+entity)     
+                st.write("Occupancy Sheetname")    
             with col4:
-                entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping.loc[entity,"Sheet_Name_Balance_Sheet"],key="BS"+entity) 
-            i+=1 
-        submitted = st.form_submit_button("Submit")
+                st.write("Balance sheet Sheetname")  
+  
+            for entity_i in entity_mapping_different_sheet.index:
+                col1,col2,col3,col4=st.columns([4,3,3,3])
+                with col1:
+                    st.write("")
+                    st.write(entity_mapping_different_sheet.loc[entity_i,"Property_Name"])
+                with col2:
+                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Finance"]=st.text_input("",placeholder =entity_mapping_different_sheet.loc[entity_i,"Sheet_Name_Finance"],key="P&L"+entity_i)    
+                with col3: 
+                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping_different_sheet.loc[entity_i,"Sheet_Name_Occupancy"],key="Census"+entity_i)     
+                with col4:
+                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping_different_sheet.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
+            submitted = st.form_submit_button("Submit")
             
-    if submitted:
-        entity_mapping.update(entity_mapping_updation)
-        #i=0
-        #for entity in entity_mapping.index:
-            #if entity_mapping_updation.loc[i,"Sheet_Name_Finance"]:
-                #entity_mapping.loc[entity,"Sheet_Name_Finance"]=entity_mapping_updation.loc[i,"Sheet_Name_Finance"] 
-            #if entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]:
-               #entity_mapping.loc[entity,"Sheet_Name_Occupancy"]=entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]
-            #if  entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"]:
-               # entity_mapping.loc[entity,"Sheet_Name_Balance_Sheet"]=entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"] 
-           # i+=1
-
+        if submitted:
+            entity_mapping.update(entity_mapping_updation)
+		
+    entity_mapping_same_sheet= entity_mapping[entity_mapping["DATE_SOLD_PAYOFF"].notna() and entity_mapping["Finance_in_separate_sheets"]=="N"]
+    if entity_mapping_same_sheet.shape[0]>0:
+        with st.form(key="Mapping Property mapping"):
+            col1,col2,col3,col4,col5=st.columns([4,3,3,3,4])
+            with col1:
+                st.write("Property")
+            with col2:
+                st.write("P&L Sheetname")    
+            with col3: 
+                st.write("Occupancy Sheetname")    
+            with col4:
+                st.write("Balance sheet Sheetname") 
+            with col5:
+                st.write("Facility Column Name") 
+  
+            for entity_i in entity_mapping_same_sheet.index:
+                col1,col2,col3,col4=st.columns([4,3,3,3])
+                with col1:
+                    st.write("")
+                    st.write(entity_mapping_same_sheet.loc[entity_i,"Property_Name"])
+                with col2:
+                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Finance"]=st.text_input("",placeholder =entity_mapping_same_sheet.loc[entity_i,"Sheet_Name_Finance"],key="P&L"+entity_i)    
+                with col3: 
+                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping_same_sheet.loc[entity_i,"Sheet_Name_Occupancy"],key="Census"+entity_i)     
+                with col4:
+                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping_same_sheet.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
+                with col5:
+                    entity_mapping_updation.loc[entity_i,"Column_Name"]=st.text_input("",placeholder =entity_mapping_same_sheet.loc[entity_i,"Column_Name"],key="BS"+entity_i) 
+            submitted = st.form_submit_button("Submit")
+        if submitted:
+            entity_mapping.update(entity_mapping_updation)
+		
+	    
         download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
         # update entity_mapping in Onedrive    
         Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,None,entity_mapping_str_col)
@@ -1424,12 +1449,11 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
     month_mask=[]
 
-    # find the row with property column names	
+    # search the row with property column names	
     for row_i in range(first_tenant_account_row):
         canditate_row=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[row_i,:])))  
-        match_names = [item for item in canditate_row if item in column_name_list_in_mapping]
-        st.write(sorted(match_names)==sorted(column_name_list_in_mapping))  
-	# found the property name header row, transfer them into entity id
+        match_names = [item for item in canditate_row if item in column_name_list_in_mapping] 
+	# found the property name header row, transferred them into entity id
         if len(match_names)>0 and sorted(match_names)==sorted(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: 
            # property name column header is unique and match with entity mapping
             mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(column_name_list_in_mapping))}
@@ -1445,8 +1469,6 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 break
         if len(max_match)>2:
             break
-		
-
     if len(max_match)==0: # there is no any column name header at all
         st.error("Fail to identify facility name header in sheet '{}'. The previous header names are as below. Please add and re-upload.".format(sheet_name))
         st.write(',    '.join(column_name_list_in_mapping))
@@ -1476,7 +1498,6 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 # This is the true column name  
                 mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
                 mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in filter_header_row]
-                st.write("max_match_row  mapped_entity",max_match_row,mapped_entity)
                 return max_match_row,mapped_entity
 
             # after apply month_mask, the column_name still doesn't match with that in entity_mapping	
@@ -1529,15 +1550,12 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                     st.stop()
 		#update header_row
                 raw_header_row=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[max_match_row,:])))  
-                st.write("raw_header_row",raw_header_row)
                 header_row = [item if item in column_name_list_in_mapping else 0 for item in raw_header_row ]
-                st.write("header_row",header_row)
+
                 if len(month_mask)>0: # filter if there are month mask
 			
                     header_row=[item if m else 0 for item, m in zip(header_row, month_mask) ]
-                    st.write("header_row,month_mask",header_row,month_mask)
-                duplicate_check = [item for item in set(header_row) if header_row.count(item) > 1 and item!=0]
-                st.write("duplicate_check",duplicate_check)		    
+                duplicate_check = [item for item in set(header_row) if header_row.count(item) > 1 and item!=0]		    
                 if len(duplicate_check)>0:
                     st.error("Detected duplicated column names —— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
                     st.stop()
@@ -1574,7 +1592,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         #set tenant_account as index of PL
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
         entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no) 
-        st.write("new_entity_header",new_entity_header)
 	#remove row above property header
         PL=PL.iloc[entity_header_row_number+1:,:]
 
