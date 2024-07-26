@@ -2009,12 +2009,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if not st.session_state.clicked["submit_report"]:
             st.markdown(
                 f'<div class="blink-button-wrapper">'
-                f'<button id="blinkButton" class="blink-button" type="button" onclick="stopBlinking()">******Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting******</button>'
+                f'<button id="blinkButton" class="blink-button" type="button" onclick="stopBlinking()">Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting</button>'
                 '</div>',
                 unsafe_allow_html=True)
         else: 
-            st.button("******Confirm and upload {} {}-{} reporting******".format(operator, reporting_month[4:6], reporting_month[0:4]),\
-		      on_click=clicked, args=["submit_report"], key='reporting_month')
+            st.write("Data uploaded")
                 
 
         	    
