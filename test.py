@@ -2001,21 +2001,15 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
      
         if not st.session_state.clicked['submit_report']:
            # HTML for the blinking button
-            button_html = f"""
-        <div class="blink-button-wrapper">
-            <button id="blinkButton" class="blink-button" onclick="fetch('/update_state?submit_report=True').then(() => window.location.reload());">
-                Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting
-            </button>
-        </div>
-              """
-            st.markdown(button_html, unsafe_allow_html=True)
-        else:
-    	    st.write("Data uploaded")
+            button_clicked = st.button(
+        f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting',
+        key='reporting_month')
+            if button_clicked:
+                st.session_state.clicked['submit_report'] = True
+                st.experimental_rerun()
 
-        # Handle state update from JavaScript fetch request
-        if st.experimental_get_query_params().get('submit_report', [''])[0] == 'True':
-    	    st.session_state.clicked['submit_report'] = True
-    	    st.experimental_set_query_params(submit_report=None)
+            else:
+                st.write("Data uploaded")
 
         # Display appropriate message
         if st.session_state.clicked['submit_report']:
