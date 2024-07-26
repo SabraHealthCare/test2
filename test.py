@@ -2013,7 +2013,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 '</div>',
                 unsafe_allow_html=True)
         else:
-            st.button("******Confirm and upload {} {}-{} reporting******".format(operator, reporting_month[4:6], reporting_month[0:4]), on_click=clicked, args=["submit_report"], key='reporting_month'):
+            st.button("******Confirm and upload {} {}-{} reporting******".format(operator, reporting_month[4:6], reporting_month[0:4]),\
+		      on_click=clicked, args=["submit_report"], key='reporting_month')
                 
 
         	    
