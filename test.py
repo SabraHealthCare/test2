@@ -2005,8 +2005,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
      
 	
 
-# Display the button
-        if not st.session_state['button_clicked']:
+        # Display the button
+        if not st.session_state['submit_report']:
             st.markdown(
                 f'<div class="blink-button-wrapper">'
                 f'<button id="blinkButton" class="blink-button" type="button" onclick="stopBlinking()">******Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting******</button>'
