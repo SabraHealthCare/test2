@@ -1139,25 +1139,7 @@ def View_Summary():
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
 
-st.markdown(
-        f"""
-        <style>
-        #reporting_month button {{
-            animation: blink 1s infinite;
-            color: black !important;
-            background-color: #a6c8ff !important; /* Low-saturation blue background */
-            border: none;
-            cursor: pointer;
-        }}
-        @keyframes blink {{
-            0% {{ background-color: #a6c8ff; }}
-            50% {{ background-color: #8fb3e9; }}
-            100% {{ background-color: #a6c8ff; }}
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+
 
 
 # no cache
