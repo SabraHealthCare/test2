@@ -1998,28 +1998,36 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         View_Summary()
        	
 
-     
+  # JavaScript to stop blinking effect and update the session state
+        stop_blinking_js = """
+    <script>
+    function stopBlinking() {
+        fetch('/?stop_blinking=true', {method: 'POST'})
+            .then(() => window.location.reload());
+    }
+    </script>
+"""
+        st.markdown(stop_blinking_js, unsafe_allow_html=True)   
+# Check if the button was clicked by checking query params
+        if st.experimental_get_query_params().get('stop_blinking'):
+            st.session_state['clicked']['submit_report'] = True
+            st.experimental_set_query_params(stop_blinking=None)
+            st.experimental_rerun()
         if not st.session_state.clicked['submit_report']:
-           # HTML for the blinking button
-            button_clicked = st.button(
-        f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting',
-        key='reporting_month')
-            if button_clicked:
-                st.session_state.clicked['submit_report'] = True
-                st.experimental_rerun()
 
-            else:
-                st.write("Data uploaded")
 
-        if st.session_state.clicked['submit_report']:
-            st.write("Data uploaded")
-        else:
+
+
+# Display the button or the uploaded message based on the state
+        if not st.session_state['clicked']['submit_report']:
             st.markdown(
         f'<div class="blink-button-wrapper">'
-        f'<button class="blink-button">Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting</button>'
+        f'<button class="blink-button" onclick="stopBlinking()">Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting</button>'
         '</div>',
         unsafe_allow_html=True
     )
+        else:
+            st.write("Data uploaded")
 
      
 
