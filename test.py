@@ -791,7 +791,7 @@ def Manage_Entity_Mapping(operator):
 	    columns=["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"],\
             index=entity_mapping.index)
  
-    entity_mapping_different_sheet= entity_mapping[entity_mapping["DATE_SOLD_PAYOFF"].notna() and entity_mapping["Finance_in_separate_sheets"]=="Y"]
+    entity_mapping_different_sheet= entity_mapping[(entity_mapping["DATE_SOLD_PAYOFF"].notna() ) & ( entity_mapping["Finance_in_separate_sheets"]=="Y")]
     if entity_mapping_different_sheet.shape[0]>0:
         with st.form(key="Mapping Property mapping"):
             col1,col2,col3,col4=st.columns([4,3,3,3])
