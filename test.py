@@ -817,8 +817,8 @@ def Manage_Entity_Mapping(operator):
                     entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping_different_sheet.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
             submitted = st.form_submit_button("Submit")
             
-        if submitted:
-            entity_mapping.update(entity_mapping_updation)
+            if submitted:
+                entity_mapping.update(entity_mapping_updation)
 		
     entity_mapping_same_sheet= entity_mapping[(entity_mapping["DATE_SOLD_PAYOFF"].notna())&(entity_mapping["Finance_in_separate_sheets"]=="N")]
     if entity_mapping_same_sheet.shape[0]>0:
@@ -849,8 +849,8 @@ def Manage_Entity_Mapping(operator):
                 with col5:
                     entity_mapping_updation.loc[entity_i,"Column_Name"]=st.text_input("",placeholder =entity_mapping_same_sheet.loc[entity_i,"Column_Name"],key="BS"+entity_i) 
             submitted = st.form_submit_button("Submit")
-        if submitted:
-            entity_mapping.update(entity_mapping_updation)
+            if submitted:
+                entity_mapping.update(entity_mapping_updation)
 		
 	    
         download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
