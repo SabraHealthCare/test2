@@ -2007,8 +2007,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting
             </button>
         </div>
-    """
-    	    st.markdown(button_html, unsafe_allow_html=True)
+              """
+            st.markdown(button_html, unsafe_allow_html=True)
 	else:
     	    st.write("Data uploaded")
 
