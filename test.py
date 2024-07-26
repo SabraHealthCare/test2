@@ -2011,11 +2011,15 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             else:
                 st.write("Data uploaded")
 
-        # Display appropriate message
         if st.session_state.clicked['submit_report']:
-    	    st.write("Data uploaded")
+            st.write("Data uploaded")
         else:
-    	    st.write("Button is blinking. Click to stop.")
+            st.markdown(
+        f'<div class="blink-button-wrapper">'
+        f'<button class="blink-button">Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting</button>'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
      
 
