@@ -2009,18 +2009,18 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         </div>
               """
             st.markdown(button_html, unsafe_allow_html=True)
-	else:
+        else:
     	    st.write("Data uploaded")
 
         # Handle state update from JavaScript fetch request
-	if st.experimental_get_query_params().get('submit_report', [''])[0] == 'True':
+        if st.experimental_get_query_params().get('submit_report', [''])[0] == 'True':
     	    st.session_state['clicked']['submit_report'] = True
     	    st.experimental_set_query_params(submit_report=None)
 
 # Display appropriate message
-	if st.session_state.clicked['submit_report']:
+        if st.session_state.clicked['submit_report']:
     	    st.write("Data uploaded")
-	else:
+        else:
     	    st.write("Button is blinking. Click to stop.")
 
      
