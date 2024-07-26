@@ -1149,7 +1149,7 @@ st.markdown(
         padding: 10px 20px;
         font-size: 16px;
         color: white;
-        background-color: #007bff;
+        background-color: #eeeeef;
         border: none;
         cursor: pointer;
     }
@@ -2000,13 +2000,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
 
 
-# Check if the button was clicked by checking query params
+        # Check if the button was clicked by checking query params
         if not st.session_state.clicked['submit_report']:
             if st.button(
         f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting',
         key='reporting_month',
-        help="Click to confirm and upload"
-    ):
+        help="Click to confirm and upload"):
                 st.session_state.clicked['submit_report']=True
         else:
             st.write("Data uploaded")
