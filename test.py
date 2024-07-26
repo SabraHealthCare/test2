@@ -2012,7 +2012,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 f'<button id="blinkButton" class="blink-button" type="button" onclick="stopBlinking()">******Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting******</button>'
                 '</div>',
                 unsafe_allow_html=True)
-        else:
+        else: 
             st.button("******Confirm and upload {} {}-{} reporting******".format(operator, reporting_month[4:6], reporting_month[0:4]),\
 		      on_click=clicked, args=["submit_report"], key='reporting_month')
                 
@@ -2021,14 +2021,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         #st.button("******Confirm and upload {} {}-{} reporting******".format(operator, reporting_month[4:6], reporting_month[0:4]), on_click=clicked, args=["submit_report"], key='reporting_month'):
  
 
-# Display appropriate message
-if st.session_state['button_clicked']:
-    st.write("Button clicked! Blinking stopped.")
-else:
-    st.write("Button is blinking. Click to stop.")
 	    
-        st.button("******Confirm and upload {} {}-{} reporting******".format(operator,reporting_month[4:6],reporting_month[0:4]),on_click=clicked, args=["submit_report"],key='reporting_month')  
-       
+        
         # 2 Discrepancy of Historic Data
         with st.expander("Discrepancy for Historic Data",expanded=True):
             ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
