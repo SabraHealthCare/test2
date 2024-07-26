@@ -808,13 +808,13 @@ def Manage_Entity_Mapping(operator):
                 col1,col2,col3,col4=st.columns([4,3,3,3])
                 with col1:
                     st.write("")
-                    st.write(entity_mapping_different_sheet.loc[entity_i,"Property_Name"])
+                    st.write(entity_mapping.loc[entity_i,"Property_Name"])
                 with col2:
-                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Finance"]=st.text_input("",placeholder =entity_mapping_different_sheet.loc[entity_i,"Sheet_Name_Finance"],key="P&L"+entity_i)    
+                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Finance"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Finance"],key="P&L"+entity_i)    
                 with col3: 
-                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping_different_sheet.loc[entity_i,"Sheet_Name_Occupancy"],key="Census"+entity_i)     
+                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="Census"+entity_i)     
                 with col4:
-                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping_different_sheet.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
+                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
             submitted = st.form_submit_button("Submit")
             
             if submitted:
@@ -836,18 +836,18 @@ def Manage_Entity_Mapping(operator):
                 st.write("Facility Column Name") 
   
             for entity_i in entity_mapping_same_sheet.index:
-                col1,col2,col3,col4=st.columns([4,3,3,3])
+                col1,col2,col3,col4,col5=st.columns([4,3,3,3,4])
                 with col1:
                     st.write("")
                     st.write(entity_mapping_same_sheet.loc[entity_i,"Property_Name"])
                 with col2:
-                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Finance"]=st.text_input("",placeholder =entity_mapping_same_sheet.loc[entity_i,"Sheet_Name_Finance"],key="PL"+entity_i)    
+                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Finance"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Finance"],key="PL"+entity_i)    
                 with col3: 
-                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping_same_sheet.loc[entity_i,"Sheet_Name_Occupancy"],key="CS"+entity_i)     
+                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="CS"+entity_i)     
                 with col4:
-                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping_same_sheet.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
+                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
                 with col5:
-                    entity_mapping_updation.loc[entity_i,"Column_Name"]=st.text_input("",placeholder =entity_mapping_same_sheet.loc[entity_i,"Column_Name"],key="CN"+entity_i) 
+                    entity_mapping_updation.loc[entity_i,"Column_Name"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Column_Name"],key="CN"+entity_i) 
             submitted = st.form_submit_button("Submit")
             if submitted:
                 entity_mapping.update(entity_mapping_updation)
@@ -1997,7 +1997,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             col1,col2=st.columns(2)
             with col1:
                 new_tenant_account=st.text_input("Enter new account and press Enter to apply. Use commas to separate them if there are multiple accounts.")
-                
+
                 if new_tenant_account:
                     new_tenant_account_list=list(set(map(lambda x:x.strip(),new_tenant_account.split(",") )))
                     duplicate_accounts=list(filter(lambda x:x.upper() in list(account_mapping['Tenant_Formated_Account']),new_tenant_account_list))
