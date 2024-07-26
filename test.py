@@ -1999,7 +1999,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
        	
 
      
-	if not st.session_state.clicked['submit_report']:
+        if not st.session_state.clicked['submit_report']:
     # HTML for the blinking button
     	button_html = f"""
         <div class="blink-button-wrapper">
@@ -2018,7 +2018,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     	    st.experimental_set_query_params(submit_report=None)
 
 # Display appropriate message
-	if st.session_state['clicked']['submit_report']:
+	if st.session_state.clicked['submit_report']:
     	    st.write("Data uploaded")
 	else:
     	    st.write("Button is blinking. Click to stop.")
