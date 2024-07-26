@@ -1999,7 +1999,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
        	
 
 
-        st.markdown(stop_blinking_js, unsafe_allow_html=True)   
+
 # Check if the button was clicked by checking query params
         if not st.session_state.clicked['submit_report']:
             if st.button(
