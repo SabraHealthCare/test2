@@ -1999,31 +1999,31 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
        	
 
      
-	
+	if not st.session_state.clicked['submit_report']:
+    # HTML for the blinking button
+    	button_html = f"""
+        <div class="blink-button-wrapper">
+            <button id="blinkButton" class="blink-button" onclick="fetch('/update_state?submit_report=True').then(() => window.location.reload());">
+                Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting
+            </button>
+        </div>
+    """
+    	st.markdown(button_html, unsafe_allow_html=True)
+	else:
+    	st.write("Data uploaded")
 
-          # Display the button with blinking effect
-        if not st.session_state.clicked['submit_report']:
-            # Use st.button for state management
-            button_clicked = st.button(
-                f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting',
-                key='reporting_month'
-            )
-    
-            # Check if the button was clicked
-            if button_clicked:
-                # Update session state to stop the blinking effect
-                st.session_state.clicked["submit_report"] = True
+# Handle state update from JavaScript fetch request
+	if st.experimental_get_query_params().get('submit_report', [''])[0] == 'True':
+    	    st.session_state['clicked']['submit_report'] = True
+    	    st.experimental_set_query_params(submit_report=None)
 
-        # Display appropriate message
-        if st.session_state.clicked["submit_report"]:
-            st.write("Data uploaded")
-        else:
-            st.markdown(
-        '<div class="blink-button-wrapper">'
-        '<button id="blinkButton" class="blink-button">Click to Confirm and Upload</button>'
-        '</div>',
-        unsafe_allow_html=True
-            )     
+# Display appropriate message
+	if st.session_state['clicked']['submit_report']:
+    	    st.write("Data uploaded")
+	else:
+    	    st.write("Button is blinking. Click to stop.")
+
+     
 
         	    
         #st.button("******Confirm and upload {} {}-{} reporting******".format(operator, reporting_month[4:6], reporting_month[0:4]), on_click=clicked, args=["submit_report"], key='reporting_month'):
