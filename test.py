@@ -2014,7 +2014,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
         # Handle state update from JavaScript fetch request
         if st.experimental_get_query_params().get('submit_report', [''])[0] == 'True':
-    	    st.session_state.'clicked'['submit_report'] = True
+    	    st.session_state.clicked['submit_report'] = True
     	    st.experimental_set_query_params(submit_report=None)
 
         # Display appropriate message
