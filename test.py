@@ -35,6 +35,11 @@ st.title("Sabra HealthCare Monthly Reporting App")
 
 
 
+import streamlit as st
+
+# Initialize session state
+if 'button_clicked' not in st.session_state:
+    st.session_state['button_clicked'] = False
 
 # Define CSS for a blinking button
 st.markdown(
@@ -70,7 +75,8 @@ stop_blinking_js = """
     function stopBlinking() {
         var button = document.getElementById('blinkButton');
         button.classList.remove('blink-button');
-        fetch('/stop_blinking', {method: 'POST'});
+        // Trigger Streamlit form submission to update the state
+        document.querySelector('button[type="submit"]').click();
     }
     </script>
 """
@@ -78,20 +84,26 @@ stop_blinking_js = """
 # Add JavaScript to the Streamlit app
 st.markdown(stop_blinking_js, unsafe_allow_html=True)
 
-# Add a button with an onclick event to stop the blinking
-st.markdown(
-    '<div class="blink-button-wrapper">'
-    '<button id="blinkButton" class="blink-button" onclick="stopBlinking()">Click Me!</button>'
-    '</div>',
-    unsafe_allow_html=True
-)
+# Create a form to handle button click
+with st.form(key='blink_form'):
+    if not st.session_state['button_clicked']:
+        st.markdown(
+            '<div class="blink-button-wrapper">'
+            '<button id="blinkButton" class="blink-button" type="button" onclick="stopBlinking()">Click Me!</button>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+    else:
+        st.markdown(
+            '<div class="blink-button-wrapper">'
+            '<button id="blinkButton" type="button">Click Me!</button>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+    submit_button = st.form_submit_button(label='Submit')
 
-# Placeholder to show the button status
-if 'button_clicked' not in st.session_state:
-    st.session_state['button_clicked'] = False
-
-# Define a function to handle button click
-def stop_blinking():
+# Update session state upon form submission
+if submit_button:
     st.session_state['button_clicked'] = True
 
 # Display appropriate message
@@ -99,6 +111,7 @@ if st.session_state['button_clicked']:
     st.write("Button clicked! Blinking stopped.")
 else:
     st.write("Button is blinking. Click to stop.")
+
 
 
 
