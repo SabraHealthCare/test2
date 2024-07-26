@@ -2010,7 +2010,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         st.markdown(stop_blinking_js, unsafe_allow_html=True)   
 # Check if the button was clicked by checking query params
         if st.experimental_get_query_params().get('stop_blinking'):
-            st.session_state['clicked']['submit_report'] = True
+            st.session_state.clicked['submit_report'] = True
             st.experimental_set_query_params(stop_blinking=None)
             st.experimental_rerun()
         if not st.session_state.clicked['submit_report']:
