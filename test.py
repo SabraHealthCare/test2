@@ -1148,16 +1148,16 @@ st.markdown(
         animation: blink 1s infinite;
         padding: 10px 20px;
         font-size: 16px;
-        color: white!important;
-        background-color:#ffcc00;
+        color: white;
+        background-color:#a6c8ff;
         border: none;
         cursor: pointer;
     }
 
     @keyframes blink {
-        0% { background-color: #ffcc00; }
-        50% { background-color: #ff9900; }
-        100% { background-color: #ffcc00; }
+        0% { background-color: #a6c8ff; }
+        50% { background-color: #8fb3e9; }
+        100% { background-color: #a6c8ff; }
     }
 
     .blink-button-wrapper {
