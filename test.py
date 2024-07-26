@@ -2007,7 +2007,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         key='reporting_month',
         help="Click to confirm and upload"
     ):
-        handle_button_click()
+                st.session_state.clicked['submit_report']=True
         else:
             st.write("Data uploaded")
         if not st.session_state.clicked['submit_report']:
