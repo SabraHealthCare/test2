@@ -1138,8 +1138,11 @@ def View_Summary():
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
-# Define CSS for blinking button for submit upload
-st.markdown("""
+
+
+
+st.markdown(
+    """
     <style>
     .blink-button {
         animation: blink 1s infinite;
@@ -1150,30 +1153,40 @@ st.markdown("""
         border: none;
         cursor: pointer;
     }
+
     @keyframes blink {
         0% { background-color: #007bff; }
         50% { background-color: #0056b3; }
         100% { background-color: #007bff; }
     }
+
     .blink-button-wrapper {
         display: inline-block;
     }
     </style>
     """,
-    unsafe_allow_html=True)
+    unsafe_allow_html=True
+)
+
 # JavaScript to stop blinking effect when button is clicked
 stop_blinking_js = """
     <script>
     function stopBlinking() {
         var button = document.getElementById('blinkButton');
         button.classList.remove('blink-button');
-        // Trigger Streamlit form submission to update the state
-        document.querySelector('button[type="submit"]').click();
+        // Use Streamlit's session state mechanism to update the state
+        fetch('/update_state', {method: 'POST'})
+            .then(() => {
+                window.location.reload();
+            });
     }
     </script>
 """
+
 # Add JavaScript to the Streamlit app
 st.markdown(stop_blinking_js, unsafe_allow_html=True)
+
+
 # no cache
 def Submit_Upload_Latestmonth():
     global Total_PL,reporting_month   
@@ -2008,19 +2021,21 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         # Display the button
         if not st.session_state.clicked["submit_report"]:
             st.markdown(
-                f'<div class="blink-button-wrapper">'
-                f'<button id="blinkButton" class="blink-button" type="button" onclick="stopBlinking()">Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting</button>'
-                '</div>',
-                unsafe_allow_html=True)
-        else: 
+        f'<div class="blink-button-wrapper">'
+        f'<button id="blinkButton" class="blink-button" type="button" onclick="stopBlinking()">Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting</button>'
+        '</div>',
+        unsafe_allow_html=True
+    )
+        else:
             st.write("Data uploaded")
+        
         # Handle state update from the JavaScript fetch request
         if st.experimental_get_query_params().get('update_state', [''])[0] == 'true':
-            st.session_state['clicked']['submit_report'] = True
+            st.session_state.clicked['submit_report'] = True
             st.experimental_set_query_params(update_state='')
 
 # Display appropriate message
-        if st.session_state['clicked']['submit_report']:
+        if st.session_state.clicked['submit_report']:
             st.write("Data uploaded")
         else:
             st.write("Button is blinking. Click to stop.")        
