@@ -33,98 +33,6 @@ st.set_page_config(
 placeholder = st.empty()
 st.title("Sabra HealthCare Monthly Reporting App")
 
-
-
-import streamlit as st
-
-# Initialize session state
-if 'button_clicked' not in st.session_state:
-    st.session_state['button_clicked'] = False
-
-# Define CSS for a blinking button
-st.markdown(
-    """
-    <style>
-    .blink-button {
-        animation: blink 1s infinite;
-        padding: 10px 20px;
-        font-size: 16px;
-        color: white;
-        background-color: #007bff;
-        border: none;
-        cursor: pointer;
-    }
-
-    @keyframes blink {
-        0% { background-color: #007bff; }
-        50% { background-color: #0056b3; }
-        100% { background-color: #007bff; }
-    }
-
-    .blink-button-wrapper {
-        display: inline-block;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-# JavaScript to stop blinking effect when button is clicked
-stop_blinking_js = """
-    <script>
-    function stopBlinking() {
-        var button = document.getElementById('blinkButton');
-        button.classList.remove('blink-button');
-        // Trigger Streamlit form submission to update the state
-        document.querySelector('button[type="submit"]').click();
-    }
-    </script>
-"""
-
-# Add JavaScript to the Streamlit app
-st.markdown(stop_blinking_js, unsafe_allow_html=True)
-
-# Create a form to handle button click
-with st.form(key='blink_form'):
-    if not st.session_state['button_clicked']:
-        st.markdown(
-            '<div class="blink-button-wrapper">'
-            '<button id="blinkButton" class="blink-button" type="button" onclick="stopBlinking()">Click Me!</button>'
-            '</div>',
-            unsafe_allow_html=True
-        )
-    else:
-        st.markdown(
-            '<div class="blink-button-wrapper">'
-            '<button id="blinkButton" type="button">Click Me!</button>'
-            '</div>',
-            unsafe_allow_html=True
-        )
-    submit_button = st.form_submit_button(label='Submit')
-
-# Update session state upon form submission
-if submit_button:
-    st.session_state['button_clicked'] = True
-
-# Display appropriate message
-if st.session_state['button_clicked']:
-    st.write("Button clicked! Blinking stopped.")
-else:
-    st.write("Button is blinking. Click to stop.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 sheet_name_discrepancy="Discrepancy_Review"
 bucket_mapping="sabramapping"
 bucket_PL="operatorpl"
@@ -1169,7 +1077,6 @@ def View_Summary():
     #check if available unit changed by previous month
     Check_Available_Units(check_patient_days,reporting_month)
 	
-    
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
     entity_list=list(reporting_month_data["ENTITY"].unique())
@@ -1182,9 +1089,7 @@ def View_Summary():
 
 
     #if "Facility Information" in list(missing_category["Category"]):
-        # fill the facility info with historical data
-        #Check_Available_Beds(missing_category,reporting_month)
-        #missing_category=missing_category[missing_category["Category"]!="Facility Information"]
+    # fill the facility info with historical data
 
     if missing_category.shape[0]>0:
         st.write("No data detected for below properties and accounts: ")
@@ -1196,9 +1101,6 @@ def View_Summary():
 		                 reporting_month:reporting_month[4:6]+"/"+reporting_month[0:4]},
 			    hide_index=True)
 	     
-
-    #duplicates = reporting_month_data[reporting_month_data.duplicated(subset=["Sabra_Account_Full_Name", "Category"], keep=False)]
-
     reporting_month_data =reporting_month_data.pivot_table(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=reporting_month,aggfunc='last')
     reporting_month_data.reset_index(drop=False,inplace=True)
 
@@ -1236,7 +1138,42 @@ def View_Summary():
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
-        
+# Define CSS for blinking button for submit upload
+st.markdown("""
+    <style>
+    .blink-button {
+        animation: blink 1s infinite;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        background-color: #007bff;
+        border: none;
+        cursor: pointer;
+    }
+    @keyframes blink {
+        0% { background-color: #007bff; }
+        50% { background-color: #0056b3; }
+        100% { background-color: #007bff; }
+    }
+    .blink-button-wrapper {
+        display: inline-block;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True)
+# JavaScript to stop blinking effect when button is clicked
+stop_blinking_js = """
+    <script>
+    function stopBlinking() {
+        var button = document.getElementById('blinkButton');
+        button.classList.remove('blink-button');
+        // Trigger Streamlit form submission to update the state
+        document.querySelector('button[type="submit"]').click();
+    }
+    </script>
+"""
+# Add JavaScript to the Streamlit app
+st.markdown(stop_blinking_js, unsafe_allow_html=True)
 # no cache
 def Submit_Upload_Latestmonth():
     global Total_PL,reporting_month   
@@ -1270,7 +1207,6 @@ def Submit_Upload_Latestmonth():
             # save tenant BS to OneDrive
             if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
                 st.write(" unsuccess")  #----------record into error report------------------------	
-
 
 # create EPM formula for download data
 def EPM_Formula(data,value_name): # make sure there is no col on index for data
@@ -2066,7 +2002,30 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         View_Summary()
        	
 
-        # upload reporting month data to AWS
+     
+	
+
+# Display the button
+        if not st.session_state['button_clicked']:
+            st.markdown(
+                f'<div class="blink-button-wrapper">'
+                f'<button id="blinkButton" class="blink-button" type="button" onclick="stopBlinking()">******Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting******</button>'
+                '</div>',
+                unsafe_allow_html=True)
+        else:
+            st.button("******Confirm and upload {} {}-{} reporting******".format(operator, reporting_month[4:6], reporting_month[0:4]), on_click=clicked, args=["submit_report"], key='reporting_month'):
+                
+
+        	    
+        #st.button("******Confirm and upload {} {}-{} reporting******".format(operator, reporting_month[4:6], reporting_month[0:4]), on_click=clicked, args=["submit_report"], key='reporting_month'):
+ 
+
+# Display appropriate message
+if st.session_state['button_clicked']:
+    st.write("Button clicked! Blinking stopped.")
+else:
+    st.write("Button is blinking. Click to stop.")
+	    
         st.button("******Confirm and upload {} {}-{} reporting******".format(operator,reporting_month[4:6],reporting_month[0:4]),on_click=clicked, args=["submit_report"],key='reporting_month')  
        
         # 2 Discrepancy of Historic Data
