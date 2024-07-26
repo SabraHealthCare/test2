@@ -791,8 +791,8 @@ def Manage_Entity_Mapping(operator):
 	    columns=["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"],\
             index=entity_mapping.index)
  
-    entity_mapping_different_sheet= entity_mapping[(entity_mapping["DATE_SOLD_PAYOFF"].notna() ) & ( entity_mapping["Finance_in_separate_sheets"]=="Y")]
-    if entity_mapping_different_sheet.shape[0]>0:
+    entity_mapping_different_sheet_index= entity_mapping.index[(entity_mapping["DATE_SOLD_PAYOFF"].notna() ) & ( entity_mapping["Finance_in_separate_sheets"]=="Y")]
+    if len(entity_mapping_different_sheet_index)>0:
         with st.form(key="Mapping Property mapping"):
             col1,col2,col3,col4=st.columns([4,3,3,3])
             with col1:
@@ -804,7 +804,7 @@ def Manage_Entity_Mapping(operator):
             with col4:
                 st.write("Balance sheet Sheetname")  
   
-            for entity_i in entity_mapping_different_sheet.index:
+            for entity_i in entity_mapping_different_sheet_index:
                 col1,col2,col3,col4=st.columns([4,3,3,3])
                 with col1:
                     st.write("")
@@ -812,16 +812,18 @@ def Manage_Entity_Mapping(operator):
                 with col2:
                     entity_mapping_updation.loc[entity_i,"Sheet_Name_Finance"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Finance"],key="P&L"+entity_i)    
                 with col3: 
-                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="Census"+entity_i)     
+                    if not pd.isna(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"]):
+                        entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="Census"+entity_i)     
                 with col4:
-                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
+                    if not pd.isna(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]):
+                        entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
             submitted = st.form_submit_button("Submit")
             
             if submitted:
                 entity_mapping.update(entity_mapping_updation)
 		
-    entity_mapping_same_sheet= entity_mapping[(entity_mapping["DATE_SOLD_PAYOFF"].notna())&(entity_mapping["Finance_in_separate_sheets"]=="N")]
-    if entity_mapping_same_sheet.shape[0]>0:
+    entity_mapping_same_sheet_index= entity_mapping.index[(entity_mapping["DATE_SOLD_PAYOFF"].notna())&(entity_mapping["Finance_in_separate_sheets"]=="N")]
+    if len(entity_mapping_same_sheet_index)>0:
         with st.form(key="Mapping Property mapping"):
             col1,col2,col3,col4,col5=st.columns([4,3,3,3,4])
             with col1:
@@ -835,17 +837,19 @@ def Manage_Entity_Mapping(operator):
             with col5:
                 st.write("Facility Column Name") 
   
-            for entity_i in entity_mapping_same_sheet.index:
+            for entity_i in entity_mapping_same_sheet_index:
                 col1,col2,col3,col4,col5=st.columns([4,3,3,3,4])
                 with col1:
                     st.write("")
-                    st.write(entity_mapping_same_sheet.loc[entity_i,"Property_Name"])
+                    st.write(entity_mapping.loc[entity_i,"Property_Name"])
                 with col2:
                     entity_mapping_updation.loc[entity_i,"Sheet_Name_Finance"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Finance"],key="PL"+entity_i)    
                 with col3: 
-                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="CS"+entity_i)     
+                    if not pd.isna(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"]):
+                        entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="CS"+entity_i)     
                 with col4:
-                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
+                    if not pd.isna(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]):
+                        entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
                 with col5:
                     entity_mapping_updation.loc[entity_i,"Column_Name"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Column_Name"],key="CN"+entity_i) 
             submitted = st.form_submit_button("Submit")
