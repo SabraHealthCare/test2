@@ -2014,12 +2014,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.experimental_set_query_params(stop_blinking=None)
             st.experimental_rerun()
         if not st.session_state.clicked['submit_report']:
-
-
-
-
-# Display the button or the uploaded message based on the state
-        if not st.session_state['clicked']['submit_report']:
             st.markdown(
         f'<div class="blink-button-wrapper">'
         f'<button class="blink-button" onclick="stopBlinking()">Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting</button>'
