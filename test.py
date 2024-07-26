@@ -606,7 +606,6 @@ def Check_Available_Units(check_patient_days,reporting_month):
 
 @st.cache_data
 def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no): 
-    #st.write("PL,PL.index,PL.columns",PL,PL.index,PL.columns,PL.shape[1],PL[1])
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
@@ -647,7 +646,6 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
         month_sort_index = [index for index, month_c in sorted_non_zero_indices]
 	    
         for month_row_index in month_sort_index: 
-            #st.write("month_sort_index",month_sort_index)
             month_row=list(month_table.iloc[month_row_index,])
             month_list=list(filter(lambda x:x!=0,month_row))
             month_len=len(month_list)
@@ -753,7 +751,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                 if column.astype(str).str.contains('current month', case=False, na=False).any():
                     current_month_cols.append(col_i)
                     current_month_rows = column.index[column.astype(str).str.contains('current month', case=False, na=False)][0]
-                    st.write("column",column,"current_month_rows",current_month_rows)
+                
             if len(current_month_cols)==1:
                 PL_date_header = [0] * PL_col_size
                 PL_date_header[current_month_cols[0]] = reporting_month
@@ -909,7 +907,6 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
                 elif len(Sabra_second_account_list[i]['checked'])>1:
                     st.warning("Only one to one mapping is allowed, but {} has more than one mappings.".format(new_tenant_account_list[i]))
                     st.stop()
-	
         else:
             st.stop()
                 
@@ -922,8 +919,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
         Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator,None,account_mapping_str_col)
         st.success("New accounts mapping were successfully saved.")    
     return account_mapping
-
-
+	
 @st.cache_data 
 def Map_PL_Sabra(PL,entity):
     # remove no need to map from account_mapping
