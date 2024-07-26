@@ -2014,7 +2014,16 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 unsafe_allow_html=True)
         else: 
             st.write("Data uploaded")
-                
+        # Handle state update from the JavaScript fetch request
+        if st.experimental_get_query_params().get('update_state', [''])[0] == 'true':
+            st.session_state['clicked']['submit_report'] = True
+            st.experimental_set_query_params(update_state='')
+
+# Display appropriate message
+        if st.session_state['clicked']['submit_report']:
+            st.write("Data uploaded")
+        else:
+            st.write("Button is blinking. Click to stop.")        
 
         	    
         #st.button("******Confirm and upload {} {}-{} reporting******".format(operator, reporting_month[4:6], reporting_month[0:4]), on_click=clicked, args=["submit_report"], key='reporting_month'):
