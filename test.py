@@ -1986,18 +1986,21 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
    
 	# 1 Summary
         View_Summary()
-       	button_key ="reporting_month"
-        # Check if the button was clicked by checking query params
+        button_key = "reporting_month"
+
+# Check if the button was clicked by checking session state
         if not st.session_state.clicked['submit_report']:
-            if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting',key=button_key,help="Click to confirm and upload"):
-                st.session_state.clicked['submit_report']=True
+            if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting', key=button_key, help="Click to confirm and upload"):
+                st.session_state.clicked['submit_report'] = True
         else:
             st.write("Data uploaded")
+
+# Apply CSS to the button if it has not been clicked
         if not st.session_state.clicked['submit_report']:
             st.markdown(
         f"""
         <style>
-        div[data-testid="stButton"] button[data-testid="st-{button_key}"] {{
+        div[data-testid="stButton"] > button {{
             animation: blink 1s infinite;
             color: black !important;
             background-color: #a6c8ff !important; /* Low-saturation blue background */
@@ -2013,6 +2016,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         """,
         unsafe_allow_html=True
     )
+
         	    
         #st.button("******Confirm and upload {} {}-{} reporting******".format(operator, reporting_month[4:6], reporting_month[0:4]), on_click=clicked, args=["submit_report"], key='reporting_month'):
  
