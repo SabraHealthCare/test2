@@ -1997,22 +1997,14 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.markdown(
         f"""
         <style>
-        div[data-testid="stButton"] button[data-testid="st-{"reporting_month"}"] {{
+        .stButton button {{
             animation: blink 1s infinite;
-            color: black !important;
-            background-color: #a6c8ff !important; /* Low-saturation blue background */
-            border: none;
-            cursor: pointer;
-        }}
-        @keyframes blink {{
-            0% {{ background-color: #a6c8ff; }}
-            50% {{ background-color: #8fb3e9; }}
-            100% {{ background-color: #a6c8ff; }}
         }}
         </style>
         """,
         unsafe_allow_html=True
     )
+
         	    
         #st.button("******Confirm and upload {} {}-{} reporting******".format(operator, reporting_month[4:6], reporting_month[0:4]), on_click=clicked, args=["submit_report"], key='reporting_month'):
  
