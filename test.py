@@ -1995,11 +1995,15 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.write("Data uploaded")
         if not st.session_state.clicked['submit_report']:
             st.markdown(
+		    
         f"""
         <style>
-        .stButton button {{
+div[data-testid="stButton"] button[aria-label="{button_key}"] {{
             animation: blink 1s infinite;
         }}
+        #.stButton button {{
+            #animation: blink 1s infinite;
+       # }}
         </style>
         """,
         unsafe_allow_html=True
