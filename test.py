@@ -1968,10 +1968,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	# 1 Summary
         View_Summary()
 
-        st.markdown(
+        if not st.session_state.clicked['submit_report']:
+            st.markdown(
         f"""
         <style>
-        div[data-testid="stButton"] button[aria-label="{button_key}"] {{
+        div[data-testid="stButton"] > button[aria-label="{button_key}"] {{
             animation: blink 1s infinite;
             color: black !important;
             background-color: #a6c8ff !important; /* Low-saturation blue background */
