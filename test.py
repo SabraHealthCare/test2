@@ -1144,7 +1144,7 @@ st.markdown(
     <style>
     #reporting_month button {{
         animation: blink 1s infinite;
-        color: white !important;
+        color: red !important;
         background-color: #a6c8ff !important; /* Low-saturation blue background */
         border: none;
         cursor: pointer;
@@ -1153,9 +1153,9 @@ st.markdown(
         animation: blink 1s infinite;
     }}
     @keyframes blink {{
-0% { background-color: #00BFFF; } (Deep Sky Blue)
-50% { background-color: #87CEFA; } (Light Sky Blue)
-100% { background-color: #00BFFF; } (Deep Sky Blue)
+        0% {{ background-color: #a6c8ff; }}
+        50% {{ background-color: #8fb3e9; }}
+        100% {{ background-color: #a6c8ff; }}
     }}
     </style>
     """,
@@ -1983,7 +1983,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
    
 	# 1 Summary
         View_Summary()
-       
+       	
+
         if not st.session_state.clicked['submit_report']: # haven't uploaded
             if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting',key='reporting_month',help="Click to confirm and upload"):
                 st.session_state.clicked['submit_report']=True
@@ -1997,6 +1998,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                         View_Discrepancy()
                 elif len(Total_PL.columns)==1:
                     st.write("There is no previous month data in tenant P&L")
+    
+       
 
     elif choice=="Manage Mapping":
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
