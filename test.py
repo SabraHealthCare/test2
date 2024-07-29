@@ -1153,9 +1153,9 @@ st.markdown(
         animation: blink 1s infinite;
     }}
     @keyframes blink {{
-0% { background-color: #00BFFF; } (Deep Sky Blue)
-50% { background-color: #87CEFA; } (Light Sky Blue)
-100% { background-color: #00BFFF; } (Deep Sky Blue)
+0% { background-color: #00BFFF; } 
+50% { background-color: #87CEFA; } 
+100% { background-color: #00BFFF; } 
     }}
     </style>
     """,
