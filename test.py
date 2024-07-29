@@ -1138,16 +1138,18 @@ def View_Summary():
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
-
+	    
+# button blink style
 st.markdown(
     f"""
     <style>
     #reporting_month button {{
         animation: blink 1s infinite;
-        color: red !important;
+        color: white !important;
         background-color: #a6c8ff !important; /* Low-saturation blue background */
         border: none;
         cursor: pointer;
+	font-weight: bold;
     }}
     .stButton button {{
         animation: blink 1s infinite;
