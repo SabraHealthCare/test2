@@ -1968,6 +1968,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	# 1 Summary
         View_Summary()
         placeholder = st.empty()
+        button_key = "submit_report"
         if not st.session_state.clicked['submit_report']:
             st.markdown(
         f"""
