@@ -1995,8 +1995,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             #Discrepancy of Historic Data
             if len(Total_PL.columns)>1:	
                 with st.expander("Discrepancy for Historic Data",expanded=True):
-                ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-                with st.spinner("********Running discrepancy check********"): 
+                    ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
                     View_Discrepancy()
 
     elif choice=="Manage Mapping":
