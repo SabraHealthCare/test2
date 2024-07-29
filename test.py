@@ -1993,15 +1993,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         else: # already uploaded
             Submit_Upload_Latestmonth()
             #Discrepancy of Historic Data
-            with st.expander("Discrepancy for Historic Data",expanded=True):
+            if len(Total_PL.columns)>1:	
+                with st.expander("Discrepancy for Historic Data",expanded=True):
                 ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-                if len(Total_PL.columns)>1:	
-                    with st.spinner("********Running discrepancy check********"): 
-                        View_Discrepancy()
-                elif len(Total_PL.columns)==1:
-                    st.write("There is no previous month data in tenant P&L")
-    
-       
+                with st.spinner("********Running discrepancy check********"): 
+                    View_Discrepancy()
 
     elif choice=="Manage Mapping":
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
