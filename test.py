@@ -1972,7 +1972,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.markdown(
         f"""
         <style>
-        .{custom_button_class} {{
+        div[data-testid="stButton"] > button[id="{button_id}"] {{
             animation: blink 1s infinite;
             color: black !important;
             background-color: #a6c8ff !important; /* Low-saturation blue background */
@@ -1988,13 +1988,14 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         """,
         unsafe_allow_html=True
     )
-        if not st.session_state.clicked['submit_report']:
-            if st.button("Submit Report", key=button_key, args=[custom_button_class]):
+
+        #if not st.session_state.clicked['submit_report']:
+        if st.button("Submit Report", key=button_key):
                 st.session_state.clicked['submit_report']=True
                 st.markdown(
         f"""
         <style>
-        .{custom_button_class} {{
+        div[data-testid="stButton"] > button[id="{button_id}"] {{
             animation: none;
         }}
         </style>
@@ -2005,7 +2006,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.markdown(
         f"""
         <style>
-        div[data-testid="stButton"] > button[aria-label="{button_key}"] {{
+        div[data-testid="stButton"] > button[id="{button_id}"] {{
             animation: blink 1s infinite;
             color: black !important;
             background-color: #a6c8ff !important; /* Low-saturation blue background */
