@@ -1910,7 +1910,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col3:
                     #st.markdown("<p style='font-size:20px;'>Upload P&L:</p>", unsafe_allow_html=True)
                     st.subheader("Upload P&L:")
-                    uploaded_finance=st.file_uploader(":star: :red[Only XLSX accepted] :star:",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
+                    #uploaded_finance=st.file_uploader(":star: :red[Only XLSX accepted] :star:",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
+                    uploaded_finance=st.file_uploader("Only XLSX accepted",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
                 with col4:
                     if BS_separate_excel=="Y":
                         st.subheader("Upload Balance Sheet:")
