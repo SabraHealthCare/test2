@@ -254,7 +254,7 @@ def Initial_Mapping(operator):
     BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
     BPC_pull=BPC_pull.set_index(["ENTITY","Sabra_Account"])
     BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
-	
+  	
     account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename,account_mapping_str_col)
     account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]==operator]
     if account_mapping.shape[0]==1:# and account_mapping.loc[:,"Sabra_Account"][0]=='Template':
@@ -584,7 +584,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
 		                "Patient Days": "Patient Days",
 		                "Operating Beds": "Operating Beds"},
 			    hide_index=True)
-    if miss_all_A_unit==False:
+    if BPC_pull.shape[0]>0 and miss_all_A_unit==False:
         BPC_pull_temp=BPC_pull.reset_index(drop=False)
         onemonth_before_reporting_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)<str(reporting_month),BPC_pull.columns)))
         previous_available_unit=BPC_pull_temp.loc[BPC_pull_temp["Sabra_Account"].isin(availble_unit_accounts),["Property_Name",onemonth_before_reporting_month]]  
@@ -1138,32 +1138,6 @@ def View_Summary():
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
-	    
-# button blink style
-st.markdown(
-    f"""
-    <style>
-    #reporting_month button {{
-        animation: blink 1s infinite;
-        color: white !important;
-        background-color: #a6c8ff !important; /* Low-saturation blue background */
-        border: none;
-        cursor: pointer;
-	font-weight: bold;
-    }}
-    .stButton button {{
-        animation: blink 1s infinite;
-    }}
-    @keyframes blink {{
-        0% {{ background-color: #a6c8ff; }}
-        50% {{ background-color: #8fb3e9; }}
-        100% {{ background-color: #a6c8ff; }}
-
-    }}
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 
 # no cache
 def Submit_Upload_Latestmonth():
@@ -1844,6 +1818,25 @@ def Upload_And_Process(uploaded_file,file_type):
 
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
     return Total_PL
+st.markdown(
+        f"""
+        <style>
+        #reporting_month button {{
+            animation: blink 1s infinite;
+            color: black !important;
+            background-color: #a6c8ff !important; /* Low-saturation blue background */
+            border: none;
+            cursor: pointer;
+        }}
+        @keyframes blink {{
+            0% {{ background-color: #a6c8ff; }}
+            50% {{ background-color: #8fb3e9; }}
+            100% {{ background-color: #a6c8ff; }}
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 #----------------------------------website widges------------------------------------
 config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
 config = yaml.safe_load(config_obj["Body"])
@@ -1907,6 +1900,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 col3,col4=st.columns([1,1])
                 with col3:
                     selected_year = st.selectbox("Year", years_range,index=years_range.index(st.session_state.selected_year))
+		
                 with col4:    
                     selected_month = st.selectbox("Month", months_range,index=months_range.index(st.session_state.selected_month))
                 if BS_separate_excel=="N":
@@ -1942,7 +1936,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.error("The reporting month should precede the current month.")
             st.stop()
         filtered_months =sorted([x for x in BPC_pull.columns if x <reporting_month],reverse=True)
-        BPC_pull=BPC_pull[["Property_Name"]+filtered_months[:previous_monthes_comparison]]    
+        if len(filtered_months)>=previous_monthes_comparison:
+            BPC_pull=BPC_pull[["Property_Name"]+filtered_months[:previous_monthes_comparison]]    
+        elif len(filtered_months)>0 and len(filtered_months)<previous_monthes_comparison:
+            BPC_pull=BPC_pull[["Property_Name"]+filtered_months]
+        elif len(filtered_months)==0:
+            BPC_pull=pd.DataFrame()
+
         entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=reporting_month) &((pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))| (entity_mapping["DATE_SOLD_PAYOFF"]>=reporting_month))),]
         if "Y" in entity_mapping["BS_separate_excel"][~pd.isna(entity_mapping["BS_separate_excel"])].values:                     
             BS_separate_excel="Y"
@@ -1982,7 +1982,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if len(Total_PL.columns)==1:
             Total_PL.columns=[reporting_month]
 
-        elif len(Total_PL.columns)>1:  # there are previous months in P&L
+        elif len(Total_PL.columns)>1 and BPC_pull.shape[0]>0:  # there are previous months in P&L
             #diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail,reporting_month)
             diff_BPC_PL=Compare_PL_Sabra(Total_PL,reporting_month)
    
@@ -1990,13 +1990,26 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         View_Summary()
        	
 
+
+        if not st.session_state.clicked['submit_report']:
+            st.markdown(
+        f"""
+        <style>
+        .stButton button {{
+            animation: blink 1s infinite;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+ 
         if not st.session_state.clicked['submit_report']: # haven't uploaded
             if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting',key='reporting_month',help="Click to confirm and upload"):
                 st.session_state.clicked['submit_report']=True
         else: # already uploaded
             Submit_Upload_Latestmonth()
             #Discrepancy of Historic Data
-            if len(Total_PL.columns)>1:	
+            if len(Total_PL.columns)>1 and BPC_pull.shape[0]>0:	
                 with st.expander("Discrepancy for Historic Data",expanded=True):
                     ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
                     View_Discrepancy()
