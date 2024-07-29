@@ -1182,12 +1182,7 @@ def Submit_Upload_Latestmonth():
             
         else: 
             st.write(" ")  #----------record into error report------------------------	
-         # save discrepancy data to OneDrive
-        if len(Total_PL.columns)>1 and diff_BPC_PL.shape[0]>0:
-            download_report(diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy")
-            Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,None,None)
-        
-	# save original tenant P&L to OneDrive
+        # save original tenant P&L to OneDrive
         if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
             st.write("unsuccess ")  #----------record into error report------------------------	
 
@@ -1375,8 +1370,6 @@ def View_Discrepancy_Detail():
         st.markdown(diff_BPC_PL_detail.style.set_table_styles(styles).apply(color_coding, axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)	
         st.write("")
-       
-         
 
 # don't use cache
 def View_Discrepancy(): 
@@ -1427,15 +1420,17 @@ def View_Discrepancy():
                         st.write(" ")
                     # insert comments to diff_BPC_PL
                     diff_BPC_PL=pd.merge(diff_BPC_PL,edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Type comments below"]],on=["Property_Name","TIME","Sabra_Account_Full_Name"],how="left")
-
+                    # save discrepancy data to OneDrive
+                    if len(Total_PL.columns)>1 and diff_BPC_PL.shape[0]>0:
+                        download_report(diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy")
+                        Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,None,None)
+        
         else:
             st.success("All previous data in P&L ties with Sabra data")
     else:
             st.success("All previous data in P&L ties with Sabra data")
 
-# all properties are in one sheet
-#return the row number of property header and mapped_entity, Column_Name and entity_list has same order 
-# return example: 4, ["0","0","Sxxxx","Sxxxx","0","Sxxxx","0"...]
+
 
 def Is_Reporting_Month(single_string):
     month=reporting_month[4:6]
@@ -1989,29 +1984,21 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	# 1 Summary
         View_Summary()
        	
-        # Check if the button was clicked by checking query params
-        if not st.session_state.clicked['submit_report']:
+
+        if not st.session_state.clicked['submit_report']: # haven't uploaded
             if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting',key='reporting_month',help="Click to confirm and upload"):
                 st.session_state.clicked['submit_report']=True
-        else:
-            st.write("Data uploaded")
-     
-
-        #st.button("******Confirm and upload {} {}-{} reporting******".format(operator, reporting_month[4:6], reporting_month[0:4]), on_click=clicked, args=["submit_report"], key='reporting_month'):
- 
-       
-	    
-        
-        # 2 Discrepancy of Historic Data
-        with st.expander("Discrepancy for Historic Data",expanded=True):
-            ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-            if len(Total_PL.columns)>1:	
-                with st.spinner("********Running discrepancy check********"): 
-                    View_Discrepancy()
-                
-            elif len(Total_PL.columns)==1:
-                st.write("There is no previous month data in tenant P&L")
-        Submit_Upload_Latestmonth()      
+        else: # already uploaded
+            Submit_Upload_Latestmonth()
+            #Discrepancy of Historic Data
+            with st.expander("Discrepancy for Historic Data",expanded=True):
+                ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
+                if len(Total_PL.columns)>1:	
+                    with st.spinner("********Running discrepancy check********"): 
+                        View_Discrepancy()
+                elif len(Total_PL.columns)==1:
+                    st.write("There is no previous month data in tenant P&L")
+    
        
 
     elif choice=="Manage Mapping":
