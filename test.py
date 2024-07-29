@@ -1972,6 +1972,39 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.markdown(
         f"""
         <style>
+        .{custom_button_class} {{
+            animation: blink 1s infinite;
+            color: black !important;
+            background-color: #a6c8ff !important; /* Low-saturation blue background */
+            border: none;
+            cursor: pointer;
+        }}
+        @keyframes blink {{
+            0% {{ background-color: #a6c8ff; }}
+            50% {{ background-color: #8fb3e9; }}
+            100% {{ background-color: #a6c8ff; }}
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+        if not st.session_state.clicked['submit_report']:
+            if st.button("Submit Report", key=button_key, args=[custom_button_class]):
+                st.session_state.clicked['submit_report']=True
+                st.markdown(
+        f"""
+        <style>
+        .{custom_button_class} {{
+            animation: none;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+else:
+    st.markdown(
+        f"""
+        <style>
         div[data-testid="stButton"] > button[aria-label="{button_key}"] {{
             animation: blink 1s infinite;
             color: black !important;
@@ -1988,11 +2021,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         """,
         unsafe_allow_html=True
     )
-    
-        # Check if the button was clicked by checking query params
-        if not st.session_state.clicked['submit_report']:
-            if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting',key='reporting_month',help="Click to confirm and upload"):
-                st.session_state.clicked['submit_report']=True
         else:
             st.write("Data uploaded")
        
