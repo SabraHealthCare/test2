@@ -1967,12 +1967,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
    
 	# 1 Summary
         View_Summary()
-
+        placeholder = st.empty()
         if not st.session_state.clicked['submit_report']:
             st.markdown(
         f"""
         <style>
-        button[title="{button_key}"] {{
+        .custom-button {{
             animation: blink 1s infinite;
             color: black !important;
             background-color: #a6c8ff !important; /* Low-saturation blue background */
@@ -1988,40 +1988,23 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         """,
         unsafe_allow_html=True
     )
+        with placeholder.container():
+            if st.button("Submit Report", key=button_key):
+                st.session_state.clicked[button_key] = True
+                # Remove blinking effect after button is clicked
+                st.markdown(
+            f"""
+            <style>
+            .custom-button {{
+                animation: none;
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
 
-        #if not st.session_state.clicked['submit_report']:
-        if st.button("Submit Report", key=button_key):
-            st.session_state.clicked['submit_report']=True
-            st.markdown(
-        f"""
-        <style>
-        button[title="{button_key}"] {{
-            animation: none;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-        else:
-            st.markdown(
-        f"""
-        <style>
-        button[title="{button_key}"] {{
-            animation: blink 1s infinite;
-            color: black !important;
-            background-color: #a6c8ff !important; /* Low-saturation blue background */
-            border: none;
-            cursor: pointer;
-        }}
-        @keyframes blink {{
-            0% {{ background-color: #a6c8ff; }}
-            50% {{ background-color: #8fb3e9; }}
-            100% {{ background-color: #a6c8ff; }}
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+# Add the custom class to the button
+        st.markdown('<div class="custom-button"></div>', unsafe_allow_html=True)
         
        
         	    
