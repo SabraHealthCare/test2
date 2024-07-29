@@ -1993,19 +1993,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.session_state.clicked['submit_report']=True
         else:
             st.write("Data uploaded")
-        if not st.session_state.clicked['submit_report']:
-            st.markdown(
-        f"""
-        <style>
-        .stButton button {{
-            animation: blink 1s infinite;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-        	    
+    
         #st.button("******Confirm and upload {} {}-{} reporting******".format(operator, reporting_month[4:6], reporting_month[0:4]), on_click=clicked, args=["submit_report"], key='reporting_month'):
  
 
