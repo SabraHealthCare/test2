@@ -1144,7 +1144,7 @@ st.markdown(
         <style>
         #reporting_month button {{
             animation: blink 1s infinite;
-            color: black !important;
+            color: red !important;
             background-color: #a6c8ff !important; /* Low-saturation blue background */
             border: none;
             cursor: pointer;
