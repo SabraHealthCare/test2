@@ -2001,8 +2001,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         """,
         unsafe_allow_html=True
     )
-else:
-    st.markdown(
+            else:
+                st.markdown(
         f"""
         <style>
         div[data-testid="stButton"] > button[aria-label="{button_key}"] {{
@@ -2021,8 +2021,7 @@ else:
         """,
         unsafe_allow_html=True
     )
-        else:
-            st.write("Data uploaded")
+        
        
         	    
         #st.button("******Confirm and upload {} {}-{} reporting******".format(operator, reporting_month[4:6], reporting_month[0:4]), on_click=clicked, args=["submit_report"], key='reporting_month'):
