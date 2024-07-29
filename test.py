@@ -1906,16 +1906,17 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     selected_year = st.selectbox("Year", years_range,index=years_range.index(st.session_state.selected_year))
                 with col4:    
                     selected_month = st.selectbox("Month", months_range,index=months_range.index(st.session_state.selected_month))
-   
-                with col3:
-                    #st.markdown("<p style='font-size:20px;'>Upload P&L:</p>", unsafe_allow_html=True)
+                if BS_separate_excel=="N":
                     st.subheader("Upload P&L:")
-                    #uploaded_finance=st.file_uploader(":star: :red[Only XLSX accepted] :star:",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
+                    #uploaded_finance=st.file_uploader(":star: :red[Only XLSX accepted] :star:"
                     uploaded_finance=st.file_uploader("Only XLSX accepted",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
-                with col4:
-                    if BS_separate_excel=="Y":
+                
+                elif BS_separate_excel=="Y":
+                    with col3:
+                        st.subheader("Upload P&L:")
+                        uploaded_finance=st.file_uploader("Only XLSX accepted",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
+                    with col4:
                         st.subheader("Upload Balance Sheet:")
-                        #st.markdown("<p style='font-size:20px;'>Upload Balance Sheet:</p>", unsafe_allow_html=True)
                         uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
                 submitted = st.form_submit_button("Upload")
                 if submitted:
