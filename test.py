@@ -1153,9 +1153,9 @@ st.markdown(
         animation: blink 1s infinite;
     }}
     @keyframes blink {{
-    0% { background-color: #FF6F61; } /* Coral */
-    50% { background-color: #FFAB91; } /* Light Coral */
-    100% { background-color: #FF6F61; } /* Coral */ 
+        0% { background-color: #FF6F61; } /* Coral */
+        50% { background-color: #FFAB91; } /* Light Coral */
+        100% { background-color: #FF6F61; } /* Coral */ 
     }}
     </style>
     """,
