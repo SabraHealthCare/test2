@@ -1153,9 +1153,9 @@ st.markdown(
         animation: blink 1s infinite;
     }}
     @keyframes blink {{
-        0% {{ background-color: #6A5ACD; }}
-        50% {{ background-color: #4682B4; }}
-        100% {{ background-color: #6A5ACD; }}
+        0% {{ background-color: #a6c8ff; }}
+        50% {{ background-color: #8fb3e9; }}
+        100% {{ background-color: #a6c8ff; }}
     }}
     </style>
     """,
