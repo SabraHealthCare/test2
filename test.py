@@ -884,8 +884,8 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
                 st.write("Sabra second account")
                 Sabra_second_account_list[i]= streamlit_tree_select.tree_select(parent_hierarchy_second,only_leaf_checkboxes=True,key=str(new_tenant_account_list[i])+"1")
 
-            st.markdown('<p class="small-font">If you need to apply transformation (such as multiplying by -1) to some accounts, please email sli@sabrahealth.com.</p>', unsafe_allow_html=True)
-            submitted = st.form_submit_button("Submit")    	    
+        st.markdown('<p class="small-font">If you need to apply transformation (such as multiplying by -1) to some accounts, please email sli@sabrahealth.com.</p>', unsafe_allow_html=True)
+        submitted = st.form_submit_button("Submit")    	    
             
         if submitted:
             for i in range(count):
