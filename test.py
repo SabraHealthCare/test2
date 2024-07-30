@@ -990,6 +990,7 @@ def Map_PL_Sabra(PL,entity):
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first
+    st.write("PL",PL)
     #return PL,PL_with_detail   
     return PL   
 
