@@ -952,7 +952,7 @@ def Map_PL_Sabra(PL,entity):
             else:
                 for month in month_cols:
                     before_conversion=PL.loc[i,month]
-                    if pd.isna(before_conversion):
+                    if pd.isna(before_conversion) or before_conversion=="" or before_conversion==" ":
                         continue 
                     elif conversion=="/monthdays":	
                         PL.loc[i,month]=before_conversion/monthrange(int(str(month)[0:4]), int(str(month)[4:6]))[1]
