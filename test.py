@@ -966,8 +966,8 @@ def Map_PL_Sabra(PL,entity):
                     elif conversion=="*monthdays":
                         PL.loc[i,month]= before_conversion*monthrange(int(str(month)[0:4]), int(str(month)[4:6]))[1]
                     elif conversion[0]=="*":
-                        st.write("PL,i, month,before_conversion",PL,i, month,before_conversion)
                         PL.loc[i,month]= before_conversion*float(conversion.split("*")[1])
+        st.write("PL",PL)
         PL=PL.drop(["Tenant_Formated_Account","Conversion","Tenant_Account"], axis=1)
         PL["ENTITY"]=entity	    
          
@@ -997,7 +997,7 @@ def Map_PL_Sabra(PL,entity):
     #PL_with_detail=PL_with_detail.set_index(['ENTITY', 'Sabra_Account',"Tenant_Account"])
 
     # group by Sabra_Account
-    st.write("PL",PL)
+
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first
     #return PL,PL_with_detail   
