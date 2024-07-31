@@ -1951,12 +1951,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             select_months_list=[]
         else:
             select_months_list =sorted([x for x in BPC_pull.columns if x <reporting_month],reverse=True)
-            if len(filtered_months)>=previous_monthes_comparison:
-                select_months_list=filtered_months[:previous_monthes_comparison]  
-            elif len(filtered_months)>0 and len(filtered_months)<previous_monthes_comparison:
-                select_months_list=filtered_months
-            elif len(filtered_months)==0:
-                select_months_list=[]
+            if len(select_months_list)>=previous_monthes_comparison:
+                select_months_list=select_months_list[:previous_monthes_comparison]  
            
         account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
 	    
