@@ -941,60 +941,44 @@ def Map_PL_Sabra(PL,entity):
     PL=PL[PL['Sabra_Account']!=" "]
     PL.dropna(subset=['Sabra_Account'], inplace=True)
     PL=PL.reset_index(drop=True)
-
+    conversion = PL["Conversion"].fillna(np.nan)
    
     
     if isinstance(entity, str):# one entity,  properties are in separate sheet
         month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
-        for i in range(PL.shape[0]):
-            for month in month_cols:
-                before_conversion=PL.loc[i,month]
-                if pd.isna(before_conversion):  # Handle NaN case
-                    PL.loc[i,month]=0
-                    continue 
-                elif isinstance(before_conversion, str) and before_conversion.strip() == "": 
-                    PL.loc[i,month]=0
-                    continue 
-                elif isinstance(before_conversion, (int, float)) and before_conversion == 0: # Handle numeric zero case
-                    continue
-                conversion=PL.loc[i,"Conversion"]
-                if pd.isna(conversion):
-                    continue
-                elif conversion=="/monthdays":	
-                    PL.loc[i,month]=before_conversion/monthrange(int(str(month)[0:4]), int(str(month)[4:6]))[1]
-                elif conversion=="*monthdays":
-                    PL.loc[i,month]= before_conversion*monthrange(int(str(month)[0:4]), int(str(month)[4:6]))[1]
-                elif conversion[0]=="*":
-                    PL.loc[i,month]= before_conversion*float(conversion.split("*")[1])
-                else:
-                    continue
+        #Convert all values in the PL to numeric, coercing non-numeric values to NaN. Fill NaN values with 0.
+        PL[month_cols] = PL[month_cols].apply(pd.to_numeric, errors='coerce').fillna(0)
+        for idx, conv in conversion.items():
+            if pd.isna(conv):
+                continue
+            elif conv == "/monthdays":
+                PL.loc[idx, month_cols] /= monthrange(int(str(month)[0:4]), int(str(month)[4:6]))[1]
+            elif conv == "*monthdays":
+                PL.loc[idx, month_cols] *= monthrange(int(str(month)[0:4]), int(str(month)[4:6]))[1]
+            elif conv.startswith("*"):
+                multiplier = float(conv.split("*")[1])
+                PL.loc[idx, month_cols] *= multiplier
+            else:
+                continue
         PL=PL.drop(["Tenant_Formated_Account","Conversion","Tenant_Account"], axis=1)
         PL["ENTITY"]=entity	    
          
     elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value" 
         monthdays=monthrange(int(str(reporting_month)[0:4]), int(str(reporting_month)[4:6]))[1]
-        for i in range(PL.shape[0]):
-            for entity_j in entity:
-                before_conversion=PL.loc[i,entity_j]
-                if pd.isna(before_conversion):  # Handle NaN case
-                    PL.loc[i,entity_j]=0
-                    continue 
-                elif isinstance(before_conversion, str):
-                    PL.loc[i,entity_j]=0
-                    continue
-                elif isinstance(before_conversion, (int, float)) and before_conversion == 0: # Handle numeric zero case
-                    continue
-                conversion=PL.loc[i,"Conversion"]
-                if pd.isna(conversion):
-                    continue
-                elif conversion=="/monthdays":	
-                    PL.loc[i,entity_j]=before_conversion/monthdays
-                elif conversion=="*monthdays":
-                    PL.loc[i,entity_j]= before_conversion*monthdays
-                elif conversion[0]=="*":
-                    PL.loc[i,entity_j]= before_conversion*float(conversion.split("*")[1])
-                else:
-                    continue
+        PL[entity] = PL[entity].apply(pd.to_numeric, errors='coerce').fillna(0)
+        for idx, conv in conversion.items():
+            if pd.isna(conv):
+                continue
+            elif conv == "/monthdays":
+                PL.loc[idx, entity] /= monthdays
+            elif conv == "*monthdays":
+                PL.loc[idx, entity] *= monthdays
+            elif conv.startswith("*"):
+                multiplier = float(conv.split("*")[1])
+                PL.loc[idx, entity] *= multiplier
+            else:
+                continue
+
         #property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
         PL=PL.drop(["Tenant_Formated_Account","Conversion"], axis=1)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='ENTITY')     
