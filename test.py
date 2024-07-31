@@ -253,6 +253,7 @@ def Initial_Mapping(operator):
     BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename)
     BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
     BPC_pull=BPC_pull.set_index(["ENTITY","Sabra_Account"])
+    BPC_pull = BPC_pull.dropna(axis=1, how='all')
     BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
   	
     account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename,account_mapping_str_col)
@@ -1213,16 +1214,16 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
         missing_PL_sheet_property = entity_mapping[(~entity_mapping["Sheet_Name_Finance"].isin(PL_sheet_list))|(pd.isna(entity_mapping["Sheet_Name_Finance"]))]
         missing_PL_sheet_property_Y=missing_PL_sheet_property.loc[missing_PL_sheet_property["Finance_in_separate_sheets"]=="Y",:]
         missing_PL_sheet_property_N=missing_PL_sheet_property.loc[missing_PL_sheet_property["Finance_in_separate_sheets"]=="N",:]
-        missing_occ_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Occupancy"].isin(PL_sheet_list)==False) & (~pd.isna(entity_mapping["Sheet_Name_Occupancy"]))& (entity_mapping["Sheet_Name_Finance"] != entity_mapping["Sheet_Name_Occupancy"])]
+        missing_occ_sheet_property = entity_mapping[(entity_mapping["Sheet_Name_Occupancy"].isin(PL_sheet_list)==False) & (pd.notna(entity_mapping["Sheet_Name_Occupancy"]))& (entity_mapping["Sheet_Name_Finance"] != entity_mapping["Sheet_Name_Occupancy"])]
         missing_occ_sheet_property_Y=missing_occ_sheet_property.loc[missing_occ_sheet_property["Finance_in_separate_sheets"]=="Y",:]
         missing_occ_sheet_property_N=missing_occ_sheet_property.loc[missing_occ_sheet_property["Finance_in_separate_sheets"]=="N",:]
-        missing_BS_sheet_property = entity_mapping[(entity_mapping["BS_separate_excel"]=="N") &(~pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))& (entity_mapping["Sheet_Name_Finance"] != entity_mapping["Sheet_Name_Balance_Sheet"])&(entity_mapping["Sheet_Name_Balance_Sheet"].isin(PL_sheet_list)==False)]		
+        missing_BS_sheet_property = entity_mapping[(entity_mapping["BS_separate_excel"]=="N") &(pd.notna(entity_mapping["Sheet_Name_Balance_Sheet"]))& (entity_mapping["Sheet_Name_Finance"] != entity_mapping["Sheet_Name_Balance_Sheet"])&(entity_mapping["Sheet_Name_Balance_Sheet"].isin(PL_sheet_list)==False)]		
         missing_BS_sheet_property_Y=missing_BS_sheet_property.loc[missing_BS_sheet_property["Finance_in_separate_sheets"]=="Y",:]
         missing_BS_sheet_property_N=missing_BS_sheet_property.loc[missing_BS_sheet_property["Finance_in_separate_sheets"]=="N",:]    
         total_missing_Y=missing_PL_sheet_property_Y.shape[0]+missing_occ_sheet_property_Y.shape[0]+missing_BS_sheet_property_Y.shape[0]
         total_missing_N=missing_PL_sheet_property_N.shape[0]+missing_occ_sheet_property_N.shape[0]+missing_BS_sheet_property_N.shape[0]
     elif sheet_type=="BS": # BS in another excel file
-        missing_BS_sheet_property = entity_mapping[(entity_mapping["BS_separate_excel"]=="Y") & (entity_mapping["Sheet_Name_Balance_Sheet"].isin(PL_sheet_list)==False)&(~pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))]
+        missing_BS_sheet_property = entity_mapping[((entity_mapping["BS_separate_excel"]=="Y") & (entity_mapping["Sheet_Name_Balance_Sheet"].isin(PL_sheet_list)==False))|(pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))]
         missing_BS_sheet_property_Y=missing_BS_sheet_property.loc[missing_BS_sheet_property["Finance_in_separate_sheets"]=="Y",:]
         missing_BS_sheet_property_N=missing_BS_sheet_property.loc[missing_BS_sheet_property["Finance_in_separate_sheets"]=="N",:]  
         total_missing_Y=missing_BS_sheet_property_Y.shape[0]
@@ -1634,6 +1635,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 	
 @st.cache_data
 def Get_Previous_Months(reporting_month,full_date_header):
+
     # Convert the reporting_month string to a datetime object
     latest_date = datetime.strptime(reporting_month, "%Y%m")
     month_list = [reporting_month]
@@ -1676,9 +1678,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()  
 		
-        # select only two or one previous months for columns
-        month_select = Get_Previous_Months(reporting_month,date_header[0]) 
-        
         #remove row above date, to prevent to map these value as new accounts
         PL=PL.iloc[date_header[1]+1:,:]
 	#remove rows with nan tenant account
@@ -1688,7 +1687,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         PL.index=map(lambda x:str(x).strip().upper(),PL.index)
 	    
         # filter columns with month_select
-        selected_columns = [val in month_select for val in date_header[0]]
+        selected_month_columns = [val in select_months_list for val in date_header[0]]
         PL = PL.loc[:,selected_columns]   
         PL.columns= [value for value in date_header[0] if value in month_select]        
            
@@ -1890,7 +1889,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         years_range = list(range(current_year, current_year - 2, -1))
         # Calculate the list of months and their indices
         months_range = [str(month).zfill(2) for month in range(1, 13)]
-        if "Y" in entity_mapping["BS_separate_excel"][~pd.isna(entity_mapping["BS_separate_excel"])].values:             
+        if "Y" in entity_mapping["BS_separate_excel"][(pd.notna(entity_mapping["BS_separate_excel"]))&(pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))].values:             
             BS_separate_excel="Y"
         else:
             BS_separate_excel="N"
@@ -1936,16 +1935,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
             st.stop()
-        filtered_months =sorted([x for x in BPC_pull.columns if x <reporting_month],reverse=True)
-        if len(filtered_months)>=previous_monthes_comparison:
-            BPC_pull=BPC_pull[["Property_Name"]+filtered_months[:previous_monthes_comparison]]    
-        elif len(filtered_months)>0 and len(filtered_months)<previous_monthes_comparison:
-            BPC_pull=BPC_pull[["Property_Name"]+filtered_months]
-        elif len(filtered_months)==0:
-            BPC_pull=pd.DataFrame()
-
         entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=reporting_month) &((pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))| (entity_mapping["DATE_SOLD_PAYOFF"]>=reporting_month))),]
-        if "Y" in entity_mapping["BS_separate_excel"][~pd.isna(entity_mapping["BS_separate_excel"])].values:                     
+        if "Y" in entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values:                     
             BS_separate_excel="Y"
             if uploaded_BS:
                 with col4:
@@ -1955,8 +1946,18 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.stop()
         else:
             BS_separate_excel="N"
-
-
+	# select_months_list contain the monthes that need to be compared for history data,if it is [], means no need to compare
+        if all(entity_mapping["Finance_in_separate_sheets"]=="N"):
+            select_months_list=[]
+	else:
+            filtered_months =sorted([x for x in BPC_pull.columns if x <reporting_month],reverse=True)
+            if len(filtered_months)>=previous_monthes_comparison:
+                select_months_list=filtered_months[:previous_monthes_comparison]  
+            elif len(filtered_months)>0 and len(filtered_months)<previous_monthes_comparison:
+                select_months_list=filtered_months
+            elif len(filtered_months)==0:
+                select_months_list=[]
+           
         account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
 	    
         if BS_separate_excel=="N":  # Finance/BS are in one excel
@@ -1990,8 +1991,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	# 1 Summary
         View_Summary()
        	
-
-
         if not st.session_state.clicked['submit_report']:
             st.markdown(
         f"""
