@@ -1623,7 +1623,7 @@ def Get_Previous_Months(reporting_month,full_date_header):
 
 #no cache    
 def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):  
-    global account_mapping,reporting_month,tenant_account_col,date_header
+    global account_mapping,reporting_month,tenant_account_col,date_header,select_months_list
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
 
@@ -1664,7 +1664,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         selected_month_columns = [val in select_months_list for val in date_header[0]]
         PL = PL.loc[:,selected_month_columns]   
         PL.columns= [value for value in date_header[0] if value in select_months_list]        
-        st.write("PL.columns",PL.columns)           
+        select_months_list= list(PL.columns)          
         # remove columns with all nan/0 or a combination of nan and 0
         #PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value or a combination of nan and 0
