@@ -999,9 +999,6 @@ def Map_PL_Sabra(PL,entity):
 @st.cache_data
 def Compare_PL_Sabra(Total_PL,reporting_month):
 #def Compare_PL_Sabra(Total_PL,PL_with_detail,reporting_month):
-    #PL_with_detail=PL_with_detail.reset_index(drop=False)
-    #diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)","Diff_Percent"])
-    #diff_BPC_PL_detail=pd.DataFrame(columns=["ENTITY","Sabra_Account","Tenant_Account","Month","Sabra","P&L Value","Diff (Sabra-P&L)",""])
     month_list = [month for month in Total_PL.columns if month != reporting_month]
     rows = []
     for entity in entity_mapping.index:
@@ -1029,8 +1026,7 @@ def Compare_PL_Sabra(Total_PL,reporting_month):
                     new_row = {"TIME": timeid,"ENTITY": entity,"Sabra_Account": matrix,"Sabra": BPC_value, "P&L": PL_value,"Diff (Sabra-P&L)": diff,"Diff_Percent": diff_percent}
                     rows.append(new_row)
     diff_BPC_PL = pd.DataFrame(rows, columns=["TIME", "ENTITY", "Sabra_Account", "Sabra", "P&L", "Diff (Sabra-P&L)", "Diff_Percent"])
-                
-                    
+                   
     if diff_BPC_PL.shape[0]>0:
         #percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
         diff_BPC_PL=diff_BPC_PL.merge(BPC_Account[["Category","Sabra_Account_Full_Name","BPC_Account_Name"]],left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")        
@@ -1045,7 +1041,6 @@ def View_Summary():
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
-    st.write("Total_PL",Total_PL)
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
@@ -1669,7 +1664,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         selected_month_columns = [val in select_months_list for val in date_header[0]]
         PL = PL.loc[:,selected_month_columns]   
         PL.columns= [value for value in date_header[0] if value in select_months_list]        
-           
+        st.write("PL.columns",PL.columns)           
         # remove columns with all nan/0 or a combination of nan and 0
         #PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value or a combination of nan and 0
