@@ -1000,10 +1000,10 @@ def Map_PL_Sabra(PL,entity):
 def Compare_PL_Sabra(Total_PL,reporting_month):
 #def Compare_PL_Sabra(Total_PL,PL_with_detail,reporting_month):
     #PL_with_detail=PL_with_detail.reset_index(drop=False)
-    diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)","Diff_Percent"])
+    #diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)","Diff_Percent"])
     #diff_BPC_PL_detail=pd.DataFrame(columns=["ENTITY","Sabra_Account","Tenant_Account","Month","Sabra","P&L Value","Diff (Sabra-P&L)",""])
     month_list = [month for month in Total_PL.columns if month != reporting_month]
-   
+    rows = []
     for entity in entity_mapping.index:
         if entity not in Total_PL.index.get_level_values('ENTITY'):
             continue
