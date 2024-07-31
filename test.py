@@ -1949,8 +1949,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	# select_months_list contain the monthes that need to be compared for history data,if it is [], means no need to compare
         if all(entity_mapping["Finance_in_separate_sheets"]=="N"):
             select_months_list=[]
-	else:
-            filtered_months =sorted([x for x in BPC_pull.columns if x <reporting_month],reverse=True)
+        else:
+            select_months_list =sorted([x for x in BPC_pull.columns if x <reporting_month],reverse=True)
             if len(filtered_months)>=previous_monthes_comparison:
                 select_months_list=filtered_months[:previous_monthes_comparison]  
             elif len(filtered_months)>0 and len(filtered_months)<previous_monthes_comparison:
