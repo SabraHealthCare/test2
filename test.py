@@ -952,9 +952,14 @@ def Map_PL_Sabra(PL,entity):
             else:
                 for month in month_cols:
                     before_conversion=PL.loc[i,month]
-                    if before_conversion==" " or i ==91:
-                        st.write("11111111111",before_conversion,type(before_conversion), before_conversion=="")
-                    if pd.isna(before_conversion) or before_conversion==0 or before_conversion.strip()=="":
+
+                    if pd.isna(before_conversion):  # Handle NaN case
+                        PL.loc[i,month]=0
+                        continue 
+                    elif isinstance(before_conversion, (int, float)) and before_conversion == 0: # Handle numeric zero case
+                        PL.loc[i,month]=0
+                        continue
+                    elif isinstance(before_conversion, str) or before_conversion.strip() == "":
                         PL.loc[i,month]=0
                         continue 
                     elif conversion=="/monthdays":	
