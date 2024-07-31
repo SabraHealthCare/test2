@@ -982,7 +982,7 @@ def Map_PL_Sabra(PL,entity):
                 elif isinstance(before_conversion, str):
                     PL.loc[i,entity_j]=0
                     continue
-		elif isinstance(before_conversion, (int, float)) and before_conversion == 0: # Handle numeric zero case
+                elif isinstance(before_conversion, (int, float)) and before_conversion == 0: # Handle numeric zero case
                     continue
                 conversion=PL.loc[i,"Conversion"]
                 if pd.isna(conversion):
