@@ -1881,7 +1881,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if 'selected_month' not in st.session_state:
             st.session_state.selected_month = '01'
         global reporting_month,reporting_month_label,tenant_account_col,date_header
-        BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
+        
         reporting_month_label=True  
         tenant_account_col=10000
         date_header=[[0],0,[]]
@@ -1916,6 +1916,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                         st.subheader("Upload Balance Sheet:")
                         uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
                 submitted = st.form_submit_button("Upload")
+                BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
                 if submitted:
 	            # clear cache for every upload
                     st.cache_data.clear()
