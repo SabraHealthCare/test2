@@ -1002,17 +1002,17 @@ def Compare_PL_Sabra(Total_PL,reporting_month):
     #PL_with_detail=PL_with_detail.reset_index(drop=False)
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)","Diff_Percent"])
     #diff_BPC_PL_detail=pd.DataFrame(columns=["ENTITY","Sabra_Account","Tenant_Account","Month","Sabra","P&L Value","Diff (Sabra-P&L)",""])
-    month_list = list(filter(lambda x:x!=reporting_month, Total_PL.columns))
+    month_list = [month for month in Total_PL.columns if month != reporting_month]
    
     for entity in entity_mapping.index:
+        if entity not in Total_PL.index.get_level_values('ENTITY'):
+        continue
+
         for timeid in month_list: 
-            if entity not in Total_PL.index.get_level_values('ENTITY'):
-                break	
 	    # if this entity don't have data for this timeid(new/transferred property), skip to next month
-            elif Total_PL.loc[entity][timeid].apply(pd.isna).all():
-                break
-            for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
-            #for matrix in BPC_Account["BPC_Account_Name"]: 
+            if Total_PL.loc[entity, timeid].isna().all():
+                continue
+            for matrix in BPC_Account.loc[BPC_Account["Category"]!="Balance Sheet","BPC_Account_Name"]: 
                 try:
                     BPC_value=int(BPC_pull.loc[entity,matrix][timeid])
                 except:
@@ -1026,37 +1026,14 @@ def Compare_PL_Sabra(Total_PL,reporting_month):
                 diff=BPC_value-PL_value
                 diff_percent=abs(diff)/max(abs(PL_value),abs(BPC_value))
                 if diff_percent>=0.001: 
-                    # for diff_BPC_PL			
-                    diff_single_record=pd.DataFrame({"TIME":timeid,"ENTITY":entity,"Sabra_Account":matrix,"Sabra":BPC_value,\
-                                                     "P&L":PL_value,"Diff (Sabra-P&L)":diff,"Diff_Percent":diff_percent},index=[0])
-
-
-                    
-		    # for diff_detail_records
-                    #diff_detail_records=PL_with_detail.loc[(PL_with_detail["Sabra_Account"]==matrix)&(PL_with_detail["ENTITY"]==entity)]\
-			                #[["ENTITY","Sabra_Account","Tenant_Account",timeid]].rename(columns={timeid:"P&L Value"})
-                    #if there is no record in diff_detail_records, means there is no mapping
-                    #if diff_detail_records.shape[0]==0:
-                        #diff_detail_records=pd.DataFrame({"ENTITY":entity,"Sabra_Account":matrix,"Tenant_Account":"Miss mapping accounts","Month":timeid,"Sabra":BPC_value,"P&L Value":0,"Diff (Sabra-P&L)":diff},index=[0]) 
-                    #else:
-                        #diff_detail_records["Month"]=timeid
-                        #diff_detail_records["Sabra"]=BPC_value
-                        #diff_detail_records["Diff (Sabra-P&L)"]=diff
-
-                    if diff_BPC_PL.isna().shape[0]==0:
-                        diff_BPC_PL = diff_single_record
-                        #diff_BPC_PL_detail=diff_detail_records
-                    else:
-                        diff_BPC_PL=pd.concat([diff_BPC_PL,diff_single_record],ignore_index=True)
-                        #diff_BPC_PL_detail=pd.concat([diff_BPC_PL_detail,diff_detail_records],ignore_index=True)
-			    
+                    new_row = {"TIME": timeid,"ENTITY": entity,"Sabra_Account": matrix,"Sabra": BPC_value, "P&L": PL_value,"Diff (Sabra-P&L)": diff,"Diff_Percent": diff_percent}
+                    diff_BPC_PL = diff_BPC_PL.append(new_row, ignore_index=True)
                     
     if diff_BPC_PL.shape[0]>0:
         #percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
         diff_BPC_PL=diff_BPC_PL.merge(BPC_Account[["Category","Sabra_Account_Full_Name","BPC_Account_Name"]],left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")        
         diff_BPC_PL=diff_BPC_PL.merge(entity_mapping.reset_index(drop=False)[["ENTITY","Property_Name"]], on="ENTITY",how="left")
     return diff_BPC_PL
-    #return diff_BPC_PL,diff_BPC_PL_detail
 	
 def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
