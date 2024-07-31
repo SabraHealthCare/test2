@@ -952,7 +952,7 @@ def Map_PL_Sabra(PL,entity):
                 if pd.isna(before_conversion):  # Handle NaN case
                     PL.loc[i,month]=0
                     continue 
-                elif isinstance(before_conversion, str) and before_conversion.strip() == "":
+                elif isinstance(before_conversion, str) and before_conversion.strip() == "": 
                     PL.loc[i,month]=0
                     continue 
                 elif isinstance(before_conversion, (int, float)) and before_conversion == 0: # Handle numeric zero case
