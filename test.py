@@ -1027,8 +1027,9 @@ def Compare_PL_Sabra(Total_PL,reporting_month):
                 diff_percent=abs(diff)/max(abs(PL_value),abs(BPC_value))
                 if diff_percent>=0.001: 
                     new_row = {"TIME": timeid,"ENTITY": entity,"Sabra_Account": matrix,"Sabra": BPC_value, "P&L": PL_value,"Diff (Sabra-P&L)": diff,"Diff_Percent": diff_percent}
-                    st.write("new_row",new_row)
-                    diff_BPC_PL = diff_BPC_PL.append(new_row, ignore_index=True)
+                    rows.append(new_row)
+    diff_BPC_PL = pd.DataFrame(rows, columns=["TIME", "ENTITY", "Sabra_Account", "Sabra", "P&L", "Diff (Sabra-P&L)", "Diff_Percent"])
+                
                     
     if diff_BPC_PL.shape[0]>0:
         #percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
