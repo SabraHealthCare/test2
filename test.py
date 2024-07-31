@@ -953,7 +953,7 @@ def Map_PL_Sabra(PL,entity):
                 for month in month_cols:
                     before_conversion=PL.loc[i,month]
                     if before_conversion==" " or i ==91:
-                        st.write("11111111111",before_conversion.strip()=="")
+                        st.write("11111111111",before_conversion.isspace(), before_conversion=="")
                     if pd.isna(before_conversion) or before_conversion==0 or before_conversion.strip()=="":
                         PL.loc[i,month]=0
                         continue 
