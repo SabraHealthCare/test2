@@ -1689,7 +1689,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         # filter columns with month_select
         selected_month_columns = [val in select_months_list for val in date_header[0]]
         PL = PL.loc[:,selected_month_columns]   
-        PL.columns= [value for value in date_header[0] if value in month_select]        
+        PL.columns= [value for value in date_header[0] if value in selected_month_columns]        
            
         # remove columns with all nan/0 or a combination of nan and 0
         #PL=PL.loc[:,(PL!= 0).any(axis=0)]
