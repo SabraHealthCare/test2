@@ -1006,7 +1006,7 @@ def Compare_PL_Sabra(Total_PL,reporting_month):
    
     for entity in entity_mapping.index:
         if entity not in Total_PL.index.get_level_values('ENTITY'):
-        continue
+            continue
 
         for timeid in month_list: 
 	    # if this entity don't have data for this timeid(new/transferred property), skip to next month
