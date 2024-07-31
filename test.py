@@ -968,7 +968,7 @@ def Map_PL_Sabra(PL,entity):
         monthdays=monthrange(int(str(reporting_month)[0:4]), int(str(reporting_month)[4:6]))[1]
         for i in range(len(PL.index)):
             conversion=PL.loc[i,"Conversion"]
-            if pd.isna(conversion) or conversion.strip()==""::
+            if pd.isna(conversion) or conversion.strip()=="":
                 continue
             else:
                 for entity_j in entity:
