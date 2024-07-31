@@ -1066,7 +1066,7 @@ def View_Summary():
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
-
+    st.write("Total_PL",Total_PL)
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
