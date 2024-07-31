@@ -947,12 +947,13 @@ def Map_PL_Sabra(PL,entity):
         month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
         for i in range(len(PL.index)):
             conversion=PL.loc[i,"Conversion"]
-            if conversion!=conversion or pd.isna(conversion):
+            if pd.isna(conversion):
                 continue
             else:
                 for month in month_cols:
                     before_conversion=PL.loc[i,month]
-                    if pd.isna(before_conversion) or before_conversion=="" or before_conversion==" ":
+                    if pd.isna(before_conversion) or before_conversion==0 or before_conversion.strip()=="":
+                        PL.loc[i,month]=0
                         continue 
                     elif conversion=="/monthdays":	
                         PL.loc[i,month]=before_conversion/monthrange(int(str(month)[0:4]), int(str(month)[4:6]))[1]
@@ -967,12 +968,13 @@ def Map_PL_Sabra(PL,entity):
         monthdays=monthrange(int(str(reporting_month)[0:4]), int(str(reporting_month)[4:6]))[1]
         for i in range(len(PL.index)):
             conversion=PL.loc[i,"Conversion"]
-            if conversion!=conversion or pd.isna(conversion):
+            if pd.isna(conversion) or conversion.strip()==""::
                 continue
             else:
                 for entity_j in entity:
                     before_conversion=PL.loc[i,entity_j]
-                    if before_conversion!=before_conversion or pd.isna(before_conversion):
+                    if pd.isna(before_conversion) or before_conversion==0 or before_conversion.strip()=="":
+                        PL.loc[i,entity_j]=0
                         continue 
                     elif conversion=="/monthdays":	
                         PL.loc[i,entity_j]=before_conversion/monthdays
