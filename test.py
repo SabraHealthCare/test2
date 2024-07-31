@@ -993,7 +993,7 @@ def Map_PL_Sabra(PL,entity):
                     PL.loc[i,entity_j]= before_conversion*monthdays
                 elif conversion[0]=="*":
                     PL.loc[i,entity_j]= before_conversion*float(conversion.split("*")[1])
-		else:
+                else:
                     continue
         #property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
         PL=PL.drop(["Tenant_Formated_Account","Conversion"], axis=1)
