@@ -1960,11 +1960,17 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	# 1 Summary
         View_Summary()
 
-        if st.session_state.clicked['submit_report']:
-            button_style = """
+        blinking_button_style = """
+        <style>
+        .stButton button {{
+            animation: blink 1s infinite;
+        }}
+        </style>
+        """
+        regular_button_style = """
     <style>
     .red-font-button {
-        color: red !important;
+        color: black !important;
         background-color: white;
         border: 1px solid #ccc;
         padding: 10px 20px;
@@ -1975,22 +1981,17 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         background-color: #f0f0f0;
     }
     </style>
-"""	    
-               
-            st.markdown(button_style, unsafe_allow_html=True)
-        if not st.session_state.clicked['submit_report']: 
-            st.markdown(
-        f"""
-        <style>
-        .stButton button {{
-            animation: blink 1s infinite;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True)
-            # Define the button and handle the click event
-            if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting', key='reporting_month', help="Click to confirm and upload"):
-                st.session_state.clicked['submit_report'] = True
+"""	     
+        st.markdown(regular_button_style, unsafe_allow_html=True)
+        if st.session_state.clicked['submit_report']:
+            st.markdown(regular_button_style, unsafe_allow_html=True)
+        else:
+            st.markdown(blinking_button_style, unsafe_allow_html=True)
+
+
+        # Define the button and handle the click event
+        if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting', key='reporting_month', help="Click to confirm and upload"):
+            st.session_state.clicked['submit_report'] = True
 
 	
         # Perform the upload action here and check for discrepancies
