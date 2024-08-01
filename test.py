@@ -1982,7 +1982,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     }
     </style>
 """	     
-        st.markdown(regular_button_style, unsafe_allow_html=True)
+       
         if st.session_state.clicked['submit_report']:
             st.markdown(regular_button_style, unsafe_allow_html=True)
         else:
@@ -1993,7 +1993,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting', key='reporting_month', help="Click to confirm and upload"):
             st.session_state.clicked['submit_report'] = True
             st.experimental_set_query_params(clicked=True)
-	
+            #st.experimental_rerun()
         # Perform the upload action here and check for discrepancies
         if st.session_state.clicked['submit_report']:
             Submit_Upload_Latestmonth()
