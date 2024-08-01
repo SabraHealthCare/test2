@@ -1790,25 +1790,40 @@ def Upload_And_Process(uploaded_file,file_type):
 
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
     return Total_PL
-st.markdown(
-        f"""
-        <style>
-        #reporting_month button {{
-            animation: blink 1s infinite;
-            color: black !important;
-            background-color: #a6c8ff !important; /* Low-saturation blue background */
-            border: none;
-            cursor: pointer;
-        }}
-        @keyframes blink {{
-            0% {{ background-color: #a6c8ff; }}
-            50% {{ background-color: #8fb3e9; }}
-            100% {{ background-color: #a6c8ff; }}
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+	
+blinking_button_style = """
+    <style>
+    .stButton button {
+        animation: blink 1s infinite;
+        color: black !important;
+        background-color: white;
+        border: 1px solid #ccc;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    @keyframes blink {
+        0% { background-color: white; }
+        50% { background-color: yellow; }
+        100% { background-color: white; }
+    }
+    </style>
+    <script>
+    setTimeout(function() {
+        var button = document.querySelector('.stButton button');
+        if (button) {
+            button.style.animation = 'none';
+        }
+    }, 5000); // Stop blinking after 5 seconds
+    </script>
+"""	
+
+st.markdown(blinking_button_style, unsafe_allow_html=True)
+
+       
+       #     0% {{ background-color: #a6c8ff; }}
+        #    50% {{ background-color: #8fb3e9; }}
+        #    100% {{ background-color: #a6c8ff; }}
 #----------------------------------website widges------------------------------------
 config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
 config = yaml.safe_load(config_obj["Body"])
