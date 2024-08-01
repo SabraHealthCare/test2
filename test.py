@@ -1961,9 +1961,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         View_Summary()
 
 	    
-        if not st.session_state.clicked['submit_report']:
-            
-
+     
         if not st.session_state.clicked['submit_report']: 
             st.markdown(
         f"""
