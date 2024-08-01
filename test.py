@@ -1976,7 +1976,25 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             # Define the button and handle the click event
             if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting', key='reporting_month', help="Click to confirm and upload"):
                 st.session_state.clicked['submit_report'] = True
+	    else:
+                button_style = """
+    <style>
+    .red-font-button {
+        color: red !important;
+        background-color: white;
+        border: 1px solid #ccc;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .red-font-button:hover {
+        background-color: #f0f0f0;
+    }
+    </style>
+"""
 
+                # Inject the CSS style into the Streamlit app
+                st.markdown(button_style, unsafe_allow_html=True)
 
         # Perform the upload action here and check for discrepancies
         if st.session_state.clicked['submit_report']:
