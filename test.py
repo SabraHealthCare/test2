@@ -1960,40 +1960,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	# 1 Summary
         View_Summary()
 
-        blinking_button_style = """
-        <style>
-        .stButton button {{
-            animation: blink 1s infinite;
-        }}
-        </style>
-        """
-        regular_button_style = """
-    <style>
-    .red-font-button {
-        color: black !important;
-        background-color: white;
-        border: 1px solid #ccc;
-        padding: 10px 20px;
-        font-size: 16px;
-        cursor: pointer;
-    }
-    .red-font-button:hover {
-        background-color: #f0f0f0;
-    }
-    </style>
-"""	     
-       
-        if st.session_state.clicked['submit_report']:
-            st.markdown(regular_button_style, unsafe_allow_html=True)
-        else:
-            st.markdown(blinking_button_style, unsafe_allow_html=True)
-
-
         # Define the button and handle the click event
         if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting', key='reporting_month', help="Click to confirm and upload"):
             st.session_state.clicked['submit_report'] = True
-            st.experimental_set_query_params(clicked=True)
-            st.experimental_rerun()
+
+
         # Perform the upload action here and check for discrepancies
         if st.session_state.clicked['submit_report']:
             Submit_Upload_Latestmonth()
