@@ -375,6 +375,8 @@ def filters_widgets(df, columns,location="Vertical"):
             return df
 		
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,pre_max_match_col):
+    st.write("PL",PL,sheet_name)
+    st.write("pre_max_match_col",pre_max_match_col)
     #search tenant account column in P&L, return col number of tenant account	
     if pre_max_match_col!=10000 and pre_max_match_col<PL.shape[1]:
         #check if pre_max_match is the tenant_col
@@ -385,10 +387,13 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,pre_m
     max_match=0
     for tenantAccount_col_no in range(0,min(15,PL.shape[1])):
         candidate_col=list(map(lambda x: str(x).strip().upper() if not pd.isna(x) and isinstance(x, str) else x,PL.iloc[:,tenantAccount_col_no]))
+
         #find out how many tenant accounts match with account_mapping
         match=[x in candidate_col for x in account_pool]
 
         match_count=sum(x for x in match)
+        if tenantAccount_col_no==0:
+            st.write("candidate_col",candidate_col,"match",match,"match_count",match_count)
         if len(match)>0 and match_count>max_match:
             max_match_col=tenantAccount_col_no
             max_match=match_count
