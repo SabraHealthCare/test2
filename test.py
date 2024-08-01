@@ -1968,8 +1968,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         """,
         unsafe_allow_html=True)
 		
-        if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting',key='reporting_month',help="Click to confirm and upload"):
-            st.session_state.clicked['submit_report']=True
+            if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting',key='reporting_month',help="Click to confirm and upload"):
+                st.session_state.clicked['submit_report']=True
 
         if st.session_state.clicked['submit_report']:# already uploaded
             Submit_Upload_Latestmonth()
