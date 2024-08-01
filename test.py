@@ -1970,13 +1970,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         }}
         </style>
         """,
-        unsafe_allow_html=True
-    )
+        unsafe_allow_html=True)
+		
+        if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting',key='reporting_month',help="Click to confirm and upload"):
+            st.session_state.clicked['submit_report']=True
  
-        if not st.session_state.clicked['submit_report']: # haven't uploaded
-            if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting',key='reporting_month',help="Click to confirm and upload"):
-                st.session_state.clicked['submit_report']=True
-        else: # already uploaded
+
+        if st.session_state.clicked['submit_report']:# already uploaded
             Submit_Upload_Latestmonth()
             #Discrepancy of Historic Data
             if len(Total_PL.columns)>1 and BPC_pull.shape[0]>0:	
