@@ -1125,11 +1125,15 @@ def Submit_Upload_Latestmonth():
     upload_reporting_month["Operator"]=operator
     upload_reporting_month=upload_reporting_month.apply(Format_Value)
 
-    # save reporting month data to OneDrive
-    if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,None,None):
-        st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,reporting_month[4:6]+"/"+reporting_month[0:4]))   
-    else: 
-        st.write(" ")  #----------record into error report------------------------	
+    if not st.session_state.clicked["submit_report"]:
+        st.stop()
+    else:
+         # save reporting month data to OneDrive
+        if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,None,None):
+            st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,reporting_month[4:6]+"/"+reporting_month[0:4]))
+            
+        else: 
+            st.write(" ")  #----------record into error report------------------------	
         # save original tenant P&L to OneDrive
         if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
             st.write("unsuccess ")  #----------record into error report------------------------	
@@ -1966,12 +1970,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         }}
         </style>
         """,
-        unsafe_allow_html=True)
-		
+        unsafe_allow_html=True
+    )
+ 
+        if not st.session_state.clicked['submit_report']: # haven't uploaded
             if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting',key='reporting_month',help="Click to confirm and upload"):
                 st.session_state.clicked['submit_report']=True
-
-        if st.session_state.clicked['submit_report']:# already uploaded
+        else: # already uploaded
             Submit_Upload_Latestmonth()
             #Discrepancy of Historic Data
             if len(Total_PL.columns)>1 and BPC_pull.shape[0]>0:	
