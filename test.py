@@ -1125,23 +1125,22 @@ def Submit_Upload_Latestmonth():
     upload_reporting_month["Operator"]=operator
     upload_reporting_month=upload_reporting_month.apply(Format_Value)
 
-    if not st.session_state.clicked["submit_report"]:
-        st.stop()
-    else:
+    #if not st.session_state.clicked["submit_report"]:
+        #st.stop()
+    #else:
          # save reporting month data to OneDrive
-        if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,None,None):
-            st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,reporting_month[4:6]+"/"+reporting_month[0:4]))
-            
-        else: 
-            st.write(" ")  #----------record into error report------------------------	
+    if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,None,None):
+        st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,reporting_month[4:6]+"/"+reporting_month[0:4]))
+    else: 
+        st.write(" ")  #----------record into error report------------------------	
         # save original tenant P&L to OneDrive
-        if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
-            st.write("unsuccess ")  #----------record into error report------------------------	
+    if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
+        st.write("unsuccess ")  #----------record into error report------------------------	
 
-        if BS_separate_excel=="Y":
-            # save tenant BS to OneDrive
-            if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
-                st.write(" unsuccess")  #----------record into error report------------------------	
+    if BS_separate_excel=="Y":
+        # save tenant BS to OneDrive
+        if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
+            st.write(" unsuccess")  #----------record into error report------------------------	
 
 # create EPM formula for download data
 def EPM_Formula(data,value_name): # make sure there is no col on index for data
