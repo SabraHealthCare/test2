@@ -1361,10 +1361,10 @@ def View_Discrepancy():
             		required =False)
 		}) 
 
-            col1,col2=st.columns([1,6]) 
+            col1,col2=st.columns([1,4]) 
             with col1:
                 submit_com=st.button("Submit comments")
-            #View_Discrepancy_Detail()
+
             if submit_com:
                 with st.empty():
                     with col2:
