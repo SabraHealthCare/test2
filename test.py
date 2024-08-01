@@ -1992,7 +1992,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         # Define the button and handle the click event
         if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting', key='reporting_month', help="Click to confirm and upload"):
             st.session_state.clicked['submit_report'] = True
-            st.experimental_rerun()  # Rerun the script to update the CSS immediately
+            st.experimental_set_query_params(clicked=True)
 	
         # Perform the upload action here and check for discrepancies
         if st.session_state.clicked['submit_report']:
