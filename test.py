@@ -1790,40 +1790,7 @@ def Upload_And_Process(uploaded_file,file_type):
 
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
     return Total_PL
-	
-blinking_button_style = """
-    <style>
-    .stButton button {
-        animation: blink 1s infinite;
-        color: black !important;
-        background-color: white;
-        border: 1px solid #ccc;
-        padding: 10px 20px;
-        font-size: 16px;
-        cursor: pointer;
-    }
-    @keyframes blink {
-        0% { background-color: white; }
-        50% { background-color: yellow; }
-        100% { background-color: white; }
-    }
-    </style>
-    <script>
-    setTimeout(function() {
-        var button = document.querySelector('.stButton button');
-        if (button) {
-            button.style.animation = 'none';
-        }
-    }, 5000); // Stop blinking after 5 seconds
-    </script>
-"""	
 
-st.markdown(blinking_button_style, unsafe_allow_html=True)
-
-       
-       #     0% {{ background-color: #a6c8ff; }}
-        #    50% {{ background-color: #8fb3e9; }}
-        #    100% {{ background-color: #a6c8ff; }}
 #----------------------------------website widges------------------------------------
 config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
 config = yaml.safe_load(config_obj["Body"])
@@ -1978,7 +1945,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         # Define the button and handle the click event
         if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting', key='reporting_month', help="Click to confirm and upload"):
             st.session_state.clicked['submit_report'] = True
-
 
         # Perform the upload action here and check for discrepancies
         if st.session_state.clicked['submit_report']:
