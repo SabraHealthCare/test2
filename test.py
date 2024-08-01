@@ -1959,8 +1959,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
    
 	# 1 Summary
         View_Summary()
-       	
+
+	    
         if not st.session_state.clicked['submit_report']:
+            
+
+        if not st.session_state.clicked['submit_report']: 
             st.markdown(
         f"""
         <style>
@@ -1971,8 +1975,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         """,
         unsafe_allow_html=True
     )
-
-        if not st.session_state.clicked['submit_report']: 
             # Define the button and handle the click event
             if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting', key='reporting_month', help="Click to confirm and upload"):
                 st.session_state.clicked['submit_report'] = True
