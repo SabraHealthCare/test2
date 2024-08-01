@@ -1972,6 +1972,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         """,
         unsafe_allow_html=True
     )
+
+          
+        # Define the button and handle the click event
+        if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting', key='reporting_month', help="Click to confirm and upload"):
+            st.session_state.clicked['submit_report'] = True
+            Submit_Upload_Latestmonth()
         # Perform the upload action here and check for discrepancies
         if st.session_state.clicked['submit_report']:
             # Discrepancy of Historic Data
@@ -1979,11 +1985,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with st.expander("Discrepancy for Historic Data", expanded=True):
                     ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
                     View_Discrepancy()
-          
-        # Define the button and handle the click event
-        if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting', key='reporting_month', help="Click to confirm and upload"):
-            st.session_state.clicked['submit_report'] = True
-            Submit_Upload_Latestmonth()
 
     elif choice=="Manage Mapping":
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
