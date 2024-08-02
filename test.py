@@ -140,7 +140,7 @@ def Read_CSV_From_Onedrive(path, file_name,type,str_col_list=None):
                 return False
             except Exception as e:
                 return False
-	elif type.upper()=="YAML":
+        elif type.upper()=="YAML":
             try:
                 file_content = response.content
                 config = yaml.safe_load(file_content)
@@ -151,7 +151,7 @@ def Read_CSV_From_Onedrive(path, file_name,type,str_col_list=None):
             except Exception as e:
                 st.write(f"Unexpected error: {e}")
                 return None	
-	elif type.upper()=="VIDEO":
+        elif type.upper()=="VIDEO":
             return BytesIO(response.content)        
     else:
         st.write(f"Failed to download file. Status code: {response.status_code}")
