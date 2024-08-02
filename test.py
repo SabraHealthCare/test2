@@ -140,7 +140,7 @@ def Read_CSV_From_Onedrive(path, file_name,type,str_col_list=None):
                 return False
             except Exception as e:
                 return False
-	elif typ.upper()e=="YAML":
+	elif type.upper()=="YAML":
             try:
                 file_content = response.content
                 config = yaml.safe_load(file_content)
