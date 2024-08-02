@@ -103,7 +103,7 @@ def detect_encoding(file_content):
     result = chardet.detect(file_content)
     return result['encoding']
 
-def Read_CSV_From_Onedrive(path, file_name,str_col_list=None):
+def Read_CSV_From_Onedrive(path, file_name,type,str_col_list=None):
     if str_col_list is None:
         str_col_list = []
     
@@ -116,29 +116,43 @@ def Read_CSV_From_Onedrive(path, file_name,str_col_list=None):
     # Check the status code 
     if response.status_code == 200 or response.status_code == 201:
         # Content of the file is available in response.content
-        try:
-            file_content = response.content
-            detected_encoding = detect_encoding(file_content)
-            dtype_dict = {col: str for col in str_col_list}
-            if file_name.lower().endswith(".csv"):
-                # Try reading the CSV with the detected encoding
-                try:
-                    df = pd.read_csv(BytesIO(file_content), encoding=detected_encoding, on_bad_lines='skip',dtype=dtype_dict)
-                except UnicodeDecodeError:
-                    # If detected encoding fails, try common fallback encodings
+        if type.upper()=="CSV":    
+            try:
+                file_content = response.content
+                detected_encoding = detect_encoding(file_content)
+                dtype_dict = {col: str for col in str_col_list}
+                if file_name.lower().endswith(".csv"):
+                    # Try reading the CSV with the detected encoding
                     try:
-                        df = pd.read_csv(BytesIO(file_content), encoding='utf-8', on_bad_lines='skip',dtype=dtype_dict)
+                        df = pd.read_csv(BytesIO(file_content), encoding=detected_encoding, on_bad_lines='skip',dtype=dtype_dict)
                     except UnicodeDecodeError:
-                        df = pd.read_csv(BytesIO(file_content), encoding='latin1', on_bad_lines='skip',dtype=dtype_dict)
-            elif file_name.lower().endswith(".xlsx"):
-                df = pd.read_excel(BytesIO(file_content),dtype=dtype_dict)
-            return df
-        except EmptyDataError:
-            return False
-        except pd.errors.ParserError as e:
-            return False
-        except Exception as e:
-            return False
+                        # If detected encoding fails, try common fallback encodings
+                        try:
+                            df = pd.read_csv(BytesIO(file_content), encoding='utf-8', on_bad_lines='skip',dtype=dtype_dict)
+                        except UnicodeDecodeError:
+                            df = pd.read_csv(BytesIO(file_content), encoding='latin1', on_bad_lines='skip',dtype=dtype_dict)
+                elif file_name.lower().endswith(".xlsx"):
+                    df = pd.read_excel(BytesIO(file_content),dtype=dtype_dict)
+                return df
+            except EmptyDataError:
+                return False
+            except pd.errors.ParserError as e:
+                return False
+            except Exception as e:
+                return False
+	elif typ.upper()e=="YAML":
+            try:
+                file_content = response.content
+                config = yaml.safe_load(file_content)
+                return config
+            except yaml.YAMLError as e:
+                st.write(f"Error reading YAML file: {e}")
+                return None
+            except Exception as e:
+                st.write(f"Unexpected error: {e}")
+                return None	
+	elif type.upper()=="VIDEO":
+            return BytesIO(response.content)        
     else:
         st.write(f"Failed to download file. Status code: {response.status_code}")
         st.write(f"Response content: {response.content}")
@@ -190,7 +204,7 @@ def Save_as_CSV_Onedrive(df,path,file_name):
 def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=None,str_col_list=None):  # replace original data
     if entity_list==None:
         entity_list=[]    
-    original_data=Read_CSV_From_Onedrive(path,file_name,str_col_list)
+    original_data=Read_CSV_From_Onedrive(path,file_name,"CSV",str_col_list)
     new_data=new_data.reset_index(drop=False)
     if  isinstance(original_data, pd.DataFrame):
         if "TIME" in original_data.columns and "TIME" in new_data.columns:
@@ -241,13 +255,13 @@ def clicked(button_name):
 
 # No cache
 def Initial_Mapping(operator):
-    BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename)
+    BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename,"CSV")
     BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
     BPC_pull=BPC_pull.set_index(["ENTITY","Sabra_Account"])
     BPC_pull = BPC_pull.dropna(axis=1, how='all')
     BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
   	
-    account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename,account_mapping_str_col)
+    account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename,"CSV",account_mapping_str_col)
     account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]==operator]
     if account_mapping.shape[0]==1:# and account_mapping.loc[:,"Sabra_Account"][0]=='Template':
         account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]=="Template"]
@@ -257,7 +271,7 @@ def Initial_Mapping(operator):
     account_mapping.loc[:, "Tenant_Formated_Account"] = account_mapping["Tenant_Account"].apply(lambda x: x.upper().strip() if pd.notna(x) else x)
     account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
 
-    entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename,entity_mapping_str_col)
+    entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename,"CSV",entity_mapping_str_col)
     entity_mapping=entity_mapping.reset_index(drop=True)
     entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
     entity_mapping=entity_mapping.set_index("ENTITY")
@@ -307,7 +321,7 @@ def Create_Tree_Hierarchy():
     #Create Tree select hierarchy
     parent_hierarchy_main=[{'label': "No need to map","value":"No need to map"}]
     parent_hierarchy_second=[{'label': "No need to map","value":"No need to map"}]
-    BPC_Account = Read_CSV_From_Onedrive(mapping_path,BPC_account_filename)
+    BPC_Account = Read_CSV_From_Onedrive(mapping_path,BPC_account_filename,"CSV")
     for category in BPC_Account[BPC_Account["Type"]=="Main"]["Category"].unique():
         children_hierarchy=[]
         for account in BPC_Account[(BPC_Account["Category"]==category)&(BPC_Account["Type"]=="Main")]["Sabra_Account_Full_Name"]:
@@ -1763,9 +1777,7 @@ def Upload_And_Process(uploaded_file,file_type):
     return Total_PL
 
 #----------------------------------website widges------------------------------------
-#config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
-#config = yaml.safe_load(config_obj["Body"])
-config = Read_Config_From_Onedrive(mapping_path, "config.yaml")
+config = Read_CSV_From_Onedrive(mapping_path, "config.yaml","YAML")
 # Creating the authenticator object
 if config:
     authenticator = Authenticate(
@@ -1958,8 +1970,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 			
     elif choice=='Instructions':
         # insert Video
-        video=s3.get_object(Bucket=bucket_mapping, Key="Sabra App video.mp4")
-        st.video(BytesIO(video['Body'].read()), format="mp4", start_time=0)
+        video=Read_Config_From_Onedrive(mapping_path,"Sabra App video.mp4","VIDEO")
+        st.video(video, format="video/mp4", start_time=0)
 	    
     elif choice=="Edit Account": 
 	# update user details widget
@@ -1973,7 +1985,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         authenticator.logout('Logout', 'main')
 # ----------------for Sabra account--------------------	    
 elif st.session_state["authentication_status"] and st.session_state["operator"]=="Sabra":
-    operator_list=Read_CSV_From_Onedrive(mapping_path,operator_list_filename)
+    operator_list=Read_CSV_From_Onedrive(mapping_path,operator_list_filename,"CSV")
     menu=["Review Monthly reporting","Review New Mapping","Edit Account","Register","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
 
@@ -2001,7 +2013,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     elif choice=="Review New Mapping":
         with st.expander("Review new mapping" ,expanded=True):
             ChangeWidgetFontSize('Review new mapping', '25px')
-            account_mapping =Read_CSV_From_Onedrive(mapping_path,account_mapping_filename,account_mapping_str_col)
+            account_mapping =Read_CSV_From_Onedrive(mapping_path,account_mapping_filename,"CSV",account_mapping_str_col)
             un_confirmed_account=account_mapping[account_mapping["Confirm"]=="N"]
             if un_confirmed_account.shape[0]==0:
                 st.write("There is no new mapping.")
@@ -2061,7 +2073,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
     elif choice=="Review Monthly reporting":
             st.subheader("Summary")
-            data=Read_CSV_From_Onedrive(master_template_path,monthly_reporting_filename)
+            data=Read_CSV_From_Onedrive(master_template_path,monthly_reporting_filename,"CSV")
             #if data is None:  # empty file
             if True:
                 data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
