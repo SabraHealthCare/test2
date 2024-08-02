@@ -5,7 +5,7 @@ from datetime import datetime, timedelta,date
 from openpyxl import load_workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 import streamlit as st             
-import boto3
+#import boto3
 from io import BytesIO
 from io import StringIO
 from tempfile import NamedTemporaryFile
@@ -25,7 +25,7 @@ from pandas.errors import EmptyDataError
 import pytz
 import chardet
 from pandas.errors import EmptyDataError
-s3 = boto3.client('s3')
+#s3 = boto3.client('s3')
 
 #---------------------------define parameters--------------------------
 st.set_page_config(
@@ -147,7 +147,30 @@ def Read_CSV_From_Onedrive(path, file_name,str_col_list=None):
         st.write(f"Failed to download file. Status code: {response.status_code}")
         st.write(f"Response content: {response.content}")
         return False
-
+	    
+def Read_Config_From_Onedrive(path, file_name):
+    # Set the API endpoint and headers for file download
+    api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/root:/{path}/{file_name}:/content'
+    
+    # Make the request to download the file
+    response = requests.get(api_url, headers=headers)
+    
+    if response.status_code == 200 or response.status_code == 201:
+        # Content of the file is available in response.content
+        try:
+            file_content = response.content
+            config = yaml.safe_load(file_content)
+            return config
+        except yaml.YAMLError as e:
+            st.write(f"Error reading YAML file: {e}")
+            return None
+        except Exception as e:
+            st.write(f"Unexpected error: {e}")
+            return None
+    else:
+        st.write(f"Failed to download YAML. Status code: {response.status_code}")
+        st.write(f"Response content: {response.content}")
+        return None
 
 # no cache, save a dataframe to OneDrive 
 def Save_as_CSV_Onedrive(df,path,file_name):   
@@ -1419,7 +1442,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
         rest_column_names=[str(x) for x in PL.iloc[max_match_row,:] if pd.notna(x) and str(x).upper().strip() not in column_name_list_in_mapping]
         duplicate_check = [name for name in set(max_match) if max_match.count(name) > 1]
         if len(duplicate_check)>0:
-		######################################################################################################
+		
 	    # there may has more than one months data in P&L, only select reporting month data
             # Check reporting month above first_tenant_account_row
             mask_table = PL.iloc[0:first_tenant_account_row-1,:].applymap(Is_Reporting_Month)
@@ -1770,16 +1793,19 @@ def Upload_And_Process(uploaded_file,file_type):
     return Total_PL
 
 #----------------------------------website widges------------------------------------
-config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
-config = yaml.safe_load(config_obj["Body"])
+#config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
+#config = yaml.safe_load(config_obj["Body"])
+config = Read_Config_From_Onedrive(path, file_name)
 # Creating the authenticator object
-authenticator = Authenticate(
+if config:
+    authenticator = Authenticate(
         config['credentials'],
         config['cookie']['name'], 
         config['cookie']['key'], 
         config['cookie']['expiry_days'],
-        config['preauthorized']
-    )
+        config['preauthorized'])
+else:
+    st.write("Failed to read configuration from OneDrive.")
 
 # set button status
 button_initial_state={"forgot_password_button":False,"forgot_username_button":False,"submit_report":False}
