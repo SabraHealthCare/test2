@@ -1765,7 +1765,7 @@ def Upload_And_Process(uploaded_file,file_type):
 #----------------------------------website widges------------------------------------
 #config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
 #config = yaml.safe_load(config_obj["Body"])
-config = Read_Config_From_Onedrive(path, file_name)
+config = Read_Config_From_Onedrive(mapping_path, "config.yaml")
 # Creating the authenticator object
 if config:
     authenticator = Authenticate(
