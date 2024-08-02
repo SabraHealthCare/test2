@@ -5,7 +5,6 @@ from datetime import datetime, timedelta,date
 from openpyxl import load_workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 import streamlit as st             
-#import boto3
 from io import BytesIO
 from io import StringIO
 from tempfile import NamedTemporaryFile
@@ -26,8 +25,6 @@ import pytz
 import chardet
 from pandas.errors import EmptyDataError
 
-#s3 = boto3.client('s3')
-
 #---------------------------define parameters--------------------------
 st.set_page_config(
    initial_sidebar_state="expanded",  layout="wide")
@@ -35,8 +32,6 @@ placeholder = st.empty()
 st.title("Sabra HealthCare Monthly Reporting App")
 
 sheet_name_discrepancy="Discrepancy_Review"
-bucket_mapping="sabramapping"
-bucket_PL="operatorpl"
 account_mapping_filename="Account_Mapping.csv"
 BPC_pull_filename="BPC_Pull.csv"
 entity_mapping_filename ="Entity_Mapping.csv"
@@ -226,32 +221,6 @@ def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=None,str_c
         updated_data=updated_data[new_columns_name]	
     return Save_as_CSV_Onedrive(updated_data,path,file_name)  # return True False
 
-
-# no cache
-def Read_CSV_FromS3(bucket,key):
-    file_obj = s3.get_object(Bucket=bucket, Key=key)
-    data = pd.read_csv(BytesIO(file_obj['Body'].read()),header=0)
-    return data
-
-# no cache,   save a dataframe to S3 
-def Save_CSV_ToS3(data,bucket,key):   
-    try:
-        data=data[list(filter(lambda x: x!="index" and "Unnamed:" not in x,data.columns))]
-        csv_buffer = StringIO()
-        data.to_csv(csv_buffer)
-        s3_resource = boto3.resource('s3')
-        s3_resource.Object(bucket,key).put(Body=csv_buffer.getvalue())
-        return True
-    except:
-        return False
-	     
-# no Cache , directly save the uploaded .xlsx file to S3 
-def Upload_File_toS3(uploaded_file, bucket, key):  
-    try:
-        s3.upload_fileobj(uploaded_file, bucket, key)
-        return True
-    except:
-        return False  
 
 def Format_Value(column):
     def format_value(x):
