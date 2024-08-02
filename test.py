@@ -303,7 +303,7 @@ def colnum_letter(col_number):
     return letter 
 	
 @st.cache_data
-def Create_Tree_Hierarchy(bucket_mapping):
+def Create_Tree_Hierarchy():
     #Create Tree select hierarchy
     parent_hierarchy_main=[{'label': "No need to map","value":"No need to map"}]
     parent_hierarchy_second=[{'label': "No need to map","value":"No need to map"}]
@@ -326,7 +326,7 @@ def Create_Tree_Hierarchy(bucket_mapping):
     
     BPC_Account=BPC_Account[["BPC_Account_Name","Sabra_Account_Full_Name","Category"]]
     return parent_hierarchy_main,parent_hierarchy_second,BPC_Account
-parent_hierarchy_main,parent_hierarchy_second,BPC_Account=Create_Tree_Hierarchy(bucket_mapping)
+parent_hierarchy_main,parent_hierarchy_second,BPC_Account=Create_Tree_Hierarchy()
 
 #-----------------------------------------------functions---------------------------------------------
 def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
