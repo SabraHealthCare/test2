@@ -84,7 +84,6 @@ def Upload_to_Onedrive(uploaded_file,path,file_name):
     # Set the API endpoint and headers
     api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
 
-
     # Ensure the file pointer is at the start
     uploaded_file.seek(0)
     
@@ -93,7 +92,6 @@ def Upload_to_Onedrive(uploaded_file,path,file_name):
     
     # Set the Content-Type header for Excel files
     headers.update({'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})
-    
     
     # Make the request to upload the file
     response = requests.put(api_url, headers=headers, data=file_content)
@@ -1148,33 +1146,7 @@ def Submit_Upload_Latestmonth():
         if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
             st.write(" unsuccess")  #----------record into error report------------------------	
 
-# create EPM formula for download data
-def EPM_Formula(data,value_name): # make sure there is no col on index for data
-    data["EPM_Formula"]=""
-    data["Upload_Check"]=""
-    col_size=data.shape[1]
-    row_size=data.shape[0]
-    col_name_list=list(data.columns)
-    time_col_letter=colnum_letter(col_name_list.index("TIME"))
-    entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
-    account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
-    facility_col_letter=colnum_letter(col_name_list.index("FACILITY_TYPE"))
-    state_col_letter=colnum_letter(col_name_list.index("GEOGRAPHY"))
-    leasename_col_letter=colnum_letter(col_name_list.index("LEASE_NAME"))
-    inv_col_letter=colnum_letter(col_name_list.index("INV_TYPE"))
-    data_col_letter=colnum_letter(col_name_list.index(value_name))    
-    EPM_Formula_col_letter=colnum_letter(col_name_list.index("EPM_Formula"))
-    upload_Check_col_letter=colnum_letter(col_name_list.index("Upload_Check"))
-    for r in range(2,row_size+2):
-        upload_formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
-		    format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
-        data.loc[r-2,"EPM_Formula"]=upload_formula
-        upload_check_formula="={}{}={}{}".format(EPM_Formula_col_letter,r,data_col_letter,r)
-        data.loc[r-2,"Upload_Check"]=upload_check_formula
-    data["""="Consistence check:"&AND({}2:{}{})""".format(upload_Check_col_letter,upload_Check_col_letter,row_size+1)]=""
-    return data
-            
-	
+
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
     try:
@@ -2114,14 +2086,5 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.write("")
                 st.subheader("Download reporting data with EPM Formula")    
 		    
-                # add average column for each line , average is from BPC_pull
-                BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename)
-                BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
-                data=data.merge(BPC_pull[["ENTITY","Sabra_Account","Mean"]], on=["ENTITY","Sabra_Account"],how="left")	
-		# add "GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE" from entity_mapping
-                entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename)
-                data=data.merge(entity_mapping[["ENTITY","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on="ENTITY",how="left")
-
-                data=EPM_Formula(data,"Amount")	
                 download_file=data.to_csv(index=False).encode('utf-8')
                 st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
