@@ -1787,7 +1787,7 @@ if 'clicked' not in st.session_state:
 # login widget
 col1,col2=st.columns(2)
 with col1:
-    authenticator.login('Login', bucket_PL,config,'main')
+    authenticator.login('Login',config,'main')
 
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
