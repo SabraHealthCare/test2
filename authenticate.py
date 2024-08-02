@@ -242,7 +242,7 @@ class Authenticate:
         json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
         json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
         
-    def login(self, form_name: str, bucket_PL:str, config, location: str='main') -> tuple:
+    def login(self, form_name: str, config, location: str='main') -> tuple:
         """
         Creates a login widget.
         Parameters
