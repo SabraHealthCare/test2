@@ -12,10 +12,7 @@ from utils import generate_random_pw
 from exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
 import smtplib
 from email.mime.text import MIMEText
-user_id= '62d4a23f-e25f-4da2-9b52-7688740d9d48'  # shali's user id of onedrive
-mapping_path="Documents/Tenant Monthly Uploading/Tenant Mapping"
-token_response = app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
-access_token = token_response['access_token']
+
 class Authenticate:
     """
     This class will create login, logout, register user, reset password, forgot password, 
@@ -216,7 +213,11 @@ class Authenticate:
             st.error("Invalid Password. It should contain at least one uppercase letter, one lower letter and one number")
             return False
 
-    def save_credentials_to_yaml(self,path, config:dict, user_id, access_token):
+    def save_credentials_to_yaml(self, config:dict):
+        user_id= '62d4a23f-e25f-4da2-9b52-7688740d9d48'  # shali's user id of onedrive
+        mapping_path="Documents/Tenant Monthly Uploading/Tenant Mapping"
+        token_response = app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
+        access_token = token_response['access_token']
         # Convert the config dictionary to YAML format
         yaml_content = yaml.dump(config)
     
@@ -296,7 +297,7 @@ class Authenticate:
                     try:
                         username_forgot_pw, email_forgot_password, random_password = self.forgot_password('Forgot password')
                         if username_forgot_pw:
-                            self.save_credentials_to_yaml(mapping_path, config, user_id, access_token)
+                            self.save_credentials_to_yaml(config)
                             self.send_email(username_forgot_pw,email_forgot_password,random_password)
            
                     except Exception as e:
@@ -476,13 +477,13 @@ class Authenticate:
                         if preauthorization:
                             if new_email in self.preauthorized['emails']:
                                 self._register_credentials(new_username, new_operator, new_password, new_email, preauthorization)
-                                self.save_credentials_to_yaml(mapping_path, config, user_id, access_token)
+                                self.save_credentials_to_yaml(config)
                                 return True
                             else:
                                 raise RegisterError('User not preauthorized to register')
                         else:
                             self._register_credentials(new_username, new_operator, new_password, new_email, preauthorization)
-                            self.save_credentials_to_yaml(mapping_path, config, user_id, access_token)
+                            self.save_credentials_to_yaml(config)
                             return True
                     else:
                         raise RegisterError('Passwords do not match')
@@ -665,7 +666,7 @@ class Authenticate:
                                     if self.password != new_password: 
                                         if self.Password_Validity(new_password):
                                             self._update_password(self.username, new_password)
-                                            self.save_credentials_to_yaml(mapping_path, config, user_id, access_token)
+                                            self.save_credentials_to_yaml(config)
                                             return True                                          
                                     else:
                                         raise ResetError('New and current passwords are the same')
@@ -693,7 +694,7 @@ class Authenticate:
                                     self.token = self._token_encode()
                                     self.cookie_manager.set(self.cookie_name, self.token,
                                                         expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
-                                    self.save_credentials_to_yaml(mapping_path, config, user_id, access_token)
+                                    self.save_credentials_to_yaml(config)
                                     #st.success("Username updated successfully")
                                     return True
                                 else:
@@ -706,7 +707,7 @@ class Authenticate:
                             if new_value != self.credentials['usernames'][self.username][field]:
                                 if self.validator.validate_email(new_value):
                                     self._update_entry(self.username, field, new_value)
-                                    self.save_credentials_to_yaml(mapping_path, config, user_id, access_token)
+                                    self.save_credentials_to_yaml(config)
                                     st.success("Email updated successfully")
                                     return True
                                 else:
