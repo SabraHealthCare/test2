@@ -324,20 +324,23 @@ class Authenticate:
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if location == 'main':
-            if st.button(button_name, key):
-                self.cookie_manager.delete(self.cookie_name)
-                st.session_state['logout'] = True
-                st.session_state['operator'] = None
-                st.session_state['username'] = None
-                st.session_state['authentication_status'] = None
+            button_clicked = st.button(button_name, key=key)
         elif location == 'sidebar':
-            if st.sidebar.button(button_name, key):
-                self.cookie_manager.delete(self.cookie_name)
-                st.session_state['logout'] = True
-                st.session_state['operator'] = None
-                st.session_state['username'] = None
-                st.session_state['authentication_status'] = None
-
+            button_clicked = st.sidebar.button(button_name, key=key)
+        if button_clicked:
+            try:
+                # Attempt to delete the cookie
+                if self.cookie_name in self.cookie_manager.cookies:
+                    self.cookie_manager.delete(self.cookie_name)
+                else:
+                    st.write(f"Cookie '{self.cookie_name}' not found.")
+            except Exception as e:
+                st.write(f"Error while deleting cookie: {str(e)}")
+            st.session_state['logout'] = True
+            st.session_state['operator'] = None
+            st.session_state['username'] = None
+            st.session_state['authentication_status'] = None    
+        
     def _update_password(self, username: str, password: str):
         """
         Updates credentials dictionary with user's reset hashed password.
