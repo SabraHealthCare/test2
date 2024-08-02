@@ -1,18 +1,18 @@
+import json
 import jwt
 import bcrypt
 import streamlit as st
 from datetime import datetime, timedelta
 import extra_streamlit_components as stx
-import boto3
+import requests
+#import boto3
 from hasher import Hasher
 from validator import Validator
 from utils import generate_random_pw
-import json
 from exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
 import smtplib
 from email.mime.text import MIMEText
-bucket_PL="operatorpl"
-
+from test import user_id, access_token, mapping_path
 
 class Authenticate:
     """
@@ -214,9 +214,27 @@ class Authenticate:
             st.error("Invalid Password. It should contain at least one uppercase letter, one lower letter and one number")
             return False
 
-
+    def save_credentials_to_yaml(self,path, config:dict, user_id, access_token):
+        # Convert the config dictionary to YAML format
+        yaml_content = yaml.dump(config)
     
-    def save_credentials_to_yaml(self,bucket:str,config:dict):
+        # Set the API endpoint and headers for file upload
+        api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/root:/{path}/{"config.yaml"}:/content'
+        headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'text/plain' }
+    
+        # Make the request to upload the file
+        response = requests.put(api_url, headers=headers, data=yaml_content)
+    
+        # Check the status code
+        if response.status_code == 200 or response.status_code == 201:
+            st.write("File uploaded successfully.")
+        else:
+            st.write(f"Failed to upload file. Status code: {response.status_code}")
+            st.write(f"Response content: {response.content}")
+    
+    def save_credentials_to_yaml1(self,bucket:str,config:dict):
         s33 = boto3.resource("s3").Bucket(bucket)
         json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
         json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
@@ -224,7 +242,6 @@ class Authenticate:
     def login(self, form_name: str, bucket_PL:str, config, location: str='main') -> tuple:
         """
         Creates a login widget.
- 
         Parameters
         ----------
         form_name: str
@@ -241,7 +258,7 @@ class Authenticate:
         str
             Username of the authenticated user.
         """
-        #st.title("Sabra HealthCare Monthly Reporting App")
+
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if not st.session_state['authentication_status']:
@@ -263,10 +280,6 @@ class Authenticate:
                     else:
                         st.warning('Please enter your username and password')
 
-
-                #if 'clicked' not in st.session_state:
-                    #st.session_state.clicked = {"forgot_password_button":False,"forgot_username_button":False}
-
                 # Function to update the value in session state
                 def clicked(button_name):
                     st.session_state.clicked[button_name] = True
@@ -281,7 +294,7 @@ class Authenticate:
                     try:
                         username_forgot_pw, email_forgot_password, random_password = self.forgot_password('Forgot password')
                         if username_forgot_pw:
-                            self.save_credentials_to_yaml(bucket_PL,config)
+                            self.save_credentials_to_yaml(mapping_path, config, user_id, access_token)
                             self.send_email(username_forgot_pw,email_forgot_password,random_password)
            
                     except Exception as e:
@@ -458,13 +471,13 @@ class Authenticate:
                         if preauthorization:
                             if new_email in self.preauthorized['emails']:
                                 self._register_credentials(new_username, new_operator, new_password, new_email, preauthorization)
-                                self.save_credentials_to_yaml(bucket_PL,config)
+                                self.save_credentials_to_yaml(mapping_path, config, user_id, access_token)
                                 return True
                             else:
                                 raise RegisterError('User not preauthorized to register')
                         else:
                             self._register_credentials(new_username, new_operator, new_password, new_email, preauthorization)
-                            self.save_credentials_to_yaml(bucket_PL,config)
+                            self.save_credentials_to_yaml(mapping_path, config, user_id, access_token)
                             return True
                     else:
                         raise RegisterError('Passwords do not match')
@@ -647,7 +660,7 @@ class Authenticate:
                                     if self.password != new_password: 
                                         if self.Password_Validity(new_password):
                                             self._update_password(self.username, new_password)
-                                            self.save_credentials_to_yaml(bucket_PL,config)
+                                            self.save_credentials_to_yaml(mapping_path, config, user_id, access_token)
                                             return True                                          
                                     else:
                                         raise ResetError('New and current passwords are the same')
@@ -675,7 +688,7 @@ class Authenticate:
                                     self.token = self._token_encode()
                                     self.cookie_manager.set(self.cookie_name, self.token,
                                                         expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
-                                    self.save_credentials_to_yaml(bucket_PL,config)
+                                    self.save_credentials_to_yaml(mapping_path, config, user_id, access_token)
                                     #st.success("Username updated successfully")
                                     return True
                                 else:
@@ -688,7 +701,7 @@ class Authenticate:
                             if new_value != self.credentials['usernames'][self.username][field]:
                                 if self.validator.validate_email(new_value):
                                     self._update_entry(self.username, field, new_value)
-                                    self.save_credentials_to_yaml(bucket_PL,config)
+                                    self.save_credentials_to_yaml(mapping_path, config, user_id, access_token)
                                     st.success("Email updated successfully")
                                     return True
                                 else:
