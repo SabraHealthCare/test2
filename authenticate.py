@@ -12,8 +12,10 @@ from utils import generate_random_pw
 from exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
 import smtplib
 from email.mime.text import MIMEText
-from test import user_id, access_token, mapping_path
-
+user_id= '62d4a23f-e25f-4da2-9b52-7688740d9d48'  # shali's user id of onedrive
+mapping_path="Documents/Tenant Monthly Uploading/Tenant Mapping"
+token_response = app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
+access_token = token_response['access_token']
 class Authenticate:
     """
     This class will create login, logout, register user, reset password, forgot password, 
