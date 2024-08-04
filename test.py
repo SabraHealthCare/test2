@@ -985,11 +985,12 @@ def Map_PL_Sabra(PL,entity):
 
 @st.cache_data
 def Fill_Operating_Beds(missing_category,reporting_month):
-# search for the Month/year row and return row number
-    entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])
+    # search for the Month/year row and return row number
+    entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])	
     onemonth_before_reporting_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]<str(reporting_month),BPC_pull.columns)))
-    previous_facility_data=BPC_pull.merge(BPC_Account,left_on="ACCOUNT",right_on="BPC_Account_Name")
-    previous_facility_data=previous_facility_data[previous_facility_data["Category"]=="Facility Information"]#[["Property_Name",onemonth_before_reporting_month,"Sabra_Account_Full_Name"]]	  
+    previous_A_unit=BPC_pull.merge(BPC_Account,left_on="ACCOUNT",right_on="BPC_Account_Name")
+    previous_A_unit = previous_A_unit[(previous_A_unit["Category"] == "Facility Information") &(previous_A_unit["Sabra_Account"].str.startswith("A_"))]
+    if 
     previous_facility_data=previous_facility_data.reset_index(drop=False)
     previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_reporting_month:reporting_month})	
     st.error("Below properties miss facility information in P&L. It has been filled by historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
