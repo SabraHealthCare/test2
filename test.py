@@ -1768,6 +1768,23 @@ def Upload_And_Process(uploaded_file,file_type):
 
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
     return Total_PL
+st.markdown(
+    """
+    <style>
+    .custom-upload {
+        border: 2px dashed #007bff;
+        padding: 20px;
+        text-align: center;
+        font-size: 16px;
+        color: #007bff;
+        border-radius: 8px;
+    }
+    </style>
+    <div class="custom-upload">
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 #----------------------------------website widges------------------------------------
 config = Read_CSV_From_Onedrive(mapping_path, "config.yaml","YAML")
@@ -1796,24 +1813,6 @@ with col1:
 
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
-
-st.markdown(
-    """
-    <style>
-    .custom-upload {
-        border: 2px dashed #007bff;
-        padding: 20px;
-        text-align: center;
-        font-size: 16px;
-        color: #007bff;
-        border-radius: 8px;
-    }
-    </style>
-    <div class="custom-upload">
-    </div>
-    """,
-    unsafe_allow_html=True
-)
 
 #---------------operator account-----------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
