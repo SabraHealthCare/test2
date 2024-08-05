@@ -1706,7 +1706,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 and entity_mapping.loc[entity_i,"Occupancy_in_separate_sheets"]=="Y":
                 PL_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
                 Total_PL=Total_PL.combine_first(PL_occ)
-        #BS
+
         for entity_i in total_entity_list: 
             if  entity_mapping.loc[entity_i,"BS_separate_excel"]=="N": 
                 sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
@@ -1768,23 +1768,6 @@ def Upload_And_Process(uploaded_file,file_type):
 
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
     return Total_PL
-st.markdown(
-    """
-    <style>
-    .custom-upload {
-        border: 2px dashed #007bff;
-        padding: 20px;
-        text-align: center;
-        font-size: 16px;
-        color: #007bff;
-        border-radius: 8px;
-    }
-    </style>
-    <div class="custom-upload">
-    </div>
-    """,
-    unsafe_allow_html=True
-)
 
 #----------------------------------website widges------------------------------------
 config = Read_CSV_From_Onedrive(mapping_path, "config.yaml","YAML")
@@ -1858,7 +1841,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     with col4:
                         st.subheader("Other Documents:")
                         uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
-                submitted = st.form_submit_button("Upload")
+                    submitted = st.form_submit_button("Upload")
                 if submitted:
 	            # clear cache for every upload
                     st.cache_data.clear()
@@ -1886,7 +1869,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col2:
                     st.subheader("Other Documents:")
                     uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
-                submitted = st.form_submit_button("Upload")
+                    submitted = st.form_submit_button("Upload")
                 if submitted:
 	            # clear cache for every upload
                     st.cache_data.clear()
@@ -1895,8 +1878,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.selected_year = selected_year
                     st.session_state.selected_month = selected_month
                     reporting_month=str(selected_year)+str(selected_month)
-        if uploaded_finance:
-            with col3:
+        col1,col2,col3=columns(3)
+        if uploaded_finance' in locals() and uploaded_finance:
+            with col1:
                 st.markdown("✔️ :green[P&L selected]")
         else:
             st.write("P&L wasn't upload.")
@@ -1909,10 +1893,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=reporting_month) &((pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))| (entity_mapping["DATE_SOLD_PAYOFF"]>=reporting_month))),]
         if "Y" in entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values:                     
             BS_separate_excel="Y"
-            if uploaded_BS:
-                with col4:
+            if 'uploaded_BS' in locals() and uploaded_BS:
+                with col2:
                     st.markdown("✔️ :green[Balance sheet selected]")
-            elif not uploaded_BS:
+            else:
                 st.write("Balance sheet wasn't upload.")
                 st.stop()
         else:
