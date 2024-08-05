@@ -1826,7 +1826,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             BS_separate_excel="Y"
         else:
             BS_separate_excel="N"
-        if BS_separate_excel="N":
+        if BS_separate_excel=="N":
             col1,col2=st.columns([3,1])
             with col1:
                 with st.form("upload_form", clear_on_submit=True):
