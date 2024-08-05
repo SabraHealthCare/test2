@@ -1817,7 +1817,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         reporting_month_label=True  
         tenant_account_col=10000
         date_header=[[0],0,[]]
-        col1,col2=st.columns([3,1])
         # Calculate the list of years and their indices
         years_range = list(range(current_year, current_year - 2, -1))
         # Calculate the list of months and their indices
@@ -1826,29 +1825,51 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             BS_separate_excel="Y"
         else:
             BS_separate_excel="N"
-        with col1:
-            with st.form("upload_form", clear_on_submit=True):
-                st.subheader("Select reporting month:") 
-                col3,col4=st.columns([1,1])
-                with col3:
-                    selected_year = st.selectbox("Year", years_range,index=years_range.index(st.session_state.selected_year))
-		
-                with col4:    
-                    selected_month = st.selectbox("Month", months_range,index=months_range.index(st.session_state.selected_month))
-                if BS_separate_excel=="N":
-                    st.subheader("Upload P&L:")
-                    #uploaded_finance=st.file_uploader(":star: :red[Only XLSX accepted] :star:"
-                    uploaded_finance=st.file_uploader("Only XLSX accepted",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
-                
-                elif BS_separate_excel=="Y":
+        if BS_separate_excel="N":
+            col1,col2=st.columns([3,1])
+            with col1:
+                with st.form("upload_form", clear_on_submit=True):
+                    st.subheader("Select reporting month:") 
+                    col3,col4=st.columns([1,1])
+                    with col3:
+                        selected_year = st.selectbox("Year", years_range,index=years_range.index(st.session_state.selected_year))
+                    with col4:    
+                        selected_month = st.selectbox("Month", months_range,index=months_range.index(st.session_state.selected_month))
                     with col3:
                         st.subheader("Upload P&L:")
-                        uploaded_finance=st.file_uploader("Only XLSX accepted",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
+                        uploaded_finance=st.file_uploader("For reporting. Only XLSX accepted",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
+                    with col4:
+                        st.subheader("Other Documents:")
+                        uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
+                submitted = st.form_submit_button("Upload")
+                if submitted:
+	            # clear cache for every upload
+                    st.cache_data.clear()
+                    st.cache_resource.clear()
+                    st.session_state.clicked = button_initial_state
+                    st.session_state.selected_year = selected_year
+                    st.session_state.selected_month = selected_month
+                    reporting_month=str(selected_year)+str(selected_month)
+        elif BS_separate_excel="Y":	 
+            with st.form("upload_form", clear_on_submit=True):
+                st.subheader("Select reporting month:") 
+		col1,col2=st.columns([2,1])
+                with col1:
+                    col3,col4=st.columns([1,1])
+                    with col3:
+                        selected_year = st.selectbox("Year", years_range,index=years_range.index(st.session_state.selected_year))
+                    with col4:    
+                        selected_month = st.selectbox("Month", months_range,index=months_range.index(st.session_state.selected_month))
+                    with col3:
+                        st.subheader("Upload P&L:")
+                        uploaded_finance=st.file_uploader("For reporting. Only XLSX accepted",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
                     with col4:
                         st.subheader("Upload Balance Sheet:")
                         uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
+                with col2:
+                    st.subheader("Other Documents:")
+                    uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
                 submitted = st.form_submit_button("Upload")
-                
                 if submitted:
 	            # clear cache for every upload
                     st.cache_data.clear()
