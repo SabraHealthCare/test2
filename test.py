@@ -1879,7 +1879,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.selected_month = selected_month
                     reporting_month=str(selected_year)+str(selected_month)
 
-        if uploaded_finance' in locals() and uploaded_finance:
+        if 'uploaded_finance' in locals() and uploaded_finance:
             with col1:
                 st.markdown("✔️ :green[P&L selected]")
         else:
