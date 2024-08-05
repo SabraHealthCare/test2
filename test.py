@@ -1851,7 +1851,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.selected_year = selected_year
                     st.session_state.selected_month = selected_month
                     reporting_month=str(selected_year)+str(selected_month)
-        elif BS_separate_excel="Y":	 
+        elif BS_separate_excel=="Y":	 
             with st.form("upload_form", clear_on_submit=True):
                 st.subheader("Select reporting month:") 
 		col1,col2=st.columns([2,1])
