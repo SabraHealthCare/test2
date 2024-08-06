@@ -1825,7 +1825,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             BS_separate_excel="Y"
         else:
             BS_separate_excel="N"
-        st.write("BS_separate_excel",BS_separate_excel,entity_mapping)
+        #st.write("BS_separate_excel",BS_separate_excel,entity_mapping)
         if BS_separate_excel=="N":
             with st.form("upload_form", clear_on_submit=True):
                 st.subheader("Select reporting month:") 
