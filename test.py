@@ -1821,6 +1821,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         years_range = list(range(current_year, current_year - 2, -1))
         # Calculate the list of months and their indices
         months_range = [str(month).zfill(2) for month in range(1, 13)]
+        st.write(entity_mapping["BS_separate_excel"][(pd.notna(entity_mapping["BS_separate_excel"]))&(pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))].values)
         if "Y" in entity_mapping["BS_separate_excel"][(pd.notna(entity_mapping["BS_separate_excel"]))&(pd.isna(entity_mapping["DATE_SOLD_PAYOFF"]))].values:             
             BS_separate_excel="Y"
         else:
