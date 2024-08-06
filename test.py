@@ -3,7 +3,7 @@ pd.set_option('future.no_silent_downcasting', True)
 import numpy as np 
 from datetime import datetime, timedelta,date
 from openpyxl import load_workbook
-from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl.utils.dataframe import dataframe_to_rowsDATE_SOLD_PAYOFF
 import streamlit as st             
 from io import BytesIO
 from io import StringIO
@@ -780,7 +780,7 @@ def Manage_Entity_Mapping(operator):
 	    columns=["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"],\
             index=entity_mapping.index)
  
-    entity_mapping_different_sheet_index= entity_mapping.index[(entity_mapping["DATE_SOLD_PAYOFF"]=="NA") & ( entity_mapping["Finance_in_separate_sheets"]=="Y")]
+    entity_mapping_different_sheet_index= entity_mapping.index[(entity_mapping["DATE_SOLD_PAYOFF"]=="N") & ( entity_mapping["Finance_in_separate_sheets"]=="Y")]
     if len(entity_mapping_different_sheet_index)>0:
         with st.form(key="Mapping Property mapping"):
             col1,col2,col3,col4=st.columns([4,3,3,3])
@@ -811,7 +811,7 @@ def Manage_Entity_Mapping(operator):
             if submitted:
                 entity_mapping.update(entity_mapping_updation)
 		
-    entity_mapping_same_sheet_index= entity_mapping.index[(entity_mapping["DATE_SOLD_PAYOFF"].notna())&(entity_mapping["Finance_in_separate_sheets"]=="N")]
+    entity_mapping_same_sheet_index= entity_mapping.index[(entity_mapping["DATE_SOLD_PAYOFF"]=="N")&(entity_mapping["Finance_in_separate_sheets"]=="N")]
     if len(entity_mapping_same_sheet_index)>0:
         with st.form(key="Mapping Property mapping"):
             col1,col2,col3,col4,col5=st.columns([4,3,3,3,4])
@@ -1821,7 +1821,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         years_range = list(range(current_year, current_year - 2, -1))
         # Calculate the list of months and their indices
         months_range = [str(month).zfill(2) for month in range(1, 13)]
-        if "Y" in entity_mapping["BS_separate_excel"][(pd.notna(entity_mapping["BS_separate_excel"]))&(pd.isna(entity_mapping["DATE_SOLD_PAYOFF"])!="NA")].values:             
+        if "Y" in entity_mapping["BS_separate_excel"][(pd.notna(entity_mapping["BS_separate_excel"]))&(entity_mapping["DATE_SOLD_PAYOFF"]=="N")].values:             
             BS_separate_excel="Y"
         else:
             BS_separate_excel="N"
@@ -1889,7 +1889,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
             st.stop()
-        entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=reporting_month) & ((entity_mapping["DATE_SOLD_PAYOFF"]=="NA")|(entity_mapping["DATE_SOLD_PAYOFF"]>=reporting_month))),]
+        entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=reporting_month) & ((entity_mapping["DATE_SOLD_PAYOFF"]=="N")|(entity_mapping["DATE_SOLD_PAYOFF"]>=reporting_month))),]
         if "Y" in entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values:                     
             BS_separate_excel="Y"
             if 'uploaded_BS' in locals() and uploaded_BS:
