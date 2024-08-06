@@ -1838,7 +1838,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.subheader("Upload P&L:")
                     uploaded_finance=st.file_uploader("P&L for monthly reporting. Only XLSX accepted",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
                 with col2:
-                    st.subheader("Other Documents:")
+                    st.write("Other Documents:")
                     uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
                 submitted = st.form_submit_button("Upload")
                 if submitted:
