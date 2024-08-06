@@ -1835,7 +1835,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col2:    
                     selected_month = st.selectbox("Month", months_range,index=months_range.index(st.session_state.selected_month))
                 with col1:
-                    st.subheader("Upload P&L:")
+                    st.write("Upload P&L:")
                     uploaded_finance=st.file_uploader("P&L for monthly reporting. Only XLSX accepted",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
                 with col2:
                     st.write("Other Documents:")
@@ -1859,14 +1859,14 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                         selected_month = st.selectbox("Month", months_range,index=months_range.index(st.session_state.selected_month))
                 col1, col2, col3 = st.columns([1, 1, 1])
                 with col1:
-                    st.subheader("Upload P&L:")
+                    st.write("Upload P&L:")
                     uploaded_finance=st.file_uploader("P&L for monthly reporting. Only XLSX accepted",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
 
                 with col2:
-                    st.subheader("Upload Balance Sheet:")
+                    st.write("Upload Balance Sheet:")
                     uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
                 with col3:
-                    st.subheader("Other Documents:")
+                    st.write("Other Documents:")
                     uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
                 submitted = st.form_submit_button("Upload")
                 if submitted:
