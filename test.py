@@ -781,7 +781,7 @@ def Manage_Entity_Mapping(operator):
             index=entity_mapping.index)
  
     entity_mapping_different_sheet_index= entity_mapping.index[(entity_mapping["DATE_SOLD_PAYOFF"]=="N") & ( entity_mapping["Finance_in_separate_sheets"]=="Y")]
-    st.write(entity_mapping,entity_mapping_different_sheet_index)
+   
     if len(entity_mapping_different_sheet_index)>0:
         with st.form(key="Mapping Property mapping"):
             col1,col2,col3,col4=st.columns([4,3,3,3])
@@ -813,7 +813,6 @@ def Manage_Entity_Mapping(operator):
                 entity_mapping.update(entity_mapping_updation)
 		
     entity_mapping_same_sheet_index= entity_mapping.index[(entity_mapping["DATE_SOLD_PAYOFF"]=="N")&(entity_mapping["Finance_in_separate_sheets"]=="N")]
-    st.write(entity_mapping,entity_mapping_same_sheet_index)
     if len(entity_mapping_same_sheet_index)>0:
         with st.form(key="Mapping Property mapping"):
             col1,col2,col3,col4,col5=st.columns([4,3,3,3,4])
