@@ -1837,7 +1837,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col1:
                     col3,col4=st.columns([1,1])	
                     with col3:
-                    st.write("Upload P&L:")
+                        st.write("Upload P&L:")
                     #with col4:
                     
                     uploaded_finance=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
