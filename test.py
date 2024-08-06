@@ -1826,7 +1826,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             BS_separate_excel="Y"
         else:
             BS_separate_excel="N"
-        #st.write("BS_separate_excel",BS_separate_excel,entity_mapping)
         if BS_separate_excel=="N":
             with st.form("upload_form", clear_on_submit=True):
                 st.subheader("Select reporting month:") 
@@ -1836,7 +1835,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col2:    
                     selected_month = st.selectbox("Month", months_range,index=months_range.index(st.session_state.selected_month))
                 with col1:
+                    col3,col4=st.columns([1,1])	
+                    with col3:
                     st.write("Upload P&L:")
+                    #with col4:
+                    
                     uploaded_finance=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
                 with col2:
                     st.write("Other Documents:")
