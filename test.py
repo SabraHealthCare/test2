@@ -581,10 +581,11 @@ def Check_Available_Units(check_patient_days,reporting_month):
         BPC_pull_reset = BPC_pull.reset_index()
         # Apply filtering and selection
         previous_A_unit = BPC_pull_reset.loc[(BPC_pull_reset["Sabra_Account"].str.startswith("A_")) &(BPC_pull_reset["Property_Name"].isin(properties_fill_Aunit)),["ENTITY","Property_Name","Sabra_Account","A_unit"]]
+        previous_A_unit=previous_A_unit.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
         reporting_month_data = reporting_month_data.merge(previous_A_unit,how='left',left_on=['ENTITY', 'Property_Name', 'Sabra_Account'],right_on=['ENTITY', 'Property_Name', 'Sabra_Account'])
         reporting_month_data[reporting_month] = reporting_month_data['A_unit'].combine_first(reporting_month_data[reporting_month])
         reporting_month_data = reporting_month_data.drop(columns=['A_unit'])
-	
+        st.write("reporting_month_data",reporting_month_data)
         st.error("Below properties are missing operating beds. Historical data has been used to fill in the missing information as shown below. If this data is incorrect, please add the operating beds in P&L and re-upload P&L.")
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values="A_unit")
         st.write(previous_A_unit_display)
