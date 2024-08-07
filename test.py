@@ -1040,7 +1040,7 @@ def Compare_PL_Sabra(Total_PL,reporting_month):
 def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
 
-def View_Summary():
+def View_Summary(): 
     global Total_PL,reporting_month_data,reporting_month
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
