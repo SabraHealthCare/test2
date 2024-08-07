@@ -578,8 +578,10 @@ def Check_Available_Units(check_patient_days,reporting_month,reporting_month_dat
         BPC_pull_reset = BPC_pull.reset_index()
         # Apply filtering and selection
         previous_A_unit = BPC_pull_reset.loc[(BPC_pull_reset["Sabra_Account"].str.startswith("A_")) &(BPC_pull_reset["Property_Name"].isin(properties_fill_Aunit)),["ENTITY","Property_Name","Sabra_Account","A_unit"]]
-        merged_data = reporting_month_data.merge(previous_A_unit,how='left',left_on=['ENTITY', 'Property_Name', 'Sabra_Account'],right_on=['ENTITY', 'Property_Name', 'Sabra_Account'])
-
+        reporting_month_data = reporting_month_data.merge(previous_A_unit,how='left',left_on=['ENTITY', 'Property_Name', 'Sabra_Account'],right_on=['ENTITY', 'Property_Name', 'Sabra_Account'])
+        reporting_month_data[reporting_month] = reporting_month_data['A_unit'].combine_first(reporting_month_data[reporting_month])
+        reporting_month_data = reporting_month_data.drop(columns=['A_unit'])
+	    
         previous_available_unit[["Property_Name",onemonth_before_reporting_month]].groupby(["Property_Name"]).sum()
         previous_available_unit=previous_available_unit.reset_index(drop=False)[["Property_Name",onemonth_before_reporting_month]]
         check_patient_days=check_patient_days.reset_index(drop=False)
