@@ -597,7 +597,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
         reporting_month_Aunit = reporting_month_Aunit.merge(BPC_pull.reset_index()[['ENTITY', 'Property_Name', 'Sabra_Account', 'A_unit']],how='left',on=['ENTITY', 'Property_Name', 'Sabra_Account'])
 
         reporting_month_Aunit['Delta'] = reporting_month_Aunit['A_unit'] - reporting_month_Aunit[reporting_month]
-        A_unit_dismatch= reporting_month_Aunit[reporting_month_Aunit['Delta'] != 0]["Property_Name",reporting_month,"A_unit"]
+        A_unit_dismatch= reporting_month_Aunit[reporting_month_Aunit['Delta'] != 0][["Property_Name",reporting_month,"A_unit"]]
         # Display the result
     
         if A_unit_dismatch.shape[0]>0:
