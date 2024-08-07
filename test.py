@@ -538,9 +538,9 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
 def Check_Available_Units(check_patient_days,reporting_month):
     month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
     problem_properties=[]
+    properties_fill_Aunit=[]
     zero_patient_days=[]
-    for property_i in reporting_month_data["ENTITY"].unique():
-        #property_i=
+    for property_i in reporting_month_data["Property_Name"].unique():
         try:
             patient_day_i=check_patient_days.loc[(property_i,"Patient Days"),reporting_month]
         except:
@@ -560,8 +560,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
             st.error("Error: {} is missing patient days. If this facility is not currently functioning or in operation, please remove the number of operating beds associated with it.".format(property_i))
             problem_properties.append(property_i)     
         elif patient_day_i>0 and operating_beds_i==0:
-            st.error("Error：{} is missing operating beds. With {} patient days, this will result in incorrect occupancy.".format(property_i,int(patient_day_i)))
-            problem_properties.append(property_i) 
+            properties_fill_Aunit.append(property_i)
     miss_all_A_unit=False
     if len(problem_properties)>0:
         check_patient_days_display=check_patient_days.loc[(problem_properties,slice(None)),reporting_month].reset_index(drop=False)
@@ -575,7 +574,22 @@ def Check_Available_Units(check_patient_days,reporting_month):
 		                "Patient Days": "Patient Days",
 		                "Operating Beds": "Operating Beds"},
 			    hide_index=True)
-    if BPC_pull.shape[0]>0 and miss_all_A_unit==False:
+    if len(properties_fill_Aunit)>0:
+            # search for the Month/year row and return row number
+        entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])	
+        onemonth_before_reporting_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]<str(reporting_month),BPC_pull.columns)))
+    previous_A_unit=BPC_pull.merge(BPC_Account,left_on="ACCOUNT",right_on="BPC_Account_Name")
+    previous_A_unit = previous_A_unit[(previous_A_unit["Category"] == "Facility Information") &(previous_A_unit["Sabra_Account"].str.startswith("A_"))]
+
+	
+    previous_facility_data=previous_facility_data.reset_index(drop=False)
+    previous_facility_data=previous_facility_data.rename(columns={"ACCOUNT":"Sabra_Account",onemonth_before_reporting_month:reporting_month})	
+    st.error("Below properties miss facility information in P&L. It has been filled by historical data as below. If the data is not correct, please add facility info in P&L and re-upload.")
+    previous_facility_data_display = previous_facility_data.pivot(index=["Sabra_Account_Full_Name"], columns="Property_Name", values=reporting_month)
+
+
+
+	    
         BPC_pull_temp=BPC_pull.reset_index(drop=False)
         onemonth_before_reporting_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)<str(reporting_month),BPC_pull.columns)))
         previous_available_unit=BPC_pull_temp.loc[BPC_pull_temp["Sabra_Account"].isin(availble_unit_accounts),["Property_Name",onemonth_before_reporting_month]]  
@@ -1050,9 +1064,9 @@ def View_Summary():
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     # check patient days ( available days > patient days)	
-    check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].str.startswith("A_")) | (reporting_month_data["Sabra_Account"].str.startswith("PD_")) ]
+    check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].str.startswith("A_"))|(reporting_month_data["Category"]=='Patient Days') ]
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
-    #check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
+    check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
     #check if available unit changed by previous month
     #Check_Available_Units(check_patient_days,reporting_month)
