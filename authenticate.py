@@ -220,7 +220,7 @@ class Authenticate:
         tenant_id = '71ffff7c-7e53-4daa-a503-f7b94631bd53'
         authority = 'https://login.microsoftonline.com/' + tenant_id
 
-# Acquire a token using client credentials flow
+        # Acquire a token using client credentials flow
         app = ConfidentialClientApplication(
     client_id,
     authority=authority,
@@ -242,15 +242,10 @@ class Authenticate:
     
         # Check the status code
         if response.status_code == 200 or response.status_code == 201:
-            st.write("File uploaded successfully.")
+            return True
         else:
-            st.write(f"Failed to upload file. Status code: {response.status_code}")
-            st.write(f"Response content: {response.content}")
+            st.error("Fail to save the change")
     
-    def save_credentials_to_yaml1(self,bucket:str,config:dict):
-        s33 = boto3.resource("s3").Bucket(bucket)
-        json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
-        json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
         
     def login(self, form_name: str, config, location: str='main') -> tuple:
         """
