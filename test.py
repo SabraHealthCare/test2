@@ -1505,7 +1505,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
 
                 column_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"]]
                 duplicate_check = [item for item in set(column_name_list_in_mapping) if column_name_list_in_mapping.count(item) > 1]
-                st.write("duplicate_check",duplicate_check)	
+                #st.write("duplicate_check",duplicate_check)	
                 if len(duplicate_check)>0:
                     st.error( "The following column has been mapped to more than one facility in sheet '{}'. Please fix and re-upload:".format(sheet_name))
                     st.error(", ".join(f"'{item}'" for item in duplicate_check))
