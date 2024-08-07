@@ -881,6 +881,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
     Sabra_second_account_list=[np.nan] * count
     Sabra_main_account_value=[np.nan] * count
     Sabra_second_account_value=[np.nan] * count
+    st.write("new_tenant_account_list",new_tenant_account_list)
     with st.form(key=new_tenant_account_list[0]):
         for i in range(count):
             if sheet_name=="False":
