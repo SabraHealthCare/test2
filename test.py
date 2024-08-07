@@ -539,8 +539,8 @@ def Check_Available_Units(check_patient_days,reporting_month):
     month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
     problem_properties=[]
     zero_patient_days=[]
-    for entity_i in reporting_month_data["ENTITY"].unique():
-        property_i=
+    for property_i in reporting_month_data["ENTITY"].unique():
+        #property_i=
         try:
             patient_day_i=check_patient_days.loc[(property_i,"Patient Days"),reporting_month]
         except:
