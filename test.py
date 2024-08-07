@@ -1568,13 +1568,14 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         PL.drop(nan_index, inplace=True)
         #set index as str ,strip
         PL.index=map(lambda x:str(x).strip(),PL.index)
-        PL=PL.map(lambda x: 0 if x!=x or pd.isna(x) or isinstance(x, str) or x==" " else x)	    
-        # don't removes with all nan/0, because some property may have no data and need to keep empty
+        PL=PL.map(lambda x: 0 if pd.isna(x) or isinstance(x, str) or x!=x or x==" " else x)	    
+        # don't removes all nan/0, because some property may have no data and need to keep empty
         #PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
         #PL=PL.loc[(PL!= 0).any(axis=1),:]
         PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
         # mapping new tenant accounts
+        st.write("PL",PL)
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
         # remove duplicate new account
         new_tenant_account_list=list(set(new_tenant_account_list))    
