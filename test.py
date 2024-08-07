@@ -1564,7 +1564,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         PL.columns= [value for value in new_entity_header if value != "0"]
 	    
         #remove rows without tenant account
-        nan_index=list(filter(lambda x: pd.isna(x) or x.strip()=="" or x!=x or x=="nan",PL.index))
+        nan_index=list(filter(lambda x: pd.isna(x) or str(x).strip()=="" or x!=x or x=="nan",PL.index))
         PL.drop(nan_index, inplace=True)
         #set index as str ,strip
         PL.index=map(lambda x:str(x).strip(),PL.index)
