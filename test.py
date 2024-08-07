@@ -1050,7 +1050,7 @@ def View_Summary():
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     # check patient days ( available days > patient days)	
-    check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].str.startswith("A_")) | (reporting_month_data.str.startswith("PD_")) ]
+    check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].str.startswith("A_")) | (reporting_month_data["Sabra_Account"].str.startswith("PD_")) ]
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
     #check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
