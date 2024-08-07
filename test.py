@@ -536,7 +536,6 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
 	
 @st.cache_data
 def Check_Available_Units(check_patient_days,reporting_month,reporting_month_data):
-    global reporting_month_data
     st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
     month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
     problem_properties=[]
