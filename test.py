@@ -535,13 +535,15 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
     return PL_date_header
 	
 @st.cache_data
-def Check_Available_Units(check_patient_days,reporting_month,reporting_month_data):
-    st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
+def Check_Available_Units(check_patient_days,reporting_month):
+    global reporting_month_data
+    #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
     month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
     problem_properties=[]
     properties_fill_Aunit=[]
     zero_patient_days=[]
-    for property_i in reporting_month_data["Property_Name"].unique():
+    total_property_list=reporting_month_data["Property_Name"].unique()
+    for property_i in total_property_list:
         try:
             patient_day_i=check_patient_days.loc[(property_i,"Patient Days"),reporting_month]
         except:
@@ -574,6 +576,7 @@ def Check_Available_Units(check_patient_days,reporting_month,reporting_month_dat
 		                "Patient Days": "Patient Days",
 		                "Operating Beds": "Operating Beds"},
 			    hide_index=True)
+        st.stop() 
     if len(properties_fill_Aunit)>0:    
         BPC_pull_reset = BPC_pull.reset_index()
         # Apply filtering and selection
@@ -581,22 +584,30 @@ def Check_Available_Units(check_patient_days,reporting_month,reporting_month_dat
         reporting_month_data = reporting_month_data.merge(previous_A_unit,how='left',left_on=['ENTITY', 'Property_Name', 'Sabra_Account'],right_on=['ENTITY', 'Property_Name', 'Sabra_Account'])
         reporting_month_data[reporting_month] = reporting_month_data['A_unit'].combine_first(reporting_month_data[reporting_month])
         reporting_month_data = reporting_month_data.drop(columns=['A_unit'])
+	
+        st.error("Below properties are missing operating beds. Historical data has been used to fill in the missing information as shown below. If this data is incorrect, please add the operating beds in P&L and re-upload P&L.")
+        previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values="A_unit")
+        st.write(previous_A_unit_display)
 	    
-        previous_available_unit[["Property_Name",onemonth_before_reporting_month]].groupby(["Property_Name"]).sum()
-        previous_available_unit=previous_available_unit.reset_index(drop=False)[["Property_Name",onemonth_before_reporting_month]]
-        check_patient_days=check_patient_days.reset_index(drop=False)
-        Unit_changed=pd.merge(previous_available_unit, check_patient_days.loc[check_patient_days['Category'] == 'Operating Beds',["Property_Name",reporting_month]],on=["Property_Name"], how='left')
-        Unit_changed["Delta"]=Unit_changed[onemonth_before_reporting_month]-Unit_changed[reporting_month]
-        Unit_changed=Unit_changed.loc[(Unit_changed["Delta"]!=0)&(Unit_changed[reporting_month]!=0)&(pd.isna(Unit_changed[reporting_month])),]
-        if len(Unit_changed)>0:
+    #check if "A_xx" changed compared with previous month
+    # Filter reporting_month_data where "Sabra_Account" starts with "A_"
+    reporting_month_Aunit = reporting_month_data[reporting_month_data["Sabra_Account"].str.startswith("A_")]
+    if reporting_month_Aunit.shape[0]>0:
+        reporting_month_Aunit = reporting_month_Aunit.merge(BPC_pull[['ENTITY', 'Property_Name', 'Sabra_Account', 'A_unit']],how='left',on=['ENTITY', 'Property_Name', 'Sabra_Account'])
+
+        reporting_month_Aunit['Delta'] = reporting_month_Aunit['A_unit'] - reporting_month_Aunit['reporting_month']
+        A_unit_dismatch= reporting_month_Aunit[reporting_month_Aunit['delta'] != 0]["Property_Name",reporting_month,"A_unit"]
+        # Display the result
+    
+        if A_unit_dismatch.shape[0]>0:
             st.warning("The number of operating beds for the properties listed below have changed compared to the previous reporting month.")
             st.warning("Please double-check if these changes are accurate.")
-            st.dataframe(Unit_changed.style.map(color_missing, subset=["Delta"]).format(precision=0, thousands=",").hide(axis="index"),
+            st.dataframe(A_unit_dismatch.style.map(color_missing, subset=["Delta"]).format(precision=0, thousands=",").hide(axis="index"),
 		    column_config={
 			        "Property_Name": "Property",
-			        onemonth_before_reporting_month:onemonth_before_reporting_month+" Operating beds",
-		                 reporting_month:reporting_month+" Operating beds",
-		                 "Delta": "Changed"},
+			         A_unit:"Previous Operating beds",
+		                 reporting_month:"Current Operating beds",
+		                 "Delta": "Delta"},
 			    hide_index=True)
 
 @st.cache_data
@@ -1056,7 +1067,7 @@ def View_Summary():
     check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
     #check if available unit changed by previous month
-    #Check_Available_Units(check_patient_days,reporting_month,reporting_month_data)
+    Check_Available_Units(check_patient_days,reporting_month,reporting_month_data)
 	
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
