@@ -593,6 +593,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
     # Filter reporting_month_data where "Sabra_Account" starts with "A_"
     reporting_month_Aunit = reporting_month_data[reporting_month_data["Sabra_Account"].str.startswith("A_")]
     if reporting_month_Aunit.shape[0]>0:
+        st.write("reporting_month_Aunit",reporting_month_Aunit,BPC_pull)
         reporting_month_Aunit = reporting_month_Aunit.merge(BPC_pull[['ENTITY', 'Property_Name', 'Sabra_Account', 'A_unit']],how='left',on=['ENTITY', 'Property_Name', 'Sabra_Account'])
 
         reporting_month_Aunit['Delta'] = reporting_month_Aunit['A_unit'] - reporting_month_Aunit['reporting_month']
