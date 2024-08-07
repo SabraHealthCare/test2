@@ -1067,7 +1067,7 @@ def View_Summary():
     check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
     #check if available unit changed by previous month
-    Check_Available_Units(check_patient_days,reporting_month,reporting_month_data)
+    Check_Available_Units(check_patient_days,reporting_month)
 	
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
