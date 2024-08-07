@@ -539,7 +539,8 @@ def Check_Available_Units(check_patient_days,reporting_month):
     month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
     problem_properties=[]
     zero_patient_days=[]
-    for property_i in reporting_month_data["Property_Name"].unique():
+    for entity_i in reporting_month_data["ENTITY"].unique():
+        property_i=
         try:
             patient_day_i=check_patient_days.loc[(property_i,"Patient Days"),reporting_month]
         except:
@@ -1044,16 +1045,17 @@ def View_Summary():
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
+    st.write("Total_PL",Total_PL,Total_PL.index)
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     # check patient days ( available days > patient days)	
-    check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].isin(availble_unit_accounts)) | (reporting_month_data["Category"]=='Patient Days')]
+    check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].str.startswith("A_")) | (reporting_month_data.str.startswith("PD_")) ]
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
-    check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
+    #check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
     #check if available unit changed by previous month
-    Check_Available_Units(check_patient_days,reporting_month)
+    #Check_Available_Units(check_patient_days,reporting_month)
 	
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
