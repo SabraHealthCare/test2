@@ -11,7 +11,7 @@ from utils import generate_random_pw
 from exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
 import smtplib
 from email.mime.text import MIMEText
-
+from msal import ConfidentialClientApplication
 class Authenticate:
     """
     This class will create login, logout, register user, reset password, forgot password, 
