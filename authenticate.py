@@ -12,6 +12,7 @@ from exceptions import CredentialsError, ForgotError, RegisterError, ResetError,
 import smtplib
 from email.mime.text import MIMEText
 from msal import ConfidentialClientApplication
+import yaml 
 class Authenticate:
     """
     This class will create login, logout, register user, reset password, forgot password, 
