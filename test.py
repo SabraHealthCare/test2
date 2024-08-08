@@ -581,7 +581,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
         BPC_pull_reset = BPC_pull.reset_index()
         # Apply filtering and selection
         previous_A_unit = BPC_pull_reset.loc[(BPC_pull_reset["Sabra_Account"].str.startswith("A_")) &(BPC_pull_reset["Property_Name"].isin(properties_fill_Aunit)),["ENTITY","Property_Name","Sabra_Account","A_unit"]]
-        previous_A_unit["Category"]="Facility Information"
+        previous_A_unit=previous_A_unit.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
         previous_A_unit=previous_A_unit.rename(columns={"A_unit":reporting_month})
         st.write("reporting_month_data before merge",reporting_month_data)
         reporting_month_data  = pd.concat([reporting_month_data, previous_A_unit], axis=0)
