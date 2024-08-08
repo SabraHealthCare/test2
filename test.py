@@ -594,10 +594,9 @@ def Check_Available_Units(check_patient_days,reporting_month):
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
         st.write(previous_A_unit_display)
 	    
-    #check if "A_xx" changed compared with previous month
-    # Filter reporting_month_data where "Sabra_Account" starts with "A_"
+    #check if operating beds changed compared with previous month "A_unit" in BPC_pull
     reporting_month_Aunit = reporting_month_data[reporting_month_data["Sabra_Account"].str.startswith("A_")]
-    if reporting_month_Aunit.shape[0]>1000000:
+    if reporting_month_Aunit.shape[0]>0:
         reporting_month_Aunit = reporting_month_Aunit.merge(BPC_pull.reset_index()[['ENTITY', 'Property_Name', 'Sabra_Account', 'A_unit']],how='left',on=['ENTITY', 'Property_Name', 'Sabra_Account'])
         reporting_month_Aunit['Delta'] = reporting_month_Aunit['A_unit'] - reporting_month_Aunit[reporting_month]
         A_unit_dismatch= reporting_month_Aunit[reporting_month_Aunit['Delta'] != 0][["Property_Name",reporting_month,"A_unit"]]
