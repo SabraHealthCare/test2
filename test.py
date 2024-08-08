@@ -1162,10 +1162,7 @@ def Submit_Upload_Latestmonth():
     upload_reporting_month["Operator"]=operator
     upload_reporting_month=upload_reporting_month.apply(Format_Value)
 
-    #if not st.session_state.clicked["submit_report"]:
-        #st.stop()
-    #else:
-         # save reporting month data to OneDrive
+
     if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,None,None):
         st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,reporting_month[4:6]+"/"+reporting_month[0:4]))
     else: 
@@ -1178,6 +1175,19 @@ def Submit_Upload_Latestmonth():
         # save tenant BS to OneDrive
         if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
             st.write(" unsuccess")  #----------record into error report------------------------	
+    if uploaded_other_docs:
+        for file in uploaded_other_docs:
+	    # create new file name by adding reporting_month at the end of original filename    
+            original_file_name = file.name
+            file_name, file_extension = original_file_name.rsplit('.', 1)
+            new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
+            Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
+
+
+
+
+
+
 
 
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
@@ -1936,6 +1946,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.stop()
         else:
             BS_separate_excel="N"
+
+        
+	    
+	    
 	# select_months_list contain the monthes that need to be compared for history data,if it is [], means no need to compare
         if all(entity_mapping["Finance_in_separate_sheets"]=="N"):
             select_months_list=[reporting_month]
@@ -1976,7 +1990,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
    
 	# 1 Summary
         View_Summary()
-
         # Define the button and handle the click event
         if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting', key='reporting_month', help="Click and wait a few seconds for the confirmation message."):
             st.session_state.clicked['submit_report'] = True
