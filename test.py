@@ -576,7 +576,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
 		                "Patient Days": "Patient Days",
 		                "Operating Beds": "Operating Beds"},
 			    hide_index=True)
-        st.stop() 
+        #st.stop() 
     if len(properties_fill_Aunit)>0:    
         BPC_pull_reset = BPC_pull.reset_index()
         # Apply filtering and selection
