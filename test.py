@@ -598,9 +598,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
     # Filter reporting_month_data where "Sabra_Account" starts with "A_"
     reporting_month_Aunit = reporting_month_data[reporting_month_data["Sabra_Account"].str.startswith("A_")]
     if reporting_month_Aunit.shape[0]>0:
-        #st.write("reporting_month_Aunit",reporting_month_Aunit,BPC_pull)
         reporting_month_Aunit = reporting_month_Aunit.merge(BPC_pull.reset_index()[['ENTITY', 'Property_Name', 'Sabra_Account', 'A_unit']],how='left',on=['ENTITY', 'Property_Name', 'Sabra_Account'])
-
         reporting_month_Aunit['Delta'] = reporting_month_Aunit['A_unit'] - reporting_month_Aunit[reporting_month]
         A_unit_dismatch= reporting_month_Aunit[reporting_month_Aunit['Delta'] != 0][["Property_Name",reporting_month,"A_unit"]]
         # Display the result
@@ -611,7 +609,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
             st.dataframe(A_unit_dismatch.style.map(color_missing, subset=["Delta"]).format(precision=0, thousands=",").hide(axis="index"),
 		    column_config={
 			        "Property_Name": "Property",
-			         A_unit:"Previous Operating beds",
+			         "A_unit":"Previous Operating beds",
 		                 reporting_month:"Current Operating beds",
 		                 "Delta": "Delta"},
 			    hide_index=True)
