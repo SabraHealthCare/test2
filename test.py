@@ -358,7 +358,7 @@ def filters_widgets(df, columns,location="Vertical"):
             return df
 		
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,pre_max_match_col):
-    #st.write("PL",PL,sheet_name)
+    
     #st.write("pre_max_match_col",pre_max_match_col)
     #st.write("account_pool",account_pool)
     #search tenant account column in P&L, return col number of tenant account	
@@ -585,7 +585,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
         reporting_month_data = reporting_month_data.merge(previous_A_unit,how='left',left_on=['ENTITY', 'Property_Name', 'Sabra_Account'],right_on=['ENTITY', 'Property_Name', 'Sabra_Account'])
         reporting_month_data[reporting_month] = reporting_month_data['A_unit'].combine_first(reporting_month_data[reporting_month])
         reporting_month_data = reporting_month_data.drop(columns=['A_unit'])
-        #st.write("reporting_month_data",reporting_month_data)
+        st.write("reporting_month_data",reporting_month_data)
         if previous_A_unit.shape[0]>1:
             st.error("Below properties are missing operating beds. Historical data has been used to fill in the missing info as shown below. If this data is incorrect, please add the operating beds and re-upload P&L.")
         elif previous_A_unit.shape[0]==1:
@@ -1575,7 +1575,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         #PL=PL.loc[(PL!= 0).any(axis=1),:]
         PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
         # mapping new tenant accounts
-        st.write("PL",PL)
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
         # remove duplicate new account
         new_tenant_account_list=list(set(new_tenant_account_list))    
