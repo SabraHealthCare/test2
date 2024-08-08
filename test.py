@@ -826,7 +826,7 @@ def Manage_Entity_Mapping(operator):
                     if not pd.isna(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"]):
                         new_value=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="Census"+entity_i)
                         if new_value:
-			    entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=new_value
+                            entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=new_value
                 with col4:
                     if not pd.isna(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]):
                         new_value=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
