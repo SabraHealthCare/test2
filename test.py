@@ -819,15 +819,20 @@ def Manage_Entity_Mapping(operator):
                     st.write("")
                     st.write(entity_mapping.loc[entity_i,"Property_Name"])
                 with col2:
-                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Finance"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Finance"],key="P&L"+entity_i)    
+                    new_value=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Finance"],key="P&L"+entity_i)  
+                    if new_value:
+                        entity_mapping_updation.loc[entity_i,"Sheet_Name_Finance"]=new_value
                 with col3: 
                     if not pd.isna(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"]):
-                        entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="Census"+entity_i)     
+                        new_value=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="Census"+entity_i)
+                        if new_value:
+			    entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=new_value
                 with col4:
                     if not pd.isna(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]):
-                        entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
+                        new_value=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
+                        if new_value:
+			    entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=new_value
             submitted = st.form_submit_button("Submit")
-            
             if submitted:
                 entity_mapping.update(entity_mapping_updation)
 		
@@ -852,18 +857,25 @@ def Manage_Entity_Mapping(operator):
                     st.write("")
                     st.write(entity_mapping.loc[entity_i,"Property_Name"])
                 with col2:
-                    entity_mapping_updation.loc[entity_i,"Sheet_Name_Finance"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Finance"],key="PL"+entity_i)    
+                    new_value=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Finance"],key="PL"+entity_i)  
+                    if new_value:
+                        entity_mapping_updation.loc[entity_i,"Sheet_Name_Finance"]=new_value
                 with col3: 
                     if not pd.isna(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"]):
-                        entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="CS"+entity_i)     
+                        new_value=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="CS"+entity_i)  
+                        if new_value:
+                            entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=new_value
                 with col4:
                     if not pd.isna(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]):
-                        entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
+                        new_value=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
+                        if new_value:
+                            entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=new_value
                 with col5:
-                    entity_mapping_updation.loc[entity_i,"Column_Name"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Column_Name"],key="CN"+entity_i) 
+                    new_value=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Column_Name"],key="CN"+entity_i) 
+                    if new_value:
+                        entity_mapping_updation.loc[entity_i,"Column_Name"]=new_value
             submitted = st.form_submit_button("Submit")
             if submitted:
-                entity_mapping_updation.replace("", np.nan, inplace=True)
                 entity_mapping.update(entity_mapping_updation)
 		
 	    
