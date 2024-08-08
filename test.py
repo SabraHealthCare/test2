@@ -863,6 +863,7 @@ def Manage_Entity_Mapping(operator):
                     entity_mapping_updation.loc[entity_i,"Column_Name"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Column_Name"],key="CN"+entity_i) 
             submitted = st.form_submit_button("Submit")
             if submitted:
+                entity_mapping_updation.replace("", np.nan, inplace=True)
                 entity_mapping.update(entity_mapping_updation)
 		
 	    
