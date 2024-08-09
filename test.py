@@ -1821,7 +1821,27 @@ def Upload_And_Process(uploaded_file,file_type):
 
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
     return Total_PL
+def Download_PL_Sample():
+    PL_sample_filename = "{}_P&L_sample.xlsx".format(operator)
+    
+    # Fetch data from OneDrive
+    PL_sample = Read_CSV_From_Onedrive(mapping_path, PL_sample_filename, "XLSX")
+    
+    if PL_sample is not False:
+        # Create a BytesIO buffer to hold the Excel data
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            PL_sample.to_excel(writer, index=False)
+        download_file = output.getvalue()
 
+        # Return the download button with the Excel file data
+        st.download_button(
+                            label="Download P&L sample",
+                            data=download_file,
+                            file_name=PL_sample_filename,
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" )
+    else:
+        st.write("P&L sample is not found. Please contact sli@sabrahealth.com to get it.")
 #----------------------------------website widges------------------------------------
 config = Read_CSV_From_Onedrive(mapping_path, "config.yaml","YAML")
 # Creating the authenticator object
@@ -1887,15 +1907,17 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col2:    
                     selected_month = st.selectbox("Month", months_range,index=months_range.index(st.session_state.selected_month))
                 with col1:
-                    col3,col4=st.columns([1,1])	
-                    with col3:
-                        st.write("Upload P&L:")
-                    #with col4:
-                    
+                    st.write("Upload P&L:")
                     uploaded_finance=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
                 with col2:
                     st.write("Other Documents:")
                     uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
+                col4, col5=st.columns([1,6])
+                with col4:
+                    submitted = st.form_submit_button("Upload")
+                with col5:
+                    download_PLsample = st.form_submit_button(label='Download P&L sample')
+                    
                 submitted = st.form_submit_button("Upload")
                 if submitted:
 	            # clear cache for every upload
@@ -1905,6 +1927,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.selected_year = selected_year
                     st.session_state.selected_month = selected_month
                     reporting_month=str(selected_year)+str(selected_month)
+                if download_PLsample:
+                    Download_PL_Sample()
         elif BS_separate_excel=="Y":	 
             with st.form("upload_form", clear_on_submit=True):
                 st.subheader("Select reporting month:") 
@@ -1938,26 +1962,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.selected_month = selected_month
                     reporting_month=str(selected_year)+str(selected_month)
                 if download_PLsample:
-                    PL_sample_filename = "{}_P&L_sample.xlsx".format(operator)
-    
-                    # Fetch data from OneDrive
-                    PL_sample = Read_CSV_From_Onedrive(mapping_path, PL_sample_filename, "XLSX")
-    
-                    if PL_sample is not False:
-                        # Create a BytesIO buffer to hold the Excel data
-                        output = io.BytesIO()
-                        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                            PL_sample.to_excel(writer, index=False)
-                        download_file = output.getvalue()
-
-                        # Return the download button with the Excel file data
-                        st.download_button(
-                            label="Download P&L sample",
-                            data=download_file,
-                            file_name=PL_sample_filename,
-                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" )
-                    else:
-                        st.write("P&L sample is not found. Please contact sli@sabrahealth.com to get it.")
+                    Download_PL_Sample()
+                    
                     
         if 'uploaded_finance' in locals() and uploaded_finance:
             with col1:
