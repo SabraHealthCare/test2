@@ -1914,9 +1914,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
                 col4, col5=st.columns([1,6])
                 with col4:
-                    submitted = st.form_submit_button("Upload",key="upload")
-                #with col5:
-                    
+                    submitted = st.form_submit_button("Upload")
 
                 if submitted:
 	            # clear cache for every upload
@@ -1949,9 +1947,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
                 col4, col5=st.columns([1,6])
                 with col4:
-                    submitted = st.form_submit_button("Upload",key="upload")
-                with col5:
-                    download_PLsample = st.form_submit_button(label='Download P&L sample',key="download_sample")
+                    submitted = st.form_submit_button("Upload")
+                #with col5:
+                    #download_PLsample = st.form_submit_button(label='Download P&L sample',key="download_sample")
                 if submitted:
 	            # clear cache for every upload
                     st.cache_data.clear()
@@ -1960,8 +1958,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.selected_year = selected_year
                     st.session_state.selected_month = selected_month
                     reporting_month=str(selected_year)+str(selected_month)
-                if download_PLsample:
-                    Download_PL_Sample()
+                #if download_PLsample:
+                    #Download_PL_Sample()
                     
                     
         if 'uploaded_finance' in locals() and uploaded_finance:
@@ -1986,7 +1984,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.stop()
         else:
             BS_separate_excel="N"
-        if st.button(label='Download P&L sample',key="download_sample")
+        if st.button(label='Download P&L sample')
             Download_PL_Sample()
           
 	# select_months_list contain the monthes that need to be compared for history data,if it is [], means no need to compare
