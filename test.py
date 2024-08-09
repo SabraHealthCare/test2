@@ -1984,7 +1984,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.stop()
         else:
             BS_separate_excel="N"
-        if st.button(label='Download P&L sample')
+        if st.button(label='Download P&L sample'):
             Download_PL_Sample()
           
 	# select_months_list contain the monthes that need to be compared for history data,if it is [], means no need to compare
