@@ -1956,7 +1956,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                             data=download_file,
                             file_name=PL_sample_filename,
                             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" )
-		    else:
+                    else:
                         st.write("P&L sample is not found. Please contact sli@sabrahealth.com to get it.")
                     
         if 'uploaded_finance' in locals() and uploaded_finance:
