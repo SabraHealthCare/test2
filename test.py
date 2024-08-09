@@ -1826,7 +1826,7 @@ def Download_PL_Sample():
     
     if PL_sample is not False:
         # Create a BytesIO buffer to hold the Excel data
-        output = io.BytesIO()
+        output = BytesIO()
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
             PL_sample.to_excel(writer, index=False)
         download_file = output.getvalue()
