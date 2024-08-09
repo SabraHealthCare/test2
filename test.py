@@ -160,9 +160,6 @@ def Read_CSV_From_Onedrive(path, file_name,type,str_col_list=None):
                 return None	
         elif type.upper()=="VIDEO":
             return BytesIO(response.content)        
-    else:
-        st.write(f"Failed to download file. Status code: {response.status_code}")
-        st.write(f"Response content: {response.content}")
         return False
 	    
 
@@ -1945,9 +1942,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col3:
                     st.write("Other Documents:")
                     uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
-                col4, col5=st.columns([1,6])
-                with col4:
-                    submitted = st.form_submit_button("Upload")
+                submitted = st.form_submit_button("Upload")
                 if submitted:
 	            # clear cache for every upload
                     st.cache_data.clear()
@@ -1956,21 +1951,19 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.selected_year = selected_year
                     st.session_state.selected_month = selected_month
                     reporting_month=str(selected_year)+str(selected_month)
-                #if download_PLsample:
-                    #Download_PL_Sample()
-                    
-        if st.button(label='Download P&L sample'):
-            Download_PL_Sample()              
-        if 'uploaded_finance' in locals() and uploaded_finance:
-            with col1:
+        with col2:          
+            if st.button(label='Download P&L sample'):
+                Download_PL_Sample()     
+        with col1:
+            if 'uploaded_finance' in locals() and uploaded_finance:
                 st.markdown("✔️ :green[P&L selected]")
-        else:
-            st.write("P&L wasn't upload.")
-            st.stop()
+            else:
+                st.write("P&L wasn't upload.")
+                st.stop()
 
-        reporting_month=str(selected_year)+str(selected_month)
-        if reporting_month>=current_date:
-            st.error("The reporting month should precede the current month.")
+            reporting_month=str(selected_year)+str(selected_month)
+            if reporting_month>=current_date:
+                st.error("The reporting month should precede the current month.")
             st.stop()
         entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=reporting_month) & ((entity_mapping["DATE_SOLD_PAYOFF"]=="N")|(entity_mapping["DATE_SOLD_PAYOFF"]>=reporting_month))),]
         if "Y" in entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values:                     
