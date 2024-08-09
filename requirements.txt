@@ -1,4 +1,5 @@
 pandas
+xlsxwriter
 numpy
 xlwt
 pyodbc
@@ -6,10 +7,6 @@ xlrd>=2.0.1
 datetime
 openpyxl>=3.0.6
 streamlit >=1.23.0
-#gcsfs
-#pyodbc
-s3fs
-boto3
 streamlit_modal
 streamlit_authenticator
 streamlit_tree_select
