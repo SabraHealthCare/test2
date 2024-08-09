@@ -140,6 +140,13 @@ def Read_CSV_From_Onedrive(path, file_name,type,str_col_list=None):
                 return False
             except Exception as e:
                 return False
+        elif type.upper() == "XLSX":
+            try:
+                df = pd.read_excel(BytesIO(file_content), dtype=dtype_dict)
+                return df
+            except Exception as e:
+                st.write(f"Fail reading P&L Sample file: {e}")
+                return False
         elif type.upper()=="YAML":
             try:
                 file_content = response.content
@@ -1917,7 +1924,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col3:
                     st.write("Other Documents:")
                     uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
-                submitted = st.form_submit_button("Upload")
+                col4, col5=st.columns([1,6])
+                with col4:
+                    submitted = st.form_submit_button("Upload")
+                with col5:
+                    download_PLsample = st.form_submit_button(label='Download P&L sample')
                 if submitted:
 	            # clear cache for every upload
                     st.cache_data.clear()
@@ -1926,7 +1937,28 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.selected_year = selected_year
                     st.session_state.selected_month = selected_month
                     reporting_month=str(selected_year)+str(selected_month)
+                if download_PLsample:
+                    PL_sample_filename = "{}_P&L_sample.xlsx".format(operator)
+    
+                    # Fetch data from OneDrive
+                    PL_sample = Read_CSV_From_Onedrive(mapping_path, PL_sample_filename, "XLSX")
+    
+                    if PL_sample is not False:
+                        # Create a BytesIO buffer to hold the Excel data
+                        output = io.BytesIO()
+                        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                            PL_sample.to_excel(writer, index=False)
+                        download_file = output.getvalue()
 
+                        # Return the download button with the Excel file data
+                        st.download_button(
+                            label="Download P&L sample",
+                            data=download_file,
+                            file_name=PL_sample_filename,
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" )
+		    else:
+                        st.write("P&L sample is not found. Please contact sli@sabrahealth.com to get it.")
+                    
         if 'uploaded_finance' in locals() and uploaded_finance:
             with col1:
                 st.markdown("✔️ :green[P&L selected]")
@@ -1950,9 +1982,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         else:
             BS_separate_excel="N"
 
-        
-	    
-	    
+          
 	# select_months_list contain the monthes that need to be compared for history data,if it is [], means no need to compare
         if all(entity_mapping["Finance_in_separate_sheets"]=="N"):
             select_months_list=[reporting_month]
