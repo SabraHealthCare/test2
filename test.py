@@ -1918,7 +1918,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col5:
                     download_PLsample = st.form_submit_button(label='Download P&L sample',key="download_sample")
                     
-                submitted = st.form_submit_button("Upload")
+
                 if submitted:
 	            # clear cache for every upload
                     st.cache_data.clear()
