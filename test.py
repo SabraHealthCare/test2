@@ -1914,9 +1914,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
                 col4, col5=st.columns([1,6])
                 with col4:
-                    submitted = st.form_submit_button("Upload")
+                    submitted = st.form_submit_button("Upload",key="upload")
                 with col5:
-                    download_PLsample = st.form_submit_button(label='Download P&L sample')
+                    download_PLsample = st.form_submit_button(label='Download P&L sample',key="download_sample")
                     
                 submitted = st.form_submit_button("Upload")
                 if submitted:
@@ -1950,9 +1950,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
                 col4, col5=st.columns([1,6])
                 with col4:
-                    submitted = st.form_submit_button("Upload")
+                    submitted = st.form_submit_button("Upload",key="upload")
                 with col5:
-                    download_PLsample = st.form_submit_button(label='Download P&L sample')
+                    download_PLsample = st.form_submit_button(label='Download P&L sample',key="download_sample")
                 if submitted:
 	            # clear cache for every upload
                     st.cache_data.clear()
