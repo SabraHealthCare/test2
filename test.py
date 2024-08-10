@@ -145,7 +145,6 @@ def Read_CSV_From_Onedrive(path, file_name,type,str_col_list=None):
                 df = pd.read_excel(BytesIO(file_content), dtype=dtype_dict)
                 return df
             except Exception as e:
-                st.write(f"Fail reading P&L Sample file: {e}")
                 return False
         elif type.upper()=="YAML":
             try:
