@@ -580,7 +580,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
 		                "Operating Beds": "Operating Beds"},
 			    hide_index=True)
         #st.stop() 
-    st.write("BPC_pull0",BPC_pull)	
+    #st.write("BPC_pull0",BPC_pull)	
     if len(properties_fill_Aunit)>0:    
         BPC_pull_reset = BPC_pull.reset_index()
 	    
@@ -588,10 +588,10 @@ def Check_Available_Units(check_patient_days,reporting_month):
         previous_A_unit = BPC_pull_reset.loc[(BPC_pull_reset["Sabra_Account"].str.startswith("A_")) &(BPC_pull_reset["Property_Name"].isin(properties_fill_Aunit)),["ENTITY","Property_Name","Sabra_Account","A_unit"]]
         previous_A_unit=previous_A_unit.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
         previous_A_unit=previous_A_unit.rename(columns={"A_unit":reporting_month})
-        st.write("reporting_month_data before merge",reporting_month_data)
+        #st.write("reporting_month_data before merge",reporting_month_data)
         reporting_month_data  = pd.concat([reporting_month_data, previous_A_unit], axis=0)
-        st.write("previous_A_unit",previous_A_unit)
-        st.write("reporting_month_data after merge",reporting_month_data)
+        #st.write("previous_A_unit",previous_A_unit)
+        #st.write("reporting_month_data after merge",reporting_month_data)
         if previous_A_unit.shape[0]>1:
             st.error("Below properties are missing operating beds. Historical data has been used to fill in the missing info as shown below. If this data is incorrect, please add the operating beds in P&L and re-upload it.")
         elif previous_A_unit.shape[0]==1:
