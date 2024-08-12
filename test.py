@@ -600,7 +600,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
         st.write(previous_A_unit_display)
 	    
     #check if operating beds changed compared with previous month "A_unit" in BPC_pull
-    reporting_month_Aunit = reporting_month_data[reporting_month_data["Sabra_Account"].str.startswith("A_")]
+    #reporting_month_Aunit = reporting_month_data[reporting_month_data["Sabra_Account"].str.startswith("A_")]
     st.write("BPC_pull12",BPC_pull)
     if reporting_month_Aunit.shape[0]>0:
         reporting_month_Aunit = reporting_month_Aunit.merge(BPC_pull.reset_index()[['ENTITY', 'Property_Name', 'Sabra_Account', 'A_unit']],how='left',on=['ENTITY', 'Property_Name', 'Sabra_Account'])
@@ -609,16 +609,16 @@ def Check_Available_Units(check_patient_days,reporting_month):
         # Display the result
         st.write("A_unit_dismatch",A_unit_dismatch,BPC_pull)  
         st.write("BPC_pull13",BPC_pull)
-        if A_unit_dismatch.shape[0]>0:
-            st.warning("The number of operating beds for the properties listed below have changed compared to the previous reporting month.")
-            st.warning("Please double-check if these changes are accurate.")
-            st.dataframe(A_unit_dismatch.style.map(color_missing, subset=["Delta"]).format(precision=0, thousands=",").hide(axis="index"),
-		    column_config={
-			        "Property_Name": "Property",
-			         "A_unit":"Previous Operating beds",
-		                 reporting_month:"Current Operating beds",
-		                 "Delta": "Delta"},
-			    hide_index=True)
+        #if A_unit_dismatch.shape[0]>0:
+            #st.warning("The number of operating beds for the properties listed below have changed compared to the previous reporting month.")
+            #st.warning("Please double-check if these changes are accurate.")
+            #st.dataframe(A_unit_dismatch.style.map(color_missing, subset=["Delta"]).format(precision=0, thousands=",").hide(axis="index"),
+		    #column_config={
+			   #     "Property_Name": "Property",
+			   #      "A_unit":"Previous Operating beds",
+		           #      reporting_month:"Current Operating beds",
+		           #      "Delta": "Delta"},
+			    #hide_index=True)
 
 @st.cache_data
 def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no): 
