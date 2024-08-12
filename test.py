@@ -607,8 +607,8 @@ def Check_Available_Units(check_patient_days,reporting_month):
         #reporting_month_Aunit['Delta'] = reporting_month_Aunit['A_unit'] - reporting_month_Aunit[reporting_month]
         #A_unit_dismatch= reporting_month_Aunit[reporting_month_Aunit['Delta'] != 0][["Property_Name",reporting_month,"A_unit"]]
         # Display the result
-        st.write("A_unit_dismatch",A_unit_dismatch,BPC_pull)  
-        st.write("BPC_pull13",BPC_pull)
+        #st.write("A_unit_dismatch",A_unit_dismatch,BPC_pull)  
+        #st.write("BPC_pull13",BPC_pull)
         #if A_unit_dismatch.shape[0]>0:
             #st.warning("The number of operating beds for the properties listed below have changed compared to the previous reporting month.")
             #st.warning("Please double-check if these changes are accurate.")
