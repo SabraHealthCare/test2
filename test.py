@@ -978,18 +978,20 @@ def Map_PL_Sabra(PL,entity):
         month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
         #Convert all values in the PL to numeric, coercing non-numeric values to NaN. Fill NaN values with 0.
         PL[month_cols] = PL[month_cols].apply(pd.to_numeric, errors='coerce').fillna(0)
+	    
         for idx, conv in conversion.items():
-            if pd.isna(conv):
-                continue
-            elif conv == "/monthdays":
-                PL.loc[idx, month_cols] /= monthrange(int(str(month)[0:4]), int(str(month)[4:6]))[1]
-            elif conv == "*monthdays":
-                PL.loc[idx, month_cols] *= monthrange(int(str(month)[0:4]), int(str(month)[4:6]))[1]
-            elif conv.startswith("*"):
-                multiplier = float(conv.split("*")[1])
-                PL.loc[idx, month_cols] *= multiplier
-            else:
-                continue
+            for month in month_cols:
+                if pd.isna(conv):
+                    continue
+                elif conv == "/monthdays":
+                    PL.loc[idx,month] /= monthrange(int(str(month)[0:4]), int(str(month)[4:6]))[1]
+                elif conv == "*monthdays":
+                    PL.loc[idx, month] *= monthrange(int(str(month)[0:4]), int(str(month)[4:6]))[1]
+                elif conv.startswith("*"):
+                    multiplier = float(conv.split("*")[1])
+                    PL.loc[idx, month] *= multiplier
+                else:
+                    continue
         PL=PL.drop(["Tenant_Formated_Account","Conversion","Tenant_Account"], axis=1)
         PL["ENTITY"]=entity	    
          
