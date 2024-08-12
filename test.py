@@ -1951,9 +1951,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.selected_month = selected_month
                     reporting_month=str(selected_year)+str(selected_month)
         col1, col2 = st.columns([1,3])  
-        with col2:
-            if st.button(label='Download P&L sample'):
-                Download_PL_Sample()     
+        #with col2:
+            #if st.button(label='Download P&L sample'):
+                #Download_PL_Sample()     
         with col1:
             if 'uploaded_finance' in locals() and uploaded_finance:
                 st.markdown("✔️ :green[P&L selected]")
