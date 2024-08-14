@@ -633,22 +633,24 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
     PL_temp=PL.loc[tenant_account_row_mask]
-    #valid_col_mask labels all the columns that ([False, False, True,...])
+    #valid_col_mask labels all the columns as ([False, False, True,...])
 	#1. on the right of tenantAccount_col_no 
 	#2.contain numeric value 
 	#3. not all 0 or nan in tenant_account_row. 
 
     valid_col_mask = PL_temp.apply(\
-    lambda x: ( pd.to_numeric(x, errors='coerce').notna().any() and \
+          lambda x: ( pd.to_numeric(x, errors='coerce').notna().any() and \
            not all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)\
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
 
     valid_col_index=[i for i, mask in enumerate(valid_col_mask) if mask]
+    if len(valid_col_index)==0: # there is no valid data column
+        return [],0,[]
     # nan_num_column is the column whose value is nan or 0 for PL.drop(nan_index)
     #nan_num_column = [all(val == 0 or pd.isna(val) or not isinstance(val, (int, float)) for val in PL.drop(nan_index).iloc[:, i]) for i in range(PL.drop(nan_index).shape[1])]
     month_table=pd.DataFrame(0,index=range(first_tenant_account_row), columns=range(PL_col_size))
     year_table=pd.DataFrame(0,index=range(first_tenant_account_row), columns=range(PL_col_size))
-
+  
     for row_i in range(first_tenant_account_row): # only search month/year above the first tenant account row
         for col_i in valid_col_index:  # only search the columns that contain numberic data and on the right of tenantAccount_col_no
             month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i]) 
@@ -1192,12 +1194,6 @@ def Submit_Upload_Latestmonth():
             Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
 
 
-
-
-
-
-
-
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
     try:
@@ -1664,6 +1660,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 
     # read data from uploaded file
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
+    if PL.shape[0]<=1:  # sheet is empty or only has one column
+        return pd.DataFrame()
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
@@ -1676,6 +1674,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         #set tenant_account as index of PL
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
         date_header=Identify_Month_Row(PL,sheet_name,date_header,tenantAccount_col_no)
+        if len(date_header[0])==0:
+            return pd.DataFrame()
         if all(x=="0" or x==0 for x in date_header[0]):
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()  
@@ -1743,7 +1743,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                 if Total_PL.shape[0]==0:
                     Total_PL=PL
-                else:
+		elif PL.shape[0]>0:
                     Total_PL=Total_PL.combine_first(PL)
 	    
 	# check census data
@@ -1868,7 +1868,7 @@ with col1:
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 
-#---------------operator account-----------------------
+#------------------------------------------operator account----------------------------------------------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
     operator=st.session_state["operator"]
     st.title(operator)
