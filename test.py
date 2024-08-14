@@ -644,7 +644,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
 
     valid_col_index=[i for i, mask in enumerate(valid_col_mask) if mask]
-    st.write("valid_col_index",sheet_name,valid_col_index,len(valid_col_index))
+    #st.write("valid_col_index",sheet_name,valid_col_index,len(valid_col_index))
     if len(valid_col_index)==0: # there is no valid data column
         return [],0,[]
     # nan_num_column is the column whose value is nan or 0 for PL.drop(nan_index)
