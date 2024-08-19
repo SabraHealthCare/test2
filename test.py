@@ -194,7 +194,7 @@ def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=None,str_c
                 condition &= original_data['ENTITY'].isin(entity_list)
                 new_data = new_data[new_data["ENTITY"].isin(entity_list)]
             # remove original data by operator and month
-             original_data = original_data[~condition]
+            original_data = original_data[~condition]
 
 
         else:
