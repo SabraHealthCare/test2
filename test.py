@@ -365,7 +365,7 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,pre_m
     #st.write("account_pool",account_pool)
     #search tenant account column in P&L, return col number of tenant account	
 
-    if pre_max_match_col != [10000] and pre_max_match_col[0] < PL.shape[1] - 1:
+    if pre_max_match_col != [10000] and pre_max_match_col[0] < PL.shape[1]:
         # Extract and clean the candidate column
         candidate_col = PL.iloc[:, pre_max_match_col[0]].fillna('').astype(str).str.strip().str.upper()
 	    
@@ -377,9 +377,15 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,pre_m
 	    
         # Check if the proportion of matches exceeds 30% of all non-empty values
         if match_count / len(non_empty_col) > 0.3:
-            return pre_max_match_col
-
-	
+            if len(pre_max_match_col)==1:
+                return pre_max_match_col
+	    elif len(pre_max_match_col)==2:
+                candidate_col = PL.iloc[:, pre_max_match_col[1]].fillna('').astype(str).str.strip().str.upper()
+                non_empty_col = candidate_col[candidate_col != '']
+                match_count = sum(candidate_col.isin(account_pool))
+                if match_count / len(non_empty_col) > 0.1 or match_count >= 3:
+                    return pre_max_match_col
+		
     match_counts = [] 
     # Loop through columns and calculate the match count for each col
     for col in range(min(15, PL.shape[1])):
