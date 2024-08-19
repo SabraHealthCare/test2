@@ -1593,13 +1593,13 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         tenant_account_col=tenantAccount_col_no_list  # for pre-compare
 
         if len(tenantAccount_col_no_list)==2:
-            col1 = PL.iloc[:, tenantAccount_col_no_list[0][1]].fillna('')
-            col2 = PL.iloc[:, tenantAccount_col_no_list[1][1]].fillna('')
+            col1 = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
+            col2 = PL.iloc[:, tenantAccount_col_no_list[1]].fillna('')
 
             # Combine the columns: if col1 has a missing value, fill it with the value from col2
-            PL.iloc[:, tenantAccount_col_no_list[0][1]] = col1.where(col1 != '', col2)
+            PL.iloc[:, tenantAccount_col_no_list[0]] = col1.where(col1 != '', col2)
 
-        tenantAccount_col_no=tenantAccount_col_no_list[0][1]  
+        tenantAccount_col_no=tenantAccount_col_no_list[0]
 		
         #set tenant_account as index of PL
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
@@ -1691,13 +1691,13 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         tenant_account_col=tenantAccount_col_no_list  # for pre-compare
 
         if len(tenantAccount_col_no_list)==2:
-            col1 = PL.iloc[:, tenantAccount_col_no_list[0][1]].fillna('')
-            col2 = PL.iloc[:, tenantAccount_col_no_list[1][1]].fillna('')
+            col1 = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
+            col2 = PL.iloc[:, tenantAccount_col_no_list[1]].fillna('')
 
             # Combine the columns: if col1 has a missing value, fill it with the value from col2
-            PL.iloc[:, tenantAccount_col_no_list[0][1]] = col1.where(col1 != '', col2)
+            PL.iloc[:, tenantAccount_col_no_list[0]] = col1.where(col1 != '', col2)
         st.write("tenantAccount_col_no_list",tenantAccount_col_no_list)
-        tenantAccount_col_no=tenantAccount_col_no_list[0][1]
+        tenantAccount_col_no=tenantAccount_col_no_list[0]
 
         #set tenant_account as index of PL
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
