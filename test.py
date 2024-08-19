@@ -361,10 +361,9 @@ def filters_widgets(df, columns,location="Vertical"):
             return df
 		
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,pre_max_match_col):
-    #st.write("pre_max_match_col",pre_max_match_col)
+    st.write("pre_max_match_col",pre_max_match_col)
     #st.write("account_pool",account_pool)
     #search tenant account column in P&L, return col number of tenant account	
-
     if pre_max_match_col != [10000] and pre_max_match_col[0] < PL.shape[1]:
         # Extract and clean the candidate column
         candidate_col = PL.iloc[:, pre_max_match_col[0]].fillna('').astype(str).str.strip().str.upper()
@@ -404,9 +403,11 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,pre_m
     # Check if there are at least two columns with matches
     if len(match_counts) >= 2 and match_counts[0][0] > 0:
         if match_counts[1][0] > 0:
+            st.write("match_counts0",match_counts)
             # Return the top two columns with the highest match counts
             return [match_counts[0][1], match_counts[1][1]]
         elif match_counts[1][0] ==0:
+            st.write("match_counts1",match_counts)
             return [match_counts[0][1]]	
     st.error(f"Fail to identify tenant accounts columns in {sheet_type_name} sheet —— {sheet_name}")
     st.stop()
