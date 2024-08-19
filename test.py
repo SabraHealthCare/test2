@@ -361,33 +361,48 @@ def filters_widgets(df, columns,location="Vertical"):
             return df
 		
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,pre_max_match_col):
-    
     #st.write("pre_max_match_col",pre_max_match_col)
     #st.write("account_pool",account_pool)
     #search tenant account column in P&L, return col number of tenant account	
-    if pre_max_match_col!=10000 and pre_max_match_col<PL.shape[1]:
-        #check if pre_max_match is the tenant_col
-        candidate_col=list(map(lambda x: str(x).strip().upper() if not pd.isna(x) and isinstance(x, str) else x,PL.iloc[:,pre_max_match_col]))
-        match=[x in candidate_col for x in account_pool]
-        if len(match)>0 and sum(x for x in match)/len(account_pool)>0.5:
+
+    if pre_max_match_col != [10000] and pre_max_match_col[0] < PL.shape[1] - 1:
+        # Extract and clean the candidate column
+        candidate_col = PL.iloc[:, pre_max_match_col[0]].fillna('').astype(str).str.strip().str.upper()
+	    
+        # Filter out empty strings after cleaning
+        non_empty_col = candidate_col[candidate_col != '']
+	    
+        # Count the number of matches between the candidate column and the account pool
+        match_count = sum(candidate_col.isin(account_pool))
+	    
+        # Check if the proportion of matches exceeds 30% of all non-empty values
+        if match_count / len(non_empty_col) > 0.3:
             return pre_max_match_col
-    max_match=0
-    for tenantAccount_col_no in range(0,min(15,PL.shape[1])):
-        candidate_col=list(map(lambda x: str(x).strip().upper() if not pd.isna(x) and isinstance(x, str) else x,PL.iloc[:,tenantAccount_col_no]))
 
-        #find out how many tenant accounts match with account_mapping
-        match=[x in candidate_col for x in account_pool]
-
-        match_count=sum(x for x in match)
-        #if tenantAccount_col_no==0:
-            #st.write("candidate_col",candidate_col,"match",match,"match_count",match_count)
-        if len(match)>0 and match_count>max_match:
-            max_match_col=tenantAccount_col_no
-            max_match=match_count
-
-    if max_match>0:
-        return max_match_col     
-    st.error("Fail to identify tenant accounts column in {} sheet —— {}".format(sheet_type_name,sheet_name))
+	
+    match_counts = [] 
+    # Loop through columns and calculate the match count for each col
+    for col in range(min(15, PL.shape[1])):
+        # Clean and prepare the candidate column
+        candidate_col = PL.iloc[:, col].fillna('').astype(str).str.strip().str.upper()
+        
+        # Count the number of matches with account_pool
+        match_count = sum(candidate_col.isin(account_pool))
+        
+        # Store the match count along with the column number
+        match_counts.append((match_count, col))
+    
+    # Sort columns by match count in descending order
+    match_counts.sort(reverse=True, key=lambda x: x[0])
+    
+    # Check if there are at least two columns with matches
+    if len(match_counts) >= 2 and match_counts[0][0] > 0:
+        if match_counts[1][0] > 0:
+        # Return the top two columns with the highest match counts
+            return [match_counts[0][1], match_counts[1][1]]
+	elif match_counts[1][0] ==0:
+            return [match_counts[0][1]]	
+    st.error(f"Fail to identify tenant accounts columns in {sheet_type_name} sheet —— {sheet_name}")
     st.stop()
 
 
@@ -1574,10 +1589,16 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 	
     # Start checking process
     if True:   
-        tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
-        if tenantAccount_col_no==None:
-            st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
-            st.stop()    
+        tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
+        tenant_account_col=tenantAccount_col_no_list  # for pre-compare
+
+        if len(tenantAccount_col_no)==2:
+            col1 = PL.iloc[:, tenantAccount_col_no_list[0][1]].fillna('')
+            col2 = PL.iloc[:, tenantAccount_col_no_list[1][1]].fillna('')
+
+            # Combine the columns: if col1 has a missing value, fill it with the value from col2
+            PL.iloc[:, tenantAccount_col_no_list[0][1]] = col1.where(col1 != '', col2)
+        tenantAccount_col_no=tenantAccount_col_no_list[0][1]  
 		
         #set tenant_account as index of PL
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
@@ -1665,13 +1686,17 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         return pd.DataFrame()
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
-        tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
-        if tenantAccount_col_no==None:
-            st.error("Fail to identify tenant account column in {} sheet '{}'".format(sheet_type_name,sheet_name))
-            st.stop()   
-        else:
-            tenant_account_col=tenantAccount_col_no
-		
+        tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
+        tenant_account_col=tenantAccount_col_no_list  # for pre-compare
+
+        if len(tenantAccount_col_no)==2:
+            col1 = PL.iloc[:, tenantAccount_col_no_list[0][1]].fillna('')
+            col2 = PL.iloc[:, tenantAccount_col_no_list[1][1]].fillna('')
+
+            # Combine the columns: if col1 has a missing value, fill it with the value from col2
+            PL.iloc[:, tenantAccount_col_no_list[0][1]] = col1.where(col1 != '', col2)
+        tenantAccount_col_no=tenantAccount_col_no_list[0][1]
+
         #set tenant_account as index of PL
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
         date_header=Identify_Month_Row(PL,sheet_name,date_header,tenantAccount_col_no)
@@ -1887,7 +1912,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         global reporting_month,reporting_month_label,tenant_account_col,date_header
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
         reporting_month_label=True  
-        tenant_account_col=10000
+        tenant_account_col=[10000]
         date_header=[[0],0,[]]
         # Calculate the list of years and their indices
         years_range = list(range(current_year, current_year - 2, -1))
