@@ -1592,7 +1592,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
         tenant_account_col=tenantAccount_col_no_list  # for pre-compare
 
-        if len(tenantAccount_col_no)==2:
+        if len(tenantAccount_col_no_list)==2:
             col1 = PL.iloc[:, tenantAccount_col_no_list[0][1]].fillna('')
             col2 = PL.iloc[:, tenantAccount_col_no_list[1][1]].fillna('')
 
@@ -1689,7 +1689,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
         tenant_account_col=tenantAccount_col_no_list  # for pre-compare
 
-        if len(tenantAccount_col_no)==2:
+        if len(tenantAccount_col_no_list)==2:
             col1 = PL.iloc[:, tenantAccount_col_no_list[0][1]].fillna('')
             col2 = PL.iloc[:, tenantAccount_col_no_list[1][1]].fillna('')
 
