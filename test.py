@@ -1696,7 +1696,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 
             # Combine the columns: if col1 has a missing value, fill it with the value from col2
             PL.iloc[:, tenantAccount_col_no_list[0][1]] = col1.where(col1 != '', col2)
-        st.write(tenantAccount_col_no_list[0][1],tenantAccount_col_no_list)
+        st.write("tenantAccount_col_no_list",tenantAccount_col_no_list)
         tenantAccount_col_no=tenantAccount_col_no_list[0][1]
 
         #set tenant_account as index of PL
