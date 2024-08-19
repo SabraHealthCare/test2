@@ -1593,7 +1593,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 	
     # Start checking process
     if True:   
-        st.write("tenant_account_col",tenant_account_col)
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
         tenant_account_col=tenantAccount_col_no_list  # for pre-compare
 
