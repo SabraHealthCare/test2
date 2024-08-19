@@ -194,14 +194,14 @@ def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=None,str_c
                 condition &= original_data['ENTITY'].isin(entity_list)
                 new_data = new_data[new_data["ENTITY"].isin(entity_list)]
             # remove original data by operator and month
-            original_data = original_data.drop(original_data[condition].index)
+             original_data = original_data[~condition]
 
 
         else:
             condition = (original_data['Operator'] == operator)
             if entity_list:
                 condition &= original_data['ENTITY'].isin(entity_list)
-            original_data = original_data.drop(original_data[condition].index)
+            original_data = original_data[~condition]
 
         updated_data = pd.concat([original_data, new_data])
         updated_data = updated_data.drop(columns='index', errors='ignore')
@@ -237,7 +237,7 @@ def Initial_Mapping(operator):
     account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename,"CSV",account_mapping_str_col)
     account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
 	
-    if account_mapping.shape[0]==1:# and account_mapping.loc[:,"Sabra_Account"][0]=='Template':
+    if account_mapping.shape[0]==1:    # and account_mapping.loc[:,"Sabra_Account"][0]=='Template':
         account_mapping = account_mapping_all[account_mapping_all["Operator"] == "Template"].copy()
         account_mapping["Operator"] = operator
 
@@ -283,15 +283,6 @@ css='''
 </style>
 '''
 st.markdown(css, unsafe_allow_html=True)
-
-# convert column number into letter for CVS file 0-A, 1-B,2-c
-def colnum_letter(col_number):
-    letter = ""
-    col_number+=1
-    while col_number > 0:
-        col_number, remainder = divmod(col_number - 1, 26)
-        letter = chr(65 + remainder) + letter
-    return letter 
 	
 @st.cache_data
 def Create_Tree_Hierarchy():
@@ -299,6 +290,30 @@ def Create_Tree_Hierarchy():
     parent_hierarchy_main=[{'label': "No need to map","value":"No need to map"}]
     parent_hierarchy_second=[{'label': "No need to map","value":"No need to map"}]
     BPC_Account = Read_CSV_From_Onedrive(mapping_path,BPC_account_filename,"CSV")
+
+
+    # Function to create hierarchy for a given type
+    def create_hierarchy(account_type):
+        hierarchy = []
+        for category in BPC_Account[BPC_Account["Type"] == account_type]["Category"].unique():
+            children_hierarchy = [
+                {'label': account, 
+                 'value': BPC_Account.loc[(BPC_Account["Sabra_Account_Full_Name"] == account) & (BPC_Account["Type"] == account_type), "BPC_Account_Name"].item()}
+                for account in BPC_Account[(BPC_Account["Category"] == category) & (BPC_Account["Type"] == account_type)]["Sabra_Account_Full_Name"]
+            ]
+            hierarchy.append({'label': category, 'value': category, 'children': children_hierarchy})
+        return hierarchy
+	    
+    # Create hierarchies for main and second types
+    parent_hierarchy_main += create_hierarchy("Main")
+    parent_hierarchy_second += create_hierarchy("Second")
+    
+    # Select relevant columns for the output
+    BPC_Account = BPC_Account[["BPC_Account_Name", "Sabra_Account_Full_Name", "Category"]]
+    
+    return parent_hierarchy_main, parent_hierarchy_second, BPC_Account
+
+	
     for category in BPC_Account[BPC_Account["Type"]=="Main"]["Category"].unique():
         children_hierarchy=[]
         for account in BPC_Account[(BPC_Account["Category"]==category)&(BPC_Account["Type"]=="Main")]["Sabra_Account_Full_Name"]:
@@ -1696,7 +1711,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 
             # Combine the columns: if col1 has a missing value, fill it with the value from col2
             PL.iloc[:, tenantAccount_col_no_list[0]] = col1.where(col1 != '', col2)
-        st.write("tenantAccount_col_no_list",tenantAccount_col_no_list)
+        
         tenantAccount_col_no=tenantAccount_col_no_list[0]
 
         #set tenant_account as index of PL
