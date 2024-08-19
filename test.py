@@ -160,11 +160,9 @@ def Read_CSV_From_Onedrive(path, file_name,type,str_col_list=None):
         elif type.upper()=="VIDEO":
             return BytesIO(response.content)        
         return False
-	    
-
 
 # no cache, save a dataframe to OneDrive 
-def Save_as_CSV_Onedrive(df,path,file_name):   
+def Save_As_CSV_Onedrive(df,path,file_name):   
     try:
         df=df[list(filter(lambda x: x!="index" and "Unnamed:" not in x,df.columns))]
         csv_string = df.to_csv(index=False)
@@ -183,15 +181,17 @@ def Save_as_CSV_Onedrive(df,path,file_name):
 # For updating account_mapping, entity_mapping, reporting_month_data, only for operator use
 # if entity_list is provided,
 def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=None,str_col_list=None):  # replace original data
-    if entity_list==None:
-        entity_list=[]    
+    entity_list = entity_list or []   
     original_data=Read_CSV_From_Onedrive(path,file_name,"CSV",str_col_list)
     new_data=new_data.reset_index(drop=False)
+	
     if  isinstance(original_data, pd.DataFrame):
         if "TIME" in original_data.columns and "TIME" in new_data.columns:
             original_data.TIME = original_data.TIME.astype(str)
             months_of_new_data=new_data["TIME"].unique()
-            if len(entity_list)==0:
+            condition = (original_data['Operator'] == operator) & (original_data['TIME'].isin(months_of_new_data))
+            if entity_list:
+                condition &= original_data['ENTITY'].isin(entity_list)
                 # remove original data by operator and month
                 original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))].index)
             elif len(entity_list)>0:  # only updated data for given entity_list
@@ -214,7 +214,7 @@ def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=None,str_c
         updated_data=new_data.reset_index(drop=False)
         new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns))
         updated_data=updated_data[new_columns_name]	
-    return Save_as_CSV_Onedrive(updated_data,path,file_name)  # return True False
+    return Save_As_CSV_Onedrive(updated_data,path,file_name)  # return True False
 
 
 def Format_Value(column):
@@ -921,7 +921,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
     Sabra_second_account_list=[np.nan] * count
     Sabra_main_account_value=[np.nan] * count
     Sabra_second_account_value=[np.nan] * count
-    st.write("new_tenant_account_list",new_tenant_account_list)
+    #st.write("new_tenant_account_list",new_tenant_account_list)
     with st.form(key=new_tenant_account_list[0]):
         for i in range(count):
             if sheet_name=="False":
@@ -1118,7 +1118,7 @@ def View_Summary():
     Check_Available_Units(check_patient_days,reporting_month)
 	
     #check missing category ( example: total revenue= 0, total Opex=0...)	
-    category_list=['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"]
+    category_list=['Revenue','Patient Days','Operating Expenses',"Balance Sheet"]
     entity_list=list(reporting_month_data["ENTITY"].unique())
     current_cagegory=reporting_month_data[["Property_Name","Category","ENTITY",reporting_month]][reporting_month_data["Category"].\
 	    isin(category_list)].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
@@ -2180,7 +2180,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                                 tenant_account=un_confirmed_account[un_confirmed_account["Index"]==selected_row[i]["Index"]]["Tenant_Account"].item()
                                 account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"]=None
                         # save account_mapping 
-                        if Save_as_CSV_Onedrive(account_mapping,path,account_mapping_filename):    
+                        if Save_As_CSV_Onedrive(account_mapping,path,account_mapping_filename):    
                             st.success("Selected mappings have been archived successfully")
                         else:
                             st.error("Can't save the change, please contact Sha Li.")
