@@ -192,28 +192,21 @@ def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=None,str_c
             condition = (original_data['Operator'] == operator) & (original_data['TIME'].isin(months_of_new_data))
             if entity_list:
                 condition &= original_data['ENTITY'].isin(entity_list)
-                # remove original data by operator and month
-                original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))].index)
-            elif len(entity_list)>0:  # only updated data for given entity_list
-            	# remove original data by operator and month and entity
-                original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'].isin(months_of_new_data))&(original_data['ENTITY'].isin(entity_list))].index)
-                new_data=new_data[new_data["ENTITY"].isin(entity_list)]
-                st.write("new data",new_data) 
-        elif "TIME" not in original_data.columns and "TIME" not in new_data.columns:
-            if len(entity_list)==0:
-                original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
-            elif len(entity_list)>0:
-            	# remove original data by operator and month and entity
-                original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['ENTITY'].isin(entity_list))].index)
-	    		
-        # append new data to original data
-        new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns))
-        updated_data = pd.concat([original_data,new_data])
-        updated_data=updated_data[new_columns_name]
-    elif original_data is None:
-        updated_data=new_data.reset_index(drop=False)
-        new_columns_name=list(filter(lambda x:str(x).upper()!="INDEX",new_data.columns))
-        updated_data=updated_data[new_columns_name]	
+                new_data = new_data[new_data["ENTITY"].isin(entity_list)]
+            # remove original data by operator and month
+            original_data = original_data.drop(original_data[condition].index)
+
+
+        else:
+            condition = (original_data['Operator'] == operator)
+            if entity_list:
+                condition &= original_data['ENTITY'].isin(entity_list)
+            original_data = original_data.drop(original_data[condition].index)
+
+        updated_data = pd.concat([original_data, new_data])
+        updated_data = updated_data.drop(columns='index', errors='ignore')
+    else:
+        updated_data = new_data.drop(columns='index', errors='ignore')
     return Save_As_CSV_Onedrive(updated_data,path,file_name)  # return True False
 
 
@@ -226,7 +219,6 @@ def Format_Value(column):
         elif isinstance(x, float):
             return round(x, 1)
         return x
-    
     return column.apply(format_value)
 
 
@@ -237,27 +229,31 @@ def clicked(button_name):
 # No cache
 def Initial_Mapping(operator):
     BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename,"CSV")
-    BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
-    BPC_pull=BPC_pull.set_index(["ENTITY","Sabra_Account"])
-    BPC_pull = BPC_pull.dropna(axis=1, how='all')
-    BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
+    BPC_pull = (BPC_pull[BPC_pull["Operator"] == operator]
+            .set_index(["ENTITY", "Sabra_Account"])
+            .dropna(axis=1, how='all')
+            .rename(columns=str))
   	
     account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename,"CSV",account_mapping_str_col)
-    account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]==operator]
+    account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
+	
     if account_mapping.shape[0]==1:# and account_mapping.loc[:,"Sabra_Account"][0]=='Template':
-        account_mapping = account_mapping_all.loc[account_mapping_all["Operator"]=="Template"]
-        account_mapping.loc[:,"Operator"]=operator
-    account_mapping.loc[:, 'Sabra_Account'] = account_mapping['Sabra_Account'].apply(lambda x: x.upper().strip() if  pd.notna(x) else x)
-    account_mapping.loc[:, 'Sabra_Second_Account'] = account_mapping['Sabra_Second_Account'].apply(lambda x:  x.upper().strip() if pd.notna(x) else x)
-    account_mapping.loc[:, "Tenant_Formated_Account"] = account_mapping["Tenant_Account"].apply(lambda x: x.upper().strip() if pd.notna(x) else x)
-    account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
+        account_mapping = account_mapping_all[account_mapping_all["Operator"] == "Template"].copy()
+        account_mapping["Operator"] = operator
+
+    # Clean and format account mapping columns
+    account_mapping_cols = ["Sabra_Account", "Sabra_Second_Account", "Tenant_Account"]
+    account_mapping[account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
+    account_mapping["Tenant_Formated_Account"] = account_mapping["Tenant_Account"].apply(lambda x: x.upper().strip() if pd.notna(x) else x)
+    account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Tenant_Formated_Account", "Conversion"]]
+
 
     entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename,"CSV",entity_mapping_str_col)
-    entity_mapping=entity_mapping.reset_index(drop=True)
-    entity_mapping=entity_mapping[entity_mapping["Operator"]==operator]
-    entity_mapping=entity_mapping.set_index("ENTITY")
-    entity_mapping['DATE_ACQUIRED'] = entity_mapping['DATE_ACQUIRED'].astype(str)
-    entity_mapping['DATE_SOLD_PAYOFF'] = entity_mapping['DATE_SOLD_PAYOFF'].astype(str)
+    entity_mapping = (Read_CSV_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
+                  .reset_index(drop=True)
+                  .query("Operator == @operator")
+                  .set_index("ENTITY"))
+    entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]] = entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]].astype(str)
     return BPC_pull,entity_mapping,account_mapping
 
 	
