@@ -399,15 +399,12 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,pre_m
     
     # Sort columns by match count in descending order
     match_counts.sort(reverse=True, key=lambda x: x[0])
-    st.write("match_counts",match_counts)
     # Check if there are at least two columns with matches
     if len(match_counts) >= 2 and match_counts[0][0] > 0:
         if match_counts[1][0] > 0:
-            st.write("match_counts0",match_counts)
             # Return the top two columns with the highest match counts
             return [match_counts[0][1], match_counts[1][1]]
         elif match_counts[1][0] ==0:
-            st.write("match_counts1",match_counts)
             return [match_counts[0][1]]	
     st.error(f"Fail to identify tenant accounts columns in {sheet_type_name} sheet —— {sheet_name}")
     st.stop()
