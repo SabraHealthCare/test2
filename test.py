@@ -283,15 +283,16 @@ css='''
 </style>
 '''
 st.markdown(css, unsafe_allow_html=True)
-	
-@st.cache_data
-def Create_Tree_Hierarchy():
-    #Create Tree select hierarchy
-    parent_hierarchy_main=[{'label': "No need to map","value":"No need to map"}]
-    parent_hierarchy_second=[{'label': "No need to map","value":"No need to map"}]
-    BPC_Account = Read_CSV_From_Onedrive(mapping_path,BPC_account_filename,"CSV")
 
 
+def Create_Tree_Hierarchy1():
+    # Initialize hierarchy with default options
+    parent_hierarchy_main = [{'label': "No need to map", 'value': "No need to map"}]
+    parent_hierarchy_second = [{'label': "No need to map", 'value': "No need to map"}]
+    
+    # Read account data
+    BPC_Account = Read_CSV_From_Onedrive(mapping_path, BPC_account_filename, "CSV")
+    
     # Function to create hierarchy for a given type
     def create_hierarchy(account_type):
         hierarchy = []
@@ -303,7 +304,7 @@ def Create_Tree_Hierarchy():
             ]
             hierarchy.append({'label': category, 'value': category, 'children': children_hierarchy})
         return hierarchy
-	    
+    
     # Create hierarchies for main and second types
     parent_hierarchy_main += create_hierarchy("Main")
     parent_hierarchy_second += create_hierarchy("Second")
@@ -313,6 +314,15 @@ def Create_Tree_Hierarchy():
     
     return parent_hierarchy_main, parent_hierarchy_second, BPC_Account
 
+#parent_hierarchy_main, parent_hierarchy_second, BPC_Account = Create_Tree_Hierarchy()
+
+
+@st.cache_data
+def Create_Tree_Hierarchy():
+    #Create Tree select hierarchy
+    parent_hierarchy_main=[{'label': "No need to map","value":"No need to map"}]
+    parent_hierarchy_second=[{'label': "No need to map","value":"No need to map"}]
+    BPC_Account = Read_CSV_From_Onedrive(mapping_path,BPC_account_filename,"CSV")
 	
     for category in BPC_Account[BPC_Account["Type"]=="Main"]["Category"].unique():
         children_hierarchy=[]
@@ -372,8 +382,6 @@ def filters_widgets(df, columns,location="Vertical"):
             return df
 
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,pre_max_match_col):
-    #st.write("pre_max_match_col",pre_max_match_col)
-    #st.write("account_pool",account_pool)
     #search tenant account column in P&L, return col number of tenant account	
     if pre_max_match_col != [10000] and pre_max_match_col[0] < PL.shape[1]:
         # Extract and clean the candidate column
@@ -480,7 +488,6 @@ def Get_Month_Year(single_string):
 
 # add year to month_header: identify current year/last year giving a list of month
 def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reporting_month):
-
     #remove rows with nan tenant account
     nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x==0 ,PL.index))
     column_mask = [all(val == 0 or not isinstance(val, (int, float)) or pd.isna(val) for val in PL.drop(nan_index).iloc[month_row_index:, i]) for i in range(PL.drop(nan_index).shape[1])]
