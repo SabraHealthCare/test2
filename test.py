@@ -392,9 +392,9 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,pre_m
 	    
         # Count the number of matches between the candidate column and the account pool
         match_count = sum(candidate_col.isin(account_pool))
-	    
+        st.write("match_count",match_count,"non_empty_col",non_empty_col)
         # Check if the proportion of matches exceeds 30% of all non-empty values
-        if match_count / len(non_empty_col) > 0.3:
+        if match_count>0 and match_count / len(non_empty_col) > 0.3:
             if len(pre_max_match_col)==1:
                 return pre_max_match_col
             elif len(pre_max_match_col)==2:
