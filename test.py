@@ -1706,6 +1706,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 
     # read data from uploaded file
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
+    st.write("PL",PL)
     if PL.shape[0]<=1:  # sheet is empty or only has one column
         return pd.DataFrame()
     # Start checking process
@@ -1943,6 +1944,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.session_state.selected_month = '01'
         global reporting_month,reporting_month_label,tenant_account_col,date_header
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
+        st.write("account_mapping",account_mapping)
         reporting_month_label=True  
         tenant_account_col=[10000]
         date_header=[[0],0,[]]
@@ -1994,7 +1996,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col1:
                     st.write("Upload P&L:")
                     uploaded_finance=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
-
                 with col2:
                     st.write("Upload Balance Sheet:")
                     uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
@@ -2020,7 +2021,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             else:
                 st.write("P&L wasn't upload.")
                 st.stop()
-            #st.write(11111111)
+
             reporting_month=str(selected_year)+str(selected_month)
             if reporting_month>=current_date:
                 st.error("The reporting month should precede the current month.")
