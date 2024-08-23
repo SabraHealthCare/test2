@@ -427,7 +427,7 @@ def Get_Year(single_string):
     for Year, keywords in year_dic.items():
         for keyword  in keywords:
             if keyword in single_string:
-                return Year,Year_keyword
+                return Year,keyword
     return 0,""
 
 def Get_Month_Year(single_string):
@@ -1691,7 +1691,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 
     # read data from uploaded file
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
-    st.write("PL",PL)
+    
     if PL.shape[0]<=1:  # sheet is empty or only has one column
         return pd.DataFrame()
     # Start checking process
