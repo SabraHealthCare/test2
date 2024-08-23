@@ -48,7 +48,7 @@ month_dic_num={10:["10/","-10","/10","10","_10"],11:["11/","-11","/11","11","_11
                    2:["02/","2/","-2","-02","/2","/02"],3:["03/","3/","-3","-03","/3","/03"],4:["04/","4/","-4","-04","/4","/04"],\
                    5:["05/","5/","-5","-05","/5","/05"],6:["06/","6/","-06","-6","/6","/06"],\
                    7:["07/","7/","-7","-07","/7","/07"],8:["08/","8/","-8","-08","/8","/08"],9:["09/","9/","-09","-9","/9","/09"]}
-year_dic={2023:["2023","23"],2024:["2024","24"],2025:["2025","25"],2026:["2026","26"]} 	    
+year_dic={2024:["2024","24"],2025:["2025","25"],2026:["2026","26"]} 	    
 #One drive authority. Set application details
 client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
 client_secret='PgR8Q~HZE2q-dmOb2w_9_0VuxfT9VMLt_Lp3Jbce'
@@ -380,108 +380,93 @@ def filters_widgets(df, columns,location="Vertical"):
             return df
         else:
             return df
-
-def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,pre_max_match_col):
-    #search tenant account column in P&L, return col number of tenant account	
-    if pre_max_match_col != [10000] and pre_max_match_col[0] < PL.shape[1]:
-        # Extract and clean the candidate column
-        candidate_col = PL.iloc[:, pre_max_match_col[0]].fillna('').astype(str).str.strip().str.upper()
-	    
-        # Filter out empty strings after cleaning
-        non_empty_col = candidate_col[candidate_col != '']
-	    
-        # Count the number of matches between the candidate column and the account pool
-        match_count = sum(candidate_col.isin(account_pool))
-        #st.write("match_count",match_count,"non_empty_col",non_empty_col)
-        # Check if the proportion of matches exceeds 30% of all non-empty values
-        if match_count>0 and match_count / len(non_empty_col) > 0.3:
-            if len(pre_max_match_col)==1:
-                return pre_max_match_col
-            elif len(pre_max_match_col)==2:
-                candidate_col = PL.iloc[:, pre_max_match_col[1]].fillna('').astype(str).str.strip().str.upper()
-                non_empty_col = candidate_col[candidate_col != '']
-                match_count = sum(candidate_col.isin(account_pool))
-                if match_count / len(non_empty_col) > 0.1 or match_count >= 3:
-                    return pre_max_match_col
 		
-    match_counts = [] 
-    # Loop through columns and calculate the match count for each col
-    for col in range(min(15, PL.shape[1])):
-        # Clean and prepare the candidate column
-        candidate_col = PL.iloc[:, col].fillna('').astype(str).str.strip().str.upper()
-        
-        # Count the number of matches with account_pool
+def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, pre_max_match_col):
+    # Helper function to clean and match candidate columns
+    def get_match_count(col_index):
+        candidate_col = PL.iloc[:, col_index].fillna('').astype(str).str.strip().str.upper()
+        non_empty_col = candidate_col[candidate_col != '']
         match_count = sum(candidate_col.isin(account_pool))
-        
-        # Store the match count along with the column number
+        return match_count, len(non_empty_col)
+    
+    # Check the pre-identified columns first
+    if pre_max_match_col != [10000] and pre_max_match_col[0] < PL.shape[1]:
+        for i in range(len(pre_max_match_col)):
+            match_count, non_empty_count = get_match_count(pre_max_match_col[i])
+            if match_count > 0 and (match_count > 1 or match_count / non_empty_count > 0.2):
+                if i == len(pre_max_match_col) - 1:
+                    return pre_max_match_col
+    
+    # If pre-identified columns are not sufficient, search for potential matches across the first 15 columns
+    match_counts = []
+    for col in range(min(15, PL.shape[1])):
+        match_count, _ = get_match_count(col)
         match_counts.append((match_count, col))
     
-    # Sort columns by match count in descending order
+    # Sort by match count in descending order
     match_counts.sort(reverse=True, key=lambda x: x[0])
-    # Check if there are at least two columns with matches
-    if len(match_counts) >= 2 and match_counts[0][0] > 0:
-        if match_counts[1][0] > 0:
-            # Return the top two columns with the highest match counts
-            return [match_counts[0][1], match_counts[1][1]]
-        elif match_counts[1][0] ==0:
-            return [match_counts[0][1]]	
-    st.error(f"Fail to identify tenant accounts columns in {sheet_type_name} sheet —— {sheet_name}")
+    
+    # Return the top columns with the highest match counts
+    if match_counts and match_counts[0][0] > 0:
+        top_matches = [match_counts[0][1]]
+        if len(match_counts) > 1 and match_counts[1][0] > 0:
+            top_matches.append(match_counts[1][1])
+        if len(match_counts) > 2 and match_counts[2][0] > 0:
+            top_matches.append(match_counts[2][1])
+        return top_matches
+    
+    # If no match is found, raise an error
+    st.error(f"Failed to identify tenant account columns in {sheet_type_name} sheet —— {sheet_name}")
     st.stop()
-
 
 def download_report(df,button_display):
     download_file=df.to_csv(index=False).encode('utf-8')
     return st.download_button(label="Download "+button_display,data=download_file,file_name=button_display+".csv",mime="text/csv")
  
 def Get_Year(single_string):
-    for Year in year_dic.keys():
-        for Year_keyword in year_dic[Year]:
-            if Year_keyword in single_string:
-                #st.write("single_string",single_string,"return",Year,Year_keyword)
+    for Year, keywords in year_dic.items():
+        for keyword  in keywords:
+            if keyword in single_string:
                 return Year,Year_keyword
     return 0,""
 
 def Get_Month_Year(single_string):
-    if single_string!=single_string or pd.isna(single_string):
+    if pd.isna(single_string):
         return 0,0
     if isinstance(single_string, datetime):
         return int(single_string.month),int(single_string.year)
 
-    if isinstance(single_string, (int,float)) and single_string not in year_dic.keys():
-        #st.write("single_string",single_string,"return 0,0")
+    if isinstance(single_string, (int,float)) and single_string not in year_dic:
         return 0,0
+	    
     single_string=str(single_string).lower()
     year,year_num=Get_Year(single_string)
+	
     if year!=0:
         single_string=single_string.replace(year_num,"")
-        if single_string=="":
+        if not single_string:
             return 0,year
     single_string=single_string.replace("30","").replace("31","").replace("29","").replace("28","")
-    for month_i in month_dic_word.keys() :#[10,11,3...12]
-        for  month_word in month_dic_word[month_i]: #month_word is element of ['december','dec',"nov",...]
-            #st.write("single_string",single_string)
-            #st.write("month_word in single_string",month_word in single_string)
+    for month_i ,month_words in month_dic_word.items():#[10,11,3...12]
+        for  month_word in month_words: # month_word is element of ['december','dec',"nov",...]
             if month_word in single_string:  # month is words ,like Jan Feb... year is optional
-
                 remaining=single_string.replace(month_word,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("asof","").replace("actual","")
                 
                 #if there are more than 3 other char in the string, this string is not month 
-                if len(remaining)>=3:
-                    return 0,0
-                else:   
+                if len(remaining)<3:  
                     return month_i,year
-        # didn't detect month words in above code, check number format: 3/31/2024, 3/2023...
-	# if there is no year , skip
-        if year==0:
-            continue   
+			
+    # didn't detect month words in above code, check number format: 3/31/2024, 3/2023...
+    # if there is no year, skip
+    if year==0:
+        return 0,0   
         
-        for  month_num in month_dic_num[month_i]: 
+    for month_i, month_nums  in month_dic_num.items(): 
+        for month_num in month_nums:
             if month_num in single_string:  # month is number ,like 01/, 02/,   year is Mandatory
                 remaining=single_string.replace(month_num,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("asof","").replace("actual","")
                 #if there are more than 3 other char in the string, this string is not month 
-                if len(remaining)>=3:
-                    return 0,0
-                else:   
+                if len(remaining)<3: 
                     return month_i,year	
     # didn't find month. return month as 0
     return 0,0   
