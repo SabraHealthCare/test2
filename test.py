@@ -1599,7 +1599,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
     if True:   
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
         tenant_account_col=tenantAccount_col_no_list  # for pre-compare
-
+        st.write("tenantAccount_col_no_list",tenantAccount_col_no_list)
         if len(tenantAccount_col_no_list)==2:
             col1 = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
             col2 = PL.iloc[:, tenantAccount_col_no_list[1]].fillna('')
@@ -1612,7 +1612,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
             PL.iloc[:, tenantAccount_col_no_list[0]] = col1
 
         tenantAccount_col_no=tenantAccount_col_no_list[0]
-		
+        st.write("PL.iloc[:, tenantAccount_col_no_list[0]]",PL.iloc[:, tenantAccount_col_no_list[0]])	
         #set tenant_account as index of PL
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
         entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no) 
