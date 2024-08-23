@@ -1599,12 +1599,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
     if True:   
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
         tenant_account_col=tenantAccount_col_no_list  # for pre-compare
-        if len(tenantAccount_col_no_list)==3:
-            col1 = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
-            col2 = PL.iloc[:, tenantAccount_col_no_list[1]].fillna('')
-            col3 = PL.iloc[:, tenantAccount_col_no_list[2]].fillna('')
-            # Combine the columns: if col1 has a missing value, fill it with the value from col2
-            PL.iloc[:, tenantAccount_col_no_list[0]] = col1.where(col1 != '', col2).where(col1 != '', col3)
 
         if len(tenantAccount_col_no_list)==2:
             col1 = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
