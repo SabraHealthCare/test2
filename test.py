@@ -1705,13 +1705,17 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         #st.write("tenantAccount_col_no_list",tenantAccount_col_no_list)
         if len(tenantAccount_col_no_list)>=2:
             col1 = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
+            st.write("col1",col1)
             col2 = PL.iloc[:, tenantAccount_col_no_list[1]].fillna('')
+            st.write("col2",col2)
             if len(tenantAccount_col_no_list) == 3:
                 col3 = PL.iloc[:, tenantAccount_col_no_list[2]].fillna('')
+                st.write("col3",col3)
                 col1 = col1.where(col1 != '', col2).where(col1 != '', col3)
             else:
                 col1 = col1.where(col1 != '', col2)
             # Combine the columns: if col1 has a missing value, fill it with the value from col2
+            st.write("combine",col1)
             PL.iloc[:, tenantAccount_col_no_list[0]] = col1
         
         tenantAccount_col_no=tenantAccount_col_no_list[0]
