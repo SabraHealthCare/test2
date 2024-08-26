@@ -1700,6 +1700,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
+        st.write("sheet_name",sheet_name,"tenantAccount_col_no_list",tenantAccount_col_no_list)
         tenant_account_col=tenantAccount_col_no_list  # for pre-compare
         #st.write("tenantAccount_col_no_list",tenantAccount_col_no_list)
         if len(tenantAccount_col_no_list)>=2:
