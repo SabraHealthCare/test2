@@ -383,9 +383,7 @@ def filters_widgets(df, columns,location="Vertical"):
 		
 def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, pre_max_match_col):
     # Helper function to clean and match candidate columns
-    if sheet_name=="Hours":
-        st.write("PL",PL)
-        #st.write("account_pool",account_pool)
+
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].fillna('').astype(str).str.strip().str.upper()
         non_empty_col = candidate_col[candidate_col != '']
