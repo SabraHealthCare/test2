@@ -1615,6 +1615,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         #set tenant_account as index of PL
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
         entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no) 
+        if sheet_name=="Hours":
+            st.write(PL,tenantAccount_col_no)
 	#remove row above property header
         PL=PL.iloc[entity_header_row_number+1:,:]
 
@@ -1843,6 +1845,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 tenant_account_col=[10000]
                 entity_list_occupancy_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Occupancy"]==sheet_name_occupancy_in_onesheet].tolist()	
                 PL_Occ=Read_Clean_PL_Multiple(entity_list_occupancy_in_onesheet,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days,sheet_name_occupancy_in_onesheet)
+                st.write("PL_Occ",PL_Occ)
                 Total_PL=Total_PL.combine_first(PL_Occ)
 		    
 	# balance sheet
