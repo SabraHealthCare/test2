@@ -385,7 +385,7 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     # Helper function to clean and match candidate columns
     if sheet_name=="Hours":
         st.write("PL",PL)
-        st.write("account_pool",account_pool)
+        #st.write("account_pool",account_pool)
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].fillna('').astype(str).str.strip().str.upper()
         non_empty_col = candidate_col[candidate_col != '']
@@ -1109,8 +1109,8 @@ def View_Summary():
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
-    st.write("Total_PL",Total_PL,Total_PL.index)
-    st.write("reporting_month",reporting_month)
+    #st.write("Total_PL",Total_PL,Total_PL.index)
+    #st.write("reporting_month",reporting_month)
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
@@ -1785,7 +1785,7 @@ def Upload_And_Process(uploaded_file,file_type):
     BS_in_one_sheet=[]
     account_pool_full=account_mapping.loc[account_mapping["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Formated_Account"]
     account_pool_patient_days = account_pool[(account_pool["Category"] == "Patient Days")|(account_pool["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]["Tenant_Formated_Account"]
-    st.write("account_pool_patient_days",account_pool_patient_days)
+    #st.write("account_pool_patient_days",account_pool_patient_days)
     #account_pool_patient_days=account_pool.loc[account_pool["Category"]=="Patient Days"]["Tenant_Formated_Account"]	   
     account_pool_balance_sheet=account_pool.loc[account_pool["Category"]=="Balance Sheet"]["Tenant_Formated_Account"]    
     
@@ -1845,7 +1845,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 tenant_account_col=[10000]
                 entity_list_occupancy_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Occupancy"]==sheet_name_occupancy_in_onesheet].tolist()	
                 PL_Occ=Read_Clean_PL_Multiple(entity_list_occupancy_in_onesheet,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days,sheet_name_occupancy_in_onesheet)
-                st.write("PL_Occ",PL_Occ)
+                #st.write("PL_Occ",PL_Occ)
                 Total_PL=Total_PL.combine_first(PL_Occ)
 		    
 	# balance sheet
