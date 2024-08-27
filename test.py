@@ -1616,8 +1616,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         #set tenant_account as index of PL
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
         entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no) 
-        if sheet_name=="Hours":
-            st.write(PL,tenantAccount_col_no)
+
 	#remove row above property header
         PL=PL.iloc[entity_header_row_number+1:,:]
 
