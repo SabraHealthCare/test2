@@ -980,26 +980,44 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
     return account_mapping
 	
 @st.cache_data 
-def Map_PL_Sabra(PL,entity,account_pool):
+def Map_PL_Sabra(PL,entity,sheet_type):
     # remove no need to map from account_mapping
-    st.write("account_pool",account_pool)
-    main_account_mapping=account_pool.loc[list(map(lambda x:x==x and x.upper()!='NO NEED TO MAP',account_pool["Sabra_Account"])),:]
+    if sheet_type=="Sheet_Name_Finance":  
+        account_pool=account_mapping
+    elif sheet_type=="Sheet_Name_Occupancy":
+        account_pool=account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]
+    elif sheet_type=="Sheet_Name_Balance_Sheet":
+        account_pool=account_mapping.loc[account_mapping["Category"]=="Balance Sheet"]
 
-    #concat main accounts with second accounts	
-    second_account_mapping=account_pool.loc[(account_pool["Sabra_Second_Account"]==account_pool["Sabra_Second_Account"])&(account_pool["Sabra_Second_Account"]!="NO NEED TO MAP")& (pd.notna(account_pool["Sabra_Second_Account"]))][["Sabra_Second_Account","Tenant_Formated_Account","Tenant_Account","Conversion"]].\
-                           rename(columns={"Sabra_Second_Account": "Sabra_Account"})
-    second_account_mapping=second_account_mapping.dropna(subset="Sabra_Account")
-    second_account_mapping=second_account_mapping[second_account_mapping["Sabra_Account"]!=" "]
-    PL.index.name="Tenant_Account"
-    PL["Tenant_Formated_Account"]=list(map(lambda x:x.upper() if isinstance(x, str) else x,PL.index))
-    PL=pd.concat([PL.merge(second_account_mapping,on="Tenant_Formated_Account",how='right'),PL.merge(main_account_mapping[main_account_mapping["Sabra_Account"]==main_account_mapping["Sabra_Account"]]\
-                                            [["Sabra_Account","Tenant_Formated_Account","Tenant_Account","Conversion"]],on="Tenant_Formated_Account",how='right')])
-    # remove blank sabra_account (corresponds to "no need to map")	
-    PL=PL[PL['Sabra_Account']!=" "]
-    PL.dropna(subset=['Sabra_Account'], inplace=True)
-    PL=PL.reset_index(drop=True)
+    main_account_mapping = account_pool.loc[account_pool["Sabra_Account"].apply(lambda x: pd.notna(x) and x.upper() != "NO NEED TO MAP")]
+        # Concatenate main accounts with second accounts
+    second_account_mapping = account_mapping.loc[(pd.notna(account_pool["Sabra_Second_Account"])) &\
+        (account_pool["Sabra_Second_Account"].str.upper() != "NO NEED TO MAP")\
+        ][["Sabra_Second_Account", "Tenant_Formated_Account", "Tenant_Account", "Conversion"]]\
+        .rename(columns={"Sabra_Second_Account": "Sabra_Account"})
+    # Remove rows with blank "Sabra_Account"
+    second_account_mapping = second_account_mapping.dropna(subset=["Sabra_Account"])
+    second_account_mapping = second_account_mapping[second_account_mapping["Sabra_Account"].str.strip() != ""]
+
+    # Ensure index name consistency
+    PL.index.name = "Tenant_Account"
+    PL["Tenant_Formated_Account"] = PL.index.str.upper()
+
+    PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Formated_Account", how="right"),\
+    PL.merge(\
+        main_account_mapping[\
+            pd.notna(main_account_mapping["Sabra_Account"])\
+        ][["Sabra_Account", "Tenant_Formated_Account", "Tenant_Account", "Conversion"]],\
+        on="Tenant_Formated_Account", how="right"\
+    )])
+
+    #Remove blank or missing "Sabra_Account" values
+    PL = PL[PL["Sabra_Account"].str.strip() != ""]
+    PL.dropna(subset=["Sabra_Account"], inplace=True)
+
+    # Reset index and handle "Conversion" column
+    PL = PL.reset_index(drop=True)
     conversion = PL["Conversion"].fillna(np.nan)
-   
     
     if isinstance(entity, str):# one entity,  properties are in separate sheet
         month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
@@ -1664,7 +1682,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         # Map PL accounts and Sabra account
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
 	# map sabra account with tenant account, groupby sabra account
-        PL=Map_PL_Sabra(PL,entity_list,account_pool) # index are ('ENTITY',"Sabra_Account")
+        PL=Map_PL_Sabra(PL,entity_list,sheet_type) # index are ('ENTITY',"Sabra_Account")
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
     #return PL,PL_with_detail
@@ -1769,8 +1787,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
             if len(dup_tenant_account)>0:
                 st.error("Duplicated accounts detected in {} sheet '{}'. Please rectify them to avoid repeated calculations: **{}** ".format(sheet_type_name,sheet_name,", ".join(dup_tenant_account)))
         # Map PL accounts and Sabra account
-        #PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
-        PL=Map_PL_Sabra(PL,entity_i,account_pool) 
+        #PL,PL_with_detail=Map_PL_Sabra(PL,entity_i,sheet_type) 
+        PL=Map_PL_Sabra(PL,entity_i,sheet_type) 
     #return PL,PL_with_detail
     return PL
        
@@ -1783,11 +1801,10 @@ def Upload_And_Process(uploaded_file,file_type):
     total_entity_list=list(entity_mapping.index)
     Occupancy_in_one_sheet=[]
     BS_in_one_sheet=[]
-    account_pool_full=account_mapping.loc[account_mapping["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Formated_Account"]
-    account_pool_patient_days = account_pool[(account_pool["Category"] == "Patient Days")|(account_pool["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]["Tenant_Formated_Account"]
-    #st.write("account_pool_patient_days",account_pool_patient_days)
-    #account_pool_patient_days=account_pool.loc[account_pool["Category"]=="Patient Days"]["Tenant_Formated_Account"]	   
-    account_pool_balance_sheet=account_pool.loc[account_pool["Category"]=="Balance Sheet"]["Tenant_Formated_Account"]    
+    account_pool_full=account_mapping.loc[account_mapping["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Formated_Account"]	
+    account_pool_patient_days = account_pool[(account_pool["Category"] == "Patient Days")|(account_pool["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]["Tenant_Formated_Account"]	
+    #account_pool_patient_days=account_pool.loc[account_pool["Category"]=="Patient Days"]["Tenant_Formated_Account"]	  
+    account_pool_balance_sheet=account_pool.loc[account_pool["Category"]=="Balance Sheet"]["Tenant_Formated_Account"]	
     
     # ****Finance and BS in one excel****
     if file_type=="Finance":
