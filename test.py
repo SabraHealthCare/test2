@@ -987,7 +987,7 @@ def Map_PL_Sabra(PL,entity,sheet_type):
     elif sheet_type=="Sheet_Name_Occupancy":
         account_pool=account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]
     elif sheet_type=="Sheet_Name_Balance_Sheet":
-        st.write()
+        st.write("account_mapping",account_mapping)
         account_pool=account_mapping.loc[account_mapping["Category"]=="Balance Sheet"]
 
     main_account_mapping = account_pool.loc[account_pool["Sabra_Account"].apply(lambda x: pd.notna(x) and x.upper() != "NO NEED TO MAP")]
