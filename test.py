@@ -1663,7 +1663,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         # Map PL accounts and Sabra account
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
 	# map sabra account with tenant account, groupby sabra account
-        PL=Map_PL_Sabra(PL,entity_list) # index are ('ENTITY',"Sabra_Account")
+        PL=Map_PL_Sabra(PL,entity_list,account_pool) # index are ('ENTITY',"Sabra_Account")
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
     #return PL,PL_with_detail
@@ -1769,7 +1769,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
                 st.error("Duplicated accounts detected in {} sheet '{}'. Please rectify them to avoid repeated calculations: **{}** ".format(sheet_type_name,sheet_name,", ".join(dup_tenant_account)))
         # Map PL accounts and Sabra account
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_i) 
-        PL=Map_PL_Sabra(PL,entity_i) 
+        PL=Map_PL_Sabra(PL,entity_i,account_pool) 
     #return PL,PL_with_detail
     return PL
        
