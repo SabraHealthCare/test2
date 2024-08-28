@@ -1874,7 +1874,10 @@ def Upload_And_Process(uploaded_file,file_type):
                 if Total_PL.shape[0]==0:
                     Total_PL=PL_BS
                 else:
+                    st.write("Total_PL",Total_PL)
                     Total_PL=PL_BS.combine_first(Total_PL)
+                    st.write("PL_BS",PL_BS)
+                    st.write("Total_PL",Total_PL)
 
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
     return Total_PL
