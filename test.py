@@ -980,12 +980,12 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
     return account_mapping
 	
 @st.cache_data 
-def Map_PL_Sabra(PL,entity):
+def Map_PL_Sabra(PL,entity,account_pool):
     # remove no need to map from account_mapping
-    main_account_mapping=account_mapping.loc[list(map(lambda x:x==x and x.upper()!='NO NEED TO MAP',account_mapping["Sabra_Account"])),:]
+    main_account_mapping=account_pool.loc[list(map(lambda x:x==x and x.upper()!='NO NEED TO MAP',account_pool["Sabra_Account"])),:]
 
     #concat main accounts with second accounts	
-    second_account_mapping=account_mapping.loc[(account_mapping["Sabra_Second_Account"]==account_mapping["Sabra_Second_Account"])&(account_mapping["Sabra_Second_Account"]!="NO NEED TO MAP")& (pd.notna(account_mapping["Sabra_Second_Account"]))][["Sabra_Second_Account","Tenant_Formated_Account","Tenant_Account","Conversion"]].\
+    second_account_mapping=account_pool.loc[(account_pool["Sabra_Second_Account"]==account_pool["Sabra_Second_Account"])&(account_pool["Sabra_Second_Account"]!="NO NEED TO MAP")& (pd.notna(account_pool["Sabra_Second_Account"]))][["Sabra_Second_Account","Tenant_Formated_Account","Tenant_Account","Conversion"]].\
                            rename(columns={"Sabra_Second_Account": "Sabra_Account"})
     second_account_mapping=second_account_mapping.dropna(subset="Sabra_Account")
     second_account_mapping=second_account_mapping[second_account_mapping["Sabra_Account"]!=" "]
@@ -1870,15 +1870,12 @@ def Upload_And_Process(uploaded_file,file_type):
             for sheet_name_bs_in_onesheet in sheet_list_bs_in_onesheet:
                 tenant_account_col=[10000]
                 entity_list_bs_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Balance_Sheet"]==sheet_name_bs_in_onesheet].tolist()	
-                PL_BS=Read_Clean_PL_Multiple(entity_list_bs_in_onesheet,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet,sheet_name_bs_in_onesheet)
-                st.write("Total_PL",Total_PL)   
+                PL_BS=Read_Clean_PL_Multiple(entity_list_bs_in_onesheet,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet,sheet_name_bs_in_onesheet)  
                 if Total_PL.shape[0]==0:
                     Total_PL=PL_BS
                 else:
                     Total_PL=PL_BS.combine_first(Total_PL)
 
-            st.write("PL_BS",PL_BS)
-            st.write("Total_PL",Total_PL)
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
     return Total_PL
 def Download_PL_Sample():
