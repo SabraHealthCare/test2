@@ -982,6 +982,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
 @st.cache_data 
 def Map_PL_Sabra(PL,entity,account_pool):
     # remove no need to map from account_mapping
+    st.write("account_pool",account_pool)
     main_account_mapping=account_pool.loc[list(map(lambda x:x==x and x.upper()!='NO NEED TO MAP',account_pool["Sabra_Account"])),:]
 
     #concat main accounts with second accounts	
