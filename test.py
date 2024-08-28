@@ -1871,14 +1871,14 @@ def Upload_And_Process(uploaded_file,file_type):
                 tenant_account_col=[10000]
                 entity_list_bs_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Balance_Sheet"]==sheet_name_bs_in_onesheet].tolist()	
                 PL_BS=Read_Clean_PL_Multiple(entity_list_bs_in_onesheet,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet,sheet_name_bs_in_onesheet)
+                st.write("Total_PL",Total_PL)   
                 if Total_PL.shape[0]==0:
                     Total_PL=PL_BS
                 else:
-                    st.write("Total_PL",Total_PL)
                     Total_PL=PL_BS.combine_first(Total_PL)
-                    st.write("PL_BS",PL_BS)
-                    st.write("Total_PL",Total_PL)
 
+            st.write("PL_BS",PL_BS)
+            st.write("Total_PL",Total_PL)
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
     return Total_PL
 def Download_PL_Sample():
@@ -1947,7 +1947,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.session_state.selected_month = '01'
         global reporting_month,reporting_month_label,tenant_account_col,date_header
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
-        st.write("account_mapping",account_mapping)
         #st.write("account_mapping",account_mapping,"entity_mapping",entity_mapping)
         reporting_month_label=True  
         tenant_account_col=[10000]
