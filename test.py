@@ -991,7 +991,7 @@ def Map_PL_Sabra(PL,entity,sheet_type):
 
     main_account_mapping = account_pool.loc[account_pool["Sabra_Account"].apply(lambda x: pd.notna(x) and x.upper() != "NO NEED TO MAP")]
         # Concatenate main accounts with second accounts
-    second_account_mapping = account_mapping.loc[(pd.notna(account_pool["Sabra_Second_Account"])) &\
+    second_account_mapping = account_pool.loc[(pd.notna(account_pool["Sabra_Second_Account"])) &\
         (account_pool["Sabra_Second_Account"].str.upper() != "NO NEED TO MAP")\
         ][["Sabra_Second_Account", "Tenant_Formated_Account", "Tenant_Account", "Conversion"]]\
         .rename(columns={"Sabra_Second_Account": "Sabra_Account"})
