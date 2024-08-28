@@ -995,7 +995,8 @@ def Map_PL_Sabra(PL,entity,sheet_type):
         .rename(columns={"Sabra_Second_Account": "Sabra_Account"})
     # Remove rows with blank "Sabra_Account"
     second_account_mapping = second_account_mapping.dropna(subset=["Sabra_Account"])
-    second_account_mapping = second_account_mapping[second_account_mapping["Sabra_Account"].str.strip() != ""]
+    if second_account_mapping.shape[0]>0:
+        second_account_mapping = second_account_mapping[second_account_mapping["Sabra_Account"].str.strip() != ""]
 
     # Ensure index name consistency
     PL.index.name = "Tenant_Account"
