@@ -116,10 +116,13 @@ def Read_File_From_Onedrive(path, file_name, type, str_col_list=None):
     # Check the status code 
     if response.status_code == 200 or response.status_code == 201:
         file_content = response.content
+        
         try:
+            # Set the dtype dictionary for specified columns
+            dtype_dict = {col: str for col in str_col_list}
+            
             if type.upper() == "CSV":    
                 detected_encoding = detect_encoding(file_content)
-                dtype_dict = {col: str for col in str_col_list}
                 if file_name.lower().endswith(".csv"):
                     df = pd.read_csv(BytesIO(file_content), encoding=detected_encoding, on_bad_lines='skip', dtype=dtype_dict)
                 elif file_name.lower().endswith(".xlsx"):
@@ -138,17 +141,17 @@ def Read_File_From_Onedrive(path, file_name, type, str_col_list=None):
                 return BytesIO(response.content)
 
         except pd.errors.EmptyDataError:
-            st.write("EmptyDataError: The file is empty.")
+            print("EmptyDataError: The file is empty.")
             return False
         except pd.errors.ParserError as e:
-            st.write(f"ParserError: {e}")
+            print(f"ParserError: {e}")
             return False
         except Exception as e:
-            st.write(f"Unexpected error: {e}")
+            print(f"Unexpected error: {e}")
             return False
         
     else:
-        st.write(f"Failed to download file: {response.status_code}")
+        print(f"Failed to download file: {response.status_code}")
         return False
 
 # no cache, save a dataframe to OneDrive 
