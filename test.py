@@ -2196,67 +2196,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 		
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
-	    
-    elif choice=="Review New Mapping":
-        with st.expander("Review new mapping" ,expanded=True):
-            ChangeWidgetFontSize('Review new mapping', '25px')
-            account_mapping =Read_File_From_Onedrive(mapping_path,account_mapping_filename,"XLSX",account_mapping_str_col)
-            un_confirmed_account=account_mapping[account_mapping["Confirm"]=="N"]
-            if un_confirmed_account.shape[0]==0:
-                st.write("There is no new mapping.")
-                st.write(un_confirmed_account)
-            else:
-                un_confirmed_account['Index'] = range(1, len(un_confirmed_account) + 1)
-                un_confirmed_account=un_confirmed_account[["Index","Operator","Tenant_Account","Sabra_Account","Sabra_Second_Account"]]
-                gd = GridOptionsBuilder.from_dataframe(un_confirmed_account)
-                gd.configure_column("Index",headerName="Select", width=60,headerCheckboxSelection = True)
-                gd.configure_selection(selection_mode='multiple', use_checkbox=True)
-                gd.configure_column("Tenant_Account", headerName="Tenant Account",width=250)
-                gd.configure_column("Sabra_Account", headerName="Sabra Account",width=170)
-                gd.configure_column("Sabra_Second_Account", headerName="Sabra Second Account",width=130)
-                gd.configure_column("Operator",width=80)
-                grid_table = AgGrid(un_confirmed_account,
-			    gridOptions=gd.build(),
-			    fit_columns_on_grid_load=True,
-        		    theme = "streamlit",
-                            update_mode=GridUpdateMode.SELECTION_CHANGED)
-                selected_row = grid_table["selected_rows"]
-
-                col1,col2=st.columns([1,4])
-                with col1:
-                    confirm_button=st.button("Confirm new mappings")
-                with col2:
-                    download_report(un_confirmed_account,"new mappings")
-                if confirm_button:
-                    if selected_row:
-                        if len(selected_row)==un_confirmed_account.shape[0]: # select all
-                            account_mapping["Confirm"]=None 
-                        else:#select part
-                            for i in range(len(selected_row)):
-                                tenant_account=un_confirmed_account[un_confirmed_account["Index"]==selected_row[i]["Index"]]["Tenant_Account"].item()
-                                account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"]=None
-                        # save account_mapping 
-                        if Save_File_To_Onedrive(account_mapping,path,account_mapping_filename,"XLSX):    
-                            st.success("Selected mappings have been archived successfully")
-                        else:
-                            st.error("Can't save the change, please contact Sha Li.")
-                    else:
-                        st.error("Please select mapping to confirm")
-        with st.expander("Review tenant mapping" ,expanded=True):
-            ChangeWidgetFontSize('Review tenant mapping', '25px')
-            col1,col2=st.columns(2)
-            select_operator=list(operator_list["Operator"])
-            select_operator[0]="Total"
-            with col1:
-                selected_operator= st.selectbox('Select Operator',select_operator)
-            if selected_operator:
-                if selected_operator!="Total":
-                    operator_mapping=account_mapping.loc[account_mapping["Operator"]==selected_operator,:]
-                    st.write(operator_mapping)
-                    download_report(operator_mapping,"{} mapping".format(selected_operator))
-                else:
-                    st.write(account_mapping)
-                    download_report(account_mapping,"Total tenant mapping")
 
     elif choice=="Review Monthly reporting":
             st.subheader("Summary")
