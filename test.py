@@ -1068,7 +1068,6 @@ def Map_PL_Sabra(PL,entity,sheet_type):
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first
     #return PL,PL_with_detail   
-    st.write("account_mapping",account_mapping)
     return PL   
 
 @st.cache_data
@@ -1659,6 +1658,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         #PL=PL.loc[(PL!= 0).any(axis=1),:]
         PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
         # mapping new tenant accounts
+        st.write("account_mapping",account_mapping)
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
         # remove duplicate new account
         new_tenant_account_list=list(set(new_tenant_account_list))    
