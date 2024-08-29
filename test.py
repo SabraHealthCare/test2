@@ -987,7 +987,7 @@ def Map_PL_Sabra(PL,entity,sheet_type):
 	  
     elif sheet_type=="Sheet_Name_Occupancy":
         account_pool=account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]
-        st.write("account_mapping",account_mapping)
+        #st.write("account_mapping",account_mapping)
         account_pool=account_mapping.loc[account_mapping["Category"]=="Balance Sheet"]
 
     main_account_mapping = account_pool.loc[account_pool["Sabra_Account"].apply(lambda x: pd.notna(x) and x.upper() != "NO NEED TO MAP")]
@@ -1604,6 +1604,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,sheet_name):  
     global account_mapping,reporting_month,tenant_account_col
+    st.write("account_mapping0",account_mapping)
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
     if sheet_type=="Sheet_Name_Finance":  
         sheet_type_name="P&L"
