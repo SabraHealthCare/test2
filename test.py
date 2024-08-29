@@ -1798,6 +1798,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 # no cache
 def Upload_And_Process(uploaded_file,file_type):
     global  tenant_account_col
+    
     Total_PL=pd.DataFrame()
     #Total_PL_detail=pd.DataFrame()
     total_entity_list=list(entity_mapping.index)
@@ -1806,7 +1807,7 @@ def Upload_And_Process(uploaded_file,file_type):
     account_pool_full=account_mapping.loc[account_mapping["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Formated_Account"]	
     account_pool_patient_days = account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]["Tenant_Formated_Account"]		  
     account_pool_balance_sheet=account_mapping.loc[account_mapping["Category"]=="Balance Sheet"]["Tenant_Formated_Account"]	
-    st.write("account_mapping-1",account_mapping)
+
     # ****Finance and BS in one excel****
     if file_type=="Finance":
         tenant_account_col=[10000]
@@ -1963,7 +1964,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.session_state.selected_month = '01'
         global reporting_month,reporting_month_label,tenant_account_col,date_header
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
-        #st.write("account_mapping",account_mapping,"entity_mapping",entity_mapping)
+        st.write("account_mapping-3",account_mapping,"entity_mapping",entity_mapping)
         reporting_month_label=True  
         tenant_account_col=[10000]
         date_header=[[0],0,[]]
