@@ -246,8 +246,8 @@ def Initial_Mapping(operator):
     account_mapping[account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
     account_mapping["Tenant_Formated_Account"] = account_mapping["Tenant_Account"].apply(lambda x: x.upper().strip() if pd.notna(x) else x)
     account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Tenant_Formated_Account", "Conversion"]]
-
-
+    account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="S
+					  
     entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename,"CSV",entity_mapping_str_col)
     entity_mapping = (Read_CSV_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
                   .reset_index(drop=True)
@@ -983,13 +983,12 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
 def Map_PL_Sabra(PL,entity,sheet_type):
     # remove no need to map from account_mapping
     if sheet_type=="Sheet_Name_Finance":  
-        account_pool=account_mapping[account_mapping["Sabra_Account"]!= "NO NEED TO MAP"].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
+        account_pool=account_mapping[account_mapping["Sabra_Account"]!= "NO NEED TO MAP"]
 	  
     elif sheet_type=="Sheet_Name_Occupancy":
-        account_pool=account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
-    elif sheet_type=="Sheet_Name_Balance_Sheet":
+        account_pool=account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]
         st.write("account_mapping",account_mapping)
-        account_pool=account_mapping.loc[account_mapping["Category"]=="Balance Sheet"].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
+        account_pool=account_mapping.loc[account_mapping["Category"]=="Balance Sheet"]
 
     main_account_mapping = account_pool.loc[account_pool["Sabra_Account"].apply(lambda x: pd.notna(x) and x.upper() != "NO NEED TO MAP")]
         # Concatenate main accounts with second accounts
@@ -1803,8 +1802,8 @@ def Upload_And_Process(uploaded_file,file_type):
     Occupancy_in_one_sheet=[]
     BS_in_one_sheet=[]
     account_pool_full=account_mapping.loc[account_mapping["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Formated_Account"]	
-    account_pool_patient_days = account_pool[(account_pool["Category"] == "Patient Days")|(account_pool["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]["Tenant_Formated_Account"]		  
-    account_pool_balance_sheet=account_pool.loc[account_pool["Category"]=="Balance Sheet"]["Tenant_Formated_Account"]	
+    account_pool_patient_days = account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]["Tenant_Formated_Account"]		  
+    account_pool_balance_sheet=account_mapping.loc[account_mapping["Category"]=="Balance Sheet"]["Tenant_Formated_Account"]	
     
     # ****Finance and BS in one excel****
     if file_type=="Finance":
