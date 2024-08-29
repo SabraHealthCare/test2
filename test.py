@@ -1605,7 +1605,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,sheet_name):  
     global account_mapping,reporting_month,tenant_account_col
-    st.write("account_mapping0",account_mapping)
+    #st.write("account_mapping0",account_mapping)
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
     if sheet_type=="Sheet_Name_Finance":  
         sheet_type_name="P&L"
@@ -1660,7 +1660,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         #PL=PL.loc[(PL!= 0).any(axis=1),:]
         PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
         # mapping new tenant accounts
-        st.write("account_mapping",account_mapping)
+        #st.write("account_mapping",account_mapping)
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
         # remove duplicate new account
         new_tenant_account_list=list(set(new_tenant_account_list))    
