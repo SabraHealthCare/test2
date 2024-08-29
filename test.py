@@ -141,9 +141,9 @@ def Read_File_From_Onedrive(path, file_name,type,str_col_list=None):
             except Exception as e:
                 return False
         elif type.upper() == "XLSX":
-            st.write("XLSX")
             try:
-                df = pd.read_excel(BytesIO(file_content), dtype=dtype_dict)
+                df = pd.read_excel(BytesIO(file_content), dtype=dtype_dict, engine='openpyxl')
+                return df
                 st.write("df",df)
                 return df
             except Exception as e:
