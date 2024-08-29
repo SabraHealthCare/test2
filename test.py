@@ -247,9 +247,7 @@ def Initial_Mapping(operator):
             .dropna(axis=1, how='all')
             .rename(columns=str))
 
-    st.write("BPC_pull",BPC_pull)  	
     account_mapping_all = Read_File_From_Onedrive(mapping_path,account_mapping_filename,"XLSX",account_mapping_str_col)
-    st.write("account_mapping_all",account_mapping_all)
     account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
 	
     if account_mapping.shape[0]==1:    # and account_mapping.loc[:,"Sabra_Account"][0]=='Template':
