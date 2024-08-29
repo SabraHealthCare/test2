@@ -1965,7 +1965,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.session_state.selected_month = '01'
         global reporting_month,reporting_month_label,tenant_account_col,date_header
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
-        st.write("account_mapping-3",account_mapping,"entity_mapping",entity_mapping)
+        #st.write("account_mapping-3",account_mapping,"entity_mapping",entity_mapping)
         reporting_month_label=True  
         tenant_account_col=[10000]
         date_header=[[0],0,[]]
