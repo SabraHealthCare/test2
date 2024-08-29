@@ -1806,7 +1806,7 @@ def Upload_And_Process(uploaded_file,file_type):
     account_pool_full=account_mapping.loc[account_mapping["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Formated_Account"]	
     account_pool_patient_days = account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]["Tenant_Formated_Account"]		  
     account_pool_balance_sheet=account_mapping.loc[account_mapping["Category"]=="Balance Sheet"]["Tenant_Formated_Account"]	
-    
+    st.write("account_mapping-1",account_mapping)
     # ****Finance and BS in one excel****
     if file_type=="Finance":
         tenant_account_col=[10000]
