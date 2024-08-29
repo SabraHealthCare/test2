@@ -1068,6 +1068,7 @@ def Map_PL_Sabra(PL,entity,sheet_type):
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first
     #return PL,PL_with_detail   
+    st.write("account_mapping",account_mapping)
     return PL   
 
 @st.cache_data
