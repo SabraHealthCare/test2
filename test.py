@@ -141,10 +141,13 @@ def Read_File_From_Onedrive(path, file_name,type,str_col_list=None):
             except Exception as e:
                 return False
         elif type.upper() == "XLSX":
+            st.write("XLSX")
             try:
                 df = pd.read_excel(BytesIO(file_content), dtype=dtype_dict)
+                st.write("df",df)
                 return df
             except Exception as e:
+                st.write(e)
                 return False
         elif type.upper()=="YAML":
             try:
@@ -253,7 +256,8 @@ def Initial_Mapping(operator):
             .set_index(["ENTITY", "Sabra_Account"])
             .dropna(axis=1, how='all')
             .rename(columns=str))
-  	
+
+    st.write("BPC_pull",BPC_pull)  	
     account_mapping_all = Read_File_From_Onedrive(mapping_path,account_mapping_filename,"XLSX",account_mapping_str_col)
     st.write("account_mapping_all",account_mapping_all)
     account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
