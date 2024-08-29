@@ -32,7 +32,7 @@ placeholder = st.empty()
 st.title("Sabra HealthCare Monthly Reporting App")
 
 sheet_name_discrepancy="Discrepancy_Review"
-account_mapping_filename="Account_Mapping.csv"
+account_mapping_filename="Account_Mapping.xlsx"
 BPC_pull_filename="BPC_Pull.csv"
 entity_mapping_filename ="Entity_Mapping.csv"
 discrepancy_filename="Total_Diecrepancy_Review.csv"
@@ -103,7 +103,7 @@ def detect_encoding(file_content):
     result = chardet.detect(file_content)
     return result['encoding']
 
-def Read_CSV_From_Onedrive(path, file_name,type,str_col_list=None):
+def Read_File_From_Onedrive(path, file_name,type,str_col_list=None):
     if str_col_list is None:
         str_col_list = []
     
@@ -162,27 +162,47 @@ def Read_CSV_From_Onedrive(path, file_name,type,str_col_list=None):
         return False
 
 # no cache, save a dataframe to OneDrive 
-def Save_As_CSV_Onedrive(df,path,file_name):   
+def Save_File_To_Onedrive(df, path, file_name, file_type):
     try:
-        df=df[list(filter(lambda x: x!="index" and "Unnamed:" not in x,df.columns))]
-        csv_string = df.to_csv(index=False)
-	# Define your Microsoft Graph API endpoint, user ID, file path, and headers
-        api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'    
-        response = requests.put(api_url, headers=headers, data=BytesIO(csv_string.encode()))
+        # Filter out unwanted columns
+        df = df[list(filter(lambda x: x != "index" and "Unnamed:" not in x, df.columns))]
+        
+        # Define your Microsoft Graph API endpoint, user ID, and headers
+        api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
+        
+        # Handle file type
+        if file_type.upper() == "CSV":
+            file_name = f"{file_name}.csv" if not file_name.endswith(".csv") else file_name
+            file_content = df.to_csv(index=False).encode()
+        elif file_type.upper() == "XLSX":
+            file_name = f"{file_name}.xlsx" if not file_name.endswith(".xlsx") else file_name
+            excel_buffer = BytesIO()
+            df.to_excel(excel_buffer, index=False, engine='xlsxwriter')
+            excel_buffer.seek(0)
+            file_content = excel_buffer.read()
+        else:
+            raise ValueError("Unsupported file type. Use 'CSV' or 'XLSX'.")
+        
+        # Send the request to OneDrive
+        response = requests.put(api_url, headers=headers, data=BytesIO(file_content))
+        
         # Check the response
         if response.status_code == 200:
             return True
         else:
             return False
-    except:
+    except Exception as e:
+        st.write(f"Error: {e}")
         return False
+	    
+
 
 
 # For updating account_mapping, entity_mapping, reporting_month_data, only for operator use
 # if entity_list is provided,
-def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=None,str_col_list=None):  # replace original data
+def Update_File_Onedrive(path,file_name,new_data,operator,file_type,entity_list=None,str_col_list=None):  # replace original data
     entity_list = entity_list or []   
-    original_data=Read_CSV_From_Onedrive(path,file_name,"CSV",str_col_list)
+    original_data=Read_File_From_Onedrive(path,file_name,file_type,str_col_list)
     new_data=new_data.reset_index(drop=False)
 	
     if  isinstance(original_data, pd.DataFrame):
@@ -207,7 +227,7 @@ def Update_File_Onedrive(path,file_name,new_data,operator,entity_list=None,str_c
         updated_data = updated_data.drop(columns='index', errors='ignore')
     else:
         updated_data = new_data.drop(columns='index', errors='ignore')
-    return Save_As_CSV_Onedrive(updated_data,path,file_name)  # return True False
+    return Save_File_To_Onedrive(updated_data,path,file_name,file_type)  # return True False
 
 
 def Format_Value(column):
@@ -228,13 +248,13 @@ def clicked(button_name):
 
 # No cache
 def Initial_Mapping(operator):
-    BPC_pull=Read_CSV_From_Onedrive(mapping_path,BPC_pull_filename,"CSV")
+    BPC_pull=Read_File_From_Onedrive(mapping_path,BPC_pull_filename,"CSV")
     BPC_pull = (BPC_pull[BPC_pull["Operator"] == operator]
             .set_index(["ENTITY", "Sabra_Account"])
             .dropna(axis=1, how='all')
             .rename(columns=str))
   	
-    account_mapping_all = Read_CSV_From_Onedrive(mapping_path,account_mapping_filename,"CSV",account_mapping_str_col)
+    account_mapping_all = Read_File_From_Onedrive(mapping_path,account_mapping_filename,"XLSX",account_mapping_str_col)
     account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
 	
     if account_mapping.shape[0]==1:    # and account_mapping.loc[:,"Sabra_Account"][0]=='Template':
@@ -248,8 +268,8 @@ def Initial_Mapping(operator):
     account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Tenant_Formated_Account", "Conversion"]]
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")
 	 				  
-    entity_mapping=Read_CSV_From_Onedrive(mapping_path,entity_mapping_filename,"CSV",entity_mapping_str_col)
-    entity_mapping = (Read_CSV_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
+    entity_mapping=Read_File_From_Onedrive(mapping_path,entity_mapping_filename,"CSV",entity_mapping_str_col)
+    entity_mapping = (Read_File_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
                   .reset_index(drop=True)
                   .query("Operator == @operator")
                   .set_index("ENTITY"))
@@ -291,7 +311,7 @@ def Create_Tree_Hierarchy1():
     parent_hierarchy_second = [{'label': "No need to map", 'value': "No need to map"}]
     
     # Read account data
-    BPC_Account = Read_CSV_From_Onedrive(mapping_path, BPC_account_filename, "CSV")
+    BPC_Account = Read_File_From_Onedrive(mapping_path, BPC_account_filename, "CSV")
     
     # Function to create hierarchy for a given type
     def create_hierarchy(account_type):
@@ -322,7 +342,7 @@ def Create_Tree_Hierarchy():
     #Create Tree select hierarchy
     parent_hierarchy_main=[{'label': "No need to map","value":"No need to map"}]
     parent_hierarchy_second=[{'label': "No need to map","value":"No need to map"}]
-    BPC_Account = Read_CSV_From_Onedrive(mapping_path,BPC_account_filename,"CSV")
+    BPC_Account = Read_File_From_Onedrive(mapping_path,BPC_account_filename,"CSV")
 	
     for category in BPC_Account[BPC_Account["Type"]=="Main"]["Category"].unique():
         children_hierarchy=[]
@@ -1903,25 +1923,21 @@ def Download_PL_Sample():
     PL_sample_filename = "{}_P&L_sample.xlsx".format(operator)
     
     # Fetch data from OneDrive
-    PL_sample = Read_CSV_From_Onedrive(mapping_path, PL_sample_filename, "XLSX")
+    #PL_sample = Read_File_From_Onedrive(mapping_path, PL_sample_filename, "XLSX")
     
-    if PL_sample is not False:
+    #if PL_sample is not False:
         # Create a BytesIO buffer to hold the Excel data
-        output = BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            PL_sample.to_excel(writer, index=False)
-        download_file = output.getvalue()
+        #output = BytesIO()
+        #with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        #    PL_sample.to_excel(writer, index=False)
+        #download_file = output.getvalue()
 
         # Return the download button with the Excel file data
-        st.download_button(
-                            label="Download P&L sample",
-                            data=download_file,
-                            file_name=PL_sample_filename,
-                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" )
-    else:
-        st.write("P&L sample is not found. Please contact sli@sabrahealth.com to get it.")
+        #st.download_button(label="Download P&L sample",data=download_file,file_name=PL_sample_filename,mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" )
+    #else:
+        #st.write("P&L sample is not found. Please contact sli@sabrahealth.com to get it.")
 #----------------------------------website widges------------------------------------
-config = Read_CSV_From_Onedrive(mapping_path, "config.yaml","YAML")
+config = Read_File_From_Onedrive(mapping_path, "config.yaml","YAML")
 # Creating the authenticator object
 if config:
     authenticator = Authenticate(
@@ -2141,7 +2157,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 			
     elif choice=='Instructions':
         # insert Video
-        video=Read_CSV_From_Onedrive(mapping_path,"Sabra App video.mp4","VIDEO")
+        video=Read_File_From_Onedrive(mapping_path,"Sabra App video.mp4","VIDEO")
         st.video(video, format="video/mp4", start_time=0)
 	    
     elif choice=="Edit Account": 
@@ -2156,7 +2172,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         authenticator.logout('Logout', 'main')
 # ----------------for Sabra account--------------------	    
 elif st.session_state["authentication_status"] and st.session_state["operator"]=="Sabra":
-    operator_list=Read_CSV_From_Onedrive(mapping_path,operator_list_filename,"CSV")
+    operator_list=Read_File_From_Onedrive(mapping_path,operator_list_filename,"CSV")
     menu=["Review Monthly reporting","Review New Mapping","Edit Account","Register","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
 
@@ -2184,7 +2200,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     elif choice=="Review New Mapping":
         with st.expander("Review new mapping" ,expanded=True):
             ChangeWidgetFontSize('Review new mapping', '25px')
-            account_mapping =Read_CSV_From_Onedrive(mapping_path,account_mapping_filename,"CSV",account_mapping_str_col)
+            account_mapping =Read_File_From_Onedrive(mapping_path,account_mapping_filename,"XLSX",account_mapping_str_col)
             un_confirmed_account=account_mapping[account_mapping["Confirm"]=="N"]
             if un_confirmed_account.shape[0]==0:
                 st.write("There is no new mapping.")
@@ -2220,7 +2236,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                                 tenant_account=un_confirmed_account[un_confirmed_account["Index"]==selected_row[i]["Index"]]["Tenant_Account"].item()
                                 account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"]=None
                         # save account_mapping 
-                        if Save_As_CSV_Onedrive(account_mapping,path,account_mapping_filename):    
+                        if Save_File_To_Onedrive(account_mapping,path,account_mapping_filename,"XLSX):    
                             st.success("Selected mappings have been archived successfully")
                         else:
                             st.error("Can't save the change, please contact Sha Li.")
@@ -2244,7 +2260,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
     elif choice=="Review Monthly reporting":
             st.subheader("Summary")
-            data=Read_CSV_From_Onedrive(master_template_path,monthly_reporting_filename,"CSV")
+            data=Read_File_From_Onedrive(master_template_path,monthly_reporting_filename,"CSV")
             #if data is None:  # empty file
             if True:
                 data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
