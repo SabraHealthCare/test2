@@ -103,7 +103,7 @@ def detect_encoding(file_content):
     result = chardet.detect(file_content)
     return result['encoding']
 
-def Read_File_From_Onedrive(path, file_name,type,str_col_list=None):
+def Read_File_From_Onedrive(path, file_name, type, str_col_list=None):
     if str_col_list is None:
         str_col_list = []
     
@@ -115,53 +115,40 @@ def Read_File_From_Onedrive(path, file_name,type,str_col_list=None):
     
     # Check the status code 
     if response.status_code == 200 or response.status_code == 201:
-        # Content of the file is available in response.content
-        if type.upper()=="CSV":    
-            try:
-                file_content = response.content
+        file_content = response.content
+        try:
+            if type.upper() == "CSV":    
                 detected_encoding = detect_encoding(file_content)
                 dtype_dict = {col: str for col in str_col_list}
                 if file_name.lower().endswith(".csv"):
-                    # Try reading the CSV with the detected encoding
-                    try:
-                        df = pd.read_csv(BytesIO(file_content), encoding=detected_encoding, on_bad_lines='skip',dtype=dtype_dict)
-                    except UnicodeDecodeError:
-                        # If detected encoding fails, try common fallback encodings
-                        try:
-                            df = pd.read_csv(BytesIO(file_content), encoding='utf-8', on_bad_lines='skip',dtype=dtype_dict)
-                        except UnicodeDecodeError:
-                            df = pd.read_csv(BytesIO(file_content), encoding='latin1', on_bad_lines='skip',dtype=dtype_dict)
+                    df = pd.read_csv(BytesIO(file_content), encoding=detected_encoding, on_bad_lines='skip', dtype=dtype_dict)
                 elif file_name.lower().endswith(".xlsx"):
-                    df = pd.read_excel(BytesIO(file_content),dtype=dtype_dict)
+                    df = pd.read_excel(BytesIO(file_content), dtype=dtype_dict, engine='openpyxl')
                 return df
-            except EmptyDataError:
-                return False
-            except pd.errors.ParserError as e:
-                return False
-            except Exception as e:
-                return False
-        elif type.upper() == "XLSX":
-            try:
+
+            elif type.upper() == "XLSX":
                 df = pd.read_excel(BytesIO(file_content), dtype=dtype_dict, engine='openpyxl')
                 return df
-                st.write("df",df)
-                return df
-            except Exception as e:
-                st.write(e)
-                return False
-        elif type.upper()=="YAML":
-            try:
-                file_content = response.content
+
+            elif type.upper() == "YAML":
                 config = yaml.safe_load(file_content)
                 return config
-            except yaml.YAMLError as e:
-                st.write(f"Error reading YAML file: {e}")
-                return None
-            except Exception as e:
-                st.write(f"Unexpected error: {e}")
-                return None	
-        elif type.upper()=="VIDEO":
-            return BytesIO(response.content)        
+
+            elif type.upper() == "VIDEO":
+                return BytesIO(response.content)
+
+        except pd.errors.EmptyDataError:
+            st.write("EmptyDataError: The file is empty.")
+            return False
+        except pd.errors.ParserError as e:
+            st.write(f"ParserError: {e}")
+            return False
+        except Exception as e:
+            st.write(f"Unexpected error: {e}")
+            return False
+        
+    else:
+        st.write(f"Failed to download file: {response.status_code}")
         return False
 
 # no cache, save a dataframe to OneDrive 
