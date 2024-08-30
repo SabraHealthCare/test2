@@ -162,7 +162,7 @@ def Save_File_To_Onedrive(df, path, file_name, file_type):
         
         # Define your Microsoft Graph API endpoint, user ID, and headers
         api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
-        
+        st.write("file_type",file_type)
         # Handle file type
         if file_type.upper() == "CSV":
             file_name = f"{file_name}.csv" if not file_name.endswith(".csv") else file_name
@@ -193,7 +193,7 @@ def Save_File_To_Onedrive(df, path, file_name, file_type):
 
 # For updating account_mapping, entity_mapping, reporting_month_data, only for operator use
 # if entity_list is provided,
-def Update_File_Onedrive(path,file_name,new_data,operator,file_type,entity_list=None,str_col_list=None):  # replace original data
+def Update_File_Onedrive(path,file_name,new_data,operator,file_type="CSV",entity_list=None,str_col_list=None):  # replace original data
     entity_list = entity_list or []   
     original_data=Read_File_From_Onedrive(path,file_name,file_type,str_col_list)
     new_data=new_data.reset_index(drop=False)
@@ -926,7 +926,7 @@ def Manage_Entity_Mapping(operator):
 	    
         download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
         # update entity_mapping in Onedrive    
-        Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,None,entity_mapping_str_col)
+        Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,"CSV",None,entity_mapping_str_col)
         return entity_mapping
 
 # no cache 
@@ -988,7 +988,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
 	
         #new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[0],new_tenant_account_list[0].upper(),"N"]            
         account_mapping=pd.concat([account_mapping, new_accounts_df],ignore_index=True)
-        Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator,None,account_mapping_str_col)
+        Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator,"XLSX",None,account_mapping_str_col)
         st.success("New accounts mapping were successfully saved.")    
     return account_mapping
 	
@@ -1231,7 +1231,7 @@ def Submit_Upload_Latestmonth():
     upload_reporting_month=upload_reporting_month.apply(Format_Value)
 
 
-    if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,None,None):
+    if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,"CSV",None,None):
         st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,reporting_month[4:6]+"/"+reporting_month[0:4]))
     else: 
         st.write(" ")  #----------record into error report------------------------	
@@ -1362,7 +1362,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
             else:
                 st.stop()
     # update entity_mapping in onedrive  
-    Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,None,entity_mapping_str_col)
+    Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,"CSV",None,entity_mapping_str_col)
     return entity_mapping
 
 def View_Discrepancy_Detail():
@@ -1457,7 +1457,7 @@ def View_Discrepancy():
                     # save discrepancy data to OneDrive
                     if len(Total_PL.columns)>1 and diff_BPC_PL.shape[0]>0:
                         download_report(diff_BPC_PL[["Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff (Sabra-P&L)"]],"discrepancy")
-                        Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,None,None)
+                        Update_File_Onedrive(master_template_path,discrepancy_filename,diff_BPC_PL,operator,"CSV",None,None)
         
         else:
             st.success("All previous data in P&L ties with Sabra data")
@@ -1609,7 +1609,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 elif len([item for item in header_row if item!=0])==len(column_name_list_in_mapping):  # property name column header is unique and match with entity mapping
                     mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(entity_list))}
                     mapped_entity = [mapping_dict[property] if property in mapping_dict else "0" for property in header_row]
-                    Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,None,entity_mapping_str_col)
+                    Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,"CSV",None,entity_mapping_str_col)
                     return max_match_row,mapped_entity
             else:
                 st.stop()
@@ -2146,7 +2146,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     if len(new_tenant_account_list)==0:
                         st.stop()
                     account_mapping=Manage_Account_Mapping(new_tenant_account_list)
-                    Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator,None,account_mapping_str_col)
+                    Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator,"XLSX",None,account_mapping_str_col)
 			
     elif choice=='Instructions':
         # insert Video
