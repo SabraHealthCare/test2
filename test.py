@@ -1140,6 +1140,7 @@ def View_Summary():
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
+    st.write("Total_PL",Total_PL)
     #st.write("Total_PL",Total_PL,Total_PL.index)
     #st.write("reporting_month",reporting_month)
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
