@@ -162,7 +162,6 @@ def Save_File_To_Onedrive(df, path, file_name, file_type):
         
         # Define your Microsoft Graph API endpoint, user ID, and headers
         api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
-        st.write("file_type",file_type)
         # Handle file type
         if file_type.upper() == "CSV":
             file_name = f"{file_name}.csv" if not file_name.endswith(".csv") else file_name
@@ -1626,7 +1625,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         sheet_type_name="Occupancy"
     elif sheet_type=="Sheet_Name_Balance_Sheet":
         sheet_type_name="Balance Sheet"
-
+    st.write("sheet_name",sheet_name,uploaded_file)
     # read data from uploaded file
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
     #st.write("sheet_name",sheet_name,"PL",PL)
