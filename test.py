@@ -2083,20 +2083,18 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
-	 
-            with st.spinner('Wait for P&L processing'):
-                Total_PL=Upload_And_Process(uploaded_finance,"Finance")
+            Total_PL=Upload_And_Process(uploaded_finance,"Finance")
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel 
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")
             entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
 
             # process Finance 
             with st.spinner('Wait for P&L processing'):
-                #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
+                st.write("uploaded_finance",uploaded_finance)
                 Total_PL=Upload_And_Process(uploaded_finance,"Finance")
 	    # process BS 
             with st.spinner('Wait for Balance Sheet processing'):
-                #Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
+                st.write("uploaded_BS",uploaded_BS)
                 Total_BL=Upload_And_Process(uploaded_BS,"BS")
 	    # combine Finance and BS
             Total_PL=Total_BL.combine_first(Total_PL)
