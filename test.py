@@ -1863,6 +1863,7 @@ def Upload_And_Process(uploaded_file,file_type):
         
 	# All the properties are in one sheet	
         sheet_list_finance_in_onesheet = entity_mapping[entity_mapping["Finance_in_separate_sheets"]=="N"]["Sheet_Name_Finance"].unique()
+        st.write("sheet_list_finance_in_onesheet",sheet_list_finance_in_onesheet)
         if len(sheet_list_finance_in_onesheet)>0:
             for sheet_name_finance_in_onesheet in sheet_list_finance_in_onesheet:
                 tenant_account_col=[10000]
@@ -1883,7 +1884,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 Total_PL=PL_Occ.combine_first(Total_PL)
 		    
 	# balance sheet
-        sheet_list_bs_in_onesheet = entity_mapping[(entity_mapping["Balance_in_separate_sheets"]=="N")&(~pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))&(entity_mapping["Sheet_Name_Balance_Sheet"]!="nan")]["Sheet_Name_Balance_Sheet"].unique()
+        sheet_list_bs_in_onesheet = entity_mapping[(entity_mapping["Balance_in_separate_sheets"]=="N")&(entity_mapping["BS_separate_excel"]=="N")&(~pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))&(entity_mapping["Sheet_Name_Balance_Sheet"]!="nan")]["Sheet_Name_Balance_Sheet"].unique()
         if len(sheet_list_bs_in_onesheet)>0:
             for sheet_name_bs_in_onesheet in sheet_list_bs_in_onesheet:
                 tenant_account_col=[10000]
