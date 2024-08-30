@@ -2089,13 +2089,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
 
             # process Finance 
-            with st.spinner('Wait for P&L processing'):
-                st.write("uploaded_finance",uploaded_finance)
-                Total_PL=Upload_And_Process(uploaded_finance,"Finance")
+            st.write("uploaded_finance99999999999999999999999",uploaded_finance)
+            Total_PL=Upload_And_Process(uploaded_finance,"Finance")
 	    # process BS 
-            with st.spinner('Wait for Balance Sheet processing'):
-                st.write("uploaded_BS",uploaded_BS)
-                Total_BL=Upload_And_Process(uploaded_BS,"BS")
+            st.write("uploaded_BS99999999999999999999999999999999",uploaded_BS)
+            Total_BL=Upload_And_Process(uploaded_BS,"BS")
 	    # combine Finance and BS
             Total_PL=Total_BL.combine_first(Total_PL)
             #Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
