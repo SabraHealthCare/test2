@@ -590,6 +590,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
             operating_beds_i=check_patient_days.loc[(property_i,"Operating Beds"),reporting_month]
         except:
             operating_beds_i=0
+            st.write("operating_beds_i",operating_beds_i,"check_patient_days",check_patient_days)
         if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
             continue
         elif operating_beds_i>0 and patient_day_i>operating_beds_i*month_days:
@@ -614,8 +615,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
 		                "Patient Days": "Patient Days",
 		                "Operating Beds": "Operating Beds"},
 			    hide_index=True)
-        #st.stop() 
-    #st.write("BPC_pull0",BPC_pull)	
+        #st.stop() 	
     if len(properties_fill_Aunit)>0:    
         BPC_pull_reset = BPC_pull.reset_index()
 	    
