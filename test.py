@@ -588,9 +588,10 @@ def Check_Available_Units(check_patient_days,reporting_month):
             patient_day_i=0
         try:
             operating_beds_i=check_patient_days.loc[(property_i,"Operating Beds"),reporting_month]
+            st.write("operating_beds_i0",operating_beds_i,"check_patient_days",check_patient_days)
         except:
             operating_beds_i=0
-            st.write("operating_beds_i",operating_beds_i,"check_patient_days",check_patient_days)
+            st.write("operating_beds_i1",operating_beds_i,"check_patient_days",check_patient_days)
         if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
             continue
         elif operating_beds_i>0 and patient_day_i>operating_beds_i*month_days:
