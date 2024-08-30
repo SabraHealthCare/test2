@@ -1846,8 +1846,10 @@ def Upload_And_Process(uploaded_file,file_type):
                 and sheet_name_occupancy!=" " \
                 and sheet_name_occupancy!="nan"	and sheet_name_occupancy!=sheet_name_finance \
                 and entity_mapping.loc[entity_i,"Occupancy_in_separate_sheets"]=="Y":
+	
                 PL_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
-                Total_PL=PL_occ.combine_first(Total_PL)
+                if PL_occ:
+                    Total_PL=PL_occ.combine_first(Total_PL)
         tenant_account_col=[10000]
         for entity_i in total_entity_list: 
             if  entity_mapping.loc[entity_i,"BS_separate_excel"]=="N": 
@@ -1859,7 +1861,8 @@ def Upload_And_Process(uploaded_file,file_type):
                        and sheet_name_balance!=sheet_name_finance \
                        and entity_mapping.loc[entity_i,"Balance_in_separate_sheets"]=="Y":
                     PL_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
-                    Total_PL=PL_BS.combine_first(Total_PL)
+                    if PL_BS:
+                        Total_PL=PL_BS.combine_first(Total_PL)
         
 	# All the properties are in one sheet	
         sheet_list_finance_in_onesheet = entity_mapping[entity_mapping["Finance_in_separate_sheets"]=="N"]["Sheet_Name_Finance"].unique()
@@ -1881,7 +1884,8 @@ def Upload_And_Process(uploaded_file,file_type):
                 tenant_account_col=[10000]
                 entity_list_occupancy_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Occupancy"]==sheet_name_occupancy_in_onesheet].tolist()	
                 PL_Occ=Read_Clean_PL_Multiple(entity_list_occupancy_in_onesheet,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days,sheet_name_occupancy_in_onesheet)
-                Total_PL=PL_Occ.combine_first(Total_PL)
+                if PL_Occ:
+                    Total_PL=PL_Occ.combine_first(Total_PL)
 		    
 	# balance sheet
         sheet_list_bs_in_onesheet = entity_mapping[(entity_mapping["Balance_in_separate_sheets"]=="N")&(entity_mapping["BS_separate_excel"]=="N")&(~pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))&(entity_mapping["Sheet_Name_Balance_Sheet"]!="nan")]["Sheet_Name_Balance_Sheet"].unique()
@@ -1890,7 +1894,8 @@ def Upload_And_Process(uploaded_file,file_type):
                 tenant_account_col=[10000]
                 entity_list_bs_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Balance_Sheet"]==sheet_name_bs_in_onesheet].tolist()	
                 PL_BS=Read_Clean_PL_Multiple(entity_list_bs_in_onesheet,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet,sheet_name_bs_in_onesheet)
-                Total_PL=PL_BS.combine_first(Total_PL)
+                if PL_BS:
+                    Total_PL=PL_BS.combine_first(Total_PL)
 		    
     elif file_type=="BS":
         tenant_account_col=[10000]
