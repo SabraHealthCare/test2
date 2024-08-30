@@ -588,7 +588,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
             patient_day_i=0
         try:
             operating_beds_i=check_patient_days.loc[(property_i,"Operating Beds"),reporting_month]
-            st.write("operating_beds_i0",operating_beds_i,"check_patient_days",check_patient_days)
+           
         except:
             operating_beds_i=0
             st.write("operating_beds_i1",operating_beds_i,"check_patient_days",check_patient_days)
@@ -1140,7 +1140,6 @@ def View_Summary():
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
-    st.write("Total_PL",Total_PL)
     #st.write("Total_PL",Total_PL,Total_PL.index)
     #st.write("reporting_month",reporting_month)
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
@@ -1150,7 +1149,6 @@ def View_Summary():
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
     # check patient days ( available days > patient days)	
     check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].str.startswith("A_"))|(reporting_month_data["Category"]=='Patient Days') ]
-    st.write("check_patient_days1",check_patient_days)
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
     check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
@@ -1740,7 +1738,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
     if PL.shape[0]<=1:  # sheet is empty or only has one column
         return pd.DataFrame()
-    st.write("PL0",PL)
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
@@ -1808,10 +1805,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
             if len(dup_tenant_account)>0:
                 st.error("Duplicated accounts detected in {} sheet '{}'. Please rectify them to avoid repeated calculations: **{}** ".format(sheet_type_name,sheet_name,", ".join(dup_tenant_account)))
         # Map PL accounts and Sabra account
-        st.write("PL1",PL)
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_i,sheet_type) 
         PL=Map_PL_Sabra(PL,entity_i,sheet_type) 
-        st.write("PL2",PL)
     #return PL,PL_with_detail
     return PL
        
