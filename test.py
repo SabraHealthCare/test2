@@ -1625,10 +1625,10 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         sheet_type_name="Occupancy"
     elif sheet_type=="Sheet_Name_Balance_Sheet":
         sheet_type_name="Balance Sheet"
-    st.write("sheet_name",sheet_name,uploaded_file)
+
     # read data from uploaded file
     excel_file = pd.ExcelFile(uploaded_file)
-    st.write("sheet_name1",excel_file.sheet_names)
+
 	
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
     #st.write("sheet_name",sheet_name,"PL",PL)
@@ -2090,10 +2090,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
 
             # process Finance 
-            st.write("uploaded_finance99999999999999999999999",uploaded_finance)
+            
             Total_PL=Upload_And_Process(uploaded_finance,"Finance")
 	    # process BS 
-            st.write("uploaded_BS99999999999999999999999999999999",uploaded_BS)
+        
             Total_BL=Upload_And_Process(uploaded_BS,"BS")
 	    # combine Finance and BS
             Total_PL=Total_BL.combine_first(Total_PL)
