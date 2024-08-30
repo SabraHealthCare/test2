@@ -999,7 +999,7 @@ def Map_PL_Sabra(PL,entity,sheet_type):
         account_pool=account_mapping[account_mapping["Sabra_Account"]!= "NO NEED TO MAP"]
 	  
     elif sheet_type=="Sheet_Name_Occupancy":
-        account_pool=account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]
+        account_pool=account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Category"] == "Facility Information")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]
         #st.write("account_mapping",account_mapping)
     elif sheet_type=="Sheet_Name_Balance_Sheet":
         account_pool=account_mapping.loc[account_mapping["Category"]=="Balance Sheet"]
@@ -1826,7 +1826,7 @@ def Upload_And_Process(uploaded_file,file_type):
     Occupancy_in_one_sheet=[]
     BS_in_one_sheet=[]
     account_pool_full=account_mapping.loc[account_mapping["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Formated_Account"]	
-    account_pool_patient_days = account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]["Tenant_Formated_Account"]		  
+    account_pool_patient_days = account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Category"] == "Facility Information")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]["Tenant_Formated_Account"]		  
     account_pool_balance_sheet=account_mapping.loc[account_mapping["Category"]=="Balance Sheet"]["Tenant_Formated_Account"]	
 
     # ****Finance and BS in one excel****
