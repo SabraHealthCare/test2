@@ -169,7 +169,7 @@ def send_confirmation_email(receiver_email_list, subject, body):
     sender_email = "sli@sabrahealth.com"
     receiver_email = "sli@sabrahealth.com"
 
-    # Create the email
+    # Create the email 
     msg = MIMEMultipart()
     msg['From'] = sender_email
     msg['To'] = receiver_email
