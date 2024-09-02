@@ -1011,29 +1011,19 @@ def Map_PL_Sabra(PL,entity,sheet_type):
 
     # Ensure index name consistency
     PL.index.name = "Tenant_Account"
-    #create a new column for merging mapping
-    #PL["Tenant_Account"] = PL.index.str.upper()
     PL = PL.reset_index(drop=False)
-    #st.write("PL",PL)
-    #st.write("second_account_mapping",second_account_mapping)
-    #st.write("main_account_mapping",main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]])
-    first_merge = PL.merge(second_account_mapping, on="Tenant_Account", how="right")
+    
     # Filter main_account_mapping before the merge
-    main_account_filtered = main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]]
-    second_merge = PL.merge(main_account_filtered, on="Tenant_Account", how="right")
-
-    # Concatenate the results
-    PL = pd.concat([first_merge, second_merge])    
+    main_account_mapping = main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]] 
 	
-    #PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
-                    #PL.merge(main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]],\
-                    #on="Tenant_Account", how="right")])
+    PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
+                    PL.merge(main_account_mapping,   on="Tenant_Account", how="right")])
 
     #Remove blank or missing "Sabra_Account" values
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
     PL.dropna(subset=["Sabra_Account"], inplace=True)
 
-    # Reset index and handle "Conversion" column
+    # Conversion column
     PL = PL.reset_index(drop=True)
     conversion = PL["Conversion"].fillna(np.nan)
     
