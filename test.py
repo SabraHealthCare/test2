@@ -1012,7 +1012,8 @@ def Map_PL_Sabra(PL,entity,sheet_type):
     # Ensure index name consistency
     PL.index.name = "Tenant_Account"
     #create a new column for merging mapping
-    PL["Tenant_Account"] = PL.index.str.upper()
+    #PL["Tenant_Account"] = PL.index.str.upper()
+    PL = PL.reset_index(drop=False)
     #st.write("PL",PL)
     #st.write("second_account_mapping",second_account_mapping)
     #st.write("main_account_mapping",main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]])
