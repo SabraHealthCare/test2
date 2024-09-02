@@ -73,7 +73,7 @@ token_response = app.acquire_token_for_client(scopes=["https://graph.microsoft.c
 access_token = token_response['access_token']
 headers = {'Authorization': 'Bearer ' + access_token,}    
 
-account_mapping_str_col=["Tenant_Account","Tenant_Formated_Account"]
+account_mapping_str_col=["Tenant_Account","Tenant_Account"]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
 #directly save the uploaded (.xlsx) file to onedrive
 def Upload_to_Onedrive(uploaded_file,path,file_name):
@@ -103,7 +103,7 @@ def detect_encoding(file_content):
     result = chardet.detect(file_content)
     return result['encoding']
 
-def Read_File_From_Onedrive(path, file_name, type, str_col_list=None):
+def Read_File_From_Onedrive(path, file_name, file_type, str_col_list=None):
     if str_col_list is None:
         str_col_list = []
     
@@ -121,7 +121,7 @@ def Read_File_From_Onedrive(path, file_name, type, str_col_list=None):
             # Set the dtype dictionary for specified columns
             dtype_dict = {col: str for col in str_col_list}
             
-            if type.upper() == "CSV":    
+            if file_type.upper() == "CSV":    
                 detected_encoding = detect_encoding(file_content)
                 if file_name.lower().endswith(".csv"):
                     df = pd.read_csv(BytesIO(file_content), encoding=detected_encoding, on_bad_lines='skip', dtype=dtype_dict)
@@ -129,29 +129,29 @@ def Read_File_From_Onedrive(path, file_name, type, str_col_list=None):
                     df = pd.read_excel(BytesIO(file_content), dtype=dtype_dict, engine='openpyxl')
                 return df
 
-            elif type.upper() == "XLSX":
+            elif file_type.upper() == "XLSX":
                 df = pd.read_excel(BytesIO(file_content), dtype=dtype_dict, engine='openpyxl')
                 return df
 
-            elif type.upper() == "YAML":
+            elif file_type.upper() == "YAML":
                 config = yaml.safe_load(file_content)
                 return config
 
-            elif type.upper() == "VIDEO":
+            elif file_type.upper() == "VIDEO":
                 return BytesIO(response.content)
 
         except pd.errors.EmptyDataError:
-            print("EmptyDataError: The file is empty.")
+            st.write("EmptyDataError: The file is empty.")
             return False
         except pd.errors.ParserError as e:
-            print(f"ParserError: {e}")
+            st.write(f"ParserError: {e}")
             return False
         except Exception as e:
-            print(f"Unexpected error: {e}")
+            st.write(f"Unexpected error: {e}")
             return False
         
     else:
-        print(f"Failed to download file: {response.status_code}")
+        st.write(f"Failed to download file: {response.status_code}")
         return False
 
 # no cache, save a dataframe to OneDrive 
@@ -162,7 +162,7 @@ def Save_File_To_Onedrive(df, path, file_name, file_type):
         
         # Define your Microsoft Graph API endpoint, user ID, and headers
         api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
-        # Handle file type
+        # Handle file_type
         if file_type.upper() == "CSV":
             file_name = f"{file_name}.csv" if not file_name.endswith(".csv") else file_name
             file_content = df.to_csv(index=False).encode()
@@ -187,8 +187,6 @@ def Save_File_To_Onedrive(df, path, file_name, file_type):
         st.write(f"Error: {e}")
         return False
 	    
-
-
 
 # For updating account_mapping, entity_mapping, reporting_month_data, only for operator use
 # if entity_list is provided,
@@ -221,18 +219,15 @@ def Update_File_Onedrive(path,file_name,new_data,operator,file_type="CSV",entity
         updated_data = new_data.drop(columns='index', errors='ignore')
     return Save_File_To_Onedrive(updated_data,path,file_name,file_type)  # return True False
 
-
+#
 def Format_Value(column):
     def format_value(x):
-        if pd.isna(x) or x == None or x == " ":
-            return None
-        elif x == 0:
+        if pd.isna(x) or (isinstance(x, str) and x.strip() == "") or x == 0:
             return None
         elif isinstance(x, float):
             return round(x, 1)
         return x
     return column.apply(format_value)
-
 
 # Function to update the value in session state
 def clicked(button_name):
@@ -246,18 +241,19 @@ def Initial_Mapping(operator):
             .dropna(axis=1, how='all')
             .rename(columns=str))
 
+    # Read account mapping file from OneDrive
     account_mapping_all = Read_File_From_Onedrive(mapping_path,account_mapping_filename,"XLSX",account_mapping_str_col)
     account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
-	
-    if account_mapping.shape[0]==1:    # and account_mapping.loc[:,"Sabra_Account"][0]=='Template':
+
+    # Handle case where there's only one row and it corresponds to a template
+    if account_mapping.shape[0] == 1 and account_mapping["Sabra_Account"].iloc[0] == 'Template':
         account_mapping = account_mapping_all[account_mapping_all["Operator"] == "Template"].copy()
-        account_mapping["Operator"] = operator
+        account_mapping["Operator"] = operator	
 
     # Clean and format account mapping columns
     account_mapping_cols = ["Sabra_Account", "Sabra_Second_Account", "Tenant_Account"]
     account_mapping[account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
-    account_mapping["Tenant_Formated_Account"] = account_mapping["Tenant_Account"].apply(lambda x: x.upper().strip() if pd.notna(x) else x)
-    account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Tenant_Formated_Account", "Conversion"]]
+    account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion"]]
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")
 	 				  
     entity_mapping=Read_File_From_Onedrive(mapping_path,entity_mapping_filename,"CSV",entity_mapping_str_col)
@@ -664,7 +660,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
             return pre_date_header
     PL_col_size=PL.shape[1]
     tenant_account_row_mask = PL.index.str.upper().str.strip().isin(\
-        [account for account, sabra_account in zip(account_mapping['Tenant_Formated_Account'], account_mapping['Sabra_Account']) \
+        [account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account']) \
 	 if sabra_account != 'NO NEED TO MAP']).tolist()
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
@@ -983,7 +979,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
             st.stop()
                 
         #insert new record to the bottom line of account_mapping
-        new_accounts_df = pd.DataFrame({'Sabra_Account': Sabra_main_account_value, 'Sabra_Second_Account': Sabra_second_account_value, 'Tenant_Account': new_tenant_account_list,'Tenant_Formated_Account':list(map(lambda x:x.upper().strip(), new_tenant_account_list))})
+        new_accounts_df = pd.DataFrame({'Sabra_Account': Sabra_main_account_value, 'Sabra_Second_Account': Sabra_second_account_value, 'Tenant_Account': new_tenant_account_list,'Tenant_Account':list(map(lambda x:x.upper().strip(), new_tenant_account_list))})
         new_accounts_df["Operator"]=operator
 	
         #new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[0],new_tenant_account_list[0].upper(),"N"]            
@@ -1006,8 +1002,9 @@ def Map_PL_Sabra(PL,entity,sheet_type):
     
     main_account_mapping = account_pool.loc[account_pool["Sabra_Account"].apply(lambda x: pd.notna(x) and x.upper() != "NO NEED TO MAP")]
         # Concatenate main accounts with second accounts
-    second_account_mapping = account_pool.loc[(pd.notna(account_pool["Sabra_Second_Account"]))][["Sabra_Second_Account", "Tenant_Formated_Account", "Tenant_Account", "Conversion"]]\
+    second_account_mapping = account_pool.loc[(pd.notna(account_pool["Sabra_Second_Account"]))][["Sabra_Second_Account","Tenant_Account", "Conversion"]]\
         .rename(columns={"Sabra_Second_Account": "Sabra_Account"})
+    
     # Remove rows with blank "Sabra_Account"
     second_account_mapping = second_account_mapping.dropna(subset=["Sabra_Account"])
     if second_account_mapping.shape[0]>0:
@@ -1015,15 +1012,12 @@ def Map_PL_Sabra(PL,entity,sheet_type):
 
     # Ensure index name consistency
     PL.index.name = "Tenant_Account"
-    PL["Tenant_Formated_Account"] = PL.index.str.upper()
+    #create a new column for merging mapping
+    PL["Tenant_Account"] = PL.index.str.upper()
 
-    PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Formated_Account", how="right"),\
-    PL.merge(\
-        main_account_mapping[\
-            pd.notna(main_account_mapping["Sabra_Account"])\
-        ][["Sabra_Account", "Tenant_Formated_Account", "Tenant_Account", "Conversion"]],\
-        on="Tenant_Formated_Account", how="right"\
-    )])
+    PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
+                    PL.merge(main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]],\
+                    on="Tenant_Account", how="right")])
 
     #Remove blank or missing "Sabra_Account" values
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
@@ -1051,7 +1045,7 @@ def Map_PL_Sabra(PL,entity,sheet_type):
                     PL.loc[idx, month] *= multiplier
                 else:
                     continue
-        PL=PL.drop(["Tenant_Formated_Account","Conversion","Tenant_Account"], axis=1)
+        PL=PL.drop(["Conversion","Tenant_Account"], axis=1)
         PL["ENTITY"]=entity	    
          
     elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value" 
@@ -1071,14 +1065,12 @@ def Map_PL_Sabra(PL,entity,sheet_type):
                 continue
 
         #property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
-        PL=PL.drop(["Tenant_Formated_Account","Conversion"], axis=1)
+        PL=PL.drop(["Conversion"], axis=1)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='ENTITY')     
         PL=PL.drop(["Tenant_Account"], axis=1)
-    #PL_with_detail=copy.copy(PL)
-    #PL_with_detail=PL_with_detail.set_index(['ENTITY', 'Sabra_Account',"Tenant_Account"])
+
 
     # group by Sabra_Account
-
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first
     #return PL,PL_with_detail   
@@ -1490,7 +1482,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
     max_match=[]
 
     tenant_account_row_mask = PL.index.str.upper().str.strip().isin(\
-	    [account for account, sabra_account in zip(account_mapping['Tenant_Formated_Account'], account_mapping['Sabra_Account'])\
+	    [account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account'])\
 	     if sabra_account != 'NO NEED TO MAP']).tolist()
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
@@ -1677,7 +1669,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
         # mapping new tenant accounts
         #st.write("account_mapping",account_mapping)
-        new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
+        new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Account"]),PL.index))
         # remove duplicate new account
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
@@ -1686,7 +1678,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         #if there are duplicated accounts in P&L, ask for confirming
         dup_tenant_account_total=list(set([x for x in PL.index if list(PL.index).count(x) > 1]))
         if len(dup_tenant_account_total)>0:
-            dup_tenant_account=[x for x in dup_tenant_account_total if x.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"])]
+            dup_tenant_account=[x for x in dup_tenant_account_total if x.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Account"])]
          
             for idx_account in dup_tenant_account[:]:
 		# Extract records with current index value
@@ -1785,7 +1777,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         # remove rows with all nan/0 value or a combination of nan and 0
         PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
 	# mapping new tenant accounts
-        new_tenant_account_list=list(filter(lambda x: x not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
+        new_tenant_account_list=list(filter(lambda x: x not in list(account_mapping["Tenant_Account"]),PL.index))
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
             account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name)        
@@ -1794,7 +1786,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         dup_tenant_account_total=set([x for x in PL.index if list(PL.index).count(x) > 1])
 
         if len(dup_tenant_account_total)>0:
-            dup_tenant_account=[x for x in dup_tenant_account_total if x.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"])]
+            dup_tenant_account=[x for x in dup_tenant_account_total if x.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Account"])]
             for idx_account in dup_tenant_account[:]:
 		# Extract records with current index value
                 records_idx = PL.loc[idx_account]
@@ -1820,9 +1812,9 @@ def Upload_And_Process(uploaded_file,file_type):
     total_entity_list=list(entity_mapping.index)
     Occupancy_in_one_sheet=[]
     BS_in_one_sheet=[]
-    account_pool_full=account_mapping.loc[account_mapping["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Formated_Account"]	
-    account_pool_patient_days = account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Category"] == "Facility Information")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]["Tenant_Formated_Account"]		  
-    account_pool_balance_sheet=account_mapping.loc[account_mapping["Category"]=="Balance Sheet"]["Tenant_Formated_Account"]	
+    account_pool_full=account_mapping.loc[account_mapping["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Account"]	
+    account_pool_patient_days = account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Category"] == "Facility Information")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]["Tenant_Account"]		  
+    account_pool_balance_sheet=account_mapping.loc[account_mapping["Category"]=="Balance Sheet"]["Tenant_Account"]	
 
     # ****Finance and BS in one excel****
     if file_type=="Finance":
@@ -2138,7 +2130,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
                 if new_tenant_account:
                     new_tenant_account_list=list(set(map(lambda x:x.strip(),new_tenant_account.split(",") )))
-                    duplicate_accounts=list(filter(lambda x:x.upper() in list(account_mapping['Tenant_Formated_Account']),new_tenant_account_list))
+                    duplicate_accounts=list(filter(lambda x:x.upper() in list(account_mapping['Tenant_Account']),new_tenant_account_list))
                    
                     if len(duplicate_accounts)>1:
                         st.write("{} are already existed in mapping list and will be skip.".format(",".join(duplicate_accounts)))
