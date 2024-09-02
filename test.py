@@ -293,7 +293,7 @@ css='''
 '''
 st.markdown(css, unsafe_allow_html=True)
 
-
+@st.cache_data
 def Create_Tree_Hierarchy():
     # Initialize hierarchy with default options
     parent_hierarchy_main = [{'label': "No need to map", 'value': "No need to map"}]
@@ -322,31 +322,6 @@ def Create_Tree_Hierarchy():
     BPC_Account = BPC_Account[["BPC_Account_Name", "Sabra_Account_Full_Name", "Category"]]
     return parent_hierarchy_main, parent_hierarchy_second, BPC_Account
 
-@st.cache_data
-def Create_Tree_Hierarchy1():
-    #Create Tree select hierarchy
-    parent_hierarchy_main=[{'label': "No need to map","value":"No need to map"}]
-    parent_hierarchy_second=[{'label': "No need to map","value":"No need to map"}]
-    BPC_Account = Read_File_From_Onedrive(mapping_path,BPC_account_filename,"CSV")
-	
-    for category in BPC_Account[BPC_Account["Type"]=="Main"]["Category"].unique():
-        children_hierarchy=[]
-        for account in BPC_Account[(BPC_Account["Category"]==category)&(BPC_Account["Type"]=="Main")]["Sabra_Account_Full_Name"]:
-            dic={"label":account,"value":BPC_Account[(BPC_Account["Sabra_Account_Full_Name"]==account)&(BPC_Account["Type"]=="Main")]["BPC_Account_Name"].item()}
-            children_hierarchy.append(dic)
-        dic={"label":category, "value":category, "children":children_hierarchy}
-        parent_hierarchy_main.append(dic)
-        
-    for category in BPC_Account[BPC_Account["Type"]=="Second"]["Category"].unique():
-        children_hierarchy=[]
-        for account in BPC_Account[(BPC_Account["Category"]==category)&(BPC_Account["Type"]=="Second")]["Sabra_Account_Full_Name"]:
-            dic={"label":account,"value":BPC_Account.loc[(BPC_Account["Sabra_Account_Full_Name"]==account)&(BPC_Account["Type"]=="Second")]["BPC_Account_Name"].item()}
-            children_hierarchy.append(dic)
-        dic={"label":category,"value":category,"children":children_hierarchy}
-        parent_hierarchy_second.append(dic)
-    
-    BPC_Account=BPC_Account[["BPC_Account_Name","Sabra_Account_Full_Name","Category"]]
-    return parent_hierarchy_main,parent_hierarchy_second,BPC_Account
 parent_hierarchy_main,parent_hierarchy_second,BPC_Account=Create_Tree_Hierarchy()
 
 #-----------------------------------------------functions---------------------------------------------
@@ -359,32 +334,6 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 
 
 # Parse the df and get filter widgets based for provided columns
-def filters_widgets(df, columns,location="Vertical"):
-    filter_widgets = st.container()
-    with filter_widgets.form(key="data_filters"):
-        if location=='Horizontal':
-            cols = st.columns(len(columns))   
-            for i, x in enumerate(cols):
-                if location=='Horizontal':
-                    user_input = x.multiselect(
-                    label=str(columns[i]),
-                    options=df[columns[i]].unique().tolist(),
-                    key=str(columns[i]))
-                    if user_input:
-                        df = df[df[columns[i]].isin(user_input)]  
-        else:  
-            for column in columns:
-                user_input = st.multiselect(
-                    label=str(column),
-                    options=df[column].unique().tolist(),
-                    key=str(column))
-                if user_input:
-                    df = df[df[columns[i]].isin(user_input)]                      
-        submit_button = st.form_submit_button("Apply Filters")
-        if submit_button:
-            return df
-        else:
-            return df
 		
 def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, pre_max_match_col):
     # Helper function to clean and match candidate columns
@@ -432,7 +381,7 @@ def download_report(df,button_display):
 def Get_Year(single_string):
     for Year, keywords in year_dic.items():
         for keyword  in keywords:
-            if keyword in single_string:
+            if re.search(r'\b' + re.escape(keyword) + r'\b', single_string):
                 return Year,keyword
     return 0,""
 
@@ -1353,46 +1302,6 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
     # update entity_mapping in onedrive  
     Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,"CSV",None,entity_mapping_str_col)
     return entity_mapping
-
-def View_Discrepancy_Detail():
-    global diff_BPC_PL,Total_PL_detail,Total_PL ,diff_BPC_PL_detail
-    # Sabra detail accounts mapping table
-    def color_coding(row):
-    	return ['color: blue'] * len(row) if row.Tenant_Account == " Total" else ['color: black'] * len(row)
-    
-    if diff_BPC_PL.shape[0]>0: 
-	# format it to display
-        st.markdown("---")
-        st.markdown("P&L—Sabra detail accounts mapping (for discrepancy data)") 
-        diff_BPC_PL_detail = (pd.concat([diff_BPC_PL_detail.groupby(["ENTITY","Sabra_Account","Month","Sabra","Diff (Sabra-P&L)"], as_index=False).sum()
-                      .assign(Tenant_Account=" Total"),diff_BPC_PL_detail]).sort_values(by=["ENTITY","Sabra_Account","Month","Sabra","Diff (Sabra-P&L)"], kind='stable', ignore_index=True)[diff_BPC_PL_detail.columns])
-        diff_BPC_PL_detail=diff_BPC_PL_detail.merge(BPC_Account[["BPC_Account_Name","Sabra_Account_Full_Name"]],left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
-        diff_BPC_PL_detail=diff_BPC_PL_detail.merge(entity_mapping[["Property_Name"]],left_on="ENTITY", right_on="ENTITY",how="left")
-        diff_BPC_PL_detail=diff_BPC_PL_detail[["Property_Name","Month","Sabra_Account_Full_Name","Tenant_Account","Sabra","P&L Value","Diff (Sabra-P&L)"]].\
-			rename(columns={"Property_Name":"Property","Sabra_Account_Full_Name":"Sabra Account"})
-        diff_BPC_PL_detail=filters_widgets(diff_BPC_PL_detail,["Property","Month","Sabra Account"],"Horizontal")
-        diff_BPC_PL_detail=diff_BPC_PL_detail.reset_index(drop=True)
-        for i in range(diff_BPC_PL_detail.shape[0]):
-            if  diff_BPC_PL_detail.loc[i,"Tenant_Account"]!=" Total":
-                diff_BPC_PL_detail.loc[i,"Property"]=""
-                diff_BPC_PL_detail.loc[i,"Month"]=""
-                diff_BPC_PL_detail.loc[i,"Sabra Account"]=""
-                diff_BPC_PL_detail.loc[i,"Sabra"]=""
-                diff_BPC_PL_detail.loc[i,"Diff (Sabra-P&L)"]=""
-                diff_BPC_PL_detail.loc[i,"Tenant_Account"]="—— "+diff_BPC_PL_detail.loc[i,"Tenant_Account"]
-        
-        st.markdown(
-            """
-        <style type="text/css" media="screen">
-        div[role="dataframe"] ul {
-            height:300px;
-        }
-        </style>
-            """,
-        unsafe_allow_html=True )
-        st.markdown(diff_BPC_PL_detail.style.set_table_styles(styles).apply(color_coding, axis=1).map(left_align)
-		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)	
-        st.write("")
 
 # don't use cache
 def View_Discrepancy(): 
