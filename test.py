@@ -25,6 +25,55 @@ import pytz
 import chardet
 from pandas.errors import EmptyDataError
 import re
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+def send_confirmation_email(user_email, subject, body):
+    # Email details
+    sender_email = "sli@sabrahealth.com"
+    receiver_email = "sli@sabrahealth.com"
+
+    # Create the email
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = receiver_email
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        # Connect to the server
+        server = smtplib.SMTP('smtp.example.com', 587)  # Replace with your SMTP server
+        server.starttls()  # Secure the connection
+        server.login(sender_email, sender_password)
+
+        # Send the email
+        server.sendmail(sender_email, receiver_email, msg.as_string())
+        server.quit()
+        st.success("Confirmation email sent successfully!")
+    except Exception as e:
+        st.error(f"Failed to send email: {e}")
+
+# Streamlit app
+st.title("Submit Form")
+
+# Example form
+with st.form(key='submit_form'):
+    user_email = st.text_input("Enter your email")
+    submit_button = st.form_submit_button("Submit")
+
+if submit_button:
+    st.write("Form submitted!")
+    # Define email content
+    subject = "Confirmation of your submission"
+    body = "Thank you for your submission! We have received your form."
+
+    # Send the confirmation email
+    send_confirmation_email(user_email, subject, body)
+
+
+
 
 #---------------------------define parameters--------------------------
 st.set_page_config(
