@@ -738,7 +738,6 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
                             #st.write("PL_date_header",PL_date_header)         
                     elif max_match_year==0:  # there is no year for all the months
 		        #fill year to month
-                        #st.write("PL",PL,"month_row_index",month_row_index,"list(month_table.iloc[month_row_index,])",list(month_table.iloc[month_row_index,]),"sheet_name",sheet_name)
                         PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                      
                         original_header=PL.iloc[month_row_index,]
@@ -1014,12 +1013,20 @@ def Map_PL_Sabra(PL,entity,sheet_type):
     PL.index.name = "Tenant_Account"
     #create a new column for merging mapping
     PL["Tenant_Account"] = PL.index.str.upper()
-    st.write("PL",PL)
-    st.write("second_account_mapping",second_account_mapping)
-    st.write("main_account_mapping",main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]])
-    PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
-                    PL.merge(main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]],\
-                    on="Tenant_Account", how="right")])
+    #st.write("PL",PL)
+    #st.write("second_account_mapping",second_account_mapping)
+    #st.write("main_account_mapping",main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]])
+    first_merge = PL.merge(second_account_mapping, on="Tenant_Account", how="right")
+    # Filter main_account_mapping before the merge
+    main_account_filtered = main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]]
+    second_merge = PL.merge(main_account_filtered, on="Tenant_Account", how="right")
+
+    # Concatenate the results
+    PL = pd.concat([first_merge, second_merge])    
+	
+    #PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
+                    #PL.merge(main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]],\
+                    #on="Tenant_Account", how="right")])
 
     #Remove blank or missing "Sabra_Account" values
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
