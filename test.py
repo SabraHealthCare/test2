@@ -164,7 +164,7 @@ def Read_File_From_Onedrive(path, file_name, file_type, str_col_list=None):
         return False
 
 
-def send_confirmation_email(user_email, subject, body):
+def send_confirmation_email(receiver_email_list, subject, body):
     # Email details
     sender_email = "sli@sabrahealth.com"
     receiver_email = "sli@sabrahealth.com"
@@ -186,27 +186,9 @@ def send_confirmation_email(user_email, subject, body):
         # Send the email
         server.sendmail(sender_email, receiver_email, msg.as_string())
         server.quit()
-        st.success("Confirmation email sent successfully!")
+       
     except Exception as e:
         st.error(f"Failed to send email: {e}")
-
-# Streamlit app
-st.title("Submit Form")
-
-# Example form
-with st.form(key='submit_form'):
-    user_email = st.text_input("Enter your email")
-    submit_button = st.form_submit_button("Submit")
-
-if submit_button:
-    st.write("Form submitted!")
-    # Define email content
-    subject = "Confirmation of your submission"
-    body = "Thank you for your submission! We have received your form."
-
-    # Send the confirmation email
-    send_confirmation_email(user_email, subject, body)
-
 
 # no cache, save a dataframe to OneDrive 
 def Save_File_To_Onedrive(df, path, file_name, file_type):
@@ -1216,6 +1198,11 @@ def Submit_Upload_Latestmonth():
             new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
             Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
 
+    subject = "Confirmation of your submission"
+    body = "Thank you for your submission! We have received your reporting data."
+    receiver_email_list=["sli@sabrahealth.com"]
+    # Send the confirmation email
+    send_confirmation_email(receiver_email_list, subject, body)    
 
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
