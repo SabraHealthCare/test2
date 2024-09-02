@@ -428,39 +428,46 @@ def Get_Month_Year(single_string):
 
 # add year to month_header: identify current year/last year giving a list of month
 def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reporting_month):
+    # month_row_index is the row number for month header
+
     #remove rows with nan tenant account
-    nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x==0 ,PL.index))
-    column_mask = [all(val == 0 or not isinstance(val, (int, float)) or pd.isna(val) for val in PL.drop(nan_index).iloc[month_row_index:, i]) for i in range(PL.drop(nan_index).shape[1])]
-   
-    # Apply the mask to set these columns to NaN in the row specified by month_row_index
-    full_month_header=[0 if column_mask[i] else full_month_header[i] for i in range(len(full_month_header))]
+    nan_index = list(filter(lambda x: pd.isna(x) or str(x).strip().lower() in ["nan", "", "0"], PL.index))
+    PL_filtered = PL.drop(nan_index)
+    column_mask = [all(val == 0 or not isinstance(val, (int, float)) or pd.isna(val) for val in PL_filtered.iloc[:, i]) for i in range(PL_filtered.shape[1])]
+    
+  # Apply the mask to set these columns to NaN in the row specified by month_row_index
+    full_month_header = [0 if column_mask[i] else full_month_header[i] for i in range(len(full_month_header))]
+
     month_list=list(filter(lambda x:x!=0,full_month_header))
     month_len=len(month_list)
+    # Initialize the full_year_header with zeros
     full_year_header=[0] * len(full_month_header)
     if month_len==1:
         year=reporting_month[0:4]
         PL_date_header= [f"{year}{month:02d}" if month!=0 else 0 for month in full_month_header]
         return PL_date_header
-
 	    
     add_year=month_list
-    last_year=current_year-1
+    report_year=int(reporting_month[:4])
+    last_report_year=report_year-1
     year_change=0  
-	
+
+    # Check for ascending or descending order in the month list
     inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
-    #st.write("inv",inv)
     ascending_check=sum([x in [1,-11] for x in inv])
     descending_check=sum([x in [-1,11] for x in inv])
-    reporting_month_date=datetime.strptime(str(reporting_month[4:6])+"/01/"+str(reporting_month[0:4]),'%m/%d/%Y').date()   
-    #month decending  , month_list[0]<today.month 
+
+    # Convert reporting month to date for comparison	
+    reporting_month_date=datetime.strptime(str(reporting_month[4:6])+"/01/"+str(report_year),'%m/%d/%Y').date()   
+    # Handle descending months, month_list[0]<today.month 
     if descending_check>0 and descending_check>ascending_check: 
-        date_of_assumption=datetime.strptime(str(month_list[0])+"/01/"+str(current_year),'%m/%d/%Y').date()
+        date_of_assumption=datetime.strptime(str(month_list[0])+"/01/"+str(report_year),'%m/%d/%Y').date()
         if date_of_assumption==reporting_month_date:	
-            report_year_start=current_year
+            report_year_start=report_year
         elif date_of_assumption<today and date_of_assumption.month<today.month:
-            report_year_start=current_year
+            report_year_start=report_year
         elif date_of_assumption>=today:
-            report_year_start=last_year
+            report_year_start=last_report_year
         for i in range(month_len):
             add_year[i]=report_year_start-year_change
             if i<month_len-1 and add_year[i+1]==12:
@@ -468,22 +475,22 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
             
     # month ascending  
     elif ascending_check>0 and ascending_check> descending_check: 
-        date_of_assumption=datetime.strptime(str(month_list[-1])+"/01/"+str(current_year),'%m/%d/%Y').date() 
+        date_of_assumption=datetime.strptime(str(month_list[-1])+"/01/"+str(report_year),'%m/%d/%Y').date() 
         if date_of_assumption==reporting_month_date:
-            report_year_start=current_year
+            report_year_start=report_year
         elif date_of_assumption<today:
-            report_year_start=current_year
+            report_year_start=report_year
         elif date_of_assumption>=today:
-            report_year_start=last_year
+            report_year_start=last_report_year
         for i in range(-1,month_len*(-1)-1,-1):
             add_year[i]=report_year_start-year_change
             if i>month_len*(-1) and add_year[i-1]==12:
                 year_change+=1
-    #month decending 	    
+    #    # Handle other cases and errors  , month decending 	    
     elif (month_list[0]>month_list[1] and month_list[0]!=12) or (month_list[0]==1 and month_list[1]==12):
-        date_of_assumption=datetime.strptime(str(month_list[0])+"/01/"+str(current_year),'%m/%d/%Y').date()
+        date_of_assumption=datetime.strptime(str(month_list[0])+"/01/"+str(report_year),'%m/%d/%Y').date()
         if date_of_assumption<today and date_of_assumption.month<today.month:
-            report_year_start=current_year
+            report_year_start=report_year
         elif date_of_assumption>=today:
             report_year_start=last_year
         for i in range(month_len):
@@ -492,9 +499,9 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
                 year_change+=1
      # month ascending
     elif (month_list[0]<month_list[1] and month_list[0]!=12) or (month_list[0]==12 and month_list[1]==1): 
-        date_of_assumption=datetime.strptime(str(month_list[-1])+"/01/"+str(current_year),'%m/%d/%Y').date()    
+        date_of_assumption=datetime.strptime(str(month_list[-1])+"/01/"+str(report_year),'%m/%d/%Y').date()    
         if date_of_assumption<today:
-            report_year_start=current_year
+            report_year_start=report_year
         elif date_of_assumption>=today:
             report_year_start=last_year
         for i in range(-1,month_len*(-1)-1,-1):
@@ -506,7 +513,6 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
         st.stop()
     j=0
   
- 
     for i in range(len(full_month_header)):
         if full_month_header[i]!=0:
             full_year_header[i]=add_year[j]
@@ -514,8 +520,9 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
     PL_date_header= [f"{year}{month:02d}" if year!=0 else 0 for year, month in zip(full_year_header, full_month_header)]
     return PL_date_header
 	
-@st.cache_data
+@st.cache_data 
 def Check_Available_Units(check_patient_days,reporting_month):
+    #check patient days,fill missing operating beds to reporting_month_data
     global reporting_month_data
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
     month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
@@ -576,27 +583,6 @@ def Check_Available_Units(check_patient_days,reporting_month):
             st.error("{} is missing operating beds. Historical data has been used to fill in the missing info as shown below. If this data is incorrect, please add the operating beds and re-upload P&L.".format(properties_fill_Aunit[0]))
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
         st.write(previous_A_unit_display)
-	    
-    #check if operating beds changed compared with previous month "A_unit" in BPC_pull
-    #reporting_month_Aunit = reporting_month_data[reporting_month_data["Sabra_Account"].str.startswith("A_")]
-    
-    #if reporting_month_Aunit.shape[0]>0:
-        #reporting_month_Aunit = reporting_month_Aunit.merge(BPC_pull.reset_index()[['ENTITY', 'Property_Name', 'Sabra_Account', 'A_unit']],how='left',on=['ENTITY', 'Property_Name', 'Sabra_Account'])
-        #reporting_month_Aunit['Delta'] = reporting_month_Aunit['A_unit'] - reporting_month_Aunit[reporting_month]
-        #A_unit_dismatch= reporting_month_Aunit[reporting_month_Aunit['Delta'] != 0][["Property_Name",reporting_month,"A_unit"]]
-        # Display the result
-        #st.write("A_unit_dismatch",A_unit_dismatch,BPC_pull)  
-        #st.write("BPC_pull13",BPC_pull)
-        #if A_unit_dismatch.shape[0]>0:
-            #st.warning("The number of operating beds for the properties listed below have changed compared to the previous reporting month.")
-            #st.warning("Please double-check if these changes are accurate.")
-            #st.dataframe(A_unit_dismatch.style.map(color_missing, subset=["Delta"]).format(precision=0, thousands=",").hide(axis="index"),
-		    #column_config={
-			   #     "Property_Name": "Property",
-			   #      "A_unit":"Previous Operating beds",
-		           #      reporting_month:"Current Operating beds",
-		           #      "Delta": "Delta"},
-			    #hide_index=True)
 
 @st.cache_data
 def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no): 
@@ -622,7 +608,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
 
     valid_col_index=[i for i, mask in enumerate(valid_col_mask) if mask]
-    #st.write("valid_col_index",sheet_name,valid_col_index,len(valid_col_index))
+
     if len(valid_col_index)==0: # there is no valid data column
         return [],0,[]
     # nan_num_column is the column whose value is nan or 0 for PL.drop(nan_index)
@@ -795,9 +781,9 @@ def Manage_Entity_Mapping(operator):
             with col2:
                 st.write("P&L Sheetname")    
             with col3: 
-                st.write("Occupancy Sheetname")    
+                st.write("Census Sheetname")    
             with col4:
-                st.write("Balance sheet Sheetname")  
+                st.write("BS Sheetname")  
   
             for entity_i in entity_mapping_different_sheet_index:
                 col1,col2,col3,col4=st.columns([4,3,3,3])
@@ -821,6 +807,7 @@ def Manage_Entity_Mapping(operator):
             submitted = st.form_submit_button("Submit")
             if submitted:
                 entity_mapping.update(entity_mapping_updation)
+                st.success("Updates submitted successfully!")
 		
     entity_mapping_same_sheet_index= entity_mapping.index[(entity_mapping["DATE_SOLD_PAYOFF"]=="N")&(entity_mapping["Finance_in_separate_sheets"]=="N")]
     if len(entity_mapping_same_sheet_index)>0:
@@ -831,11 +818,11 @@ def Manage_Entity_Mapping(operator):
             with col2:
                 st.write("P&L Sheetname")    
             with col3: 
-                st.write("Occupancy Sheetname")    
+                st.write("Census Sheetname")    
             with col4:
-                st.write("Balance sheet Sheetname") 
+                st.write("BS Sheetname") 
             with col5:
-                st.write("Facility Column Name") 
+                st.write("Property name in header") 
   
             for entity_i in entity_mapping_same_sheet_index:
                 col1,col2,col3,col4,col5=st.columns([4,3,3,3,4])
@@ -863,9 +850,7 @@ def Manage_Entity_Mapping(operator):
             submitted = st.form_submit_button("Submit")
             if submitted:
                 entity_mapping.update(entity_mapping_updation)
-		
-	    
-        download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
+                st.success("Updates submitted successfully!")
         # update entity_mapping in Onedrive    
         Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,"CSV",None,entity_mapping_str_col)
         return entity_mapping
@@ -879,7 +864,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
     Sabra_second_account_list=[np.nan] * count
     Sabra_main_account_value=[np.nan] * count
     Sabra_second_account_value=[np.nan] * count
-    #st.write("new_tenant_account_list",new_tenant_account_list)
+   
     with st.form(key=new_tenant_account_list[0]):
         for i in range(count):
             if sheet_name=="False":
@@ -1021,17 +1006,6 @@ def Map_PL_Sabra(PL,entity,sheet_type):
     PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first
     #return PL,PL_with_detail   
     return PL   
-
-@st.cache_data
-def Fill_Operating_Beds(missing_category,reporting_month):
-    # search for the Month/year row and return row number
-    entities_missing_facility=list(missing_category[missing_category["Category"]=="Facility Information"]["ENTITY"])	
-    onemonth_before_reporting_month=max(list(filter(lambda x: str(x)[0:2]=="20" and str(x)[0:6]<str(reporting_month),BPC_pull.columns)))
-    previous_A_unit=BPC_pull.merge(BPC_Account,left_on="ACCOUNT",right_on="BPC_Account_Name")
-    previous_A_unit = previous_A_unit[(previous_A_unit["Category"] == "Facility Information") &(previous_A_unit["Sabra_Account"].str.startswith("A_"))]
-	
-    previous_facility_data=previous_facility_data.reset_index(drop=False)
-
 	
 @st.cache_data
 def Compare_PL_Sabra(Total_PL,reporting_month):
@@ -1095,19 +1069,18 @@ def View_Summary():
 	
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Balance Sheet"]
-    entity_list=list(reporting_month_data["ENTITY"].unique())
+
+    # Get unique entities
+    entity_list = list(reporting_month_data["ENTITY"].unique())
+	
     current_cagegory=reporting_month_data[["Property_Name","Category","ENTITY",reporting_month]][reporting_month_data["Category"].\
 	    isin(category_list)].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
+
+	
     full_category = pd.DataFrame(list(product(entity_list,category_list)), columns=['ENTITY', 'Category'])
     missing_category=full_category.merge(current_cagegory,on=['ENTITY', 'Category'],how="left")
     missing_category=missing_category[(missing_category[reporting_month]==0)|(missing_category[reporting_month].isnull())]
     missing_category[reporting_month]="NA" 
-
-
-   #if "Facility Information" in list(missing_category["Category"]):
-        # fill the facility info with historical data
-        #Fill_Operating_Beds(missing_category,reporting_month)
-        #missing_category=missing_category[missing_category["Category"]!="Facility Information"]
 
     if missing_category.shape[0]>0:
         st.write("No data detected for below properties and accounts: ")
