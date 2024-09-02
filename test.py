@@ -24,6 +24,7 @@ from pandas.errors import EmptyDataError
 import pytz
 import chardet
 from pandas.errors import EmptyDataError
+import re
 
 #---------------------------define parameters--------------------------
 st.set_page_config(
