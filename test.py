@@ -279,6 +279,7 @@ styles = [dict(selector="th", props=th_props),dict(selector="td", props=td_props
 
 def left_align(s, props='text-align: left;'):
     return props
+	
 css='''
 <style>
     section.main>div {
@@ -293,7 +294,7 @@ css='''
 st.markdown(css, unsafe_allow_html=True)
 
 
-def Create_Tree_Hierarchy1():
+def Create_Tree_Hierarchy():
     # Initialize hierarchy with default options
     parent_hierarchy_main = [{'label': "No need to map", 'value': "No need to map"}]
     parent_hierarchy_second = [{'label': "No need to map", 'value': "No need to map"}]
@@ -319,14 +320,10 @@ def Create_Tree_Hierarchy1():
     
     # Select relevant columns for the output
     BPC_Account = BPC_Account[["BPC_Account_Name", "Sabra_Account_Full_Name", "Category"]]
-    
     return parent_hierarchy_main, parent_hierarchy_second, BPC_Account
 
-#parent_hierarchy_main, parent_hierarchy_second, BPC_Account = Create_Tree_Hierarchy()
-
-
 @st.cache_data
-def Create_Tree_Hierarchy():
+def Create_Tree_Hierarchy1():
     #Create Tree select hierarchy
     parent_hierarchy_main=[{'label': "No need to map","value":"No need to map"}]
     parent_hierarchy_second=[{'label': "No need to map","value":"No need to map"}]
