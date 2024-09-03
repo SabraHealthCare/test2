@@ -954,7 +954,6 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
 	
 @st.cache_data 
 def Map_PL_Sabra(PL,entity,sheet_type):
-    st.write("PL01",PL)
     # remove no need to map from account_mapping
     if sheet_type=="Sheet_Name_Finance":  
         account_pool=account_mapping[account_mapping["Sabra_Account"]!= "NO NEED TO MAP"]
@@ -974,11 +973,10 @@ def Map_PL_Sabra(PL,entity,sheet_type):
     second_account_mapping = second_account_mapping.dropna(subset=["Sabra_Account"])
     if second_account_mapping.shape[0]>0:
         second_account_mapping = second_account_mapping[second_account_mapping["Sabra_Account"].str.strip() != ""]
-        st.write("second_account_mapping",second_account_mapping)
+
     # Ensure index name consistency
     PL.index.name = "Tenant_Account"
     PL = PL.reset_index(drop=False)
-    st.write("PL02",PL)
     
     # Filter main_account_mapping before the merge
     main_account_mapping_filtered = main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]] 
@@ -987,16 +985,16 @@ def Map_PL_Sabra(PL,entity,sheet_type):
 	
     PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
                     PL.merge(main_account_mapping_filtered,   on="Tenant_Account", how="right")])
-    st.write("PL03",PL)
+
     #Remove blank or missing "Sabra_Account" values
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
 
     PL.dropna(subset=["Sabra_Account"], inplace=True)
-    st.write("PL2",PL)
+
     # Conversion column
     PL = PL.reset_index(drop=True)
     conversion = PL["Conversion"].fillna(np.nan)
-    st.write("PL3",PL)
+
     if isinstance(entity, str):# one entity,  properties are in separate sheet
         month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
         #Convert all values in the PL to numeric, coercing non-numeric values to NaN. Fill NaN values with 0.
@@ -1548,7 +1546,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 
 	
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
-    st.write("sheet_name",sheet_name,"PL",PL)
+    #st.write("sheet_name",sheet_name,"PL",PL)
     # Start checking process
     if True:   
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
@@ -1584,7 +1582,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         nan_index=list(filter(lambda x: pd.isna(x) or str(x).strip()=="" or x!=x or x=="nan",PL.index))
         PL.drop(nan_index, inplace=True)
         #set index as str ,strip
-        PL.index=map(lambda x:str(x).strip(),PL.index)
+        PL.index=map(lambda x:str(x).upper().strip(),PL.index)
         PL=PL.map(lambda x: 0 if pd.isna(x) or isinstance(x, str) or x!=x or x==" " else x)	    
         # don't removes all nan/0, because some property may have no data and need to keep empty
         #PL=PL.loc[:,(PL!= 0).any(axis=0)]
@@ -1793,7 +1791,7 @@ def Upload_And_Process(uploaded_file,file_type):
                     Total_PL=PL
                 else:
                     Total_PL=Total_PL.combine_first(PL)
-                st.write("PL0000",Total_PL)
+
 	# census
         sheet_list_occupancy_in_onesheet = entity_mapping[(entity_mapping["Occupancy_in_separate_sheets"]=="N")&(~pd.isna(entity_mapping["Sheet_Name_Occupancy"]))&(entity_mapping["Sheet_Name_Occupancy"]!="nan")]["Sheet_Name_Occupancy"].unique()
         if len(sheet_list_occupancy_in_onesheet)>0:
