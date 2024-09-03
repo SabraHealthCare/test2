@@ -146,7 +146,7 @@ def Read_File_From_Onedrive(path, file_name, file_type, str_col_list=None):
                 config = yaml.safe_load(file_content)
                 return config
 
-            elif file_type.upper() == "VIDEO":
+            elif file_type.upper() == "VIDEO": 
                 return BytesIO(response.content)
 
         except pd.errors.EmptyDataError:
