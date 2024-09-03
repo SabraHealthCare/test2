@@ -1542,7 +1542,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 
 	
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
-    #st.write("sheet_name",sheet_name,"PL",PL)
+    st.write("sheet_name",sheet_name,"PL",PL)
     # Start checking process
     if True:   
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
@@ -1611,7 +1611,9 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         # Map PL accounts and Sabra account
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
 	# map sabra account with tenant account, groupby sabra account
+        st.write("PL before map",PL)
         PL=Map_PL_Sabra(PL,entity_list,sheet_type) # index are ('ENTITY',"Sabra_Account")
+        st.write("PL after map",PL)
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
     #return PL,PL_with_detail
@@ -2001,7 +2003,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
             # process Finance 
             Total_PL=Upload_And_Process(uploaded_finance,"Finance")
-            #st.write("Total_PL",Total_PL)
+
 	    # process BS 
             Total_BL=Upload_And_Process(uploaded_BS,"BS")
 	    # combine Finance and BS
