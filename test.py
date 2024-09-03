@@ -981,14 +981,16 @@ def Map_PL_Sabra(PL,entity,sheet_type):
     st.write("PL02",PL)
     
     # Filter main_account_mapping before the merge
-    main_account_mapping = main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]] 
+    main_account_mapping_filtered = main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]] 
+
+    st.write("main_account_mapping_filtered",main_account_mapping_filtered)
 	
     PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
-                    PL.merge(main_account_mapping,   on="Tenant_Account", how="right")])
+                    PL.merge(main_account_mapping_filtered,   on="Tenant_Account", how="right")])
     st.write("PL03",PL)
     #Remove blank or missing "Sabra_Account" values
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
-    st.write("PL1",PL)
+
     PL.dropna(subset=["Sabra_Account"], inplace=True)
     st.write("PL2",PL)
     # Conversion column
