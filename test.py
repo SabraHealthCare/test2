@@ -974,7 +974,7 @@ def Map_PL_Sabra(PL,entity,sheet_type):
     second_account_mapping = second_account_mapping.dropna(subset=["Sabra_Account"])
     if second_account_mapping.shape[0]>0:
         second_account_mapping = second_account_mapping[second_account_mapping["Sabra_Account"].str.strip() != ""]
-
+        st.write("second_account_mapping",second_account_mapping)
     # Ensure index name consistency
     PL.index.name = "Tenant_Account"
     PL = PL.reset_index(drop=False)
