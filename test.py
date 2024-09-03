@@ -167,28 +167,27 @@ def Read_File_From_Onedrive(path, file_name, file_type, str_col_list=None):
 def send_confirmation_email(receiver_email_list, subject, body):
     # Email details
     sender_email = "sli@sabrahealth.com"
-    receiver_email = "sli@sabrahealth.com"
-
-    # Create the email 
+    
+    # Create the email
     msg = MIMEMultipart()
     msg['From'] = sender_email
-    msg['To'] = receiver_email
+    msg['To'] = ", ".join(receiver_email_list)  # Join the list of emails into a single string
     msg['Subject'] = subject
 
     msg.attach(MIMEText(body, 'plain'))
 
     try:
-        # Connect to the server
-        server = smtplib.SMTP('smtp.example.com', 587)  # Replace with your SMTP server
+        # Connect to the Office 365 server
+        server = smtplib.SMTP('smtp.office365.com', 587)
         server.starttls()  # Secure the connection
-        server.login(sender_email, sender_password)
+        server.login(sender_email, "June2021SL!")
 
         # Send the email
-        server.sendmail(sender_email, receiver_email, msg.as_string())
+        server.sendmail(sender_email, receiver_email_list, msg.as_string())
         server.quit()
-       
+        st.write("Confirmation email sent successfully!")
     except Exception as e:
-        st.error(f"Failed to send email: {e}")
+        st.write(f"Failed to send email: {e}")
 
 # no cache, save a dataframe to OneDrive 
 def Save_File_To_Onedrive(df, path, file_name, file_type):
