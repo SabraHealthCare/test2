@@ -575,7 +575,6 @@ def Check_Available_Units(check_patient_days,reporting_month):
            
         except:
             operating_beds_i=0
-            st.write("operating_beds_i1",operating_beds_i,"check_patient_days",check_patient_days)
         if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
             continue
         elif operating_beds_i>0 and patient_day_i>operating_beds_i*month_days:
