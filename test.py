@@ -954,6 +954,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
 	
 @st.cache_data 
 def Map_PL_Sabra(PL,entity,sheet_type):
+    st.write("PL01",PL)
     # remove no need to map from account_mapping
     if sheet_type=="Sheet_Name_Finance":  
         account_pool=account_mapping[account_mapping["Sabra_Account"]!= "NO NEED TO MAP"]
@@ -977,13 +978,14 @@ def Map_PL_Sabra(PL,entity,sheet_type):
     # Ensure index name consistency
     PL.index.name = "Tenant_Account"
     PL = PL.reset_index(drop=False)
+    st.write("PL02",PL)
     
     # Filter main_account_mapping before the merge
     main_account_mapping = main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]] 
 	
     PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
                     PL.merge(main_account_mapping,   on="Tenant_Account", how="right")])
-    st.write("PL0",PL)
+    st.write("PL03",PL)
     #Remove blank or missing "Sabra_Account" values
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
     st.write("PL1",PL)
