@@ -980,8 +980,6 @@ def Map_PL_Sabra(PL,entity,sheet_type):
     
     # Filter main_account_mapping before the merge
     main_account_mapping_filtered = main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]] 
-
-    st.write("main_account_mapping_filtered",main_account_mapping_filtered)
 	
     PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
                     PL.merge(main_account_mapping_filtered,   on="Tenant_Account", how="right")])
