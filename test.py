@@ -1959,10 +1959,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.selected_year = selected_year
                     st.session_state.selected_month = selected_month
                     reporting_month=str(selected_year)+str(selected_month)
-        col1, col2 = st.columns([1,3])  
-        #with col2:
-            #if st.button(label='Download P&L sample'):
-                #Download_PL_Sample()     
+        col1, col2 = st.columns([1,3])   
         with col1:
             if 'uploaded_finance' in locals() and uploaded_finance:
                 st.markdown("✔️ :green[P&L selected]")
@@ -1986,7 +1983,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         else:
             BS_separate_excel="N"
 
-          
 	# select_months_list contain the monthes that need to be compared for history data,if it is [], means no need to compare
         if all(entity_mapping["Finance_in_separate_sheets"]=="N"):
             select_months_list=[reporting_month]
@@ -1995,20 +1991,19 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             if len(select_months_list)>=previous_monthes_comparison:
                 select_months_list=select_months_list[:previous_monthes_comparison]+[reporting_month]  
            
-        
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
             Total_PL=Upload_And_Process(uploaded_finance,"Finance")
+
         elif BS_separate_excel=="Y":     # Finance/BS are in different excel 
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")
             entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
 
             # process Finance 
-            
             Total_PL=Upload_And_Process(uploaded_finance,"Finance")
+            st.write("Total_PL",Total_PL)
 	    # process BS 
-        
             Total_BL=Upload_And_Process(uploaded_BS,"BS")
 	    # combine Finance and BS
             Total_PL=Total_BL.combine_first(Total_PL)
