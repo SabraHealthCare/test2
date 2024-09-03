@@ -1031,13 +1031,13 @@ def Map_PL_Sabra(PL,entity,sheet_type):
                 PL.loc[idx, entity] *= multiplier
             else:
                 continue
-        st.write("PL5",PL)
+
         #property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
 
         PL=PL.drop(["Conversion"], axis=1)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='ENTITY')     
         PL=PL.drop(["Tenant_Account"], axis=1)
-        st.write("PL6",PL) 
+
 
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
