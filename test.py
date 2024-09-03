@@ -1663,7 +1663,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
             else:
                 col1 = col1.where(col1 != '', col2)
             # Combine the columns: if col1 has a missing value, fill it with the value from col2
-            st.write("combine",col1)
             PL.iloc[:, tenantAccount_col_no_list[0]] = col1
         
         tenantAccount_col_no=tenantAccount_col_no_list[0]
@@ -1741,6 +1740,7 @@ def Upload_And_Process(uploaded_file,file_type):
 	    # properties in seperate sheet 
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
+                st.write("PL0000",PL)
                 if Total_PL.shape[0]==0:
                     Total_PL=PL
                 elif PL.shape[0]>0:
@@ -2002,7 +2002,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
             # process Finance 
             Total_PL=Upload_And_Process(uploaded_finance,"Finance")
-            st.write("Total_PL",Total_PL)
+            #st.write("Total_PL",Total_PL)
 	    # process BS 
             Total_BL=Upload_And_Process(uploaded_BS,"BS")
 	    # combine Finance and BS
