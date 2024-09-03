@@ -1740,7 +1740,6 @@ def Upload_And_Process(uploaded_file,file_type):
 	    # properties in seperate sheet 
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
-                st.write("PL0000",PL)
                 if Total_PL.shape[0]==0:
                     Total_PL=PL
                 elif PL.shape[0]>0:
@@ -1786,7 +1785,7 @@ def Upload_And_Process(uploaded_file,file_type):
                     Total_PL=PL
                 else:
                     Total_PL=Total_PL.combine_first(PL)
-	
+                st.write("PL0000",Total_PL)
 	# census
         sheet_list_occupancy_in_onesheet = entity_mapping[(entity_mapping["Occupancy_in_separate_sheets"]=="N")&(~pd.isna(entity_mapping["Sheet_Name_Occupancy"]))&(entity_mapping["Sheet_Name_Occupancy"]!="nan")]["Sheet_Name_Occupancy"].unique()
         if len(sheet_list_occupancy_in_onesheet)>0:
