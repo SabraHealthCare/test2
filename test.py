@@ -983,15 +983,16 @@ def Map_PL_Sabra(PL,entity,sheet_type):
 	
     PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
                     PL.merge(main_account_mapping,   on="Tenant_Account", how="right")])
-
+    st.write("PL0",PL)
     #Remove blank or missing "Sabra_Account" values
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
+    st.write("PL1",PL)
     PL.dropna(subset=["Sabra_Account"], inplace=True)
-
+    st.write("PL2",PL)
     # Conversion column
     PL = PL.reset_index(drop=True)
     conversion = PL["Conversion"].fillna(np.nan)
-    
+    st.write("PL3",PL)
     if isinstance(entity, str):# one entity,  properties are in separate sheet
         month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
         #Convert all values in the PL to numeric, coercing non-numeric values to NaN. Fill NaN values with 0.
@@ -1012,7 +1013,7 @@ def Map_PL_Sabra(PL,entity,sheet_type):
                     continue
         PL=PL.drop(["Conversion","Tenant_Account"], axis=1)
         PL["ENTITY"]=entity	    
-         
+
     elif isinstance(entity, list):  # multiple properties are in one sheet,column name of data is "value" 
         monthdays=monthrange(int(str(reporting_month)[0:4]), int(str(reporting_month)[4:6]))[1]
         PL[entity] = PL[entity].apply(pd.to_numeric, errors='coerce').fillna(0)
@@ -1028,12 +1029,13 @@ def Map_PL_Sabra(PL,entity,sheet_type):
                 PL.loc[idx, entity] *= multiplier
             else:
                 continue
-
+        st.write("PL5",PL)
         #property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
+
         PL=PL.drop(["Conversion"], axis=1)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='ENTITY')     
         PL=PL.drop(["Tenant_Account"], axis=1)
-
+        st.write("PL6",PL) 
 
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
