@@ -416,7 +416,7 @@ def download_report(df,button_display):
 def Get_Year(single_string):
     for Year, keywords in year_dic.items():
         for keyword  in keywords:
-            if re.search(r'\b' + re.escape(keyword) + r'\b', single_string):
+            if re.search(re.escape(keyword), single_string):
                 return Year,keyword
     return 0,""
 
