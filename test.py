@@ -431,8 +431,7 @@ def Get_Month_Year(single_string):
     
     single_string=str(single_string).lower()
     year,year_num=Get_Year(single_string)
-    if single_string=="june2024":
-        st.write("year",year)
+
     if year!=0:
         single_string=single_string.replace(year_num,"")
         if not single_string:
@@ -657,7 +656,7 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     max_len=0
     candidate_date=[]
     month_count = month_table.apply(lambda row: (row != 0).sum(), axis=1).tolist()
-    st.write("month_count",month_count)
+
     if not all(x==0 for x in month_count):
        # month_sort_index is the index(row number) which contain month/year, and sorted desc. month_sort_index[0] is the row number that contrain most months in PL
         non_zero_indices = [(index, month_c) for index, month_c in enumerate(month_count) if month_c!= 0]
