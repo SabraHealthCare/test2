@@ -428,10 +428,11 @@ def Get_Month_Year(single_string):
 
     if isinstance(single_string, (int,float)) and single_string not in year_dic:
         return 0,0
-	    
+    
     single_string=str(single_string).lower()
     year,year_num=Get_Year(single_string)
-	
+    if single_string=="june2024":
+        st.write("year",year)
     if year!=0:
         single_string=single_string.replace(year_num,"")
         if not single_string:
@@ -642,14 +643,14 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
 
     valid_col_index=[i for i, mask in enumerate(valid_col_mask) if mask]
-
+    
     if len(valid_col_index)==0: # there is no valid data column
         return [],0,[]
     # nan_num_column is the column whose value is nan or 0 for PL.drop(nan_index)
     #nan_num_column = [all(val == 0 or pd.isna(val) or not isinstance(val, (int, float)) for val in PL.drop(nan_index).iloc[:, i]) for i in range(PL.drop(nan_index).shape[1])]
     month_table=pd.DataFrame(0,index=range(first_tenant_account_row), columns=range(PL_col_size))
     year_table=pd.DataFrame(0,index=range(first_tenant_account_row), columns=range(PL_col_size))
-    st.write("month_table",month_table)  
+ 
     for row_i in range(first_tenant_account_row): # only search month/year above the first tenant account row
         for col_i in valid_col_index:  # only search the columns that contain numberic data and on the right of tenantAccount_col_no
             month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i]) 
