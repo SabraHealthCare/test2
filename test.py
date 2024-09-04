@@ -649,13 +649,14 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
     #nan_num_column = [all(val == 0 or pd.isna(val) or not isinstance(val, (int, float)) for val in PL.drop(nan_index).iloc[:, i]) for i in range(PL.drop(nan_index).shape[1])]
     month_table=pd.DataFrame(0,index=range(first_tenant_account_row), columns=range(PL_col_size))
     year_table=pd.DataFrame(0,index=range(first_tenant_account_row), columns=range(PL_col_size))
-  
+    st.write("month_table",month_table)  
     for row_i in range(first_tenant_account_row): # only search month/year above the first tenant account row
         for col_i in valid_col_index:  # only search the columns that contain numberic data and on the right of tenantAccount_col_no
             month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i]) 
     max_len=0
     candidate_date=[]
     month_count = month_table.apply(lambda row: (row != 0).sum(), axis=1).tolist()
+    st.write("month_count",month_count)
     if not all(x==0 for x in month_count):
        # month_sort_index is the index(row number) which contain month/year, and sorted desc. month_sort_index[0] is the row number that contrain most months in PL
         non_zero_indices = [(index, month_c) for index, month_c in enumerate(month_count) if month_c!= 0]
