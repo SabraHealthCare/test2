@@ -175,12 +175,13 @@ def Send_Confirmation_Email(receiver_email_list, subject, body):
     msg['Subject'] = subject
 
     msg.attach(MIMEText(body, 'plain'))
-
+    password = "jhjspqkhrnyfytpk"
+    st.write(password)
     try:
         # Connect to the Office 365 server
         server = smtplib.SMTP('smtp.office365.com', 587)
         server.starttls()  # Secure the connection
-        server.login(sender_email, "jhjspqkhrnyfytpk")
+        server.login(sender_email, password)
 
         # Send the email
         server.sendmail(sender_email, receiver_email_list, msg.as_string())
