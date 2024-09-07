@@ -620,7 +620,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
         st.write(previous_A_unit_display)
         st.write("previous_A_unit",previous_A_unit)
         st.write("Total_PL.index",Total_PL.index)  
-        Total_PL=pd.concat([Total_PL, previous_A_unit["ENTITY","Sabra_Account",reporting_month]], axis=0)
+        Total_PL=pd.concat([Total_PL, previous_A_unit.set_index(["ENTITY","Sabra_Account"])[reporting_month]], axis=0)
         st.write("Total_PL",Total_PL)
 
 @st.cache_data
