@@ -619,7 +619,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
         st.write(previous_A_unit_display)
         st.write("previous_A_unit",previous_A_unit)
-        st.write("Total_PL",Total_PL)  
+        st.write("Total_PL.index",Total_PL.index)  
         Total_PL=pd.concat([Total_PL, previous_A_unit["ENTITY","Sabra_Account",reporting_month]], axis=0)
         st.write("Total_PL",Total_PL)
 
