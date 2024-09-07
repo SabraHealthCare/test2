@@ -618,6 +618,8 @@ def Check_Available_Units(check_patient_days,reporting_month):
             st.error("{} is missing operating beds. Historical data has been used to fill in the missing info as shown below. If this data is incorrect, please add the operating beds and re-upload P&L.".format(properties_fill_Aunit[0]))
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
         st.write(previous_A_unit_display)
+        st.write("previous_A_unit",previous_A_unit)
+        st.write("Total_PL",Total_PL)        
 
 @st.cache_data
 def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no): 
