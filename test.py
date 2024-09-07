@@ -1200,11 +1200,11 @@ def Submit_Upload_Latestmonth():
             new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
             Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
 
-    subject = "Confirmation of your submission"
-    body = "Thank you for your submission! We have received your reporting data."
+    #subject = "Confirmation of your submission"
+    #body = "Thank you for your submission! We have received your reporting data."
     receiver_email_list=["sli@sabrahealth.com"]
     # Send the confirmation email
-    Send_Confirmation_Email(receiver_email_list, subject, body)    
+    #Send_Confirmation_Email(receiver_email_list, subject, body)    
 
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
