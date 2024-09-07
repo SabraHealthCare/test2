@@ -611,17 +611,13 @@ def Check_Available_Units(check_patient_days,reporting_month):
         #st.write("reporting_month_data before merge",reporting_month_data)
         reporting_month_data  = pd.concat([reporting_month_data, previous_A_unit], axis=0)
         #st.write("previous_A_unit",previous_A_unit)
-        #st.write("reporting_month_data after merge",reporting_month_data)
         if previous_A_unit.shape[0]>1:
             st.error("The following properties are missing operating beds. Historical data has been used to fill in the gaps. If this information is incorrect, please update the operating beds in the P&L and re-upload.")
         elif previous_A_unit.shape[0]==1:
             st.error("{} is missing operating beds. Historical data has been used to fill in the missing info as shown below. If this data is incorrect, please add the operating beds and re-upload P&L.".format(properties_fill_Aunit[0]))
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
-        st.write(previous_A_unit_display)
-        st.write("previous_A_unit",previous_A_unit)
-        st.write("Total_PL.index",Total_PL.index)  
+        st.write(previous_A_unit_display) 
         Total_PL=pd.concat([Total_PL, previous_A_unit.set_index(["ENTITY","Sabra_Account"])[reporting_month]], axis=0)
-        st.write("Total_PL",Total_PL)
 
 @st.cache_data
 def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no): 
