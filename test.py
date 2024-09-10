@@ -289,9 +289,9 @@ def Initial_Mapping(operator):
     # Clean and format account mapping columns
     account_mapping_cols = ["Sabra_Account", "Sabra_Second_Account", "Tenant_Account"]
     account_mapping[account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
-    account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion"]]
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")
-	 				  
+    account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion","Category"]]
+     				  
     entity_mapping=Read_File_From_Onedrive(mapping_path,entity_mapping_filename,"CSV",entity_mapping_str_col)
     entity_mapping = (Read_File_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
                   .reset_index(drop=True)
@@ -945,13 +945,12 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
             st.stop()
                 
         #insert new record to the bottom line of account_mapping
-        new_accounts_df = pd.DataFrame({'Sabra_Account': Sabra_main_account_value, 'Sabra_Second_Account': Sabra_second_account_value, 'Tenant_Account': new_tenant_account_list,'Tenant_Account':list(map(lambda x:x.upper().strip(), new_tenant_account_list))})
-        new_accounts_df["Operator"]=operator
-	
-        #new_mapping_row=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[0],new_tenant_account_list[0].upper(),"N"]            
+        new_accounts_df = pd.DataFrame({'Sabra_Account': Sabra_main_account_value, 'Sabra_Second_Account': Sabra_second_account_value, 'Tenant_Account':list(map(lambda x:x.upper().strip(), new_tenant_account_list))})
+        new_accounts_df["Operator"]=operator     
+        new_accounts_df=new_accounts_df.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")     
         account_mapping=pd.concat([account_mapping, new_accounts_df],ignore_index=True)
-        Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator,"XLSX",None,account_mapping_str_col)
-        st.success("New accounts mapping were successfully saved.")    
+        Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion"],operator,"XLSX",None,account_mapping_str_col)
+        st.success("New accounts mapping were successfully saved.")   
     return account_mapping
 	
 @st.cache_data 
@@ -1620,7 +1619,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         #st.write("PL after map",PL)
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
-    #return PL,PL_with_detail
     return PL
 	
 @st.cache_data
