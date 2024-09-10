@@ -1203,7 +1203,7 @@ def Submit_Upload_Latestmonth():
     body = "Thank you for your submission! We have received your reporting data."
     receiver_email_list=["sli@sabrahealth.com"]
     # Send the confirmation email
-    Send_Confirmation_Email(receiver_email_list, subject, body)    
+    #Send_Confirmation_Email(receiver_email_list, subject, body)    
 
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
