@@ -949,7 +949,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
         new_accounts_df["Operator"]=operator     
         new_accounts_df=new_accounts_df.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")     
         account_mapping=pd.concat([account_mapping, new_accounts_df],ignore_index=True)
-        Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion"],operator,"XLSX",None,account_mapping_str_col)
+        Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion"]],operator,"XLSX",None,account_mapping_str_col)
         st.success("New accounts mapping were successfully saved.")   
     return account_mapping
 	
