@@ -190,7 +190,7 @@ class Authenticate:
             # Replace 'your_outlook_password' with your actual Outlook password or app password
             server = smtplib.SMTP('smtp.office365.com', 587)
             server.starttls()
-            server.login(email_sender, 'your_outlook_password')  # Use your Outlook password or an app password
+            server.login(email_sender, 'glzcqffnnzrrymtn')  # Use your Outlook password or an app password
             server.sendmail(email_sender, email_receiver, msg.as_string())
             server.quit()
             
