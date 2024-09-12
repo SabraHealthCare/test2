@@ -17,4 +17,5 @@ Pillow
 msal
 requests
 chardet
+boto3
 git+https://github.com/streamlit/files-connection 
