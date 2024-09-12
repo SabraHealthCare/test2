@@ -180,7 +180,7 @@ class Authenticate:
         Regards,
         Sabra
         """
-    
+        st.write("random_password",random_password)
         try:
             msg = MIMEText(body)
             msg['From'] = email_sender
