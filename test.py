@@ -166,7 +166,7 @@ def Read_File_From_Onedrive(path, file_name, file_type, str_col_list=None):
 
 def Send_Confirmation_Email(receiver_email_list, subject, body):
     # Email details
-    sender_email = "sli@sabrahealth.com"
+    sender_email = "shaperi@gmail.com"   # "sli@sabrahealth.com"
     
     # Create the email
     msg = MIMEMultipart()
@@ -175,7 +175,7 @@ def Send_Confirmation_Email(receiver_email_list, subject, body):
     msg['Subject'] = subject
 
     msg.attach(MIMEText(body, 'plain'))
-    password = "jhjspqkhrnyfytpk"
+    password ="gdwipqjqbtaeixfx" #"jhjspqkhrnyfytpk"
     st.write(password)
     try:
         # Connect to the Office 365 server
