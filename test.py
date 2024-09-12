@@ -165,7 +165,7 @@ def Read_File_From_Onedrive(path, file_name, file_type, str_col_list=None):
 
 def Send_Confirmation_Email(receiver_email_list, subject, body):
         email_sender="shaperi@gmail.com"
-        email_receiver = email
+        
         
 
         try:
@@ -176,7 +176,7 @@ def Send_Confirmation_Email(receiver_email_list, subject, body):
             server = smtplib.SMTP('smtp.gmail.com', 587)
             server.starttls()
             server.login(email_sender, "gdwipqjqbtaeixfx")
-            server.sendmail(email_sender, email_receiver, msg.as_string())
+            server.sendmail(email_sender, receiver_email_list[0], msg.as_string())
             server.quit()
             st.success('A temperate password was send to your email: {}.'.format(email))
         except Exception as e:
