@@ -705,7 +705,7 @@ class Authenticate:
                             if len(new_password) > 0:
                                 if new_password == new_password_repeat:
                                     if self.password != new_password: 
-                                        if self.Password_Validity(new_password):
+                                        #if self.Password_Validity(new_password):
                                             self._update_password(self.username, new_password)
                                             self.save_credentials_to_yaml(config)
                                             return True                                          
