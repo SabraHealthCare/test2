@@ -163,24 +163,29 @@ def Read_File_From_Onedrive(path, file_name, file_type, str_col_list=None):
         st.write(f"Failed to download file: {response.status_code}")
         return False
 
-def Send_Confirmation_Email(receiver_email_list, subject, body):
-        email_sender="shaperi@gmail.com"
-        
-        
+import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
-        try:
-            msg = MIMEText(subject)
-            msg['From'] = email_sender
-            msg['To'] =", ".join(receiver_email_list)  # Join the list of emails into a single string
-            msg['Subject'] = subject
-            server = smtplib.SMTP('smtp.gmail.com', 587)
-            server.starttls()
-            server.login(email_sender, "gdwipqjqbtaeixfx")
-            server.sendmail(email_sender, receiver_email_list[0], msg.as_string())
-            server.quit()
-            st.success('A temperate password was send to your email: {}.'.format(email))
-        except Exception as e:
-            st.error("Fail to send email:{}".format(e))
+
+def Send_Confirmation_Email1(receiver_email_list, subject, body):
+    message = Mail(
+        from_email='shaperi@gmail.com',
+        to_emails=receiver_email_list[0],
+        subject='Temporary password for Sabra App',
+        html_content=f"""
+        Hi
+        Sabra
+        """
+    )
+    try:
+        sg = SendGridAPIClient('your_sendgrid_api_key')
+        response = sg.send(message)
+        st.success(f'A temporary password was sent to your email')
+    except Exception as e:
+        st.error(f"Failed to send email: {e}")
+
+
 
 def Send_Confirmation_Email1(receiver_email_list, subject, body):
     # Email details
