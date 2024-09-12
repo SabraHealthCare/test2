@@ -13,6 +13,9 @@ import smtplib
 from email.mime.text import MIMEText
 from msal import ConfidentialClientApplication
 import yaml 
+
+import boto3
+from botocore.exceptions import NoCredentialsError, ClientError
 class Authenticate:
     """
     This class will create login, logout, register user, reset password, forgot password, 
@@ -161,8 +164,48 @@ class Authenticate:
                 st.session_state['authentication_status'] = False
             else:
                 return False
+import boto3
+from botocore.exceptions import NoCredentialsError, ClientError
+import streamlit as st
 
-    def send_email(self,username: str,email:str,random_password:str):
+def send_email(self, username: str, email: str, random_password: str):
+    SENDER = "shaperi@gmail.com"
+    RECIPIENT = email
+    SUBJECT = "Temporary password for Sabra App"
+    BODY_TEXT = (f"Hi {username},\n\n"
+                 f"Your temporary password for Sabra Monthly Reporting App is: {random_password}.\n"
+                 "Please reset the password after login.\n\n"
+                 "Feel free to contact sli@sabrahealth.com if you have any questions.\n\n"
+                 "Regards,\nSabra")
+    CHARSET = "UTF-8"
+    
+    client = boto3.client('ses', region_name="us-east-1")  # Specify your AWS region
+    try:
+        response = client.send_email(
+            Destination={
+                'ToAddresses': [RECIPIENT],
+            },
+            Message={
+                'Body': {
+                    'Text': {
+                        'Charset': CHARSET,
+                        'Data': BODY_TEXT,
+                    },
+                },
+                'Subject': {
+                    'Charset': CHARSET,
+                    'Data': SUBJECT,
+                },
+            },
+            Source=SENDER,
+        )
+        st.success(f'A temporary password was sent to your email: {email}.')
+    except ClientError as e:
+        st.error(f"Failed to send email: {e.response['Error']['Message']}")
+    except NoCredentialsError:
+        st.error("AWS credentials not available.")
+
+    def send_email1(self,username: str,email:str,random_password:str):
         email_sender="shaperi@gmail.com"
         email_receiver = email
         
