@@ -14,8 +14,8 @@ from email.mime.text import MIMEText
 from msal import ConfidentialClientApplication
 import yaml 
 
-import boto3
-from botocore.exceptions import NoCredentialsError, ClientError
+import smtplib
+from email.mime.text import MIMEText
 class Authenticate:
     """
     This class will create login, logout, register user, reset password, forgot password, 
@@ -167,41 +167,36 @@ class Authenticate:
 
 
     def send_email(self, username: str, email: str, random_password: str):
-        SENDER = "shaperi@gmail.com"
-        RECIPIENT = email
-        SUBJECT = "Temporary password for Sabra App"
-        BODY_TEXT = (f"Hi {username},\n\n"
-                     f"Your temporary password for Sabra Monthly Reporting App is: {random_password}.\n"
-                     "Please reset the password after login.\n\n"
-                     "Feel free to contact sli@sabrahealth.com if you have any questions.\n\n"
-                     "Regards,\nSabra")
-        CHARSET = "UTF-8"
-        
-        client = boto3.client('ses', region_name="us-east-1")  # Specify your AWS region
+        email_sender = "sli@sabrahealth.com"  # Replace with your Outlook email
+        email_receiver = email
+    
+        body = f"""
+        Hi {username},
+    
+        Your temporary password for Sabra Monthly Reporting App is: {random_password}
+        Please reset the password after login.
+        Feel free to contact sli@sabrahealth.com if you have any questions.
+    
+        Regards,
+        Sabra
+        """
+    
         try:
-            response = client.send_email(
-                Destination={
-                    'ToAddresses': [RECIPIENT],
-                },
-                Message={
-                    'Body': {
-                        'Text': {
-                            'Charset': CHARSET,
-                            'Data': BODY_TEXT,
-                        },
-                    },
-                    'Subject': {
-                        'Charset': CHARSET,
-                        'Data': SUBJECT,
-                    },
-                },
-                Source=SENDER,
-            )
+            msg = MIMEText(body)
+            msg['From'] = email_sender
+            msg['To'] = email_receiver
+            msg['Subject'] = "Temporary password for Sabra App"
+            
+            # Replace 'your_outlook_password' with your actual Outlook password or app password
+            server = smtplib.SMTP('smtp.office365.com', 587)
+            server.starttls()
+            server.login(email_sender, 'your_outlook_password')  # Use your Outlook password or an app password
+            server.sendmail(email_sender, email_receiver, msg.as_string())
+            server.quit()
+            
             st.success(f'A temporary password was sent to your email: {email}.')
-        except ClientError as e:
-            st.error(f"Failed to send email: {e.response['Error']['Message']}")
-        except NoCredentialsError:
-            st.error("AWS credentials not available.")
+        except Exception as e:
+            st.error(f"Failed to send email: {e}")
 
     def send_email1(self,username: str,email:str,random_password:str):
         email_sender="shaperi@gmail.com"
