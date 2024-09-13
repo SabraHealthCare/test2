@@ -168,26 +168,10 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
 
-def Send_Confirmation_Email1(receiver_email_list, subject, body):
-    message = Mail(
-        from_email='shaperi@gmail.com',
-        to_emails=receiver_email_list[0],
-        subject='Temporary password for Sabra App',
-        html_content=f"""
-        Hi
-        Sabra
-        """
-    )
-    try:
-        sg = SendGridAPIClient('your_sendgrid_api_key')
-        response = sg.send(message)
-        st.success(f'A temporary password was sent to your email')
-    except Exception as e:
-        st.error(f"Failed to send email: {e}")
 
 
 
-def Send_Confirmation_Email1(receiver_email_list, subject, body):
+def Send_Confirmation_Email(receiver_email_list, subject, body):
     # Email details
     sender_email = "shaperi@gmail.com"   # "sli@sabrahealth.com"
     
