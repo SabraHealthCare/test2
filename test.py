@@ -198,7 +198,7 @@ def Send_Confirmation_Email1(receiver_email_list, subject, body):
     msg['Subject'] = subject
 
     msg.attach(MIMEText(body, 'plain'))
-    password ="gdwipqjqbtaeixfx" #"jhjspqkhrnyfytpk"
+    password ="bcxbkrcbprbfxccz" #"jhjspqkhrnyfytpk"
     st.write(password)
     try:
         # Connect to the Office 365 server
