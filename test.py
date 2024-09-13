@@ -173,7 +173,7 @@ from sendgrid.helpers.mail import Mail
 
 def Send_Confirmation_Email(receiver_email_list, subject, body):
     # Email details
-    sender_email = "shaperi@gmail.com"   # "sli@sabrahealth.com"
+    sender_email = "sli@sabrahealth.com"   # "sli@sabrahealth.com"
     
     # Create the email
     msg = MIMEMultipart()
