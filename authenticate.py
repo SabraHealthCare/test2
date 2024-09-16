@@ -328,10 +328,10 @@ class Authenticate:
                 def clicked(button_name):
                     st.session_state.clicked[button_name] = True
                 col1,col2=st.columns([25,10])
-                with col1:
-                    st.button('Forgot password', on_click=clicked, args=["forgot_password_button"])
-                with col2:
-                    st.button('Forgot username', on_click=clicked, args=["forgot_username_button"])
+                #with col1:
+                    #st.button('Forgot password', on_click=clicked, args=["forgot_password_button"])
+                #with col2:
+                    #st.button('Forgot username', on_click=clicked, args=["forgot_username_button"])
 
                 
                 if st.session_state.clicked["forgot_password_button"]:
