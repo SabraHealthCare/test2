@@ -892,10 +892,11 @@ def Manage_Entity_Mapping(operator):
             submitted = st.form_submit_button("Submit")
             if submitted:
                 entity_mapping.update(entity_mapping_updation)
-                st.success("Updates submitted successfully!")
+                st.success("Updates mapping successfully!")
                 st.write("entity_mapping",entity_mapping)
         # update entity_mapping in Onedrive    
         Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,"CSV",None,entity_mapping_str_col)
+        st.write("entity_mapping",entity_mapping)
         return entity_mapping
 
 # no cache 
