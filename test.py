@@ -849,7 +849,8 @@ def Manage_Entity_Mapping(operator):
             submitted = st.form_submit_button("Submit")
             if submitted:
                 entity_mapping.update(entity_mapping_updation)
-                st.success("Updates submitted successfully!")
+                st.success("Updates mapping successfully!")
+             
 		
     entity_mapping_same_sheet_index= entity_mapping.index[(entity_mapping["DATE_SOLD_PAYOFF"]=="N")&(entity_mapping["Finance_in_separate_sheets"]=="N")]
     if len(entity_mapping_same_sheet_index)>0:
@@ -891,13 +892,12 @@ def Manage_Entity_Mapping(operator):
                         entity_mapping_updation.loc[entity_i,"Column_Name"]=new_value
             submitted = st.form_submit_button("Submit")
             if submitted:
-                entity_mapping.update(entity_mapping_updation)
                 st.success("Updates mapping successfully!")
-                st.write("entity_mapping",entity_mapping)
-        # update entity_mapping in Onedrive    
-        Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,"CSV",None,entity_mapping_str_col)
-        st.write("entity_mapping",entity_mapping)
-        return entity_mapping
+       
+    # update entity_mapping in Onedrive    
+    Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,"CSV",None,entity_mapping_str_col)
+    st.write("entity_mapping",entity_mapping)
+    return entity_mapping
 
 # no cache 
 def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
