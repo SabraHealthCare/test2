@@ -1369,15 +1369,8 @@ def Is_Reporting_Month(single_string):
     return False
 
 def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no): 
-    st.write("entity_list",entity_list)
-    #entity_without_propertynamefinance = entity_mapping[((entity_mapping['Column_Name'].isna()) | (entity_mapping['Column_Name'].str.strip() == ""))].index.tolist()
-	#(entity_mapping['ENTITY'].isin(entity_list)) & 
-    #st.write(entity_mapping.index())
-    #st.write("entity_without_propertynamefinance",entity_without_propertynamefinance)
-    entity_without_propertynamefinance = entity_mapping[ \
-    (entity_mapping.index.isin(entity_list)) & \
-    ((entity_mapping['Column_Name'].isna()) | \
-     (entity_mapping['Column_Name'].str.strip() == ""))].index.tolist()
+    entity_without_propertynamefinance = entity_mapping[ (entity_mapping.index.isin(entity_list)) & \
+    ((entity_mapping['Column_Name'].isna()) | (entity_mapping['Column_Name'].str.strip() == ""))].index.tolist()
     column_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"] if pd.notna(x) and str(x).strip()]
     max_match=[]
 
@@ -1758,12 +1751,10 @@ def Upload_And_Process(uploaded_file,file_type):
         
 	# All the properties are in one sheet	
         sheet_list_finance_in_onesheet = entity_mapping[entity_mapping["Finance_in_separate_sheets"]=="N"]["Sheet_Name_Finance"].unique()
-        st.write("sheet_list_finance_in_onesheet",sheet_list_finance_in_onesheet,len(sheet_list_finance_in_onesheet))
         if len(sheet_list_finance_in_onesheet)>0:
             for sheet_name_finance_in_onesheet in sheet_list_finance_in_onesheet:
                 tenant_account_col=[10000]
                 entity_list_finance_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_in_onesheet].tolist()
-                st.write("entity_list_finance_in_onesheet",entity_list_finance_in_onesheet)
                 PL=Read_Clean_PL_Multiple(entity_list_finance_in_onesheet,"Sheet_Name_Finance",uploaded_file,account_pool_full,sheet_name_finance_in_onesheet)
                 if Total_PL.shape[0]==0:
                     Total_PL=PL
