@@ -137,15 +137,12 @@ def Read_File_From_Onedrive(path, file_name, file_type, str_col_list=None):
                 elif file_name.lower().endswith(".xlsx"):
                     df = pd.read_excel(BytesIO(file_content), dtype=dtype_dict, engine='openpyxl')
                 return df
-
             elif file_type.upper() == "XLSX":
                 df = pd.read_excel(BytesIO(file_content), dtype=dtype_dict, engine='openpyxl')
                 return df
-
             elif file_type.upper() == "YAML":
                 config = yaml.safe_load(file_content)
                 return config
-
             elif file_type.upper() == "VIDEO": 
                 return BytesIO(response.content)
 
@@ -162,39 +159,6 @@ def Read_File_From_Onedrive(path, file_name, file_type, str_col_list=None):
     else: 
         st.write(f"Failed to download file: {response.status_code}")
         return False
-
-import os
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
-
-
-
-
-
-def Send_Confirmation_Email(receiver_email_list, subject, body):
-    # Email details
-    sender_email = "sli@sabrahealth.com"   # "sli@sabrahealth.com"
-    
-    # Create the email
-    msg = MIMEMultipart()
-    msg['From'] = sender_email
-    msg['To'] = ", ".join(receiver_email_list)  # Join the list of emails into a single string
-    msg['Subject'] = subject
-
-    msg.attach(MIMEText(body, 'plain'))
-    password ="bcxbkrcbprbfxccz" #"jhjspqkhrnyfytpk"
-    try:
-        # Connect to the Office 365 server
-        server = smtplib.SMTP('smtp.office365.com', 587)
-        server.starttls()  # Secure the connection
-        server.login(sender_email, password)
-
-        # Send the email
-        server.sendmail(sender_email, receiver_email_list, msg.as_string())
-        server.quit()
-        st.write("Confirmation email sent successfully!")
-    except Exception as e:
-        st.write(f"Failed to send email: {e}")
 
 # no cache, save a dataframe to OneDrive 
 def Save_File_To_Onedrive(df, path, file_name, file_type):
@@ -1175,7 +1139,7 @@ def View_Summary():
         st.write("")
 
 # no cache
-def Submit_Upload_Latestmonth():
+def Submit_Upload():
     global Total_PL,reporting_month   
     upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
     upload_reporting_month["TIME"]=reporting_month
@@ -1206,11 +1170,11 @@ def Submit_Upload_Latestmonth():
             new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
             Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
 
-    subject = "Confirmation of your submission"
-    body = "Thank you for your submission! We have received your reporting data."
-    receiver_email_list=["sli@sabrahealth.com"]
+    #subject = "Confirmation of your submission"
+    #body = "Thank you for your submission! We have received your reporting data."
+    #receiver_email_list=["sli@sabrahealth.com"]
     # Send the confirmation email
-    Send_Confirmation_Email(receiver_email_list, subject, body)    
+    #Send_Confirmation_Email(receiver_email_list, subject, body)    
 
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
@@ -1786,7 +1750,7 @@ def Upload_And_Process(uploaded_file,file_type):
         
 	# All the properties are in one sheet	
         sheet_list_finance_in_onesheet = entity_mapping[entity_mapping["Finance_in_separate_sheets"]=="N"]["Sheet_Name_Finance"].unique()
-       
+        st.write("sheet_list_finance_in_onesheet",sheet_list_finance_in_onesheet,len(sheet_list_finance_in_onesheet))
         if len(sheet_list_finance_in_onesheet)>0:
             for sheet_name_finance_in_onesheet in sheet_list_finance_in_onesheet:
                 tenant_account_col=[10000]
@@ -2034,7 +1998,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
         # Perform the upload action here and check for discrepancies
         if st.session_state.clicked['submit_report']:
-            Submit_Upload_Latestmonth()
+            Submit_Upload()
             # Discrepancy of Historic Data
             if len(Total_PL.columns) > 1 and BPC_pull.shape[0] > 0:
                 with st.expander("Discrepancy for Historic Data", expanded=True):
