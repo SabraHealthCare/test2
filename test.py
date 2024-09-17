@@ -1003,7 +1003,6 @@ def Map_PL_Sabra(PL,entity,sheet_type):
                 continue
            
         #property_header = [x for x in PL.columns if x not in ["Sabra_Account","Tenant_Account"]]
-        st.write("PL",PL)
         PL=PL.drop(["Conversion"], axis=1)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='ENTITY')     
         PL=PL.drop(["Tenant_Account"], axis=1)
