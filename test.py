@@ -563,9 +563,8 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
     return PL_date_header
 	
 @st.cache_data 
-def Check_Available_Units(check_patient_days,reporting_month):
+def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month):
     #check patient days,fill missing operating beds to reporting_month_data
-    global reporting_month_data,Total_PL
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
     month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
     problem_properties=[]
@@ -624,6 +623,7 @@ def Check_Available_Units(check_patient_days,reporting_month):
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
         st.write(previous_A_unit_display) 
         Total_PL=pd.concat([Total_PL, previous_A_unit.set_index(["ENTITY","Sabra_Account"])[reporting_month]], axis=0)
+    return reporting_month_data,Total_PL   
 
 @st.cache_data
 def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no): 
@@ -1109,7 +1109,7 @@ def View_Summary():
     check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
     #check if available unit changed by previous month
-    Check_Available_Units(check_patient_days,reporting_month)
+    reporting_month_data=Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month)
 	
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Balance Sheet"]
