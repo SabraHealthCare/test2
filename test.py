@@ -1754,7 +1754,8 @@ def Upload_And_Process(uploaded_file,file_type):
         if len(sheet_list_finance_in_onesheet)>0:
             for sheet_name_finance_in_onesheet in sheet_list_finance_in_onesheet:
                 tenant_account_col=[10000]
-                entity_list_finance_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_in_onesheet].tolist()	
+                entity_list_finance_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_in_onesheet].tolist()
+                st.write("entity_list_finance_in_onesheet",entity_list_finance_in_onesheet)
                 PL=Read_Clean_PL_Multiple(entity_list_finance_in_onesheet,"Sheet_Name_Finance",uploaded_file,account_pool_full,sheet_name_finance_in_onesheet)
                 if Total_PL.shape[0]==0:
                     Total_PL=PL
