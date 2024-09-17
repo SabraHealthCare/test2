@@ -1370,10 +1370,14 @@ def Is_Reporting_Month(single_string):
 
 def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no): 
     st.write("entity_list",entity_list)
-    entity_without_propertynamefinance = entity_mapping[((entity_mapping['Column_Name'].isna()) | (entity_mapping['Column_Name'].str.strip() == ""))].index.tolist()
+    #entity_without_propertynamefinance = entity_mapping[((entity_mapping['Column_Name'].isna()) | (entity_mapping['Column_Name'].str.strip() == ""))].index.tolist()
 	#(entity_mapping['ENTITY'].isin(entity_list)) & 
-    st.write(entity_mapping[(entity_mapping['ENTITY'].isin(entity_list))])
-    st.write("entity_without_propertynamefinance",entity_without_propertynamefinance)
+    #st.write(entity_mapping.index())
+    #st.write("entity_without_propertynamefinance",entity_without_propertynamefinance)
+    entity_without_propertynamefinance = entity_mapping[ \
+    (entity_mapping.index.isin(entity_list)) & \
+    ((entity_mapping['Column_Name'].isna()) | \
+     (entity_mapping['Column_Name'].str.strip() == ""))].index.tolist()
     column_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"] if pd.notna(x) and str(x).strip()]
     max_match=[]
 
