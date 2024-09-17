@@ -964,7 +964,7 @@ def Map_PL_Sabra(PL,entity,sheet_type):
     # Conversion column
     PL = PL.reset_index(drop=True)
     conversion = PL["Conversion"].fillna(np.nan)
-
+    st.write("PL00",PL)
     if isinstance(entity, str):# one entity,  properties are in separate sheet
         month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
         #Convert all values in the PL to numeric, coercing non-numeric values to NaN. Fill NaN values with 0.
