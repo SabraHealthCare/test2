@@ -114,11 +114,10 @@ def Send_Confirmation_Email(receiver_email_list, subject, body):
         mailServer.starttls()
         mailServer.ehlo()
         mailServer.login(username, password)
-        mailServer.sendmail("sli@sabrahealth.com", receiver_email_list, msg.as_string())
+        mailServer.sendmail("Sabra_reporting@sabrahealth.com", receiver_email_list, msg.as_string())
         mailServer.close()
-        st.write("Confirmation email sent to your Email!")
     except Exception as e:
-        st.write( f"Failed to send confirmation email. Please make sure the Email address is correct. You can edit your email address in 'Edit Account' in left menu")
+        st.write( f"Failed to send confirmation email.")
 	    
 #directly save the uploaded (.xlsx) file to onedrive
 def Upload_to_Onedrive(uploaded_file,path,file_name):
