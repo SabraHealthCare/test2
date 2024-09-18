@@ -368,13 +368,16 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     match_counts.sort(reverse=True, key=lambda x: x[0])
     
     # Return the top columns with the highest match counts
-    if match_counts and match_counts[0][0] > 0:
-        top_matches = [match_counts[0][1]]
-        if len(match_counts) > 1 and match_counts[1][0] > 0:
-            top_matches.append(match_counts[1][1])
-        if len(match_counts) > 2 and match_counts[2][0] > 0:
-            top_matches.append(match_counts[2][1])
-        return top_matches
+    top_matches = [match[1] for match in match_counts if match[0] > 0]
+    if len(top_matches)>0:
+        return top_matches # return a list of col index
+    #if match_counts and match_counts[0][0] > 0:
+        #top_matches = [match_counts[0][1]]
+        #if len(match_counts) > 1 and match_counts[1][0] > 0:
+            #top_matches.append(match_counts[1][1])
+        #if len(match_counts) > 2 and match_counts[2][0] > 0:
+            #top_matches.append(match_counts[2][1])
+        #return top_matches
     
     # If no match is found, raise an error
     st.error(f"Failed to identify tenant account columns in {sheet_type_name} sheet —— {sheet_name}")
@@ -1518,19 +1521,31 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
     if True:   
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
         tenant_account_col=tenantAccount_col_no_list  # for pre-compare
-        
-        if len(tenantAccount_col_no_list)>=2:
-            col1 = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
-            col2 = PL.iloc[:, tenantAccount_col_no_list[1]].fillna('')
-            if len(tenantAccount_col_no_list) == 3:
-                col3 = PL.iloc[:, tenantAccount_col_no_list[2]].fillna('')
-                col1 = col1.where(col1 != '', col3)
-                col1 = col1.where(col1 != '', col2)
+
+        if len(tenantAccount_col_no_list) >= 2:
+            # Start with the first column
+            combined_col = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
+
+            # Iterate over the rest of the columns and combine them
+            for col_idx in tenantAccount_col_no_list[1:]:
+                current_col = PL.iloc[:, col_idx].fillna('')
+                # Fill missing values in the combined column with values from the current column
+                combined_col = combined_col.where(combined_col != '', current_col)
+
+            # Assign the combined result back to the first column
+            PL.iloc[:, tenantAccount_col_no_list[0]] = combined_col
+        #if len(tenantAccount_col_no_list)>=2:
+            #col1 = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
+            #col2 = PL.iloc[:, tenantAccount_col_no_list[1]].fillna('')
+            #if len(tenantAccount_col_no_list) == 3:
+                #col3 = PL.iloc[:, tenantAccount_col_no_list[2]].fillna('')
+                #col1 = col1.where(col1 != '', col3)
+                #col1 = col1.where(col1 != '', col2)
                
-            else:
-                col1 = col1.where(col1 != '', col2)
+            #else:
+                #col1 = col1.where(col1 != '', col2)
             # Combine the columns: if col1 has a missing value, fill it with the value from col2
-            PL.iloc[:, tenantAccount_col_no_list[0]] = col1
+            #PL.iloc[:, tenantAccount_col_no_list[0]] = col1
 
         tenantAccount_col_no=tenantAccount_col_no_list[0]
         #set tenant_account as index of PL
