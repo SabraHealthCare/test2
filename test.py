@@ -114,7 +114,7 @@ def Send_Confirmation_Email(receiver_email_list, subject, body):
         mailServer.starttls()
         mailServer.ehlo()
         mailServer.login(username, password)
-        mailServer.sendmail("sli@sabrahealth.com", recipient, msg.as_string())
+        mailServer.sendmail("sli@sabrahealth.com", ", ".join(receiver_email_list) , msg.as_string())
         mailServer.close()
         st.write("Email sent successfully!")
     except Exception as e:
