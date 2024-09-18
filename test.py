@@ -92,7 +92,7 @@ from email.mime.multipart import MIMEMultipart
 import streamlit as st
 
 # Function to send the email
-def Send_Confirmation_Email(receiver_email_list, subject, body):(receiver_email_list, subject, body)    
+def Send_Confirmation_Email(receiver_email_list, subject, body):
     username = 'sabrahealth.com'  #SMTP2GO username
     password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password
 
