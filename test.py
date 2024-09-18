@@ -93,13 +93,13 @@ import streamlit as st
 
 # Function to send the email
 def Send_Confirmation_Email(receiver_email_list, subject, body):
-    username = 'sabrahealth.com'  #SMTP2GO username
+    username = 'sabrahealth.com'  
     password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password
 
     # Create the email
     msg = MIMEMultipart('mixed')
     msg['Subject'] = subject
-    msg['From'] = "sli@sabrahealth.com"
+    msg['From'] = "Sabra_reporting@sabrahealth.com"
     msg['To'] = receiver_email_list[-1] 
 
     # Attach both plain text and HTML messages
@@ -114,7 +114,7 @@ def Send_Confirmation_Email(receiver_email_list, subject, body):
         mailServer.starttls()
         mailServer.ehlo()
         mailServer.login(username, password)
-        mailServer.sendmail("Sabra_reporting@sabrahealth.com", receiver_email_list, msg.as_string())
+        mailServer.sendmail("sli@sabrahealth.com", receiver_email_list, msg.as_string())
         mailServer.close()
     except Exception as e:
         st.write( f"Failed to send confirmation email.")
