@@ -84,6 +84,42 @@ headers = {'Authorization': 'Bearer ' + access_token,}
 
 account_mapping_str_col=["Tenant_Account","Tenant_Account"]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
+
+
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import streamlit as st
+
+# Function to send the email
+def Send_Confirmation_Email(receiver_email_list, subject, body):(receiver_email_list, subject, body)    
+    username = 'sabrahealth.com'  #SMTP2GO username
+    password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password
+
+    # Create the email
+    msg = MIMEMultipart('mixed')
+    msg['Subject'] = subject
+    msg['From'] = "sli@sabrahealth.com"
+    msg['To'] = ", ".join(receiver_email_list) 
+
+    # Attach both plain text and HTML messages
+    plain_text = MIMEText(body, 'plain')
+    msg.attach(plain_text)
+
+
+    # Connect to SMTP2GO server and send email
+    try:
+        mailServer = smtplib.SMTP('mail.smtp2go.com', 2525)  # Can also use 8025, 587, or 25
+        mailServer.ehlo()
+        mailServer.starttls()
+        mailServer.ehlo()
+        mailServer.login(username, password)
+        mailServer.sendmail(sender, recipient, msg.as_string())
+        mailServer.close()
+        st.write("Email sent successfully!")
+    except Exception as e:
+        st.write( f"Failed to send email. Error: {str(e)}")
+	    
 #directly save the uploaded (.xlsx) file to onedrive
 def Upload_to_Onedrive(uploaded_file,path,file_name):
     # Set the API endpoint and headers
@@ -1169,11 +1205,11 @@ def Submit_Upload():
             new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
             Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
 
-    #subject = "Confirmation of your submission"
-    #body = "Thank you for your submission! We have received your reporting data."
-    #receiver_email_list=["sli@sabrahealth.com"]
+    subject = "Confirmation of your submission"
+    body = "Thank you for your submission! We have received your reporting data."
+    receiver_email_list=["sli@sabrahealth.com","shaperi@gmail.com"]
     # Send the confirmation email
-    #Send_Confirmation_Email(receiver_email_list, subject, body)    
+    Send_Confirmation_Email(receiver_email_list, subject, body)    
 
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
