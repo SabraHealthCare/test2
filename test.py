@@ -926,7 +926,6 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
 	
 @st.cache_data 
 def Map_PL_Sabra(PL,entity,sheet_type):
-    st.write("PL0",PL)
     # remove no need to map from account_mapping
     if sheet_type=="Sheet_Name_Finance":  
         account_pool=account_mapping[account_mapping["Sabra_Account"]!= "NO NEED TO MAP"]
@@ -965,7 +964,6 @@ def Map_PL_Sabra(PL,entity,sheet_type):
     # Conversion column
     PL = PL.reset_index(drop=True)
     conversion = PL["Conversion"].fillna(np.nan)
-    st.write("PL1",PL)
     if isinstance(entity, str):# one entity,  properties are in separate sheet
         month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
         #Convert all values in the PL to numeric, coercing non-numeric values to NaN. Fill NaN values with 0.
@@ -1007,7 +1005,6 @@ def Map_PL_Sabra(PL,entity,sheet_type):
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='ENTITY')     
         PL=PL.drop(["Tenant_Account"], axis=1)
 
-    st.write("PL2",PL)
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first
@@ -1560,7 +1557,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         #PL=PL.loc[(PL!= 0).any(axis=1),:]
         PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
         # mapping new tenant accounts
-        #st.write("account_mapping",account_mapping)
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Account"]),PL.index))
         # remove duplicate new account
         new_tenant_account_list=list(set(new_tenant_account_list))    
@@ -1585,9 +1581,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         # Map PL accounts and Sabra account
         #PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
 	# map sabra account with tenant account, groupby sabra account
-        st.write("PL before map",PL)
         PL=Map_PL_Sabra(PL,entity_list,sheet_type) # index are ('ENTITY',"Sabra_Account")
-        st.write("PL after map",PL)
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
     return PL
