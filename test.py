@@ -1,5 +1,3 @@
-
-
 import pandas as pd
 pd.set_option('future.no_silent_downcasting', True) 
 import numpy as np 
@@ -1209,7 +1207,7 @@ def Submit_Upload():
 
     subject = "Confirmation of your submission"
     body = "Thank you for your submission! We have received your reporting data."
-    receiver_email_list=["sli@sabrahealth.com","shaperi@gmail.com"]
+    receiver_email_list=["sli@sabrahealth.com","sli@XX.com"]
     # Send the confirmation email
     Send_Confirmation_Email(receiver_email_list, subject, body)    
 
