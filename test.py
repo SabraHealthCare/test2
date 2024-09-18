@@ -1,3 +1,5 @@
+
+
 import pandas as pd
 pd.set_option('future.no_silent_downcasting', True) 
 import numpy as np 
@@ -100,7 +102,7 @@ def Send_Confirmation_Email(receiver_email_list, subject, body):
     msg = MIMEMultipart('mixed')
     msg['Subject'] = subject
     msg['From'] = "sli@sabrahealth.com"
-    msg['To'] = ", ".join(receiver_email_list) 
+    msg['To'] = receiver_email_list[-1] 
 
     # Attach both plain text and HTML messages
     plain_text = MIMEText(body, 'plain')
@@ -116,9 +118,9 @@ def Send_Confirmation_Email(receiver_email_list, subject, body):
         mailServer.login(username, password)
         mailServer.sendmail("sli@sabrahealth.com", receiver_email_list, msg.as_string())
         mailServer.close()
-        st.write("Email sent successfully!")
+        st.write("Confirmation email sent to your Email!")
     except Exception as e:
-        st.write( f"Failed to send email. Error: {str(e)}")
+        st.write( f"Failed to send confirmation email. Please make sure the Email address is correct. You can edit your email address in 'Edit Account' in left menu")
 	    
 #directly save the uploaded (.xlsx) file to onedrive
 def Upload_to_Onedrive(uploaded_file,path,file_name):
