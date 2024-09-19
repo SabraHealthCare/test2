@@ -63,7 +63,7 @@ user_id= '62d4a23f-e25f-4da2-9b52-7688740d9d48'  # shali's user id of onedrive
 PL_path="Documents/Tenant Monthly Uploading/Tenant P&L"
 mapping_path="Documents/Tenant Monthly Uploading/Tenant Mapping"
 master_template_path="Documents/Tenant Monthly Uploading/Master Template"
-
+email_body=""
 today=date.today()
 current_year= today.year
 current_month= today.month
@@ -81,7 +81,7 @@ headers = {'Authorization': 'Bearer ' + access_token,}
 account_mapping_str_col=["Tenant_Account","Tenant_Account"]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
 
-def Send_Confirmation_Email(receiver_email_list, subject, body):
+def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
     password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password, not the API_key
 
@@ -90,11 +90,13 @@ def Send_Confirmation_Email(receiver_email_list, subject, body):
     msg['Subject'] = subject
     msg['From'] = "Sabra_reporting@sabrahealth.com"
     msg['To'] = receiver_email_list[-1] 
-
-    # Attach both plain text and HTML messages
+    
     plain_text = MIMEText(body, 'plain')
+    html_part = MIMEText(email_body, 'html')
+    # Attach both plain text and HTML messages
     msg.attach(plain_text)
-	
+    msg.attach(html_part)
+
     # Connect to SMTP2GO server and send email
     try:
         mailServer = smtplib.SMTP('mail.smtp2go.com', 2525)  # Can also use 8025, 587, or 25
@@ -554,6 +556,7 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
 	
 @st.cache_data 
 def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month):
+    global email_body
     #check patient days,fill missing operating beds to reporting_month_data
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
     month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
@@ -561,6 +564,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
     properties_fill_Aunit=[]
     zero_patient_days=[]
     total_property_list=reporting_month_data["Property_Name"].unique()
+    error_for_email=""
     for property_i in total_property_list:
         try:
             patient_day_i=check_patient_days.loc[(property_i,"Patient Days"),reporting_month]
@@ -574,13 +578,17 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
             continue
         elif operating_beds_i>0 and patient_day_i>operating_beds_i*month_days:
-            st.error("Error：The number of patient days for {} exceeds its available days (Operating Beds * {}). This will result in incorrect occupancy.".format(property_i,month_days))
+            error_message="The number of patient days for {} exceeds its available days (Operating Beds * {}). This will result in incorrect occupancy.".format(property_i,month_days)		
+            st.error("Error："+error_message)
             problem_properties.append(property_i)
+            error_for_email+="<li>• "+error_message+"</li>"
         elif operating_beds_i==0 and patient_day_i==0:
             zero_patient_days.append(property_i)
         elif patient_day_i==0 and operating_beds_i>0:
-            st.error("Error: {} is missing patient days. If this facility is not currently functioning or in operation, please remove the number of operating beds associated with it.".format(property_i))
-            problem_properties.append(property_i)     
+            error_message="{} is missing patient days. If this facility is not currently functioning or in operation, please remove the number of operating beds associated with it.".format(property_i)
+            st.error("Error: "+error_message)
+            problem_properties.append(property_i)   
+            error_for_email+="<li>• "+error_message+"</li>"
         elif patient_day_i>0 and operating_beds_i==0:
             properties_fill_Aunit.append(property_i)
     if len(problem_properties)>0:
@@ -595,10 +603,9 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
 		                "Patient Days": "Patient Days",
 		                "Operating Beds": "Operating Beds"},
 			    hide_index=True)
-        #st.stop() 	
+        email_body= " <p>Please pay attention to the improper entries in the patient days:</p>"+"<ul>"+error_for_email+"</ul>"+"{dataframe_to_html(check_patient_days_display) if check_patient_days_display is not None else ""}"	
     if len(properties_fill_Aunit)>0:    
         BPC_pull_reset = BPC_pull.reset_index()
-	    
         # Apply filtering and selection
         previous_A_unit = BPC_pull_reset.loc[(BPC_pull_reset["Sabra_Account"].str.startswith("A_")) &(BPC_pull_reset["Property_Name"].isin(properties_fill_Aunit)),["ENTITY","Property_Name","Sabra_Account","A_unit"]]
         previous_A_unit=previous_A_unit.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
@@ -1033,8 +1040,7 @@ def Map_PL_Sabra(PL,entity,sheet_type):
 
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
-    PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first
-    #return PL,PL_with_detail   
+    PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first 
     return PL   
 	
 @st.cache_data
@@ -1078,12 +1084,11 @@ def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
 
 def View_Summary(): 
-    global Total_PL,reporting_month_data,reporting_month
+    global Total_PL,reporting_month_data,reporting_month,email_body
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
     #st.write("Total_PL",Total_PL,Total_PL.index)
-    #st.write("reporting_month",reporting_month)
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
@@ -1121,7 +1126,8 @@ def View_Summary():
 			        "Category":"Account category",
 		                 reporting_month:reporting_month[4:6]+"/"+reporting_month[0:4]},
 			    hide_index=True)
-	     
+        email_body+= "<p> No data detected for below properties and accounts:</p>
+        {dataframe_to_html(missing_category) if missing_category is not None else ""}"
     reporting_month_data =reporting_month_data.pivot_table(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=reporting_month,aggfunc='last')
     reporting_month_data.reset_index(drop=False,inplace=True)
 
@@ -1159,10 +1165,13 @@ def View_Summary():
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
-
+        summary_for_email= reporting_month_data[reporting_month_data["Sabra_Account"].isin(["Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"])]
+        email_body=f"<p>Here is the summary for your reference,:</p>
+        {dataframe_to_html(summary_for_email) if summary_for_email is not None else ""}+email_body
+        
 # no cache
 def Submit_Upload():
-    global Total_PL,reporting_month   
+    global Total_PL,reporting_month,email_body  
     upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
     upload_reporting_month["TIME"]=reporting_month
     upload_reporting_month=upload_reporting_month.rename(columns={reporting_month:"Amount"})
@@ -1196,7 +1205,16 @@ def Submit_Upload():
     body = "Thank you for your submission! We have received  {} {} reporting data.".format(operator,reporting_month_display)
     receiver_email_list=["sli@sabrahealth.com"]
     # Send the confirmation email
-    Send_Confirmation_Email(receiver_email_list, subject, body)    
+    email_body= f"""
+    <html>
+    <body>
+        <p>Dear {operator} team,</p>
+	<p>Thank you for your submission! We have received {reporting_month_display} reporting data.</p>"""+email_body+"<p>Best regards,</p>
+        <p>Sabra Health Team</p>
+    </body>
+    </html>"
+
+    Send_Confirmation_Email(receiver_email_list, subject, email_body)    
 
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
