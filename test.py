@@ -1209,10 +1209,10 @@ def Submit_Upload():
     <html>
     <body>
         <p>Dear {operator} team,</p>
-	<p>Thank you for your submission! We have received {reporting_month_display} reporting data.</p>"""+email_body+"<p>Best regards,</p>
+	<p>Thank you for your submission! We have received {reporting_month_display} reporting data.</p>"""+email_body+f"""<p>Best regards,</p>
         <p>Sabra Health Team</p>
     </body>
-    </html>"
+    </html>"""
 
     Send_Confirmation_Email(receiver_email_list, subject, email_body)    
 
