@@ -1173,7 +1173,7 @@ def Submit_Upload():
 
 
     if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,"CSV",None,None):
-        st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,reporting_month[4:6]+"/"+reporting_month[0:4]))
+        st.success("{} {} reporting data was uploaded successfully!".format(operator,reporting_month[4:6]+"/"+reporting_month[0:4]))
     else: 
         st.write(" ")  #----------record into error report------------------------	
         # save original tenant P&L to OneDrive
