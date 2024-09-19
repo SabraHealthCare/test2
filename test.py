@@ -1913,6 +1913,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.session_state.selected_year = current_year
         if 'selected_month' not in st.session_state:
             st.session_state.selected_month = 'Jan'
+            st.write("st.session_state.selected_month",st.session_state.selected_month)
         global reporting_month,reporting_month_label,tenant_account_col,date_header
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
 	
@@ -1924,7 +1925,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         years_range = list(range(current_year, current_year - 2, -1))
         # Calculate the list of months and their indices
         months_range = list(month_map.keys())
-        st.write("st.session_state.selected_month",st.session_state.selected_month)
         if "Y" in entity_mapping["BS_separate_excel"][(pd.notna(entity_mapping["BS_separate_excel"]))&(entity_mapping["DATE_SOLD_PAYOFF"]=="N")].values:             
             BS_separate_excel="Y"
         else:
