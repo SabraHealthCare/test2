@@ -1935,25 +1935,22 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col1:
                     selected_year = st.selectbox("Year", years_range,index=years_range.index(st.session_state.selected_year))
                 with col2:    
-                    selected_month = st.selectbox("Month",  months_range, index=months_range.index(st.session_state.selected_month))
+                    selected_month = st.selectbox("Month", months_range, index=months_range.index(st.session_state.selected_month))
                 with col1:
                     st.write("Upload P&L:")
                     uploaded_finance=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
                 with col2:
                     st.write("Other Documents:")
                     uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
-                col4, col5=st.columns([1,6])
-                with col4:
-                    submitted = st.form_submit_button("Upload")
+                submitted = st.form_submit_button("Upload")
 
-                if submitted:
+            if submitted:
 	            # clear cache for every upload
                     st.cache_data.clear()
                     st.cache_resource.clear()
                     st.session_state.clicked = button_initial_state
                     st.session_state.selected_year = selected_year
                     st.session_state.selected_month = selected_month
-                #if download_PLsample:
 
         elif BS_separate_excel=="Y":	 
             with st.form("upload_form", clear_on_submit=True):
