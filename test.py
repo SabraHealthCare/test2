@@ -29,11 +29,6 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-
-
-
-
-
 #---------------------------define parameters--------------------------
 st.set_page_config(
    initial_sidebar_state="expanded",  layout="wide")
@@ -57,7 +52,8 @@ month_dic_num={10:["10/","-10","/10","10","_10"],11:["11/","-11","/11","11","_11
                    2:["02/","2/","-2","-02","/2","/02"],3:["03/","3/","-3","-03","/3","/03"],4:["04/","4/","-4","-04","/4","/04"],\
                    5:["05/","5/","-5","-05","/5","/05"],6:["06/","6/","-06","-6","/6","/06"],\
                    7:["07/","7/","-7","-07","/7","/07"],8:["08/","8/","-8","-08","/8","/08"],9:["09/","9/","-09","-9","/9","/09"]}
-year_dic={2024:["2024","24"],2025:["2025","25"],2026:["2026","26"]} 	    
+year_dic={2024:["2024","24"],2025:["2025","25"],2026:["2026","26"]} 	
+month_map = {"Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "Jun": "06", "Jul": "07", "Aug": "08","Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"}
 #One drive authority. Set application details
 client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
 client_secret='PgR8Q~HZE2q-dmOb2w_9_0VuxfT9VMLt_Lp3Jbce'
@@ -85,16 +81,9 @@ headers = {'Authorization': 'Bearer ' + access_token,}
 account_mapping_str_col=["Tenant_Account","Tenant_Account"]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
 
-
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-import streamlit as st
-
-# Function to send the email
 def Send_Confirmation_Email(receiver_email_list, subject, body):
     username = 'sabrahealth.com'  
-    password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password
+    password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password, not the API_key
 
     # Create the email
     msg = MIMEMultipart('mixed')
@@ -105,8 +94,7 @@ def Send_Confirmation_Email(receiver_email_list, subject, body):
     # Attach both plain text and HTML messages
     plain_text = MIMEText(body, 'plain')
     msg.attach(plain_text)
-
-
+	
     # Connect to SMTP2GO server and send email
     try:
         mailServer = smtplib.SMTP('mail.smtp2go.com', 2525)  # Can also use 8025, 587, or 25
@@ -1161,9 +1149,9 @@ def View_Summary():
     else:
         reporting_month_data=reporting_month_data[["Sabra_Account"]+list(entity_columns)]   
 
-    with st.expander("Summary of {}/{} reporting".format(reporting_month[4:6],reporting_month[0:4]) ,expanded=True):
+    with st.expander("Summary of {} {} reporting".format(operator,reporting_month_display) ,expanded=True):
         ChangeWidgetFontSize("Summary of {}/{} reporting".format(reporting_month[4:6],reporting_month[0:4]), '25px')
-        download_report(reporting_month_data,"{} {}-{} Report".format(operator,reporting_month[4:6],reporting_month[0:4]))
+        download_report(reporting_month_data,"{} {} Report".format(operator,reporting_month_display))
         reporting_month_data=reporting_month_data.apply(Format_Value)
         reporting_month_data=reporting_month_data.fillna(0).infer_objects(copy=False)
         reporting_month_data=reporting_month_data.replace(0,'')
@@ -1204,9 +1192,9 @@ def Submit_Upload():
             new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
             Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
 
-    subject = "Confirmation of your submission"
-    body = "Thank you for your submission! We have received your reporting data."
-    receiver_email_list=["sli@sabrahealth.com","sli@XX.com"]
+    subject = "Confirmation of {} {} submission".format(operator,reporting_month)
+    body = "Thank you for your submission! We have received  {} {} reporting data.".format(operator,reporting_month_display)
+    receiver_email_list=["sli@sabrahealth.com"]
     # Send the confirmation email
     Send_Confirmation_Email(receiver_email_list, subject, body)    
 
@@ -1929,7 +1917,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col1:
                     selected_year = st.selectbox("Year", years_range,index=years_range.index(st.session_state.selected_year))
                 with col2:    
-                    selected_month = st.selectbox("Month", months_range,index=months_range.index(st.session_state.selected_month))
+                    selected_month = st.selectbox("Month",  list(month_map.keys()),index=months_range.index(st.session_state.selected_month))
                 with col1:
                     st.write("Upload P&L:")
                     uploaded_finance=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
@@ -1947,7 +1935,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.clicked = button_initial_state
                     st.session_state.selected_year = selected_year
                     st.session_state.selected_month = selected_month
-                    reporting_month=str(selected_year)+str(selected_month)
                 #if download_PLsample:
 
         elif BS_separate_excel=="Y":	 
@@ -1976,7 +1963,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.clicked = button_initial_state
                     st.session_state.selected_year = selected_year
                     st.session_state.selected_month = selected_month
-                    reporting_month=str(selected_year)+str(selected_month)
+                    
+        reporting_month_display=str(selected_month)+" "+str(selected_year)
+        reporting_month=str(selected_year)+month_map[selected_month]	    
         col1, col2 = st.columns([1,3])   
         with col1:
             if 'uploaded_finance' in locals() and uploaded_finance:
@@ -1985,7 +1974,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.write("P&L wasn't upload.")
                 st.stop()
 
-            reporting_month=str(selected_year)+str(selected_month)
+            
             if reporting_month>=current_date:
                 st.error("The reporting month should precede the current month.")
                 st.stop()
@@ -2014,7 +2003,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
             Total_PL=Upload_And_Process(uploaded_finance,"Finance")
 
-        elif BS_separate_excel=="Y":     # Finance/BS are in different excel 
+        elif BS_separate_excel=="Y": # Finance/BS are in different excel 
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")
             entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
 
@@ -2036,7 +2025,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	# 1 Summary
         View_Summary()
         # Define the button and handle the click event
-        if st.button(f'Confirm and upload {operator} {reporting_month[4:6]}-{reporting_month[0:4]} reporting', key='reporting_month', help="Click and wait a few seconds for the confirmation message."):
+        if st.button(f'Confirm and upload {operator} {reporting_month_display} reporting', key='reporting_month', help="Click and wait a few seconds for the confirmation message."):
             st.session_state.clicked['submit_report'] = True
 
         # Perform the upload action here and check for discrepancies
