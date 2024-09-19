@@ -1126,8 +1126,8 @@ def View_Summary():
 			        "Category":"Account category",
 		                 reporting_month:reporting_month[4:6]+"/"+reporting_month[0:4]},
 			    hide_index=True)
-        email_body+= "<p> No data detected for below properties and accounts:</p>
-        {dataframe_to_html(missing_category) if missing_category is not None else ""}"
+        email_body+= f"""<p> No data detected for below properties and accounts:</p>
+        {dataframe_to_html(missing_category) if missing_category is not None else ""}"""
     reporting_month_data =reporting_month_data.pivot_table(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=reporting_month,aggfunc='last')
     reporting_month_data.reset_index(drop=False,inplace=True)
 
