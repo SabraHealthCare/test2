@@ -1914,6 +1914,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if 'selected_month' not in st.session_state:
             st.session_state.selected_month = 'Jan'
             st.write("st.session_state.selected_month",st.session_state.selected_month)
+        st.write("st.session_state.selected_month",st.session_state.selected_month)
         global reporting_month,reporting_month_label,tenant_account_col,date_header
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
 	
@@ -1943,7 +1944,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col2:
                     st.write("Other Documents:")
                     uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
-                st.write("months_range",months_range)
                 submitted = st.form_submit_button("Upload")
 
                 if submitted:
