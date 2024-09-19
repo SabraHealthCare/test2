@@ -1936,7 +1936,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col1:
                     selected_year = st.selectbox("Year", years_range,index=years_range.index(st.session_state.selected_year))
                 with col2:    
-                    selected_month = st.selectbox("Month", months_range, index=months_range.index(st.session_state.selected_month))
+                    selected_month = st.selectbox("Month", months_range, index=months_range.index("Jan"))
                 with col1:
                     st.write("Upload P&L:")
                     uploaded_finance=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
