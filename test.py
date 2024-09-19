@@ -1149,9 +1149,9 @@ def View_Summary():
     else:
         reporting_month_data=reporting_month_data[["Sabra_Account"]+list(entity_columns)]   
 
-    with st.expander("Summary of {} {} reporting".format(operator,reporting_month_display) ,expanded=True):
-        ChangeWidgetFontSize("Summary of {}/{} reporting".format(reporting_month[4:6],reporting_month[0:4]), '25px')
-        download_report(reporting_month_data,"{} {} Report".format(operator,reporting_month_display))
+    with st.expander("{} {} reporting".format(operator,reporting_month_display) ,expanded=True):
+        ChangeWidgetFontSize("{} {} reporting".format(operator,reporting_month_display), '25px')
+        download_report(reporting_month_data,"Report")
         reporting_month_data=reporting_month_data.apply(Format_Value)
         reporting_month_data=reporting_month_data.fillna(0).infer_objects(copy=False)
         reporting_month_data=reporting_month_data.replace(0,'')
@@ -1192,7 +1192,7 @@ def Submit_Upload():
             new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
             Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
 
-    subject = "Confirmation of {} {} submission".format(operator,reporting_month)
+    subject = "Confirmation of {} {} submission".format(operator,reporting_month_display)
     body = "Thank you for your submission! We have received  {} {} reporting data.".format(operator,reporting_month_display)
     receiver_email_list=["sli@sabrahealth.com"]
     # Send the confirmation email
@@ -2025,7 +2025,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	# 1 Summary
         View_Summary()
         # Define the button and handle the click event
-        if st.button(f'Confirm and upload {operator} {reporting_month_display} reporting', key='reporting_month', help="Click and wait a few seconds for the confirmation message."):
+        if st.button(f'Confirm and upload {reporting_month_display} reporting', key='reporting_month', help="Click and wait a few seconds for the confirmation message."):
             st.session_state.clicked['submit_report'] = True
 
         # Perform the upload action here and check for discrepancies
