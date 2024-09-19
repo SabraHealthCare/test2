@@ -1905,7 +1905,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         # Calculate the list of years and their indices
         years_range = list(range(current_year, current_year - 2, -1))
         # Calculate the list of months and their indices
-        months_range = [str(month).zfill(2) for month in range(1, 13)]
+        months_range = list(month_map.keys())
         if "Y" in entity_mapping["BS_separate_excel"][(pd.notna(entity_mapping["BS_separate_excel"]))&(entity_mapping["DATE_SOLD_PAYOFF"]=="N")].values:             
             BS_separate_excel="Y"
         else:
@@ -1917,7 +1917,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col1:
                     selected_year = st.selectbox("Year", years_range,index=years_range.index(st.session_state.selected_year))
                 with col2:    
-                    selected_month = st.selectbox("Month",  list(month_map.keys()),index=months_range.index(st.session_state.selected_month))
+                    selected_month = st.selectbox("Month",  months_range, index=months_range.index(st.session_state.selected_month))
                 with col1:
                     st.write("Upload P&L:")
                     uploaded_finance=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
