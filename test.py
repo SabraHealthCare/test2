@@ -94,7 +94,7 @@ def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     #plain_text = MIMEText(email_body, 'plain')
     html_part = MIMEText(email_body, 'html')
     # Attach both plain text and HTML messages
-    msg.attach(plain_text)
+    #msg.attach(plain_text)
     msg.attach(html_part)
 
     # Connect to SMTP2GO server and send email
