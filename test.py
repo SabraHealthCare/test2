@@ -91,7 +91,7 @@ def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     msg['From'] = "Sabra_reporting@sabrahealth.com"
     msg['To'] = receiver_email_list[-1] 
     
-    plain_text = MIMEText(body, 'plain')
+    #plain_text = MIMEText(email_body, 'plain')
     html_part = MIMEText(email_body, 'html')
     # Attach both plain text and HTML messages
     msg.attach(plain_text)
