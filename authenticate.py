@@ -13,9 +13,6 @@ import smtplib
 from email.mime.text import MIMEText
 from msal import ConfidentialClientApplication
 import yaml 
-
-import smtplib
-from email.mime.text import MIMEText
 class Authenticate:
     """
     This class will create login, logout, register user, reset password, forgot password, 
@@ -164,9 +161,43 @@ class Authenticate:
                 st.session_state['authentication_status'] = False
             else:
                 return False
-
-
     def send_email(self, username: str, email: str, random_password: str):
+        username_smtp = 'sabrahealth.com'  
+        password_smtp = 'b1bpwmzxs9hnbpkM' 
+    
+        body = f"""
+            Hi {username},
+        
+            Your temporary password for Sabra Monthly Reporting App is: {random_password}
+            Please reset the password after login.
+            Feel free to contact sli@sabrahealth.com if you have any questions.
+        
+            Regards,
+            Sabra
+            """
+        plain_text = MIMEText(body, 'plain')
+        # Create the email
+        msg = MIMEText(body)
+        msg['Subject'] = "Temporary password for Sabra App"
+        msg['From'] = "Sabra_reporting@sabrahealth.com"
+        msg['To'] = email
+        msg.attach(plain_text)
+    
+    
+        # Connect to SMTP2GO server and send email
+        try:
+            mailServer = smtplib.SMTP('mail.smtp2go.com', 2525)  # Can also use 8025, 587, or 25
+            mailServer.ehlo()
+            mailServer.starttls()
+            mailServer.ehlo()
+            mailServer.login(username_smtp, password_smtp)
+            mailServer.sendmail("sli@sabrahealth.com", email, msg.as_string())
+            mailServer.close()
+        except Exception as e:
+            st.write( f"Failed to send email. please contact sli@sabrahealth.com")
+
+    
+    def send_email1(self, username: str, email: str, random_password: str):
         email_sender = "sli@sabrahealth.com"  # Replace with your Outlook email
         email_receiver = email
     
@@ -198,33 +229,6 @@ class Authenticate:
         except Exception as e:
             st.error(f"Failed to send email: {e}")
 
-    def send_email1(self,username: str,email:str,random_password:str):
-        email_sender="shaperi@gmail.com"
-        email_receiver = email
-        
-        body = """
-        Hi {},
-        
-        Your temperate password for Sabra Monthly reporting APP is: {}
-        Please reset password after login.
-        Feel free to contact sli@sabrahealth.com if you have any questions.
-
-        Regards,
-        Sabra
-        """.format(username,random_password)
-        try:
-            msg = MIMEText(body)
-            msg['From'] = email_sender
-            msg['To'] = email_receiver
-            msg['Subject'] = "Temperate password for Sabra App"
-            server = smtplib.SMTP('smtp.gmail.com', 587)
-            server.starttls()
-            server.login(email_sender, "gdwipqjqbtaeixfx")
-            server.sendmail(email_sender, email_receiver, msg.as_string())
-            server.quit()
-            st.success('A temperate password was send to your email: {}.'.format(email))
-        except Exception as e:
-            st.error("Fail to send email:{}".format(e))
 
     def Password_Validity(self, s:str):
         l, u, d = 0, 0, 0
