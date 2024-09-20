@@ -1,3 +1,4 @@
+
 import pandas as pd
 pd.set_option('future.no_silent_downcasting', True) 
 import numpy as np 
@@ -1873,7 +1874,7 @@ config = Read_File_From_Onedrive(mapping_path, "config.yaml","YAML")
 # Creating the authenticator object
 if config:
     authenticator = Authenticate(
-        config['credentials'], 
+        config['credentials'],
         config['cookie']['name'], 
         config['cookie']['key'], 
         config['cookie']['expiry_days'],
@@ -2083,7 +2084,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         st.video(video, format="video/mp4", start_time=0)
 	    
     elif choice=="Edit Account": 
-	# update user details widget 
+	# update user details widget
         try:
             authenticator.update_user_details(st.session_state["username"], 'Update user details',config)
 
