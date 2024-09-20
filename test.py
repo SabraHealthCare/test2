@@ -579,14 +579,14 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
             error_message="The number of patient days for {} exceeds its available days (Operating Beds * {}). This will result in incorrect occupancy.".format(property_i,month_days)		
             st.error("Error："+error_message)
             problem_properties.append(property_i)
-            error_for_email+="<li>• "+error_message+"</li>"
+            error_for_email+="<li> "+error_message+"</li>"
         elif operating_beds_i==0 and patient_day_i==0:
             zero_patient_days.append(property_i)
         elif patient_day_i==0 and operating_beds_i>0:
             error_message="{} is missing patient days. If this facility is not currently functioning or in operation, please remove the number of operating beds associated with it.".format(property_i)
             st.error("Error: "+error_message)
             problem_properties.append(property_i)   
-            error_for_email+="<li>• "+error_message+"</li>"
+            error_for_email+="<li> "+error_message+"</li>"
         elif patient_day_i>0 and operating_beds_i==0:
             properties_fill_Aunit.append(property_i)
     if len(problem_properties)>0:
