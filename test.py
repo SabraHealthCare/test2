@@ -1198,7 +1198,7 @@ def Submit_Upload():
 
     subject = "Confirmation of {} {} submission".format(operator,reporting_month_display)
     body = "Thank you for your submission! We have received  {} {} reporting data.".format(operator,reporting_month_display)
-    receiver_email_list=["sli@sabrahealth.com"]
+    receiver_email_list=["sli@sabrahealth.com","shaperi@gmail.com"]
     # Send the confirmation email
     email_body= f"""
     <html>
