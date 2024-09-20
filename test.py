@@ -1170,7 +1170,8 @@ def View_Summary():
         summary_for_email.index.name=None
         st.write("summary_for_email",summary_for_email.index.name,summary_for_email.columns)
         #summary_for_email= reporting_month_data.drop('Property_Name', axis=1) 
-        email_body=f"<p>Here is the summaryyyyyy for your reference:</p>{summary_for_email[["Sabra_Account","Total"]+list(entity_columns)].to_html(index=False)}"+email_body
+        summary_for_email=summary_for_email[["Sabra_Account","Total"]+list(entity_columns)]
+        email_body=f"<p>Here is the summaryyyyyy for your reference:</p>{summary_for_email.to_html(index=False)}"+email_body
         
 # no cache
 def Submit_Upload():
