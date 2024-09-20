@@ -1166,7 +1166,7 @@ def View_Summary():
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
         summary_for_email= reporting_month_data[reporting_month_data["Sabra_Account"].isin(["Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"])]
-        email_body=f"""<p>Here is the summary for your reference,:</p>{dataframe_to_html(summary_for_email) if summary_for_email is not None else ""}"""+email_body
+        email_body="<p>Here is the summary for your reference,:</p>{dataframe_to_html(summary_for_email) if summary_for_email is not None else ""}"+email_body
         
 # no cache
 def Submit_Upload():
