@@ -2083,7 +2083,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         st.video(video, format="video/mp4", start_time=0)
 	    
     elif choice=="Edit Account": 
-	# update user details widget
+	# update user details widget 
         try:
             authenticator.update_user_details(st.session_state["username"], 'Update user details',config)
 
