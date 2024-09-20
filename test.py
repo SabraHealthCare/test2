@@ -1121,8 +1121,9 @@ def View_Summary():
         st.write("No data detected for below properties and accounts: ")
         missing_category=missing_category[["ENTITY",reporting_month,"Category"]].merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")[["Property_Name","Category",reporting_month]]
         missing_category=missing_category.rename(columns={'Property_Name':'Property',"Category":"Account category",reporting_month:reporting_month_display})
-        #st.dataframe(missing_category.style.applymap(color_missing, subset=[reporting_month]).hide(axis='index'))
-        st.dataframe(missing_category.reset_index().style.map(color_missing, subset=[reporting_month]))
+        st.write(missing_category)
+	#st.dataframe(missing_category.style.applymap(color_missing, subset=[reporting_month]).hide(axis='index'))
+        st.dataframe(missing_category.style.map(color_missing, subset=[reporting_month]))
 
         email_body+= f"<p> No data detected for below properties and accounts:</p>{missing_category.to_html(index=False)}"
     reporting_month_data =reporting_month_data.pivot_table(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=reporting_month,aggfunc='last')
