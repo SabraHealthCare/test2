@@ -592,16 +592,12 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
     if len(problem_properties)>0:
         check_patient_days_display=check_patient_days.loc[(problem_properties,slice(None)),reporting_month].reset_index(drop=False)
         check_patient_days_display=check_patient_days_display.pivot_table(index=["Property_Name"],columns="Category", values=reporting_month,aggfunc='last')
-        check_patient_days_display.reset_index(inplace=True)    
+        check_patient_days_display.reset_index(drop=True,inplace=True)    
         if "Operating Beds" not in check_patient_days_display.columns:
             check_patient_days_display["Operating Beds"]=0
             miss_all_A_unit=True
-        st.dataframe(check_patient_days_display.style.map(color_missing, subset=["Patient Days","Operating Beds"]).format(precision=0, thousands=",").hide(axis="index"),
-		    column_config={
-			        "Property_Name": "Property",
-		                "Patient Days": "Patient Days",
-		                "Operating Beds": "Operating Beds"},
-			    hide_index=True)
+        check_patient_days_display=check_patient_days_display.renames({"Property_Name": "Property"})
+        st.dataframe(check_patient_days_display.style.map(color_missing, subset=["Patient Days","Operating Beds"]).format(precision=0, thousands=","),hide_index=True)
         
         email_body= f" <p>Please pay attention to the improper entries in the patient days:</p>{check_patient_days_display.to_html(index=False)}"+"<ul>"+error_for_email+"</ul>"	
     if len(properties_fill_Aunit)>0:    
@@ -610,9 +606,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         previous_A_unit = BPC_pull_reset.loc[(BPC_pull_reset["Sabra_Account"].str.startswith("A_")) &(BPC_pull_reset["Property_Name"].isin(properties_fill_Aunit)),["ENTITY","Property_Name","Sabra_Account","A_unit"]]
         previous_A_unit=previous_A_unit.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
         previous_A_unit=previous_A_unit.rename(columns={"A_unit":reporting_month})
-        #st.write("reporting_month_data before merge",reporting_month_data)
         reporting_month_data  = pd.concat([reporting_month_data, previous_A_unit], axis=0)
-        #st.write("previous_A_unit",previous_A_unit)
         if previous_A_unit.shape[0]>1:
             st.error("The following properties are missing operating beds. Historical data has been used to fill in the gaps. If this information is incorrect, please update the operating beds in the P&L and re-upload.")
         elif previous_A_unit.shape[0]==1:
@@ -1121,8 +1115,6 @@ def View_Summary():
         st.write("No data detected for below properties and accounts: ")
         missing_category=missing_category[["ENTITY",reporting_month,"Category"]].merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")[["Property_Name","Category",reporting_month]]
         missing_category=missing_category.rename(columns={'Property_Name':'Property',"Category":"Account category",reporting_month:reporting_month_display})
-        st.write(missing_category)
-	#st.dataframe(missing_category.style.applymap(color_missing, subset=[reporting_month]).hide(axis='index'))
         st.dataframe(missing_category.style.applymap(color_missing, subset=[reporting_month_display]).hide(axis="index"))
 
         email_body+= f"<p> No data detected for below properties and accounts:</p>{missing_category.to_html(index=False)}"
