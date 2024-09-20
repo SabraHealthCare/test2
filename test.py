@@ -89,12 +89,10 @@ def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     msg = MIMEMultipart('mixed')
     msg['Subject'] = subject
     msg['From'] = "Sabra_reporting@sabrahealth.com"
-    msg['To'] = receiver_email_list[-1] 
+    msg['To'] = receiver_email_list 
     
-    #plain_text = MIMEText(email_body, 'plain')
     html_part = MIMEText(email_body, 'html')
     # Attach both plain text and HTML messages
-    #msg.attach(plain_text)
     msg.attach(html_part)
 
     # Connect to SMTP2GO server and send email
@@ -555,8 +553,7 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
     return PL_date_header
 	
 @st.cache_data 
-def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month):
-    global email_body
+def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month,email_body):
     #check patient days,fill missing operating beds to reporting_month_data
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
     month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
@@ -603,7 +600,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
 		                "Patient Days": "Patient Days",
 		                "Operating Beds": "Operating Beds"},
 			    hide_index=True)
-        email_body= " <p>Please pay attention to the improper entries in the patient days:</p>"+"<ul>"+error_for_email+"</ul>"+"{dataframe_to_html(check_patient_days_display) if check_patient_days_display is not None else ""}"	
+        email_body= " <p>Please pay attention to the improper entries in the patient days:</p>"+"<ul>"+error_for_email+"</ul>"+"{check_patient_days_display.to_html()}"	
     if len(properties_fill_Aunit)>0:    
         BPC_pull_reset = BPC_pull.reset_index()
         # Apply filtering and selection
@@ -620,7 +617,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
         st.write(previous_A_unit_display) 
         Total_PL=pd.concat([Total_PL, previous_A_unit.set_index(["ENTITY","Sabra_Account"])[reporting_month]], axis=0)
-    return reporting_month_data,Total_PL   
+    return reporting_month_data,Total_PL,email_body
 
 @st.cache_data
 def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no): 
@@ -1100,7 +1097,7 @@ def View_Summary():
     check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
     #check if available unit changed by previous month
-    reporting_month_data,Total_PL=Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month)
+    reporting_month_data,Total_PL,email_body=Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month)
 	
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Balance Sheet"]
@@ -1126,7 +1123,7 @@ def View_Summary():
 			        "Category":"Account category",
 		                 reporting_month:reporting_month_display},
 			    hide_index=True)
-        email_body+= "<p> No data detected for below properties and accounts:</p>{dataframe_to_html(missing_category)}"
+        email_body+= "<p> No data detected for below properties and accounts:</p>{missing_category.to_html()}"
     reporting_month_data =reporting_month_data.pivot_table(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=reporting_month,aggfunc='last')
     reporting_month_data.reset_index(drop=False,inplace=True)
 
@@ -1165,7 +1162,7 @@ def View_Summary():
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
         summary_for_email= reporting_month_data[reporting_month_data["Sabra_Account"].isin(["Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"])]
-        email_body="<p>Here is the summary for your reference,:</p>{dataframe_to_html(summary_for_email) if summary_for_email is not None else ""}"+email_body
+        email_body="<p>Here is the summary for your reference,:</p>{summary_for_email.to_html()}"+email_body
         
 # no cache
 def Submit_Upload():
@@ -1911,7 +1908,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.session_state.selected_year = current_year
         if 'selected_month' not in st.session_state:
             st.session_state.selected_month = 'Jan'
-            st.write("st.session_state.selected_month",st.session_state.selected_month)
         st.write("st.session_state.selected_month",st.session_state.selected_month)
         global reporting_month,reporting_month_label,tenant_account_col,date_header
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
