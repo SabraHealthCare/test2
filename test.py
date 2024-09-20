@@ -592,10 +592,11 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
     if len(problem_properties)>0:
         check_patient_days_display=check_patient_days.loc[(problem_properties,slice(None)),reporting_month].reset_index(drop=False)
         check_patient_days_display=check_patient_days_display.pivot_table(index=["Property_Name"],columns="Category", values=reporting_month,aggfunc='last')
-        check_patient_days_display.reset_index(drop=True,inplace=True)    
+        check_patient_days_display.reset_index(inplace=True)    
         if "Operating Beds" not in check_patient_days_display.columns:
             check_patient_days_display["Operating Beds"]=0
             miss_all_A_unit=True
+        check_patient_days_display.columns.name=None
         check_patient_days_display=check_patient_days_display.rename(columns={"Property_Name": "Property"})
         st.dataframe(check_patient_days_display.style.map(color_missing, subset=["Patient Days","Operating Beds"]).format(precision=0, thousands=","),hide_index=True)
         
