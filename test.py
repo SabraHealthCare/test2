@@ -600,7 +600,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
 		                "Patient Days": "Patient Days",
 		                "Operating Beds": "Operating Beds"},
 			    hide_index=True)
-        email_body= " <p>Please pay attention to the improper entries in the patient days:</p>"+"<ul>"+error_for_email+"</ul>"+"{check_patient_days_display.to_html()}"	
+        email_body= f" <p>Please pay attention to the improper entries in the patient days:</p>"+"<ul>"+error_for_email+"</ul>"+"{check_patient_days_display.to_html()}"	
     if len(properties_fill_Aunit)>0:    
         BPC_pull_reset = BPC_pull.reset_index()
         # Apply filtering and selection
@@ -1162,7 +1162,7 @@ def View_Summary():
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
         summary_for_email= reporting_month_data[reporting_month_data["Sabra_Account"].isin(["Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"])]
-        email_body="<p>Here is the summary for your reference,:</p>{summary_for_email.to_html()}"+email_body
+        email_body=f"<p>Here is the summary for your reference:</p>{summary_for_email.to_html()}"+email_body
         
 # no cache
 def Submit_Upload():
