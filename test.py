@@ -600,7 +600,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
 		                "Patient Days": "Patient Days",
 		                "Operating Beds": "Operating Beds"},
 			    hide_index=True)
-        email_body= f" <p>Please pay attention to the improper entries in the patient days:</p>{check_patient_days_display.to_html()}"+"<ul>"+error_for_email+"</ul>"	
+        email_body= f" <p>Please pay attention to the improper entries in the patient days:</p>{check_patient_days_display.to_html(index=False)}"+"<ul>"+error_for_email+"</ul>"	
     if len(properties_fill_Aunit)>0:    
         BPC_pull_reset = BPC_pull.reset_index()
         # Apply filtering and selection
@@ -1112,7 +1112,7 @@ def View_Summary():
     full_category = pd.DataFrame(list(product(entity_list,category_list)), columns=['ENTITY', 'Category'])
     missing_category=full_category.merge(current_cagegory,on=['ENTITY', 'Category'],how="left")
     missing_category=missing_category[(missing_category[reporting_month]==0)|(missing_category[reporting_month].isnull())]
-    missing_category[reporting_month]="NA" 
+    missing_category[reporting_month]="Missing" 
 
     if missing_category.shape[0]>0:
         st.write("No data detected for below properties and accounts: ")
@@ -1123,7 +1123,7 @@ def View_Summary():
 			        "Category":"Account category",
 		                 reporting_month:reporting_month_display},
 			    hide_index=True)
-        email_body+= f"<p> No data detected for below properties and accounts:</p>{missing_category.to_html()}"
+        email_body+= f"<p> No data detected for below properties and accounts:</p>{missing_category.to_html(index=False)}"
     reporting_month_data =reporting_month_data.pivot_table(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=reporting_month,aggfunc='last')
     reporting_month_data.reset_index(drop=False,inplace=True)
 
