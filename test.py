@@ -1165,12 +1165,12 @@ def View_Summary():
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
         summary_for_email= reporting_month_data[reporting_month_data["Sabra_Account"].isin(["Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"])]  
-
-        summary_for_email=summary_for_email.reset_index(drop=True)
+        summary_for_email.reset_index(drop=True, inplace=True)
+        #summary_for_email=summary_for_email.reset_index(drop=True)
         summary_for_email.index.name=None
         st.write("summary_for_email",summary_for_email.index.name,summary_for_email.columns)
         #summary_for_email= reporting_month_data.drop('Property_Name', axis=1) 
-        email_body=f"<p>Here is the summary for your reference:</p>{summary_for_email.to_html(index=False)}"+email_body
+        email_body=f"<p>Here is the summaryyyyyy for your reference:</p>{summary_for_email.to_html(index=False)}"+email_body
         
 # no cache
 def Submit_Upload():
