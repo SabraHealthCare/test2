@@ -1873,7 +1873,7 @@ config = Read_File_From_Onedrive(mapping_path, "config.yaml","YAML")
 # Creating the authenticator object
 if config:
     authenticator = Authenticate(
-        config['credentials'],
+        config['credentials'], 
         config['cookie']['name'], 
         config['cookie']['key'], 
         config['cookie']['expiry_days'],
