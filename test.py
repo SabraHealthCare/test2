@@ -596,7 +596,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         if "Operating Beds" not in check_patient_days_display.columns:
             check_patient_days_display["Operating Beds"]=0
             miss_all_A_unit=True
-        check_patient_days_display=check_patient_days_display.renames({"Property_Name": "Property"})
+        check_patient_days_display=check_patient_days_display.rename(columns={"Property_Name": "Property"})
         st.dataframe(check_patient_days_display.style.map(color_missing, subset=["Patient Days","Operating Beds"]).format(precision=0, thousands=","),hide_index=True)
         
         email_body= f" <p>Please pay attention to the improper entries in the patient days:</p>{check_patient_days_display.to_html(index=False)}"+"<ul>"+error_for_email+"</ul>"	
