@@ -1169,7 +1169,7 @@ def View_Summary():
         summary_for_email=summary_for_email.reset_index(drop=True)
         summary_for_email.index.name=None
         st.write("summary_for_email",summary_for_email.index,summary_for_email)
-        #summary_for_email= reporting_month_data.drop('Property_Name', axis=1) 
+        summary_for_email= reporting_month_data.drop('Property_Name', axis=1) 
         email_body=f"<p>Here is the summary for your reference:</p>{summary_for_email.to_html(index=False)}"+email_body
         
 # no cache
