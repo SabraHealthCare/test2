@@ -1156,7 +1156,8 @@ def View_Summary():
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
-        summary_for_email= reporting_month_data[reporting_month_data["Sabra_Account"].isin(["Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"])][["Sabra_Account","Total"]+list(entity_columns)].astype(int)
+        summary_for_email= reporting_month_data[reporting_month_data["Sabra_Account"].isin(["Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"])][["Sabra_Account","Total"]+list(entity_columns)]
+        summary_for_email= reporting_month_data.astype(int)
         summary_for_email.columns.name = None 
 
         email_body=f"<p>Here is the summary for your reference:</p>{summary_for_email.to_html(index=False)}"+email_body
