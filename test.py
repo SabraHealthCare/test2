@@ -592,7 +592,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
     if len(problem_properties)>0:
         check_patient_days_display=check_patient_days.loc[(problem_properties,slice(None)),reporting_month].reset_index(drop=False)
         check_patient_days_display=check_patient_days_display.pivot_table(index=["Property_Name"],columns="Category", values=reporting_month,aggfunc='last')
-        check_patient_days_display.reset_index(inplace=True)    
+        check_patient_days_display.reset_index(inplace=True).astype(int)    
         if "Operating Beds" not in check_patient_days_display.columns:
             check_patient_days_display["Operating Beds"]=0
             miss_all_A_unit=True
@@ -1156,7 +1156,7 @@ def View_Summary():
         # Display the HTML using st.markdown
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
-        summary_for_email= reporting_month_data[reporting_month_data["Sabra_Account"].isin(["Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"])][["Sabra_Account","Total"]+list(entity_columns)]
+        summary_for_email= reporting_month_data[reporting_month_data["Sabra_Account"].isin(["Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"])][["Sabra_Account","Total"]+list(entity_columns)].astype(int)
         summary_for_email.columns.name = None 
         email_body=f"<p>Here is the summary for your reference:</p>{summary_for_email.to_html(index=False)}"+email_body
         
@@ -1192,15 +1192,14 @@ def Submit_Upload():
             new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
             Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
 
-    subject = "Confirmation of {} {} submission".format(operator,reporting_month_display)
-    body = "Thank you for your submission! We have received  {} {} reporting data.".format(operator,reporting_month_display)
+    subject = "Confirmation of {} {} reporting".format(operator,reporting_month_display)
     receiver_email_list=["sli@sabrahealth.com","shaperi@gmail.com"]
     # Send the confirmation email
     email_body= f"""
     <html>
     <body>
         <p>Dear {operator} team,</p>
-	<p>Thank you for your submission! We have received {reporting_month_display} reporting data.</p>"""+email_body+f"""<p>Best regards,</p>
+	<p>Thanks for submitting {operator} {reporting_month_display} reporting data.</p>"""+email_body+f"""<p>Best regards,</p>
         <p>Sabra Health Team</p>
     </body>
     </html>"""
