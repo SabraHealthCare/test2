@@ -280,13 +280,14 @@ def Initial_Mapping(operator):
     if account_mapping.shape[0] == 1 and account_mapping["Sabra_Account"].iloc[0] == 'Template':
         account_mapping = account_mapping_all[account_mapping_all["Operator"] == "Template"].copy()
         account_mapping["Operator"] = operator	
-
+    st.write("account_mapping1",account_mapping)
     # Clean and format account mapping columns
     account_mapping_cols = ["Sabra_Account", "Sabra_Second_Account", "Tenant_Account"]
     account_mapping[account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")
     account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion","Category"]]
-    st.write("account_mapping",account_mapping)  				  
+    st.write("account_mapping2",account_mapping) 
+    st.write(3)
     entity_mapping=Read_File_From_Onedrive(mapping_path,entity_mapping_filename,"CSV",entity_mapping_str_col)
     entity_mapping = (Read_File_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
                   .reset_index(drop=True)
