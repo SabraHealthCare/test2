@@ -1158,11 +1158,9 @@ def View_Summary():
             summary_for_email= reporting_month_data[reporting_month_data["Sabra_Account"].isin(["Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"])][["Sabra_Account"]+list(entity_columns)]
 	
         numeric_cols = summary_for_email.columns.difference(['Sabra_Account'])
-        # Convert the identified numeric columns to integers
-        reporting_month_data[numeric_cols] = reporting_month_data[numeric_cols].astype(int)
+        summary_for_email[numeric_cols] = summary_for_email[numeric_cols].astype(int)
 
-# Now the DataFrame has numeric columns as integers, while 'Sabra_Account' remains unchanged
-summary_for_email = reporting_month_datasummary_for_email.columns.name = None 
+        summary_for_email.columns.name = None 
         email_body=f"<p>Here is the summary for your reference:</p>{summary_for_email.to_html(index=False)}"+email_body
         
 # no cache
