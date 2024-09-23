@@ -1154,7 +1154,7 @@ def View_Summary():
         st.write("")
         if len(reporting_month_data.columns)>3:
             summary_for_email= reporting_month_data[reporting_month_data["Sabra_Account"].isin(["Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"])][["Sabra_Account","Total"]+list(entity_columns)]
-	else: 
+        else: 
             summary_for_email= reporting_month_data[reporting_month_data["Sabra_Account"].isin(["Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"])][["Sabra_Account"]+list(entity_columns)]
 	
         numeric_cols = summary_for_email.columns.difference(['Sabra_Account'])
