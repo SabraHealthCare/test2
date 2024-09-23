@@ -1163,7 +1163,6 @@ def View_Summary():
 
 # Now the DataFrame has numeric columns as integers, while 'Sabra_Account' remains unchanged
 summary_for_email = reporting_month_datasummary_for_email.columns.name = None 
-
         email_body=f"<p>Here is the summary for your reference:</p>{summary_for_email.to_html(index=False)}"+email_body
         
 # no cache
