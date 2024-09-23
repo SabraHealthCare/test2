@@ -248,7 +248,6 @@ def Update_File_Onedrive(path,file_name,new_data,operator,file_type="CSV",entity
         updated_data = new_data.drop(columns='index', errors='ignore')
     return Save_File_To_Onedrive(updated_data,path,file_name,file_type)  # return True False
 
-#
 def Format_Value(column):
     def format_value(x):
         if pd.isna(x) or (isinstance(x, str) and x.strip() == "") or x == 0:
@@ -264,7 +263,6 @@ def clicked(button_name):
 
 # No cache
 def Initial_Mapping(operator):
-    st.write("operator",operator)
 
     BPC_pull=Read_File_From_Onedrive(mapping_path,BPC_pull_filename,"CSV")
     BPC_pull = (BPC_pull[BPC_pull["Operator"] == operator]
@@ -283,14 +281,9 @@ def Initial_Mapping(operator):
     st.write("account_mapping1",account_mapping)
     # Clean and format account mapping columns
     account_mapping_cols = ["Sabra_Account", "Sabra_Second_Account", "Tenant_Account"]
-    st.write("BPC_Account",BPC_Account)
     account_mapping[account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
-    st.write("account_mapping2",account_mapping)
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")
-    st.write("account_mapping3",account_mapping)
     account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion","Category"]]
-    st.write("account_mapping4",account_mapping) 
-    st.write(3)
     entity_mapping=Read_File_From_Onedrive(mapping_path,entity_mapping_filename,"CSV",entity_mapping_str_col)
     entity_mapping = (Read_File_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
                   .reset_index(drop=True)
@@ -1911,7 +1904,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.session_state.selected_year = current_year
         if 'selected_month' not in st.session_state:
             st.session_state.selected_month = 'Jan'
-        st.write("st.session_state.selected_month",st.session_state.selected_month)
+        
         global reporting_month,reporting_month_label,tenant_account_col,date_header
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
 	
