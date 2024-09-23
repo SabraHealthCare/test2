@@ -1,4 +1,3 @@
-
 import pandas as pd
 pd.set_option('future.no_silent_downcasting', True) 
 import numpy as np 
@@ -265,12 +264,14 @@ def clicked(button_name):
 
 # No cache
 def Initial_Mapping(operator):
+    st.write("operator",operator)
+
     BPC_pull=Read_File_From_Onedrive(mapping_path,BPC_pull_filename,"CSV")
     BPC_pull = (BPC_pull[BPC_pull["Operator"] == operator]
             .set_index(["ENTITY", "Sabra_Account"])
             .dropna(axis=1, how='all')
             .rename(columns=str))
-
+    st.write("BPC_pull",BPC_pull)
     # Read account mapping file from OneDrive
     account_mapping_all = Read_File_From_Onedrive(mapping_path,account_mapping_filename,"XLSX",account_mapping_str_col)
     account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
@@ -285,13 +286,14 @@ def Initial_Mapping(operator):
     account_mapping[account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")
     account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion","Category"]]
-     				  
+    st.write("account_mapping",account_mapping)  				  
     entity_mapping=Read_File_From_Onedrive(mapping_path,entity_mapping_filename,"CSV",entity_mapping_str_col)
     entity_mapping = (Read_File_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
                   .reset_index(drop=True)
                   .query("Operator == @operator")
                   .set_index("ENTITY"))
     entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]] = entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]].astype(str)
+    st.write("entity_mapping",entity_mapping)  
     return BPC_pull,entity_mapping,account_mapping
 
 	
