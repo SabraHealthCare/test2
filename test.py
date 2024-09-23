@@ -1158,6 +1158,7 @@ def View_Summary():
             summary_for_email= reporting_month_data[reporting_month_data["Sabra_Account"].isin(["Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"])][["Sabra_Account"]+list(entity_columns)]
 	
         numeric_cols = summary_for_email.columns.difference(['Sabra_Account'])
+        st.write("numeric_cols",numeric_cols)
         summary_for_email[numeric_cols] = summary_for_email[numeric_cols].astype(int)
 
         summary_for_email.columns.name = None 
