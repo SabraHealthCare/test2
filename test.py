@@ -1185,7 +1185,7 @@ def Submit_Upload():
         if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
             st.write(" unsuccess")  #----------record into error report------------------------	
     if uploaded_other_docs:
-        for file in uploaded_other_docs:
+        for file in uploaded_other_docs: 
 	    # create new file name by adding reporting_month at the end of original filename    
             original_file_name = file.name
             file_name, file_extension = original_file_name.rsplit('.', 1)
