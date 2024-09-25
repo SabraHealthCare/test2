@@ -391,14 +391,8 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     # Return the top columns with the highest match counts
     top_matches = [match[1] for match in match_counts if match[0] > 0]
     if len(top_matches)>0:
+        st.write("top_matches",sheet_name,top_matches)
         return top_matches # return a list of col index
-    #if match_counts and match_counts[0][0] > 0:
-        #top_matches = [match_counts[0][1]]
-        #if len(match_counts) > 1 and match_counts[1][0] > 0:
-            #top_matches.append(match_counts[1][1])
-        #if len(match_counts) > 2 and match_counts[2][0] > 0:
-            #top_matches.append(match_counts[2][1])
-        #return top_matches
     
     # If no match is found, raise an error
     st.error(f"Failed to identify tenant account columns in {sheet_type_name} sheet —— {sheet_name}")
