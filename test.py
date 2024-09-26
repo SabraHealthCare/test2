@@ -1562,10 +1562,9 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
                 current_col = PL.iloc[:, col_idx].fillna('')
                 # Fill missing values in the combined column with values from the current column
                 combined_col = combined_col.where(combined_col != '', current_col)
-            st.write("combined_col",combined_col)
+            #st.write("combined_col",combined_col)
             # Assign the combined result back to the first column
             PL.iloc[:, tenantAccount_col_no_list[0]] = combined_col
-
 
         tenantAccount_col_no=tenantAccount_col_no_list[0]
         #set tenant_account as index of PL
@@ -1655,21 +1654,21 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
         tenant_account_col=tenantAccount_col_no_list  # for pre-compare
-        #st.write("tenantAccount_col_no_list",tenantAccount_col_no_list)
-        if len(tenantAccount_col_no_list)>=2:
-            col1 = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
-            col2 = PL.iloc[:, tenantAccount_col_no_list[1]].fillna('')
-            if len(tenantAccount_col_no_list) == 3:
-                col3 = PL.iloc[:, tenantAccount_col_no_list[2]].fillna('')
-                col1 = col1.where(col1 != '', col3)
-                col1 = col1.where(col1 != '', col2)
-            else:
-                col1 = col1.where(col1 != '', col2)
-            # Combine the columns: if col1 has a missing value, fill it with the value from col2
-            PL.iloc[:, tenantAccount_col_no_list[0]] = col1
+
+        if len(tenantAccount_col_no_list) > 1:
+            # Start with the first column
+            combined_col = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
+
+            # Iterate over the rest of the columns and combine them
+            for col_idx in tenantAccount_col_no_list[1:]:
+                current_col = PL.iloc[:, col_idx].fillna('')
+                # Fill missing values in the combined column with values from the current column
+                combined_col = combined_col.where(combined_col != '', current_col)
+            #st.write("combined_col",combined_col)
+            # Assign the combined result back to the first column
+            PL.iloc[:, tenantAccount_col_no_list[0]] = combined_col
         
         tenantAccount_col_no=tenantAccount_col_no_list[0]
-
         #set tenant_account as index of PL
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
         date_header=Identify_Month_Row(PL,sheet_name,date_header,tenantAccount_col_no)
