@@ -611,7 +611,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
     return reporting_month_data,Total_PL,email_body
 
 @st.cache_data
-def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no): 
+def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_col_no): 
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
@@ -757,9 +757,11 @@ def Identify_Month_Row(PL,sheet_name,pre_date_header,tenantAccount_col_no):
 
             for col_i in valid_col_index:
                 column = PL.iloc[0:first_tenant_account_row, col_i].reset_index(drop=True)
-                if column.astype(str).str.contains('current month', case=False, na=False).any():
+                if column.astype(str).str.contains('current month', case=False, na=False).any() or \
+		    (sheet_type=="Sheet_Name_Occupancy" and column.astype(str).str.contains('#\\s*of\\s*days|total', case=False, na=False).any()):
                     current_month_cols.append(col_i)
                     current_month_rows = column.index[column.astype(str).str.contains('current month', case=False, na=False)][0]
+		
                 
             if len(current_month_cols)==1:
                 PL_date_header = [0] * PL_col_size
@@ -1671,7 +1673,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         tenantAccount_col_no=tenantAccount_col_no_list[0]
         #set tenant_account as index of PL
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
-        date_header=Identify_Month_Row(PL,sheet_name,date_header,tenantAccount_col_no)
+        date_header=Identify_Month_Row(PL,sheet_name,sheet_type,date_header,tenantAccount_col_no)
         if len(date_header[0])==0:
             return pd.DataFrame()
         if all(x=="0" or x==0 for x in date_header[0]):
