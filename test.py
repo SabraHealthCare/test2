@@ -948,16 +948,19 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
     return account_mapping
 	
 @st.cache_data 
-def Map_PL_Sabra(PL,entity,sheet_type):
+def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     # remove no need to map from account_mapping
-    if sheet_type=="Sheet_Name_Finance":  
-        account_pool=account_mapping[account_mapping["Sabra_Account"]!= "NO NEED TO MAP"]
+    account_pool=account_mapping[account_mapping["Sabra_Account"]!= "NO NEED TO MAP"]
+	
+    #if sheet_type=="Sheet_Name_Finance":  
+        #account_pool=account_mapping[account_mapping["Sabra_Account"]!= "NO NEED TO MAP"]
 	  
-    elif sheet_type=="Sheet_Name_Occupancy":
-        account_pool=account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Category"] == "Facility Information")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]
+    #elif sheet_type=="Sheet_Name_Occupancy":
+        #account_pool=account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Category"] == "Facility Information")|\
+	             #(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]
         #st.write("account_mapping",account_mapping)
-    elif sheet_type=="Sheet_Name_Balance_Sheet":
-        account_pool=account_mapping.loc[account_mapping["Category"]=="Balance Sheet"]
+    #elif sheet_type=="Sheet_Name_Balance_Sheet":
+        #account_pool=account_mapping.loc[account_mapping["Category"]=="Balance Sheet"]
     
     main_account_mapping = account_pool.loc[account_pool["Sabra_Account"].apply(lambda x: pd.notna(x) and x.upper() != "NO NEED TO MAP")]
         # Concatenate main accounts with second accounts
@@ -1549,7 +1552,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
     #st.write("sheet_name",sheet_name,"PL",PL)
     # Start checking process
     if True:   
-        tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
+        tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
         tenant_account_col=tenantAccount_col_no_list  # for pre-compare
 
         if len(tenantAccount_col_no_list) >= 2:
@@ -1624,9 +1627,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
                 st.error("Duplicated accounts detected in {} sheet '{}'. Please rectify them to avoid repeated calculations: **{}** ".format(sheet_type_name,sheet_name,", ".join(dup_tenant_account)))
 	    
         # Map PL accounts and Sabra account
-        #PL,PL_with_detail=Map_PL_Sabra(PL,entity_list) 
 	# map sabra account with tenant account, groupby sabra account
-        PL=Map_PL_Sabra(PL,entity_list,sheet_type) # index are ('ENTITY',"Sabra_Account")
+        PL=Map_PL_Sabra(PL,entity_list,sheet_type,account_pool) # index are ('ENTITY',"Sabra_Account")
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
     return PL
@@ -1664,7 +1666,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         return pd.DataFrame()
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
-        tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool,tenant_account_col)
+        tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
         tenant_account_col=tenantAccount_col_no_list  # for pre-compare
         #st.write("tenantAccount_col_no_list",tenantAccount_col_no_list)
         if len(tenantAccount_col_no_list)>=2:
@@ -1728,8 +1730,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
             if len(dup_tenant_account)>0:
                 st.error("Duplicated accounts detected in {} sheet '{}'. Please rectify them to avoid repeated calculations: **{}** ".format(sheet_type_name,sheet_name,", ".join(dup_tenant_account)))
         # Map PL accounts and Sabra account
-        #PL,PL_with_detail=Map_PL_Sabra(PL,entity_i,sheet_type) 
-        PL=Map_PL_Sabra(PL,entity_i,sheet_type) 
+        PL=Map_PL_Sabra(PL,entity_i,sheet_type,account_pool) 
     #return PL,PL_with_detail
     return PL
        
@@ -1743,13 +1744,13 @@ def Upload_And_Process(uploaded_file,file_type):
     total_entity_list=list(entity_mapping.index)
     Occupancy_in_one_sheet=[]
     BS_in_one_sheet=[]
-    account_pool_full=account_mapping["Tenant_Account"]	
+    account_pool_full=account_mapping.copy()
     account_pool_patient_days = account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")|(account_mapping["Category"] == "Patient Days")|\
 	                        (account_mapping["Category"] == "Facility Information")|\
 	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS'])) |\
-	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']) ) ]["Tenant_Account"]		  
-    account_pool_balance_sheet= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]["Tenant_Account"]	
-    #st.write("account_pool_patient_days",account_pool_patient_days,"account_pool_balance_sheet",account_pool_balance_sheet)
+	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]	  
+    account_pool_balance_sheet= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]	
+    st.write("account_pool_patient_days",account_pool_patient_days,"account_pool_balance_sheet",account_pool_balance_sheet)
     # ****Finance and BS in one excel****
     if file_type=="Finance":
         tenant_account_col=[10000]
