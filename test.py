@@ -1744,9 +1744,12 @@ def Upload_And_Process(uploaded_file,file_type):
     Occupancy_in_one_sheet=[]
     BS_in_one_sheet=[]
     account_pool_full=account_mapping["Tenant_Account"]	
-    account_pool_patient_days = account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")|(account_mapping["Category"] == "Patient Days")|(account_mapping["Category"] == "Facility Information")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]["Tenant_Account"]		  
+    account_pool_patient_days = account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")|(account_mapping["Category"] == "Patient Days")|\
+	                        (account_mapping["Category"] == "Facility Information")|\
+	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS'])) |\
+	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']) ) ]["Tenant_Account"]		  
     account_pool_balance_sheet= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]["Tenant_Account"]	
-    st.write("account_pool_patient_days",account_pool_patient_days,"account_pool_balance_sheet",account_pool_balance_sheet)
+    #st.write("account_pool_patient_days",account_pool_patient_days,"account_pool_balance_sheet",account_pool_balance_sheet)
     # ****Finance and BS in one excel****
     if file_type=="Finance":
         tenant_account_col=[10000]
