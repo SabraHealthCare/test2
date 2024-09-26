@@ -310,9 +310,10 @@ class Authenticate:
 
                 
                 if st.session_state.clicked["forgot_password_button"]:
-                    st.write(random_password)
+                    
                     try:
                         username_forgot_pw, email_forgot_password, random_password = self.forgot_password('Forgot password')
+                        st.write(random_password)
                         if username_forgot_pw:
                             self.save_credentials_to_yaml(config)
                             self.send_email(username_forgot_pw,email_forgot_password,random_password)
