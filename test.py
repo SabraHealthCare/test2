@@ -374,11 +374,13 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     
     # Check the pre-identified columns first
     if pre_max_match_col != [10000] and pre_max_match_col[0] < PL.shape[1] and len(pre_max_match_col)==1:
+
         for i in range(len(pre_max_match_col)):
             match_count, non_empty_count = get_match_count(pre_max_match_col[i])
-            st.write("error")
+            st.write("pre_max_match_col",pre_max_match_col)
             if match_count > 0 and (match_count > 1 or match_count / non_empty_count > 0.2):
-                if i == len(pre_max_match_col) - 1:
+                if i == len(pre_max_match_col)-1
+                    st.write("use pre_max_match_col")
                     return pre_max_match_col
     
     # If pre-identified columns are not sufficient, search for potential matches across the first 15 columns
