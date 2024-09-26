@@ -282,7 +282,7 @@ def Initial_Mapping(operator):
     account_mapping[account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")
     account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion","Category"]]
-    st.write("account_mapping",account_mapping)
+  
     entity_mapping=Read_File_From_Onedrive(mapping_path,entity_mapping_filename,"CSV",entity_mapping_str_col)
     entity_mapping = (Read_File_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
                   .reset_index(drop=True)
@@ -367,8 +367,10 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
 
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].fillna('').astype(str).str.strip().str.upper()
+        st.write("candidate_col",candidate_col)
         non_empty_col = candidate_col[candidate_col != '']
         match_count = sum(candidate_col.isin(account_pool))
+        st.write("match_count",match_count)
         return match_count, len(non_empty_col)
     
     # Check the pre-identified columns first
@@ -382,6 +384,7 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     # If pre-identified columns are not sufficient, search for potential matches across the first 15 columns
     match_counts = []
     for col in range(min(15, PL.shape[1])):
+        st.write("account_pool",account_pool)
         match_count, _ = get_match_count(col)
         match_counts.append((match_count, col))
     
