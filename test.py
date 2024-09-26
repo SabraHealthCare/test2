@@ -363,7 +363,6 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 # Parse the df and get filter widgets based for provided columns
 		
 def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, pre_max_match_col):
-    
     #st.write("sheet_name",sheet_name,"account_pool",account_pool)
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].fillna('').astype(str).str.strip().str.upper()
@@ -1563,7 +1562,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
                 current_col = PL.iloc[:, col_idx].fillna('')
                 # Fill missing values in the combined column with values from the current column
                 combined_col = combined_col.where(combined_col != '', current_col)
-                st.write("combined_col",combined_col)
+            st.write("combined_col",combined_col)
             # Assign the combined result back to the first column
             PL.iloc[:, tenantAccount_col_no_list[0]] = combined_col
 
@@ -1738,7 +1737,7 @@ def Upload_And_Process(uploaded_file,file_type):
 	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS'])) |\
 	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]	  
     account_pool_balance_sheet= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]	
-    st.write("account_pool_patient_days",account_pool_patient_days,"account_pool_balance_sheet",account_pool_balance_sheet)
+    
     # ****Finance and BS in one excel****
     if file_type=="Finance":
         tenant_account_col=[10000]
