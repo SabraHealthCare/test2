@@ -369,25 +369,23 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
         candidate_col = PL.iloc[:, col_index].fillna('').astype(str).str.strip().str.upper()
         non_empty_col = candidate_col[candidate_col != '']
         match_count = sum(candidate_col.isin(account_pool))
-        st.write("candidate_col,match_count",candidate_col,match_count)
+        if match_count>3:
+            st.write("candidate_col,match_count",candidate_col,match_count)
         return match_count, len(non_empty_col)
     
     # Check the pre-identified columns first
     if pre_max_match_col != [10000] and pre_max_match_col[0] < PL.shape[1] and len(pre_max_match_col)==1:
-
         for i in range(len(pre_max_match_col)):
             match_count, non_empty_count = get_match_count(pre_max_match_col[i])
-            st.write("pre_max_match_col",pre_max_match_col)
             if match_count > 0 and (match_count > 1 or match_count / non_empty_count > 0.2):
                 if i == len(pre_max_match_col)-1:
-                    st.write("use pre_max_match_col")
+                    st.write("_______________________________use pre_max_match_col_______________________")
                     return pre_max_match_col
     
     # If pre-identified columns are not sufficient, search for potential matches across the first 15 columns
     match_counts = []
     for col in range(min(15, PL.shape[1])):
         match_count, _ = get_match_count(col)
-        st.write("match_count",match_count)
         match_counts.append((match_count, col))
     
     # Sort by match count in descending order
@@ -396,6 +394,7 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     # Return the top columns with the highest match counts
     top_matches = [match[1] for match in match_counts if match[0] > 0]
     if len(top_matches)>0:
+        st.write("*******************final top_matches*******************************",top_matches)
         return top_matches # return a list of col index
     
     # If no match is found, raise an error
