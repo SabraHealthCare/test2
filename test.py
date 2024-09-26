@@ -757,10 +757,12 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
 
             for col_i in valid_col_index:
                 column = PL.iloc[0:first_tenant_account_row, col_i].reset_index(drop=True)
-                if column.astype(str).str.contains('current month', case=False, na=False).any() or \
-		    (sheet_type=="Sheet_Name_Occupancy" and column.astype(str).str.contains('#\\s*of\\s*days|total', case=False, na=False).any()):
+                if column.astype(str).str.contains('current month', case=False, na=False).any():
                     current_month_cols.append(col_i)
                     current_month_rows = column.index[column.astype(str).str.contains('current month', case=False, na=False)][0]
+                elif sheet_type=="Sheet_Name_Occupancy" and column.astype(str).str.contains('#\\s*of\\s*days|total', case=False, na=False).any():
+                    current_month_cols.append(col_i)
+                    current_month_rows = column.index[column.astype(str).str.contains('#\\s*of\\s*days|total', case=False, na=False)][0]
 		
                 
             if len(current_month_cols)==1:
