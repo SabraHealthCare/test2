@@ -364,7 +364,7 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 		
 def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, pre_max_match_col):
     
-    st.write("sheet_name",sheet_name)
+    st.write("sheet_name",sheet_name,"account_pool",account_pool)
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].fillna('').astype(str).str.strip().str.upper()
         non_empty_col = candidate_col[candidate_col != '']
