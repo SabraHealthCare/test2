@@ -383,8 +383,8 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     
     # If pre-identified columns are not sufficient, search for potential matches across the first 15 columns
     match_counts = []
+    st.write("sheet_name",sheet_name)
     for col in range(min(15, PL.shape[1])):
-        st.write("account_pool",account_pool)
         match_count, _ = get_match_count(col)
         match_counts.append((match_count, col))
     
