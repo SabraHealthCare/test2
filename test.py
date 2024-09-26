@@ -363,6 +363,7 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 # Parse the df and get filter widgets based for provided columns
 		
 def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, pre_max_match_col):
+    
     st.write("sheet_name",sheet_name)
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].fillna('').astype(str).str.strip().str.upper()
@@ -1740,9 +1741,9 @@ def Upload_And_Process(uploaded_file,file_type):
     total_entity_list=list(entity_mapping.index)
     Occupancy_in_one_sheet=[]
     BS_in_one_sheet=[]
-    account_pool_full=account_mapping.loc[account_mapping["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Account"]	
-    account_pool_patient_days = account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Category"] == "Facility Information")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]["Tenant_Account"]		  
-    account_pool_balance_sheet=account_mapping.loc[account_mapping["Category"]=="Balance Sheet"]["Tenant_Account"]	
+    account_pool_full=account_mapping["Tenant_Account"]	
+    account_pool_patient_days = account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")|(account_mapping["Category"] == "Patient Days")|(account_mapping["Category"] == "Facility Information")|(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]["Tenant_Account"]		  
+    account_pool_balance_sheet=account_mapping.loc[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| account_mapping["Category"]=="Balance Sheet"]["Tenant_Account"]	
 
     # ****Finance and BS in one excel****
     if file_type=="Finance":
