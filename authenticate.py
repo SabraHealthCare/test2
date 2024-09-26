@@ -302,8 +302,8 @@ class Authenticate:
                 def clicked(button_name):
                     st.session_state.clicked[button_name] = True
                 col1,col2=st.columns([25,10])
-                #with col1:
-                    #st.button('Forgot password', on_click=clicked, args=["forgot_password_button"])
+                with col1:
+                    st.button('Forgot password', on_click=clicked, args=["forgot_password_button"])
                 #with col2:
                     #st.button('Forgot username', on_click=clicked, args=["forgot_username_button"])
 
@@ -312,6 +312,7 @@ class Authenticate:
                     try:
                         username_forgot_pw, email_forgot_password, random_password = self.forgot_password('Forgot password')
                         if username_forgot_pw:
+                            st.write(random_password)
                             self.save_credentials_to_yaml(config)
                             self.send_email(username_forgot_pw,email_forgot_password,random_password)
            
