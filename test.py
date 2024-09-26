@@ -363,21 +363,19 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 # Parse the df and get filter widgets based for provided columns
 		
 def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, pre_max_match_col):
-    # Helper function to clean and match candidate columns
-
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].fillna('').astype(str).str.strip().str.upper()
-        st.write("candidate_col",candidate_col)
         non_empty_col = candidate_col[candidate_col != '']
         match_count = sum(candidate_col.isin(account_pool))
-        st.write("match_count",match_count)
         return match_count, len(non_empty_col)
     
     # Check the pre-identified columns first
     if pre_max_match_col != [10000] and pre_max_match_col[0] < PL.shape[1]:
+        st.write("pre_max_match_col",pre_max_match_col)
         for i in range(len(pre_max_match_col)):
             match_count, non_empty_count = get_match_count(pre_max_match_col[i])
             if match_count > 0 and (match_count > 1 or match_count / non_empty_count > 0.2):
+                st.write("match_count>0",match_count)
                 if i == len(pre_max_match_col) - 1:
                     return pre_max_match_col
     
