@@ -1394,16 +1394,14 @@ def Is_Reporting_Month(single_string):
     if isinstance(single_string, (int,float)):
         return False
     single_string=str(single_string).lower()
-    if single_string in month_dic_word[int(month)]:
+    if any([month_i in single_string for month_i in month_dic_word[int(month)]):
         return True
     if (year in single_string) or (year[2:4] in single_string):
         st.write("Year is in singlestring")
         single_string=single_string.replace(year,"").replace(year[2:4],"").replace("30","").replace("31","").replace("29","").replace("28","").\
 	              replace("/","").replace("-","").replace(" ","").replace("_","").replace("asof","").replace("actual","").replace("mtd","")
-        st.write("rest of string",single_string)
-        st.write(month_dic_num[int(month)])  
+
         if str(int(month)) in single_string: 
-            st.write(4)
             return True
     return False
 
@@ -1451,9 +1449,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
 	    # there may has more than one month for each property, only find the column of reporting month
             # Check reporting month above first_tenant_account_row
             mask_table = PL.iloc[0:first_tenant_account_row,:].applymap(Is_Reporting_Month)
-            st.write("first_tenant_account_row",first_tenant_account_row, PL.iloc[0:first_tenant_account_row,:])
             month_counts=pd.Series(np.sum(mask_table.values, axis=1))		
-            st.write("month_counts",month_counts)
             if all(month_count==0 for month_count in month_counts): # there is no month
                 st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
                 st.stop()
