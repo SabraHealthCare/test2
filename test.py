@@ -1401,6 +1401,9 @@ def Is_Reporting_Month(single_string):
         st.write("Year is in singlestring")
         single_string=single_string.replace(year,"").replace(year[2:4],"").replace("30","").replace("31","").replace("29","").replace("28","").\
 	              replace("/","").replace("-","").replace(" ","").replace("_","").replace("asof","").replace("actual","").replace("mtd","")
+        st.write("single_string",single_string)
+        st.write(month_dic_num[int(month)],any(month_i in single_string for month_i in month_dic_num[int(month)]))
+	    
         if any(month_i in single_string for month_i in month_dic_num[int(month)]):
             st.write(4)
             return True
