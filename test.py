@@ -1443,9 +1443,9 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
         rest_column_names=[str(x) for x in PL.iloc[max_match_row,:] if pd.notna(x) and str(x).upper().strip() not in column_name_list_in_mapping]
         duplicate_check = [name for name in set(max_match) if max_match.count(name) > 1]
         if len(duplicate_check)>0:
-	    # there may has more than one month for each property, only select reporting month data
+	    # there may has more than one month for each property, only find the column of reporting month
             # Check reporting month above first_tenant_account_row
-            mask_table = PL.iloc[0:first_tenant_account_row-1,:].applymap(Is_Reporting_Month)
+            mask_table = PL.iloc[0:first_tenant_account_row,:].applymap(Is_Reporting_Month)
             month_counts=pd.Series(np.sum(mask_table.values, axis=1))		
           
             if all(month_count==0 for month_count in month_counts): # there is no month
