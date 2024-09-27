@@ -1389,20 +1389,18 @@ def Is_Reporting_Month(single_string):
     year=reporting_month[0:4]
     st.write("single_string",single_string)
     if single_string!=single_string or pd.isna(single_string):
-        st.write(0)
         return False
     if isinstance(single_string, datetime) and int(single_string.month)==int(month):
-        st.write(1)
         return True
     if isinstance(single_string, (int,float)):
-        st.write(2)
         return False
     single_string=str(single_string).lower()
     if single_string in month_dic_word[int(month)]:
-        st.write(3)
         return True
-    if year in single_string or year[2:4] in single_string:    
+    if (year in single_string) or (year[2:4] in single_string):
+        st.write("Year is in singlestring")
         single_string=single_string.replace(year,"").replace(year[2:4],"").replace("30","").replace("31","").replace("29","").replace("28","")
+        st.write("rest",single_string)
         if any(month_i in single_string for month_i in month_dic_num[int(month)]):
             st.write(4)
             return True
