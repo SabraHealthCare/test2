@@ -1394,7 +1394,7 @@ def Is_Reporting_Month(single_string):
     if isinstance(single_string, (int,float)):
         return False
     single_string=str(single_string).lower()
-    if any([month_i in single_string for month_i in month_dic_word[int(month)]):
+    if any([month_i in single_string for month_i in month_dic_word[int(month)]]):
         return True
     if (year in single_string) or (year[2:4] in single_string):
         st.write("Year is in singlestring")
