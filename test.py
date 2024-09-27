@@ -1208,7 +1208,7 @@ def Submit_Upload():
     </body>
     </html>"""
 
-    Send_Confirmation_Email(receiver_email_list, subject, email_body)    
+    #Send_Confirmation_Email(receiver_email_list, subject, email_body)    
 
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
@@ -1387,18 +1387,24 @@ def View_Discrepancy():
 def Is_Reporting_Month(single_string):
     month=reporting_month[4:6]
     year=reporting_month[0:4]
+    st.write("single_string",single_string)
     if single_string!=single_string or pd.isna(single_string):
+        st.write(0)
         return False
     if isinstance(single_string, datetime) and int(single_string.month)==int(month):
+        st.write(1)
         return True
     if isinstance(single_string, (int,float)):
+        st.write(2)
         return False
     single_string=str(single_string).lower()
     if single_string in month_dic_word[int(month)]:
+        st.write(3)
         return True
     if year in single_string or year[2:4] in single_string:    
         single_string=single_string.replace(year,"").replace(year[2:4],"").replace("30","").replace("31","").replace("29","").replace("28","")
         if any(month_i in single_string for month_i in month_dic_num[int(month)]):
+            st.write(4)
             return True
     return False
 
