@@ -1419,7 +1419,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
     for row_i in range(first_tenant_account_row):
         canditate_row=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[row_i,:])))  
         match_names = [item for item in canditate_row if item in column_name_list_in_mapping] 
-	# found the property name header row, transferred them into entity id
+	# find the property name header row, transferred them into entity id
         if len(match_names)>0 and sorted(match_names)==sorted(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: 
            # property name column header is unique and match with entity mapping
             mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(column_name_list_in_mapping))}
@@ -1443,8 +1443,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
         rest_column_names=[str(x) for x in PL.iloc[max_match_row,:] if pd.notna(x) and str(x).upper().strip() not in column_name_list_in_mapping]
         duplicate_check = [name for name in set(max_match) if max_match.count(name) > 1]
         if len(duplicate_check)>0:
-		
-	    # there may has more than one months data in P&L, only select reporting month data
+	    # there may has more than one month for each property, only select reporting month data
             # Check reporting month above first_tenant_account_row
             mask_table = PL.iloc[0:first_tenant_account_row-1,:].applymap(Is_Reporting_Month)
             month_counts=pd.Series(np.sum(mask_table.values, axis=1))		
