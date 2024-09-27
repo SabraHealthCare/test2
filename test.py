@@ -1439,7 +1439,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
         st.error("Fail to identify facility name header in sheet '{}'. The previous header names are as below. Please add and re-upload.".format(sheet_name))
         st.write(',    '.join(column_name_list_in_mapping))
         st.stop()
-    elif len(max_match)>0: # only part of entities have column name in P&L 
+    elif len(max_match)>0: # only part of entities have column name in P&L  
         rest_column_names=[str(x) for x in PL.iloc[max_match_row,:] if pd.notna(x) and str(x).upper().strip() not in column_name_list_in_mapping]
         duplicate_check = [name for name in set(max_match) if max_match.count(name) > 1]
         if len(duplicate_check)>0:
