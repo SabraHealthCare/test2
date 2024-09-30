@@ -1619,7 +1619,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 	    
         # Map PL accounts and Sabra account
 	# map sabra account with tenant account, groupby sabra account
-        st.write("sheet_type",sheet_type,"PL",PL,"account_pool",account_pool)
+        #st.write("sheet_type",sheet_type,"PL",PL,"account_pool",account_pool)
         PL=Map_PL_Sabra(PL,entity_list,sheet_type,account_pool) # index are ('ENTITY',"Sabra_Account")
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
@@ -1747,14 +1747,10 @@ def Upload_And_Process(uploaded_file,file_type):
     if file_type=="Finance":
         tenant_account_col=[10000]
         for entity_i in total_entity_list:   # entity_i is the entity code S number
-	    # properties in seperate sheet 
+	    # properties are in seperate sheet 
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
-                #st.write("just read PL",PL)
-                if Total_PL.shape[0]==0:
-                    Total_PL=PL
-                elif PL.shape[0]>0:
-                    Total_PL=Total_PL.combine_first(PL)
+                Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
 	    
 	# check census data
         tenant_account_col=[10000]
@@ -1768,7 +1764,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 and entity_mapping.loc[entity_i,"Occupancy_in_separate_sheets"]=="Y":
 	
                 PL_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
-                if PL_occ.shape[0]>0:
+                if not PL_occ.empty:
                     Total_PL=PL_occ.combine_first(Total_PL)
         tenant_account_col=[10000]
         for entity_i in total_entity_list: 
@@ -1791,11 +1787,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 tenant_account_col=[10000]
                 entity_list_finance_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_in_onesheet].tolist()
                 PL=Read_Clean_PL_Multiple(entity_list_finance_in_onesheet,"Sheet_Name_Finance",uploaded_file,account_pool_full,sheet_name_finance_in_onesheet)
-
-                if Total_PL.shape[0]==0:
-                    Total_PL=PL
-                else:
-                    Total_PL=Total_PL.combine_first(PL)
+                Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
 
 	# census
         sheet_list_occupancy_in_onesheet = entity_mapping[(entity_mapping["Occupancy_in_separate_sheets"]=="N")&(~pd.isna(entity_mapping["Sheet_Name_Occupancy"]))&(entity_mapping["Sheet_Name_Occupancy"]!="nan")]["Sheet_Name_Occupancy"].unique()
@@ -1822,10 +1814,7 @@ def Upload_And_Process(uploaded_file,file_type):
         for entity_i in total_entity_list: 
             if entity_mapping.loc[entity_i,"Balance_in_separate_sheets"]=="Y":
                 PL_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
-                if Total_PL.shape[0]==0:
-                    Total_PL=PL_BS
-                else:
-                    Total_PL=PL_BS.combine_first(Total_PL)
+                Total_PL = PL_BS.combine_first(Total_PL) if not Total_PL.empty else PL_BS
 
         sheet_list_bs_in_onesheet = entity_mapping[(entity_mapping["Balance_in_separate_sheets"]=="N")&(~pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))&(entity_mapping["Sheet_Name_Balance_Sheet"]!="nan")]["Sheet_Name_Balance_Sheet"].unique()
         if len(sheet_list_bs_in_onesheet)>0:
@@ -1833,13 +1822,10 @@ def Upload_And_Process(uploaded_file,file_type):
                 tenant_account_col=[10000]
                 entity_list_bs_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Balance_Sheet"]==sheet_name_bs_in_onesheet].tolist()	
                 PL_BS=Read_Clean_PL_Multiple(entity_list_bs_in_onesheet,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet,sheet_name_bs_in_onesheet)  
-                if Total_PL.shape[0]==0:
-                    Total_PL=PL_BS
-                else:
-                    Total_PL=PL_BS.combine_first(Total_PL)
+                Total_PL = PL_BS.combine_first(Total_PL) if not Total_PL.empty else PL_BS
 
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
-    st.write("Total_PL",Total_PL)
+    #st.write("Total_PL",Total_PL)
     return Total_PL
 def Download_PL_Sample():
     PL_sample_filename = "{}_P&L_sample.xlsx".format(operator)
