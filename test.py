@@ -952,7 +952,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
 @st.cache_data 
 def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     # remove no need to map from account_mapping
-    account_pool=account_mapping[account_mapping["Sabra_Account"]!= "NO NEED TO MAP"]
+    account_pool=account_pool[account_pool["Sabra_Account"]!= "NO NEED TO MAP"]
 	
     #if sheet_type=="Sheet_Name_Finance":  
         #account_pool=account_mapping[account_mapping["Sabra_Account"]!= "NO NEED TO MAP"]
