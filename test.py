@@ -1749,6 +1749,7 @@ def Upload_And_Process(uploaded_file,file_type):
 	    # properties in seperate sheet 
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
+                st.write("just read PL",PL)
                 if Total_PL.shape[0]==0:
                     Total_PL=PL
                 elif PL.shape[0]>0:
@@ -1836,6 +1837,7 @@ def Upload_And_Process(uploaded_file,file_type):
                     Total_PL=PL_BS.combine_first(Total_PL)
 
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
+    st.write("Total_PL",Total_PL)
     return Total_PL
 def Download_PL_Sample():
     PL_sample_filename = "{}_P&L_sample.xlsx".format(operator)
