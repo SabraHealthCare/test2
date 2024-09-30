@@ -1749,7 +1749,7 @@ def Upload_And_Process(uploaded_file,file_type):
 	    # properties in seperate sheet 
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
-                st.write("just read PL",PL)
+                #st.write("just read PL",PL)
                 if Total_PL.shape[0]==0:
                     Total_PL=PL
                 elif PL.shape[0]>0:
@@ -1790,6 +1790,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 tenant_account_col=[10000]
                 entity_list_finance_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_in_onesheet].tolist()
                 PL=Read_Clean_PL_Multiple(entity_list_finance_in_onesheet,"Sheet_Name_Finance",uploaded_file,account_pool_full,sheet_name_finance_in_onesheet)
+                st.write("PL",PL)
                 if Total_PL.shape[0]==0:
                     Total_PL=PL
                 else:
