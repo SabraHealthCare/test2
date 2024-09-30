@@ -1293,7 +1293,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
             if sheet_type=="Finance":	    
                 if missing_PL_sheet_property_N.shape[0]>0:
                     st.warning("Please provide P&L sheet name for below properties:")
-                    st.markdown(missing_PL_sheet_property_N[["Property_Name"]].style.hide(axis='index'))
+                    st.dataframe(missing_PL_sheet_property_N[["Property_Name"]],hide_index=True)
                     PL_sheet=st.selectbox("",[""]+PL_sheet_list,key="P&L_N")
                 if missing_occ_sheet_property_N.shape[0]>0:
                     st.warning("Please provide sheet name for Occupancy:")
