@@ -1204,7 +1204,7 @@ def Submit_Upload():
     <body>
         <p>Dear {operator} team,</p>
 	<p>Thanks for submitting {operator} {reporting_month_display} reporting data.</p>"""+email_body+f"""<p>Best regards,</p>
-        <p>Sabra Health Team</p>
+        <p>Sabra Healthcare REIT.</p>
     </body>
     </html>"""
 
