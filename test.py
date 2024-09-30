@@ -1538,7 +1538,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,sheet_name):  
     global account_mapping,reporting_month,tenant_account_col
-    #st.write("account_mapping0",account_mapping)
+    st.write("account_mapping0",account_mapping)
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
     if sheet_type=="Sheet_Name_Finance":  
         sheet_type_name="P&L"
@@ -1552,7 +1552,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 
 	
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
-    #st.write("sheet_name",sheet_name,"PL",PL)
+    st.write("sheet_name",sheet_name,"PL",PL)
     # Start checking process
     if True:   
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
@@ -1567,7 +1567,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
                 current_col = PL.iloc[:, col_idx].fillna('')
                 # Fill missing values in the combined column with values from the current column
                 combined_col = combined_col.where(combined_col != '', current_col)
-            #st.write("combined_col",combined_col)
+            st.write("combined_col",combined_col)
             # Assign the combined result back to the first column
             PL.iloc[:, tenantAccount_col_no_list[0]] = combined_col
 
@@ -1790,7 +1790,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 tenant_account_col=[10000]
                 entity_list_finance_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_in_onesheet].tolist()
                 PL=Read_Clean_PL_Multiple(entity_list_finance_in_onesheet,"Sheet_Name_Finance",uploaded_file,account_pool_full,sheet_name_finance_in_onesheet)
-                st.write("PL",PL)
+
                 if Total_PL.shape[0]==0:
                     Total_PL=PL
                 else:
