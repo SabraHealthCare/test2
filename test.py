@@ -949,7 +949,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
         st.success("New accounts mapping were successfully saved.")   
     return account_mapping
 	
-@st.cache_data 
+#@st.cache_data 
 def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     # remove no need to map from account_mapping
     account_pool=account_pool[account_pool["Sabra_Account"]!= "NO NEED TO MAP"]
