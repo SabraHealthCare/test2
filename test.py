@@ -272,7 +272,7 @@ def Initial_Mapping(operator):
     # Read account mapping file from OneDrive
     account_mapping_all = Read_File_From_Onedrive(mapping_path,account_mapping_filename,"XLSX",account_mapping_str_col)
     account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
-    st.write(BPC_pull[(BPC_pull["ENTITY"] == "S09206") & (BPC_pull["Sabra_Account"] == "T_MAINTENANCE")])
+    st.write(BPC_pull["Sabra_Account"] == "T_MAINTENANCE"])
     # Handle case where there's only one row and it corresponds to a template
     if account_mapping.shape[0] == 1 and account_mapping["Sabra_Account"].iloc[0] == 'Template':
         account_mapping = account_mapping_all[account_mapping_all["Operator"] == "Template"].copy()
