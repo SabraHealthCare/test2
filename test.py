@@ -953,16 +953,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
 def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     # remove no need to map from account_mapping
     account_pool=account_pool[account_pool["Sabra_Account"]!= "NO NEED TO MAP"]
-    st.write(account_pool)
-    #if sheet_type=="Sheet_Name_Finance":  
-        #account_pool=account_mapping[account_mapping["Sabra_Account"]!= "NO NEED TO MAP"]
-	  
-    #elif sheet_type=="Sheet_Name_Occupancy":
-        #account_pool=account_mapping[(account_mapping["Category"] == "Patient Days")|(account_mapping["Category"] == "Facility Information")|\
-	             #(account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]
-        #st.write("account_mapping",account_mapping)
-    #elif sheet_type=="Sheet_Name_Balance_Sheet":
-        #account_pool=account_mapping.loc[account_mapping["Category"]=="Balance Sheet"]
+    #st.write(account_pool)
     
     main_account_mapping = account_pool.loc[account_pool["Sabra_Account"].apply(lambda x: pd.notna(x) and x.upper() != "NO NEED TO MAP")]
         # Concatenate main accounts with second accounts
