@@ -144,6 +144,7 @@ class Authenticate:
                 if self._check_pw():
                     if inplace:
                         st.session_state['operator'] = self.credentials['usernames'][self.username]['operator']
+                        st.session_state['email'] = self.credentials['usernames'][self.username]['email']  
                         self.exp_date = self._set_exp_date()
                         self.token = self._token_encode()
                         self.cookie_manager.set(self.cookie_name, self.token,
