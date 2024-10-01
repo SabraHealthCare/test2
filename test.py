@@ -1304,11 +1304,13 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                         if missing_occ_sheet_property_N.shape[0]>0:
                             entity_mapping.loc[:,"Sheet_Name_Occupancy"]=occ_sheet
                 elif missing_BS_sheet_property_N.shape[0]>0:
-                    if BS_sheet.isna():
+                    st.write("BS_sheet",BS_sheet,BS_sheet== "")
+                    if BS_sheet== "":
                         st.error("Please complete Balance Sheet mapping.")
                         st.stop()
                     else:
                         entity_mapping.loc[:,"Sheet_Name_Balance_Sheet"]=BS_sheet
+                        st.write("BS_sheet",BS_sheet,entity_mapping)
             else:
                 st.stop()
     # update entity_mapping in onedrive  
