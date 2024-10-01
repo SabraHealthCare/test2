@@ -265,7 +265,6 @@ def clicked(button_name):
 def Initial_Mapping(operator):
 
     BPC_pull=Read_File_From_Onedrive(mapping_path,BPC_pull_filename,"CSV")
-    st.write(BPC_pull[BPC_pull["Sabra_Account"] == "T_MAINTENANCE"])
     BPC_pull = (BPC_pull[BPC_pull["Operator"] == operator]
             .set_index(["ENTITY", "Sabra_Account"])
             .dropna(axis=1, how='all')
@@ -1860,9 +1859,12 @@ if 'clicked' not in st.session_state:
 col1,col2=st.columns(2)
 with col1:
     authenticator.login('Login',config,'main')
-
-if st.session_state["authentication_status"] is False:
+if st.session_state["authentication_status"] is True:
+    operator_email = st.session_state['email']  # Accessing the email
+    st.write(f"Logged in as: {user_email}")
+else:
     st.error('Username/password is incorrect')
+
 
 #------------------------------------------operator account----------------------------------------------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
