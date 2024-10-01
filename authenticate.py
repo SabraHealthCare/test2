@@ -58,6 +58,10 @@ class Authenticate:
             st.session_state['username'] = None
         if 'logout' not in st.session_state:
             st.session_state['logout'] = None
+        if 'email' not in st.session_state:
+            st.session_state['email'] = None  
+
+
     
     def _token_encode(self) -> str:
         """
@@ -71,6 +75,7 @@ class Authenticate:
         
         return jwt.encode({'operator':st.session_state['operator'],
             'username':st.session_state['username'],
+            'email':   st.session_state['email'],           
             'exp_date':self.exp_date}, self.key, algorithm='HS256')
 
     def _token_decode(self) -> str:
@@ -120,9 +125,10 @@ class Authenticate:
             if self.token is not False:
                 if not st.session_state['logout']:
                     if self.token['exp_date'] > datetime.utcnow().timestamp():
-                        if 'operator' and 'username' in self.token:
+                        if 'operator' in self.token and 'username' in self.token and 'email' in self.token:
                             st.session_state['operator'] = self.token['operator']
                             st.session_state['username'] = self.token['username']
+                            st.session_state['email'] = self.token['email']   
                             st.session_state['authentication_status'] = True
     
     def _check_credentials(self, inplace: bool=True) -> bool:
