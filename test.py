@@ -1859,15 +1859,12 @@ if 'clicked' not in st.session_state:
 col1,col2=st.columns(2)
 with col1:
     authenticator.login('Login',config,'main')
-if st.session_state["authentication_status"] is True:
-    operator_email = st.session_state['email']  # Accessing the email
-    st.write(f"Logged in as: {user_email}")
-else:
+if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
-
-
 #------------------------------------------operator account----------------------------------------------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
+    operator_email = st.session_state['email']  # Accessing the email
+    st.write(f"Logged in as: {user_email}")
     operator=st.session_state["operator"]
     st.title(operator)
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
