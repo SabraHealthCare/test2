@@ -725,6 +725,7 @@ class Authenticate:
                                 if self.validator.validate_email(new_value):
                                     self._update_entry(self.username, field, new_value)
                                     self.save_credentials_to_yaml(config)
+                                    st.session_state['email'] = new_value
                                     st.success("Email updated successfully")
                                     return True
                                 else:
