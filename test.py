@@ -1531,8 +1531,9 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,sheet_name):  
     global account_mapping,reporting_month,tenant_account_col
-    #st.write("account_mapping0",account_mapping)
+    #st.write("account_mapping",account_mapping)
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
+    st.write("sheet_type",sheet_type,"account_pool","sheet_name",sheet_name)
     if sheet_type=="Sheet_Name_Finance":  
         sheet_type_name="P&L"
     elif sheet_type=="Sheet_Name_Occupancy":
