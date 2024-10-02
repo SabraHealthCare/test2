@@ -324,7 +324,7 @@ st.markdown(css, unsafe_allow_html=True)
 def Create_Tree_Hierarchy():
     # Initialize hierarchy with default options
     parent_hierarchy_main = [{'label': "No need to map", 'value': "No need to map"}]
-    parent_hierarchy_second = [{'label': "No need to map", 'value': "No need to map"}]
+    parent_hierarchy_second = []
     
     # Read account data
     BPC_Account = Read_File_From_Onedrive(mapping_path, BPC_account_filename, "CSV")
@@ -952,7 +952,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
 #@st.cache_data 
 def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     # remove no need to map from account_mapping
-    account_pool=account_pool[account_pool["Sabra_Account"]!= "NO NEED TO MAP"]
+    account_pool=account_pool[account_pool["Sabra_Account"]!= "NO NEED TO MAP" ]
     #st.write(account_pool)
     
     main_account_mapping = account_pool.loc[account_pool["Sabra_Account"].apply(lambda x: pd.notna(x) and x.upper() != "NO NEED TO MAP")]
@@ -1533,7 +1533,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
     global account_mapping,reporting_month,tenant_account_col
     #st.write("account_mapping",account_mapping)
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
-    st.write("sheet_type",sheet_type,"account_pool","account_pool",sheet_name)
+    #st.write("sheet_type",sheet_type,"account_pool","account_pool",sheet_name)
     if sheet_type=="Sheet_Name_Finance":  
         sheet_type_name="P&L"
     elif sheet_type=="Sheet_Name_Occupancy":
