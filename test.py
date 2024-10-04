@@ -282,7 +282,7 @@ def Initial_Mapping(operator):
     account_mapping[account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")
     account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion","Category"]]
-    st.write("account_mapping",account_mapping)  
+    #st.write("account_mapping",account_mapping)  
     entity_mapping=Read_File_From_Onedrive(mapping_path,entity_mapping_filename,"CSV",entity_mapping_str_col)
     entity_mapping = (Read_File_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
                   .reset_index(drop=True)
@@ -1883,7 +1883,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         
         global reporting_month,reporting_month_label,tenant_account_col,date_header
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
-	
         #st.write("account_mapping-3",account_mapping,"entity_mapping",entity_mapping)
         reporting_month_label=True  
         tenant_account_col=[10000]
