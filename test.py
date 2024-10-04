@@ -412,7 +412,7 @@ def Get_Year(single_string):
     return 0
 
 def Get_Month_Year(single_string):
-    st.write("single_string0",single_string)
+    #st.write("single_string0",single_string)
     if pd.isna(single_string):
         return 0,0
     if isinstance(single_string, datetime):
@@ -425,16 +425,16 @@ def Get_Month_Year(single_string):
     year=Get_Year(single_string)
 
     if year!=0:
-        single_string=single_string.replace(str(year_num),"").replace(str(year_num)[-2:],"")
+        single_string=single_string.replace(str(year_num),"")
         if not single_string:
             return 0,year
     single_string=single_string.replace("30","").replace("31","").replace("29","").replace("28","")
-    st.write("single_string1",single_string)
+    #st.write("single_string1",single_string)
     for month_i ,month_words in month_dic_word.items():#[10,11,3...12]
         for  month_word in month_words: # month_word is element of ['december','dec',"nov",...]
             if month_word in single_string:  # month is words ,like Jan Feb... year is optional
                 remaining=single_string.replace(month_word,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("asof","").replace("actual","").replace("mtd","")
-                st.write("remaining",remaining)
+                #st.write("remaining",remaining)
                 #if there are more than 3 other char in the string, this string is not month 
                 if len(remaining)<3:  
                     return month_i,year
@@ -650,7 +650,7 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
     max_len=0
     candidate_date=[]
     month_count = month_table.apply(lambda row: (row != 0).sum(), axis=1).tolist()
-
+    st.write("month_count",month_count)
     if not all(x==0 for x in month_count):
        # month_sort_index is the index(row number) which contain month/year, and sorted desc. month_sort_index[0] is the row number that contrain most months in PL
         non_zero_indices = [(index, month_c) for index, month_c in enumerate(month_count) if month_c!= 0]
