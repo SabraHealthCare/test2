@@ -616,6 +616,8 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
 @st.cache_data
 def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_col_no): 
     st.write("sheet_name",sheet_name)
+    if sheet_name=='LV Census':
+        st.write("PL",PL)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
