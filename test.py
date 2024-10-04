@@ -416,6 +416,7 @@ def Get_Month_Year(single_string):
     if pd.isna(single_string):
         return 0,0
     if isinstance(single_string, datetime):
+        st.write("single_string",single_string,int(single_string.month),int(single_string.year))
         return int(single_string.month),int(single_string.year)
 
     if isinstance(single_string, (int,float)) and single_string not in year_dic:
@@ -650,7 +651,7 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
     max_len=0
     candidate_date=[]
     month_count = month_table.apply(lambda row: (row != 0).sum(), axis=1).tolist()
-    st.write("month_count",month_count)
+    #st.write("month_count",month_count)
     if not all(x==0 for x in month_count):
        # month_sort_index is the index(row number) which contain month/year, and sorted desc. month_sort_index[0] is the row number that contrain most months in PL
         non_zero_indices = [(index, month_c) for index, month_c in enumerate(month_count) if month_c!= 0]
