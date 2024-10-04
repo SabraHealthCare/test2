@@ -621,6 +621,8 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
+            if sheet_name=='LV Census':
+                st.write("pre_date_header",pre_date_header)
             return pre_date_header
     PL_col_size=PL.shape[1]
     tenant_account_row_mask = PL.index.str.upper().str.strip().isin(\
