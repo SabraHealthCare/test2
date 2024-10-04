@@ -412,6 +412,7 @@ def Get_Year(single_string):
     return 0
 
 def Get_Month_Year(single_string):
+    st.write("single_string0",single_string)
     if pd.isna(single_string):
         return 0,0
     if isinstance(single_string, datetime):
@@ -428,7 +429,7 @@ def Get_Month_Year(single_string):
         if not single_string:
             return 0,year
     single_string=single_string.replace("30","").replace("31","").replace("29","").replace("28","")
-    st.write("single_string",single_string)
+    st.write("single_string1",single_string)
     for month_i ,month_words in month_dic_word.items():#[10,11,3...12]
         for  month_word in month_words: # month_word is element of ['december','dec',"nov",...]
             if month_word in single_string:  # month is words ,like Jan Feb... year is optional
