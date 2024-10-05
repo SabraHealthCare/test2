@@ -640,7 +640,7 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
            not all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)\
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
     valid_col_index=[i for i, mask in enumerate(valid_col_mask) if mask]
-    st.write("valid_col_mask",valid_col_mask,valid_col_index)
+    #st.write("valid_col_mask",valid_col_mask,valid_col_index)
     if len(valid_col_index)==0: # there is no valid data column
         return [],0,[]
     # nan_num_column is the column whose value is nan or 0 for PL.drop(nan_index)
@@ -653,7 +653,7 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
     max_len=0
     candidate_date=[]
     month_count = month_table.apply(lambda row: (row != 0).sum(), axis=1).tolist()
-    #st.write("month_table",month_table)
+    st.write("month_table",month_table)
     if not all(x==0 for x in month_count):
        # month_sort_index is the index(row number) which contain month/year, and sorted desc. month_sort_index[0] is the row number that contrain most months in PL
         non_zero_indices = [(index, month_c) for index, month_c in enumerate(month_count) if month_c!= 0]
