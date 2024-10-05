@@ -660,10 +660,10 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
     if sheet_name=='LV Census':
         st.write("valid_col_mask",valid_col_mask,tenantAccount_col_no)
 	# Apply the modified function to each column
-	valid_col_mask = PL_temp.apply(lambda x: check_conditions(x, tenantAccount_col_no), axis=0)
+        valid_col_mask = PL_temp.apply(lambda x: check_conditions(x, tenantAccount_col_no), axis=0)
 
 	# Check the final mask result
-	st.write(f"Valid columns: {valid_col_mask}")
+        st.write(f"Valid columns: {valid_col_mask}")
     valid_col_index=[i for i, mask in enumerate(valid_col_mask) if mask]
     
     if len(valid_col_index)==0: # there is no valid data column
