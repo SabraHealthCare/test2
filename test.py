@@ -643,7 +643,8 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
     if sheet_name=='LV Census':
         for col_name in PL_temp.columns:
             col_data = PL_temp[col_name]
-                    
+            col_index = PL_temp.columns.get_loc(col_name)
+            st.write("col_data",col_data)   
     # Condition 1: Check if the column contains any numeric values
             has_numeric = pd.to_numeric(col_data, errors='coerce').notna().any()
     
