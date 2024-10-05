@@ -380,7 +380,7 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
             match_count, non_empty_count = get_match_count(pre_max_match_col[i])
             if match_count > 0 and (match_count > 1 or match_count / non_empty_count > 0.2):
                 if i == len(pre_max_match_col)-1:
-                    st.write("_______________________________use pre_max_match_col_______________________:",pre_max_match_col)
+                    #st.write("_______________________________use pre_max_match_col_______________________:",pre_max_match_col)
                     return pre_max_match_col
     
     # If pre-identified columns are not sufficient, search for potential matches across the first 15 columns
@@ -395,8 +395,6 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     # Return the top columns with the highest match counts
     top_matches = [match[1] for match in match_counts if match[0] > 0]
     if len(top_matches)>0:
-        if sheet_name=="LV Census":
-            st.write("*******************final top_matches*******************************",top_matches)
         return top_matches # return a list of col index
     
     # If no match is found, raise an error
@@ -620,8 +618,6 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
 @st.cache_data
 def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_col_no): 
     #st.write("sheet_name",sheet_name)
-    if sheet_name=='LV Census':
-        st.write("PL",PL)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
@@ -632,7 +628,7 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
 	 if sabra_account != 'NO NEED TO MAP']).tolist()
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
-
+    st.write("tenant_account_row_mask",tenant_account_row_mask)
     PL_temp=PL.loc[tenant_account_row_mask]
     #valid_col_mask labels all the columns as ([False, False, True,...])
 	#1. on the right of tenantAccount_col_no 
@@ -651,8 +647,6 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
     #nan_num_column = [all(val == 0 or pd.isna(val) or not isinstance(val, (int, float)) for val in PL.drop(nan_index).iloc[:, i]) for i in range(PL.drop(nan_index).shape[1])]
     month_table=pd.DataFrame(0,index=range(first_tenant_account_row), columns=range(PL_col_size))
     year_table=pd.DataFrame(0,index=range(first_tenant_account_row), columns=range(PL_col_size))
-    if sheet_name=='LV Census':
-        st.write("first_tenant_account_row",first_tenant_account_row)    
     for row_i in range(first_tenant_account_row): # only search month/year above the first tenant account row
         for col_i in valid_col_index:  # only search the columns that contain numberic data and on the right of tenantAccount_col_no
             month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i]) 
@@ -1564,8 +1558,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
     if True:   
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
         tenant_account_col=tenantAccount_col_no_list  # for pre-compare
-        if sheet_name=="LV Census":
-            st.write("tenant_account_col",tenant_account_col)
+
         if len(tenantAccount_col_no_list) > 1:
             # Start with the first column
             combined_col = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
