@@ -411,10 +411,11 @@ def Get_Year(single_string):
     return 0
 
 def Get_Month_Year(single_string):
-    #st.write("single_string0",single_string)
+    st.write("single_string0",single_string)
     if pd.isna(single_string):
         return 0,0
     if isinstance(single_string, datetime):
+        st.write("single_string1",single_string,int(single_string.month),int(single_string.year))
         return int(single_string.month),int(single_string.year)
 
     if isinstance(single_string, (int,float)) and single_string not in year_dic:
