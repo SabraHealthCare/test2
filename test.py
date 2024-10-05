@@ -615,7 +615,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
     
 @st.cache_data
 def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_col_no): 
-    #st.write("sheet_name",sheet_name)
+    st.write("sheet_name",sheet_name)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
@@ -635,7 +635,7 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
 	#1. on the right of tenantAccount_col_no 
 	#2.contain numeric value 
 	#3. not all 0 or nan in tenant_account_row. 
-    
+    st.write("PL_temp",PL_temp)
     valid_col_mask = PL_temp.apply(lambda x: ( pd.to_numeric(x, errors='coerce').notna().any() and \
            not all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)\
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
