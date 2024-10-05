@@ -407,25 +407,24 @@ def Get_Year(single_string):
     for Year, keywords in year_dic.items():
         for keyword  in keywords: # keywards are "2024","24"
             if re.search(re.escape(keyword), single_string):
-                return Year
-    return 0
+                return Year,keyword
+    return 0,0
 
 def Get_Month_Year(single_string):
-    st.write("single_string0",single_string)
+    #st.write("single_string0",single_string)
     if pd.isna(single_string):
         return 0,0
     if isinstance(single_string, datetime):
-        st.write("single_string1",single_string,int(single_string.month),int(single_string.year))
         return int(single_string.month),int(single_string.year)
 
     if isinstance(single_string, (int,float)) and single_string not in year_dic:
         return 0,0
     
     single_string=str(single_string).lower()
-    year=Get_Year(single_string)
+    year,year_num=Get_Year(single_string)
 
     if year!=0:
-        single_string=single_string.replace(str(year_num),"")
+        single_string=single_string.replace(year_num,"")
         if not single_string:
             return 0,year
     single_string=single_string.replace("30","").replace("31","").replace("29","").replace("28","")
