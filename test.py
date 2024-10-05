@@ -613,25 +613,8 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         Total_PL=pd.concat([Total_PL, previous_A_unit.set_index(["ENTITY","Sabra_Account"])[reporting_month]], axis=0)
     return reporting_month_data,Total_PL,email_body
 
-def check_conditions(x, tenantAccount_col_no):
-    col_index = PL_temp.columns.get_loc(x.name)
-    st.write(col_index)
-    # Condition 1: Check if column contains numeric values
-    has_numeric = pd.to_numeric(x, errors='coerce').notna().any()
-    st.write(f"Column '{x.name}' (index {col_index}): has_numeric = {has_numeric}")
+
     
-    # Condition 2: Check if all values are either 0, NaN, string, or non-numeric
-    is_all_invalid = all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)
-    st.write(f"Column '{x.name}' (index {col_index}): is_all_invalid = {is_all_invalid}")
-    
-    # Only process columns to the right of tenantAccount_col_no
-    if col_index > tenantAccount_col_no:
-        valid = has_numeric and not is_all_invalid
-        st.write(f"Column '{x.name}' (index {col_index}): valid = {valid}")
-        return valid
-    else:
-        return False
-	    
 @st.cache_data
 def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_col_no): 
     st.write("sheet_name",sheet_name)
@@ -658,12 +641,36 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
            not all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)\
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
     if sheet_name=='LV Census':
-        st.write("LV Census***********************","valid_col_mask",valid_col_mask,tenantAccount_col_no)
-	# Apply the modified function to each column
-        valid_col_mask = PL_temp.apply(lambda x: check_conditions(x, tenantAccount_col_no), axis=0)
+        for col_name in PL_temp.columns:
+            col_data = PL_temp[col_name]
+                    
+    # Condition 1: Check if the column contains any numeric values
+            has_numeric = pd.to_numeric(col_data, errors='coerce').notna().any()
+    
+    # Condition 2: Check if all values are either 0, NaN, strings, or non-numeric
+            is_all_invalid = all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in col_data)
+    
+    # Only process columns to the right of tenantAccount_col_no
+            if col_index > tenantAccount_col_no:
+        # Check final condition
+                valid = has_numeric and not is_all_invalid
+        # Output the results for debugging
+                st.write(f"Column '{col_name}' (index {col_index}):")
+                st.write(f"  has_numeric = {has_numeric}")
+                st.write(f"  is_all_invalid = {is_all_invalid}")
+                st.write(f"  valid = {valid}\n")
+            else:
+                st.write(f"Column '{col_name}' (index {col_index}) is skipped because it's before tenantAccount_col_no\n")
 
-	# Check the final mask result
-        st.write(f"Valid columns: {valid_col_mask}")
+                # Final check: output valid column mask
+        valid_col_mask = [\
+            pd.to_numeric(PL_temp[col_name], errors='coerce').notna().any() and \
+            not all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in PL_temp[col_name]) \
+            if PL_temp.columns.get_loc(col_name) > tenantAccount_col_no else False \
+            for col_name in PL_temp.columns]
+
+        st.write(f"Final valid column mask: {valid_col_mask}")
+	   ##################### 
     valid_col_index=[i for i, mask in enumerate(valid_col_mask) if mask]
     
     if len(valid_col_index)==0: # there is no valid data column
