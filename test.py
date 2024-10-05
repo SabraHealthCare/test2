@@ -618,16 +618,16 @@ def check_conditions(x, tenantAccount_col_no):
     
     # Condition 1: Check if column contains numeric values
     has_numeric = pd.to_numeric(x, errors='coerce').notna().any()
-    print(f"Column '{x.name}' (index {col_index}): has_numeric = {has_numeric}")
+    st.write(f"Column '{x.name}' (index {col_index}): has_numeric = {has_numeric}")
     
     # Condition 2: Check if all values are either 0, NaN, string, or non-numeric
     is_all_invalid = all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)
-    print(f"Column '{x.name}' (index {col_index}): is_all_invalid = {is_all_invalid}")
+    st.write(f"Column '{x.name}' (index {col_index}): is_all_invalid = {is_all_invalid}")
     
     # Only process columns to the right of tenantAccount_col_no
     if col_index > tenantAccount_col_no:
         valid = has_numeric and not is_all_invalid
-        print(f"Column '{x.name}' (index {col_index}): valid = {valid}")
+        st.write(f"Column '{x.name}' (index {col_index}): valid = {valid}")
         return valid
     else:
         return False
