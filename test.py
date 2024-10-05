@@ -628,14 +628,14 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
     #st.write("tenant_account_row_mask",tenant_account_row_mask)
     if not any(tenant_account_row_mask):  #all the accounts in tenant_account_col are new accounts 
-        PL.temp=PL.copy()
+        PL_temp=PL.copy()
     else:
         PL_temp=PL.loc[tenant_account_row_mask]
     #valid_col_mask labels all the columns as ([False, False, True,...])
 	#1. on the right of tenantAccount_col_no 
 	#2.contain numeric value 
 	#3. not all 0 or nan in tenant_account_row. 
-
+    
     valid_col_mask = PL_temp.apply(lambda x: ( pd.to_numeric(x, errors='coerce').notna().any() and \
            not all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)\
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
