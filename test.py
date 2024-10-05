@@ -630,6 +630,7 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
 	 if sabra_account != 'NO NEED TO MAP']).tolist()
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
+
     PL_temp=PL.loc[tenant_account_row_mask]
     #valid_col_mask labels all the columns as ([False, False, True,...])
 	#1. on the right of tenantAccount_col_no 
@@ -641,6 +642,7 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
            not all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)\
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
     if sheet_name=='LV Census':
+        st.write("tenant_account_row_mask",tenant_account_row_mask,"PL_temp",PL_temp)
         for col_name in PL_temp.columns:
             col_data = PL_temp[col_name]
             col_index = PL_temp.columns.get_loc(col_name)
