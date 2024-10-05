@@ -627,7 +627,7 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
     #st.write("tenant_account_row_mask",tenant_account_row_mask)
-    if not any(tenant_account_row_mask)::  #all the accounts in tenant_account_col are new accounts 
+    if not any(tenant_account_row_mask):  #all the accounts in tenant_account_col are new accounts 
         PL.temp=PL.copy
     else:
         PL_temp=PL.loc[tenant_account_row_mask]
