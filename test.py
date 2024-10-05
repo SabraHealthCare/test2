@@ -363,6 +363,8 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 # Parse the df and get filter widgets based for provided columns
 		
 def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, pre_max_match_col):
+    if sheet_name=="LV Census":
+        st.write("sheet_name",sheet_name,"pre_max_match_col",pre_max_match_col)
     #st.write("sheet_name",sheet_name,"account_pool",account_pool)
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].fillna('').astype(str).str.strip().str.upper()
@@ -378,7 +380,7 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
             match_count, non_empty_count = get_match_count(pre_max_match_col[i])
             if match_count > 0 and (match_count > 1 or match_count / non_empty_count > 0.2):
                 if i == len(pre_max_match_col)-1:
-                   # st.write("_______________________________use pre_max_match_col_______________________")
+                    st.write("_______________________________use pre_max_match_col_______________________:",pre_max_match_col)
                     return pre_max_match_col
     
     # If pre-identified columns are not sufficient, search for potential matches across the first 15 columns
@@ -393,7 +395,8 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     # Return the top columns with the highest match counts
     top_matches = [match[1] for match in match_counts if match[0] > 0]
     if len(top_matches)>0:
-        #st.write("*******************final top_matches*******************************",top_matches)
+        if sheet_name=="LV Census":
+            st.write("*******************final top_matches*******************************",top_matches)
         return top_matches # return a list of col index
     
     # If no match is found, raise an error
@@ -1561,7 +1564,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
     if True:   
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
         tenant_account_col=tenantAccount_col_no_list  # for pre-compare
-
+        if sheet_name=="LV Census":
+            st.write("tenant_account_col",tenant_account_col)
         if len(tenantAccount_col_no_list) > 1:
             # Start with the first column
             combined_col = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
