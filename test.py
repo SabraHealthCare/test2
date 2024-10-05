@@ -615,7 +615,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
 
 def check_conditions(x, tenantAccount_col_no):
     col_index = PL_temp.columns.get_loc(x.name)
-    
+    st.write(col_index)
     # Condition 1: Check if column contains numeric values
     has_numeric = pd.to_numeric(x, errors='coerce').notna().any()
     st.write(f"Column '{x.name}' (index {col_index}): has_numeric = {has_numeric}")
