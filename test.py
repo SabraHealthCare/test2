@@ -658,7 +658,7 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
            not all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)\
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
     if sheet_name=='LV Census':
-        st.write("valid_col_mask",valid_col_mask,tenantAccount_col_no)
+        st.write("LV Census***********************","valid_col_mask",valid_col_mask,tenantAccount_col_no)
 	# Apply the modified function to each column
         valid_col_mask = PL_temp.apply(lambda x: check_conditions(x, tenantAccount_col_no), axis=0)
 
