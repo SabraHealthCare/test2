@@ -626,12 +626,14 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
         [account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account']) \
 	 if sabra_account != 'NO NEED TO MAP']).tolist()
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
-    first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
+
     #st.write("tenant_account_row_mask",tenant_account_row_mask)
     if not any(tenant_account_row_mask):  #all the accounts in tenant_account_col are new accounts 
         PL_temp=PL.copy()
+        first_tenant_account_row=PL_temp.shape[0]
     else:
         PL_temp=PL.loc[tenant_account_row_mask]
+         first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
     #valid_col_mask labels all the columns as ([False, False, True,...])
 	#1. on the right of tenantAccount_col_no 
 	#2.contain numeric value 
