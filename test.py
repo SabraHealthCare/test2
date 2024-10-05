@@ -363,8 +363,6 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 # Parse the df and get filter widgets based for provided columns
 		
 def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, pre_max_match_col):
-    if sheet_name=="LV Census":
-        st.write("sheet_name",sheet_name,"pre_max_match_col",pre_max_match_col)
     #st.write("sheet_name",sheet_name,"account_pool",account_pool)
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].fillna('').astype(str).str.strip().str.upper()
@@ -628,8 +626,11 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
 	 if sabra_account != 'NO NEED TO MAP']).tolist()
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
-    st.write("tenant_account_row_mask",tenant_account_row_mask)
-    PL_temp=PL.loc[tenant_account_row_mask]
+    #st.write("tenant_account_row_mask",tenant_account_row_mask)
+    if tenant_account_row_mask.all() == False:  #all the accounts in tenant_account_col are new accounts 
+        PL.temp=PL.copy
+    else:
+        PL_temp=PL.loc[tenant_account_row_mask]
     #valid_col_mask labels all the columns as ([False, False, True,...])
 	#1. on the right of tenantAccount_col_no 
 	#2.contain numeric value 
@@ -650,8 +651,6 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
     for row_i in range(first_tenant_account_row): # only search month/year above the first tenant account row
         for col_i in valid_col_index:  # only search the columns that contain numberic data and on the right of tenantAccount_col_no
             month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i]) 
-            if sheet_name=='LV Census':
-                print("month_table",month_table)
     max_len=0
     candidate_date=[]
     month_count = month_table.apply(lambda row: (row != 0).sum(), axis=1).tolist()
