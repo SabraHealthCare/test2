@@ -193,11 +193,11 @@ class Authenticate:
         msg['From'] = "Sabra_reporting@sabrahealth.com"
         msg['To'] = email
         msg.attach(plain_text)
-        st.write(1)
+
     
         # Connect to SMTP2GO server and send email
         try:
-            st.write(2)
+
             mailServer = smtplib.SMTP('mail.smtp2go.com', 2525)  # Can also use 8025, 587, or 25
             mailServer.ehlo()
             mailServer.starttls()
@@ -320,6 +320,7 @@ class Authenticate:
                 if st.session_state.clicked["forgot_password_button"]:
                     try:
                         username_forgot_pw, email_forgot_password, random_password = self.forgot_password('Forgot password')
+                        st.write(0,random_password)
                         if username_forgot_pw:
                             st.write(1,random_password)
                             self.save_credentials_to_yaml(config)
