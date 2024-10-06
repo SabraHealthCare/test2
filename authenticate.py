@@ -321,9 +321,10 @@ class Authenticate:
                     try:
                         username_forgot_pw, email_forgot_password, random_password = self.forgot_password('Forgot password')
                         if username_forgot_pw:
-                            st.write(random_password)
+                            st.write(1,random_password)
                             self.save_credentials_to_yaml(config)
                             self.send_email(username_forgot_pw,email_forgot_password,random_password)
+                            st.write(2,random_password)
            
                     except Exception as e:
                         st.error(e)
