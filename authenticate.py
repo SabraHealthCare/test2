@@ -172,6 +172,7 @@ class Authenticate:
             else:
                 return False
     def send_email(self, username: str, email: str, random_password: str):
+        st.write(username,email,random_password)
         username_smtp = 'sabrahealth.com'  
         password_smtp = 'b1bpwmzxs9hnbpkM' 
     
@@ -192,10 +193,11 @@ class Authenticate:
         msg['From'] = "Sabra_reporting@sabrahealth.com"
         msg['To'] = email
         msg.attach(plain_text)
-    
+        st.write(1)
     
         # Connect to SMTP2GO server and send email
         try:
+            st.write(2)
             mailServer = smtplib.SMTP('mail.smtp2go.com', 2525)  # Can also use 8025, 587, or 25
             mailServer.ehlo()
             mailServer.starttls()
