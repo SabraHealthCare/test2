@@ -189,10 +189,15 @@ class Authenticate:
         plain_text = MIMEText(body, 'plain')
         # Create the email
         msg = MIMEText(body)
+        st.write(0)
         msg['Subject'] = "Temporary password for Sabra monthly reporting App"
+        st.write(1)
         msg['From'] = "Sabra_reporting@sabrahealth.com"
+        st.write(2)
         msg['To'] = email
+        st.write(3)
         msg.attach(plain_text)
+        st.write(4)
 
     
         # Connect to SMTP2GO server and send email
@@ -203,7 +208,9 @@ class Authenticate:
             mailServer.starttls()
             mailServer.ehlo()
             mailServer.login(username_smtp, password_smtp)
+            st.write(5)
             mailServer.sendmail("sli@sabrahealth.com", email, msg.as_string())
+            st.write(5)
             mailServer.close()
             st.success(f'A temporary password was sent to your email: {email}.')
         except Exception as e:
