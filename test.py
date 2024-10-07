@@ -1552,7 +1552,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 
 	
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
-    #st.write("sheet_name",sheet_name,"PL",PL)
+    st.write("sheet_name",sheet_name,"PL",PL)
     # Start checking process
     if True:   
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
