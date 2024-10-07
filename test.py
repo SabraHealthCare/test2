@@ -1469,6 +1469,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
             month_counts=pd.Series(np.sum(mask_table.values, axis=1))		
             if all(month_count==0 for month_count in month_counts): # there is no month
                 st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
+                st.write("stop1")
                 st.stop()
             # month_row_index is the row having most reporting month
             max_month_index = month_counts.idxmax()
@@ -1487,7 +1488,8 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
             # after apply month_mask, the column_name still doesn't match with that in entity_mapping	
             elif len(duplicate_check)>0: # there is still duplicate property name
                 st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
-                st.stop()		    
+                st.stop()
+                st.write("stop2")
             elif len(duplicate_check)==0:  # miss some property names              
                 max_match=[x for x in filter_header_row if x!=0]
                 header_row=filter_header_row
@@ -1503,12 +1505,14 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 if len(rest_column_names)>0:			
                     st.error("If this facility has a new column name, please re-map it as indicated below.")
                 elif len(rest_column_names)==0:
+                    st.write("stop3")
                     st.stop()
             elif len(total_missed_entities)>1:
                 st.error("Can't identify the data columns for facilities: {} in sheet {}. Please add their column names and re-upload. If their column name has been updated, please re-map it as indicated below.".format( ",".join(entity_mapping.loc[total_missed_entities, "Property_Name"]),sheet_name))
                 if len(rest_column_names)>0:			
                     st.error("If these facilities have new column names, please re-map them as indicated below.") 
                 elif len(rest_column_names)==0:
+                    st.write("stop4")
                     st.stop()
             with st.form(key="miss_match_column_name"):
                 for entity_i in total_missed_entities:
@@ -1549,8 +1553,10 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                     Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,"CSV",None,entity_mapping_str_col)
                     return max_match_row,mapped_entity
             else:
+                st.write("stop6")
                 st.stop()
         else:
+            st.write("stop7")
             st.stop()    
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,sheet_name):  
