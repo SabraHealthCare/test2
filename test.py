@@ -1605,7 +1605,9 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 	    
         #if there are duplicated accounts in P&L, ask for confirming
         # Step 1: Remove all duplicate rows, keeping only unique records based on all column values
-        PL = PL.reset_index().set_index('index')
+        PL = PL.reset_index()
+        st.write("PL***************",PL,PL.index,PL.columns)
+        PL = PL.set_index('index')
         st.write("PL***************",PL,PL.index,PL.columns)
         PL=PL.drop_duplicates()
         PL = PL.set_index('index')  
