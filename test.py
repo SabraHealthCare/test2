@@ -913,8 +913,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
             col1,col2=st.columns(2) 
             with col1:
                 st.write("Sabra main account")
-                Sabra_main_account_list[i]=streamlit_tree_select.tree_select(parent_hierarchy_main,only_leaf_checkboxes=True,key=str(new_tenant_account_list[i])) 
-                st.write("Sabra_main_account_list",Sabra_main_account_list[i])    
+                Sabra_main_account_list[i]=streamlit_tree_select.tree_select(parent_hierarchy_main,only_leaf_checkboxes=True,key=str(new_tenant_account_list[i]))  
             with col2:
                 st.write("Sabra second account")
                 Sabra_second_account_list[i]= streamlit_tree_select.tree_select(parent_hierarchy_second,only_leaf_checkboxes=True,key=str(new_tenant_account_list[i])+"1")
