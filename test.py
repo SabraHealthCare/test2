@@ -1434,12 +1434,15 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
     month_mask=[]
-
+    st.write("first_tenant_account_row",first_tenant_account_row)
     # search the row with property column names	
     for row_i in range(first_tenant_account_row):
         canditate_row=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[row_i,:])))  
         match_names = [item for item in canditate_row if item in column_name_list_in_mapping] 
 	# find the property name header row, transferred them into entity id
+
+        st.write("match_names",match_names,"sorted(column_name_list_in_mapping)",sorted(column_name_list_in_mapping),"entity_without_propertynamefinance",entity_without_propertynamefinance)
+
         if len(match_names)>0 and sorted(match_names)==sorted(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: 
            # property name column header is unique and match with entity mapping
             mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(column_name_list_in_mapping))}
@@ -1469,7 +1472,6 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
             month_counts=pd.Series(np.sum(mask_table.values, axis=1))		
             if all(month_count==0 for month_count in month_counts): # there is no month
                 st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
-                st.write("stop1")
                 st.stop()
             # month_row_index is the row having most reporting month
             max_month_index = month_counts.idxmax()
@@ -1489,7 +1491,6 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
             elif len(duplicate_check)>0: # there is still duplicate property name
                 st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
                 st.stop()
-                st.write("stop2")
             elif len(duplicate_check)==0:  # miss some property names              
                 max_match=[x for x in filter_header_row if x!=0]
                 header_row=filter_header_row
@@ -1505,14 +1506,12 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                 if len(rest_column_names)>0:			
                     st.error("If this facility has a new column name, please re-map it as indicated below.")
                 elif len(rest_column_names)==0:
-                    st.write("stop3")
                     st.stop()
             elif len(total_missed_entities)>1:
                 st.error("Can't identify the data columns for facilities: {} in sheet {}. Please add their column names and re-upload. If their column name has been updated, please re-map it as indicated below.".format( ",".join(entity_mapping.loc[total_missed_entities, "Property_Name"]),sheet_name))
                 if len(rest_column_names)>0:			
                     st.error("If these facilities have new column names, please re-map them as indicated below.") 
                 elif len(rest_column_names)==0:
-                    st.write("stop4")
                     st.stop()
             with st.form(key="miss_match_column_name"):
                 for entity_i in total_missed_entities:
@@ -1553,9 +1552,8 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                     Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,"CSV",None,entity_mapping_str_col)
                     return max_match_row,mapped_entity
             else:
-                st.write("stop6")
                 st.stop()
-        else:
+else:
             st.write("stop7")
             st.stop()    
 # no cache
