@@ -1607,10 +1607,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         # Step 1: Remove all duplicate rows, keeping only unique records based on all column values
         PL.index.name = "Tenant_Account"
         PL = PL.reset_index(drop=False)
-        st.write("PL***************",PL,PL.index,PL.columns)
         PL=PL.drop_duplicates()
         PL = PL.set_index('Tenant_Account')  
-        st.write("PL***************set back index",PL,PL.index,PL.columns)
 	    
         # Step 2: Identify any remaining duplicated indices after removing duplicate rows
         dup_tenant_account_all = PL.index[PL.index.duplicated()].unique()
