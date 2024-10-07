@@ -1574,7 +1574,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         tenantAccount_col_no=tenantAccount_col_no_list[0]
         #set tenant_account as index of PL
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
-        PL.index.name = "Tenant_Account"
         entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no) 
 
 	#remove row above property header
@@ -1606,7 +1605,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 	    
         #if there are duplicated accounts in P&L, ask for confirming
         # Step 1: Remove all duplicate rows, keeping only unique records based on all column values
-        PL = PL.reset_index()
+        PL.index.name = "Tenant_Account"
+        PL = PL.reset_index(drop=False)
         st.write("PL***************",PL,PL.index,PL.columns)
         PL=PL.drop_duplicates()
         PL = PL.set_index('Tenant_Account')  
