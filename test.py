@@ -1553,9 +1553,8 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
                     return max_match_row,mapped_entity
             else:
                 st.stop()
-else:
-            st.write("stop7")
-            st.stop()    
+    else:
+        st.stop()    
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,sheet_name):  
     global account_mapping,reporting_month,tenant_account_col
