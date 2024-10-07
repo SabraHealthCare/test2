@@ -1,4 +1,4 @@
-import pandas as pd 
+import pandas as pd  
 pd.set_option('future.no_silent_downcasting', True) 
 import numpy as np 
 from datetime import datetime, timedelta,date
@@ -2026,7 +2026,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
             # process Finance 
             Total_PL=Upload_And_Process(uploaded_finance,"Finance")
-
+            st.write("Total_PL",Total_PL)
 	    # process BS 
             Total_BL=Upload_And_Process(uploaded_BS,"BS")
 	    # combine Finance and BS
