@@ -1552,7 +1552,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 
 	
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
-    st.write("sheet_name",sheet_name,"PL",PL)
+    #st.write("sheet_name",sheet_name,"PL",PL)
     # Start checking process
     if True:   
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
@@ -1601,17 +1601,20 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
             account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name)
-        st.write("PL***",PL,PL.index,PL.columns)
+
 	    
         #if there are duplicated accounts in P&L, ask for confirming
         # Step 1: Remove all duplicate rows, keeping only unique records based on all column values
-        PL = PL.drop_duplicates()
-
+        PL = PL.reset_index().set_index('index')
+        st.write("PL***",PL,PL.index,PL.columns)
+        PL=PL.drop_duplicates()
+        PL = PL.set_index('index')  
+	    
         # Step 2: Identify any remaining duplicated indices after removing duplicate rows
-        dup_tenant_account_total = PL_unique.index[PL_unique.index.duplicated()].unique()
+        dup_tenant_account_all = PL.index[PL.index.duplicated()].unique()
 
         # Step 3: Filter out accounts that do not need to be mapped
-        dup_tenant_account = [x for x in dup_tenant_account_total \
+        dup_tenant_account = [x for x in dup_tenant_account_all \
              if x.upper() not in list(account_mapping[account_mapping["Sabra_Account"] == "NO NEED TO MAP"]["Tenant_Account"])]
 
         # Step 4: Show error if any duplicated accounts remain after handling duplicates
