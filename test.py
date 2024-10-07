@@ -950,7 +950,19 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
         #insert new record to the bottom line of account_mapping
         new_accounts_df = pd.DataFrame({'Sabra_Account': Sabra_main_account_value, 'Sabra_Second_Account': Sabra_second_account_value, 'Tenant_Account':list(map(lambda x:x.upper().strip(), new_tenant_account_list))})
         new_accounts_df["Operator"]=operator     
-        new_accounts_df=new_accounts_df.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")     
+        new_accounts_df=new_accounts_df.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")  
+
+        #non_nan_conversion = account_mapping[account_mapping['Conversion'].notna()]
+        # check if there is any conversion for same Sabra_Accounts. 
+        #if non_nan_conversion.shape[0]>0:
+            #accounts_with_conversions = new_accounts_df[new_accounts_df['Sabra_Account'].isin(non_nan_conversion['Sabra_Account'])]
+            #if accounts_with_conversions.shape[0]>0:
+                #st.write("Please confirm if below account need to be applied conversion")
+                #for tenant_account in accounts_with_conversions["Tenant_Account"]:
+                    
+                
+
+	    
         account_mapping=pd.concat([account_mapping, new_accounts_df],ignore_index=True)
         Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion"]],operator,"XLSX",None,account_mapping_str_col)
         st.success("New accounts mapping were successfully saved.")   
