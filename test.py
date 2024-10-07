@@ -1585,10 +1585,10 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
                 current_col = PL.iloc[:, col_idx].fillna('')
                 # Fill missing values in the combined column with values from the current column
                 combined_col = combined_col.where(combined_col != '', current_col)
-            #st.write("combined_col",combined_col)
+            st.write("combined_col",combined_col)
             # Assign the combined result back to the first column
             PL.iloc[:, tenantAccount_col_no_list[0]] = combined_col
-
+            st.write("PL00",PL)
         tenantAccount_col_no=tenantAccount_col_no_list[0]
         #set tenant_account as index of PL
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
