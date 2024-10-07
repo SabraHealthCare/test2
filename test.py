@@ -748,7 +748,7 @@ def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_co
 
     if len(candidate_date)>1:
         #st.write(",".join([sublist[-1]+1 for sublist in candidate_date]))
-        st.error("We detected {} date headers in sheet——'{}'. Please ensure there's only one date header for the data column.".format(len(candidate_date),sheet_name))
+        st.error("We detected {} month headers in sheet——'{}'. Please ensure there's only one month header for the data column.".format(len(candidate_date),sheet_name))
         st.stop()
     elif len(candidate_date)==1:	    
         return candidate_date[0][0:3]
@@ -1710,14 +1710,16 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
             account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name)        
-        st.write("PL",PL,PL.index,PL[reporting_month])
+        
         #if there are duplicated accounts in P&L, ask for confirming
         # Step 1: Remove all duplicate rows, keeping only unique records based on all column values
         PL.index.name = "Tenant_Account"
+        st.write("PL",PL.index)
         PL = PL.reset_index(drop=False)
+        st.write("PL",PL,PL.index,PL[reporting_month])
         PL=PL.drop_duplicates(subset=["Tenant_Account", reporting_month])
         PL = PL.set_index('Tenant_Account')  
-	    
+        st.write("PL set back index",PL,PL.index,PL[reporting_month])    
         # Step 2: Identify any remaining duplicated indices after removing duplicate rows
         dup_tenant_account_all = PL.index[PL.index.duplicated()].unique()
 
