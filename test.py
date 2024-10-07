@@ -616,7 +616,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
     
 @st.cache_data
 def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_col_no): 
-    st.write("sheet_name",sheet_name)
+    #st.write("sheet_name",sheet_name)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
@@ -1575,7 +1575,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
     if True:   
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
         tenant_account_col=tenantAccount_col_no_list  # for pre-compare
-
+        st.write("tenant_account_col",tenant_account_col)
         if len(tenantAccount_col_no_list) > 1:
             # Start with the first column
             combined_col = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
@@ -1593,7 +1593,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         #set tenant_account as index of PL
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
         entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no) 
-
+        st.write("PL2",PL)
 	#remove row above property header
         PL=PL.iloc[entity_header_row_number+1:,:]
 
@@ -1626,7 +1626,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         PL = PL.reset_index(drop=False)
         PL=PL.drop_duplicates()
         PL = PL.set_index('Tenant_Account')  
-	    
+        st.write("PL3",PL)   
         # Step 2: Identify any remaining duplicated indices after removing duplicate rows
         dup_tenant_account_all = PL.index[PL.index.duplicated()].unique()
 
@@ -1645,6 +1645,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         PL=Map_PL_Sabra(PL,entity_list,sheet_type,account_pool) # index are ('ENTITY',"Sabra_Account")
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
+        st.write("PL4",PL)  
     return PL
 	
 @st.cache_data
