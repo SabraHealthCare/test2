@@ -964,11 +964,10 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     
     main_account_mapping = account_pool.loc[account_pool["Sabra_Account"].apply(lambda x: pd.notna(x) and x.upper() != "NO NEED TO MAP")]
         # Concatenate main accounts with second accounts
-    second_account_mapping = account_pool.loc[(pd.notna(account_pool["Sabra_Second_Account"]))][["Sabra_Second_Account","Tenant_Account", "Conversion"]]\
+    second_account_mapping = account_pool.loc[(pd.notna(account_pool["Sabra_Second_Account"])) & (account_pool["Sabra_Second_Account"] != "NO NEED TO MAP")]\
+	[["Sabra_Second_Account","Tenant_Account", "Conversion"]]\
         .rename(columns={"Sabra_Second_Account": "Sabra_Account"})
     
-    # Remove rows with blank "Sabra_Account"
-    second_account_mapping = second_account_mapping.dropna(subset=["Sabra_Account"])
     if second_account_mapping.shape[0]>0:
         second_account_mapping = second_account_mapping[second_account_mapping["Sabra_Account"].str.strip() != ""]
 
@@ -1602,22 +1601,24 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
             account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name)
-		
-        #if there are duplicated accounts in P&L, ask for confirming
-        dup_tenant_account_total=list(set([x for x in PL.index if list(PL.index).count(x) > 1]))
-        if len(dup_tenant_account_total)>0:
-            dup_tenant_account=[x for x in dup_tenant_account_total if x.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Account"])]
-         
-            for idx_account in dup_tenant_account[:]:
-		# Extract records with current index value
-                records_idx = PL.loc[idx_account]
-                # if all records have the same data, remove the duplicated records, remove this account from dup_tenant_account
-                if (records_idx == records_idx.iloc[0]).all(axis=None):
-                    PL = pd.concat([PL.loc[idx_account].drop_duplicates().head(1), PL.loc[PL.index != idx_account]])
-                    dup_tenant_account.remove(idx_account)  
-            if len(dup_tenant_account)>0:
-                st.error("Duplicated accounts detected in {} sheet '{}'. Please rectify them to avoid repeated calculations: **{}** ".format(sheet_type_name,sheet_name,", ".join(dup_tenant_account)))
+        st.write("PL***",PL,PL.index,PL.columns)
 	    
+        #if there are duplicated accounts in P&L, ask for confirming
+        # Step 1: Remove all duplicate rows, keeping only unique records based on all column values
+        PL = PL.drop_duplicates()
+
+        # Step 2: Identify any remaining duplicated indices after removing duplicate rows
+        dup_tenant_account_total = PL_unique.index[PL_unique.index.duplicated()].unique()
+
+        # Step 3: Filter out accounts that do not need to be mapped
+        dup_tenant_account = [x for x in dup_tenant_account_total \
+             if x.upper() not in list(account_mapping[account_mapping["Sabra_Account"] == "NO NEED TO MAP"]["Tenant_Account"])]
+
+        # Step 4: Show error if any duplicated accounts remain after handling duplicates
+        if len(dup_tenant_account) > 0:
+            st.error(f"Duplicated accounts detected in {sheet_type_name} sheet '{sheet_name}'. "
+             f"Please rectify them to avoid repeated calculations: **{', '.join(dup_tenant_account)}**.")
+       
         # Map PL accounts and Sabra account
 	# map sabra account with tenant account, groupby sabra account
         #st.write("sheet_type",sheet_type,"PL",PL,"account_pool",account_pool)
