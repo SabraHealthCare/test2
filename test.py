@@ -1590,8 +1590,11 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
             PL.iloc[:, tenantAccount_col_no_list[0]] = combined_col
             st.write("PL00",PL)
         tenantAccount_col_no=tenantAccount_col_no_list[0]
+        st.write("tenantAccount_col_no",tenantAccount_col_no,PL.columns[tenantAccount_col_no])	    
         #set tenant_account as index of PL
+        st.write("PL0",PL)
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
+        st.write("PL1",PL)
         entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no) 
         st.write("PL2",PL)
 	#remove row above property header
