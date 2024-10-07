@@ -272,7 +272,7 @@ def Initial_Mapping(operator):
     # Read account mapping file from OneDrive
     account_mapping_all = Read_File_From_Onedrive(mapping_path,account_mapping_filename,"XLSX",account_mapping_str_col)
     account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
-    st.write("account_mapping",account_mapping)
+    #st.write("account_mapping",account_mapping)
     # Handle case where there's only one row and it corresponds to a template
     if account_mapping.shape[0] == 1 and account_mapping["Sabra_Account"].iloc[0] == 'Template':
         account_mapping = account_mapping_all[account_mapping_all["Operator"] == "Template"].copy()
@@ -289,7 +289,7 @@ def Initial_Mapping(operator):
                   .query("Operator == @operator")
                   .set_index("ENTITY"))
     entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]] = entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]].astype(str)  
-    st.write("entity_mapping",entity_mapping)
+    #st.write("entity_mapping",entity_mapping)
     return BPC_pull,entity_mapping,account_mapping
 
 	
@@ -1558,7 +1558,7 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,sheet_name):  
     global account_mapping,reporting_month,tenant_account_col
-    st.write("account_mapping",account_mapping)
+    #st.write("account_mapping",account_mapping)
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
     st.write("sheet_type",sheet_type,"account_pool","account_pool",sheet_name)
     if sheet_type=="Sheet_Name_Finance":  
@@ -1778,7 +1778,7 @@ def Upload_And_Process(uploaded_file,file_type):
 	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS'])) |\
 	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]	  
     account_pool_balance_sheet= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]	
-    st.write("account_pool_full",account_pool_full)
+    #st.write("account_pool_full",account_pool_full)
     # ****Finance and BS in one excel****
     if file_type=="Finance":
         tenant_account_col=[10000]
@@ -1819,7 +1819,7 @@ def Upload_And_Process(uploaded_file,file_type):
 	# All the properties are in one sheet	
         sheet_list_finance_in_onesheet = entity_mapping[entity_mapping["Finance_in_separate_sheets"]=="N"]["Sheet_Name_Finance"].unique()
         if len(sheet_list_finance_in_onesheet)>0:
-            st.write("sheet_list_finance_in_onesheet",sheet_list_finance_in_onesheet)
+            #st.write("sheet_list_finance_in_onesheet",sheet_list_finance_in_onesheet)
             for sheet_name_finance_in_onesheet in sheet_list_finance_in_onesheet:
                 tenant_account_col=[10000]
                 entity_list_finance_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_in_onesheet].tolist()
