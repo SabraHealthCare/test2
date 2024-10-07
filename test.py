@@ -959,7 +959,12 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
             #if accounts_with_conversions.shape[0]>0:
                 #st.write("Please confirm if below account need to be applied conversion")
                 #for tenant_account in accounts_with_conversions["Tenant_Account"]:
-                    
+#or index, row in df.iterrows():
+    # Display the row data
+    #st.write(f"Row {index}: {row['Column 1']}, {row['Column 2']}")
+    
+    # Create a dropdown for the last column
+    #decision = st.selectbox(f"Select for Row {index}", options=["Yes", "No"], index=0, key=index)
                 
 
 	    
