@@ -274,6 +274,9 @@ def Initial_Mapping(operator):
     st.write("account_mapping_all",account_mapping_all)
     # Handle case where there's only one row and it corresponds to a template
     account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
+    st.write("template",account_mapping_all[account_mapping_all["Operator"] == "Template"])
+    st.write(account_mapping.shape[0] == 1)
+    st.write(account_mapping["Sabra_Account"].iloc[0] == 'Template')
     if account_mapping.shape[0] == 1 and account_mapping["Sabra_Account"].iloc[0] == 'Template':
         account_mapping = account_mapping_all[account_mapping_all["Operator"] == "Template"].copy()
         account_mapping["Operator"] = operator	
