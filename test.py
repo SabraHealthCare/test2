@@ -276,7 +276,7 @@ def Initial_Mapping(operator):
     account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
     #st.write("template",account_mapping_all[account_mapping_all["Operator"] == "Template"])
 
-    if account_mapping.shape[0] == 1 and account_mapping["Sabra_Account"].values[0] == 'Template'::
+    if account_mapping.shape[0] == 1 and account_mapping["Sabra_Account"].values[0] == 'Template':
         account_mapping = account_mapping_all[account_mapping_all["Operator"] == "Template"].copy()
         account_mapping["Operator"] = operator	
     
