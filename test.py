@@ -1560,7 +1560,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
     global account_mapping,reporting_month,tenant_account_col
     #st.write("account_mapping",account_mapping)
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
-    st.write("sheet_type",sheet_type,"account_pool","account_pool",sheet_name)
+    #st.write("sheet_type",sheet_type,"account_pool","account_pool",sheet_name)
     if sheet_type=="Sheet_Name_Finance":  
         sheet_type_name="P&L"
     elif sheet_type=="Sheet_Name_Occupancy":
@@ -1573,12 +1573,12 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 
 	
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
-    st.write("sheet_name",sheet_name,"PL",PL)
+    #st.write("sheet_name",sheet_name,"PL",PL)
     # Start checking process
     if True:   
         tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
         tenant_account_col=tenantAccount_col_no_list  # for pre-compare
-        st.write("tenant_account_col",tenant_account_col)
+        #st.write("tenant_account_col",tenant_account_col)
         if len(tenantAccount_col_no_list) > 1:
             # Start with the first column
             combined_col = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
@@ -1588,18 +1588,18 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
                 current_col = PL.iloc[:, col_idx].fillna('')
                 # Fill missing values in the combined column with values from the current column
                 combined_col = combined_col.where(combined_col != '', current_col)
-            st.write("combined_col",combined_col)
+            #st.write("combined_col",combined_col)
             # Assign the combined result back to the first column
             PL.iloc[:, tenantAccount_col_no_list[0]] = combined_col
-            st.write("PL00",PL)
+            
         tenantAccount_col_no=tenantAccount_col_no_list[0]
         st.write("tenantAccount_col_no",tenantAccount_col_no,PL.columns[tenantAccount_col_no])	    
         #set tenant_account as index of PL
-        st.write("PL0",PL)
+      
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
-        st.write("PL1",PL)
+
         entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no) 
-        st.write("PL2",PL)
+
 	#remove row above property header
         PL=PL.iloc[entity_header_row_number+1:,:]
 
@@ -1632,7 +1632,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         PL = PL.reset_index(drop=False)
         PL=PL.drop_duplicates()
         PL = PL.set_index('Tenant_Account')  
-        st.write("PL3",PL)   
+      
         # Step 2: Identify any remaining duplicated indices after removing duplicate rows
         dup_tenant_account_all = PL.index[PL.index.duplicated()].unique()
 
@@ -1651,7 +1651,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         PL=Map_PL_Sabra(PL,entity_list,sheet_type,account_pool) # index are ('ENTITY',"Sabra_Account")
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
-        st.write("PL4",PL)  
+       
     return PL
 	
 @st.cache_data
