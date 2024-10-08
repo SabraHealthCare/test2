@@ -271,12 +271,13 @@ def Initial_Mapping(operator):
             .rename(columns=str))
     # Read account mapping file from OneDrive
     account_mapping_all = Read_File_From_Onedrive(mapping_path,account_mapping_filename,"XLSX",account_mapping_str_col)
+    st.write("account_mapping_all",account_mapping_all)
     # Handle case where there's only one row and it corresponds to a template
+    account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
     if account_mapping.shape[0] == 1 and account_mapping["Sabra_Account"].iloc[0] == 'Template':
         account_mapping = account_mapping_all[account_mapping_all["Operator"] == "Template"].copy()
         account_mapping["Operator"] = operator	
-    else:
-        account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
+    
     st.write("account_mapping1",account_mapping)  
     # Clean and format account mapping columns
     account_mapping_cols = ["Sabra_Account", "Sabra_Second_Account", "Tenant_Account"]
