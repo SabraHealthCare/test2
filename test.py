@@ -271,7 +271,7 @@ def Initial_Mapping(operator):
             .rename(columns=str))
     # Read account mapping file from OneDrive
     account_mapping_all = Read_File_From_Onedrive(mapping_path,account_mapping_filename,"XLSX",account_mapping_str_col)
-    st.write("account_mapping0",account_mapping) 
+    st.write("account_mapping_all",account_mapping_all) 
     account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
     st.write("account_mapping1",account_mapping)  
     # Handle case where there's only one row and it corresponds to a template
