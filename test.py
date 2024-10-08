@@ -1434,14 +1434,14 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
     month_mask=[]
-    st.write("first_tenant_account_row",first_tenant_account_row)
+    #st.write("first_tenant_account_row",first_tenant_account_row)
     # search the row with property column names	
     for row_i in range(first_tenant_account_row):
         canditate_row=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[row_i,:])))  
         match_names = [item for item in canditate_row if item in column_name_list_in_mapping] 
 	# find the property name header row, transferred them into entity id
 
-        st.write("match_names",match_names,"sorted(column_name_list_in_mapping)",sorted(column_name_list_in_mapping),"entity_without_propertynamefinance",entity_without_propertynamefinance)
+        #st.write("match_names",match_names,"sorted(column_name_list_in_mapping)",sorted(column_name_list_in_mapping),"entity_without_propertynamefinance",entity_without_propertynamefinance)
 
         if len(match_names)>0 and sorted(match_names)==sorted(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: 
            # property name column header is unique and match with entity mapping
@@ -1593,7 +1593,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
             PL.iloc[:, tenantAccount_col_no_list[0]] = combined_col
             
         tenantAccount_col_no=tenantAccount_col_no_list[0]
-        st.write("tenantAccount_col_no",tenantAccount_col_no,PL.columns[tenantAccount_col_no])	    
+        #st.write("tenantAccount_col_no",tenantAccount_col_no,PL.columns[tenantAccount_col_no])	    
         #set tenant_account as index of PL
       
         PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
