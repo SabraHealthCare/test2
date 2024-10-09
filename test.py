@@ -1733,7 +1733,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         select_months_list= list(PL.columns)          
         # remove columns with all nan/0 or a combination of nan and 0
         #PL=PL.loc[:,(PL!= 0).any(axis=0)]
-        # remove rows with all nan/0 value or a combination of nan and 0
+        # remove rows with all nan/0 value or a combination of nan and 0 
         PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
 	# mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x: x not in list(account_mapping["Tenant_Account"]),PL.index))
