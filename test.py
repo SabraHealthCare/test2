@@ -1746,7 +1746,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         PL.index.name = "Tenant_Account"
         st.write("PL",PL.index)
         PL = PL.reset_index(drop=False)
-        st.write("PL",PL,PL.index,PL[reporting_month])
+        #st.write("PL",PL,PL.index,PL[reporting_month])
         PL=PL.drop_duplicates(subset=["Tenant_Account", reporting_month])
         PL = PL.set_index('Tenant_Account')  
         st.write("PL set back index",PL,PL.index,PL[reporting_month])    
