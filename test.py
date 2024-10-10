@@ -1576,7 +1576,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
     # read data from uploaded file
     excel_file = pd.ExcelFile(uploaded_file)
 
-	
+	 
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
     #st.write("sheet_name",sheet_name,"PL",PL)
     # Start checking process
