@@ -1624,6 +1624,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         # remove rows with all nan/0 value
         #PL=PL.loc[(PL!= 0).any(axis=1),:]
         PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
+        st.write("PL.index",PL.index)
         # mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Account"]),PL.index))
         # remove duplicate new account
