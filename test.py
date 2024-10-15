@@ -1427,13 +1427,13 @@ def Is_Reporting_Month(single_string):
             return True
     return False
 
-def Identify_Column_Name_Header(PL,tenant_account_col,entity_list,sheet_name): 
+def Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_name): 
     entity_without_propertynamefinance = entity_mapping[ (entity_mapping.index.isin(entity_list)) & \
     ((entity_mapping['Column_Name'].isna()) | (entity_mapping['Column_Name'].str.strip() == ""))].index.tolist()
     column_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"] if pd.notna(x) and str(x).strip()]
     max_match=[]
 
-    tenant_account_row_mask = tenant_account_col.isin(\
+    tenant_account_row_mask = tenant_account_col_values.isin(\
 	    [account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account'])\
 	     if sabra_account != 'NO NEED TO MAP']).tolist()
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
