@@ -1724,7 +1724,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
                 tenant_account_col_values = tenant_account_col_values.where(tenant_account_col_values != '', current_col)
         elif len(tenant_account_col) == 1:
             tenant_account_col_values=PL.iloc[:, tenant_account_col[0]]
-	tenant_account_col_values=tenant_account_col_values.str.upper().str.strip()    
+        tenant_account_col_values=tenant_account_col_values.str.upper().str.strip()    
         date_header=Identify_Month_Row(PL,tenant_account_col_values,tenant_account_col[0],sheet_name,sheet_type,date_header)
         if len(date_header[0])==0:
             return pd.DataFrame()
