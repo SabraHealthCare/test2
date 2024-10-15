@@ -629,7 +629,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     PL_col_size=PL.shape[1]
 
     # Create a set of tenant accounts that need mapping
-    accounts_to_map = {account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account']) if account_mapping['Sabra_Account'] != 'NO NEED TO MAP'}
+    accounts_to_map = {account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account']) if sabra_account!= 'NO NEED TO MAP'}
 
     # Create a boolean mask using a list comprehension
     tenant_account_row_mask = [account in accounts_to_map for account in tenant_account_col_values]
@@ -1438,7 +1438,7 @@ def Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_n
     max_match=[]
 
     # Create a set of tenant accounts that need mapping
-    accounts_to_map = {account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account']) if account_mapping['Sabra_Account'] != 'NO NEED TO MAP'}
+    accounts_to_map = {account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account']) if sabra_account!= 'NO NEED TO MAP'}
 
     # Create a boolean mask using a list comprehension
     tenant_account_row_mask = [account in accounts_to_map for account in tenant_account_col_values]
