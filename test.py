@@ -630,10 +630,10 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
 
     # Create a set of tenant accounts that need mapping
     accounts_to_map = [account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account']) if sabra_account!= 'NO NEED TO MAP']
-    st.write("tenant_account_col_values",tenant_account_col_values,"accounts_to_map",accounts_to_map)
+    #st.write("tenant_account_col_values",tenant_account_col_values,"accounts_to_map",accounts_to_map)
     # Create a boolean mask using a list comprehension
     tenant_account_row_mask = [account in accounts_to_map for account in tenant_account_col_values]
-    st.write("tenant_account_row_mask",tenant_account_row_mask)	
+    #st.write("tenant_account_row_mask",tenant_account_row_mask)	
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
 
     #st.write("tenant_account_row_mask",tenant_account_row_mask)
@@ -643,7 +643,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     else:
         PL_temp=PL.loc[tenant_account_row_mask]
         first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
-        st.write("PL_temp",PL_temp,first_tenant_account_row)
+        #st.write("PL_temp",PL_temp,first_tenant_account_row)
     #valid_col_mask labels all the columns as ([False, False, True,.True..False...])
 	#1. on the right of tenantAccount_col_no 
 	#2.contain numeric value 
@@ -653,7 +653,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
            not all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)\
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
     valid_col_index=[i for i, mask in enumerate(valid_col_mask) if mask]
-    st.write("PL_temp",PL_temp,"valid_col_mask",valid_col_mask,valid_col_index)
+    #st.write("PL_temp",PL_temp,"valid_col_mask",valid_col_mask,valid_col_index)
     if len(valid_col_index)==0: # there is no valid data column
         return [],0,[]
     # nan_num_column is the column whose value is nan or 0 for PL.drop(nan_index)
@@ -1731,7 +1731,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         if all(x=="0" or x==0 for x in date_header[0]):
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()  
-        st.write("date_header",date_header)
+        #st.write("date_header",date_header)
 	# some tenant account col are in the right side of month header, remove these column from tenant_account_col
         if len(tenant_account_col) > 1:
             # Find the index of the first non-'0' in new_entity_header
@@ -1820,7 +1820,7 @@ def Upload_And_Process(uploaded_file,file_type):
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                 Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
-                st.write("PL15",PL)
+
 	# check census data
         tenant_account_col=[10000]
         for entity_i in total_entity_list: 
