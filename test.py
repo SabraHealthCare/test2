@@ -1436,17 +1436,17 @@ def Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_n
     ((entity_mapping['Column_Name'].isna()) | (entity_mapping['Column_Name'].str.strip() == ""))].index.tolist()
     column_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"] if pd.notna(x) and str(x).strip()]
     max_match=[]
-    st.write("tenant_account_col_values",tenant_account_col_values)	
+    #st.write("tenant_account_col_values",tenant_account_col_values)	
     # Create a set of tenant accounts that need mapping
     accounts_to_map = {account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account']) if sabra_account!= 'NO NEED TO MAP'}
 
     # Create a boolean mask using a list comprehension
     tenant_account_row_mask = [account in accounts_to_map for account in tenant_account_col_values]
-    st.write("tenant_account_row_mask",tenant_account_row_mask)	
+    #st.write("tenant_account_row_mask",tenant_account_row_mask)	
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
     month_mask=[]
-    st.write("first_tenant_account_row",first_tenant_account_row)
+    #st.write("first_tenant_account_row",first_tenant_account_row)
     # search the row with property column names	
     for row_i in range(first_tenant_account_row):
         canditate_row=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[row_i,:])))  
@@ -1606,10 +1606,10 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         if len(tenant_account_col) > 1:
             # Find the index of the first non-'0' in new_entity_header
             first_non_zero_index = next(i for i, value in enumerate(new_entity_header) if value != "0")
-            st.write("before",first_non_zero_index,tenant_account_col)
+            
             # Filter tenant_account_col to keep only indices less than or equal to the first_non_zero_index
-            updated_tenant_account_col = [index for index in tenant_account_col if index <= first_non_zero_index]
-            st.write("After",updated_tenant_account_col)
+            updated_tenant_account_col = [index for index in tenant_account_col if index < first_non_zero_index]
+            
             if len(updated_tenant_account_col)<len(tenant_account_col): 
                 tenant_account_col_values = PL.iloc[:, updated_tenant_account_col[0]].fillna('')
 
@@ -1736,7 +1736,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
             first_non_zero_index = next(i for i, value in enumerate(date_header[0]) if value != "0" and value != 0)
 
             # Filter tenant_account_col to keep only indices less than or equal to the first_non_zero_index
-            updated_tenant_account_col = [index for index in tenant_account_col if index <= first_non_zero_index]
+            updated_tenant_account_col = [index for index in tenant_account_col if index < first_non_zero_index]
 
             if len(updated_tenant_account_col)<len(tenant_account_col): 
                 tenant_account_col_values = PL.iloc[:, updated_tenant_account_col[0]].fillna('')
