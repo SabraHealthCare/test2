@@ -619,15 +619,15 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
 
 
     
-@st.cache_data
-def Identify_Month_Row(PL,sheet_name,sheet_type,pre_date_header,tenantAccount_col_no): 
+@st.cache_data  
+def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_name,sheet_type,date_header): 
     #st.write("sheet_name",sheet_name)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
             return pre_date_header
     PL_col_size=PL.shape[1]
-    tenant_account_row_mask = PL.index.str.upper().str.strip().isin(\
+    tenant_account_row_mask = tenantAccount_col_values.isin(\
         [account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account']) \
 	 if sabra_account != 'NO NEED TO MAP']).tolist()
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
@@ -1427,13 +1427,13 @@ def Is_Reporting_Month(single_string):
             return True
     return False
 
-def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no): 
+def Identify_Column_Name_Header(PL,tenant_account_col,entity_list,sheet_name): 
     entity_without_propertynamefinance = entity_mapping[ (entity_mapping.index.isin(entity_list)) & \
     ((entity_mapping['Column_Name'].isna()) | (entity_mapping['Column_Name'].str.strip() == ""))].index.tolist()
     column_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"] if pd.notna(x) and str(x).strip()]
     max_match=[]
 
-    tenant_account_row_mask = PL.index.str.upper().str.strip().isin(\
+    tenant_account_row_mask = tenant_account_col.isin(\
 	    [account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account'])\
 	     if sabra_account != 'NO NEED TO MAP']).tolist()
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
@@ -1445,9 +1445,6 @@ def Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no):
         canditate_row=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[row_i,:])))  
         match_names = [item for item in canditate_row if item in column_name_list_in_mapping] 
 	# find the property name header row, transferred them into entity id
-
-        #st.write("match_names",match_names,"sorted(column_name_list_in_mapping)",sorted(column_name_list_in_mapping),"entity_without_propertynamefinance",entity_without_propertynamefinance)
-
         if len(match_names)>0 and sorted(match_names)==sorted(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: 
            # property name column header is unique and match with entity mapping
             mapping_dict = {column_name_list_in_mapping[i]: entity_list[i] for i in range(len(column_name_list_in_mapping))}
@@ -1581,30 +1578,44 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
     #st.write("sheet_name",sheet_name,"PL",PL)
     # Start checking process
     if True:   
-        tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
-        tenant_account_col=tenantAccount_col_no_list  # for pre-compare
+        tenant_account_col=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
         #st.write("tenant_account_col",tenant_account_col)
-        if len(tenantAccount_col_no_list) > 1:
+
+        if len(tenant_account_col) > 1:
             # Start with the first column
-            combined_col = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
+            tenant_account_col_values = PL.iloc[:, tenant_account_col[0]].fillna('')
 
             # Iterate over the rest of the columns and combine them
-            for col_idx in tenantAccount_col_no_list[1:]:
+            for col_idx in tenant_account_col[1:]:
                 current_col = PL.iloc[:, col_idx].fillna('')
                 # Fill missing values in the combined column with values from the current column
-                combined_col = combined_col.where(combined_col != '', current_col)
-            #st.write("combined_col",combined_col)
-            # Assign the combined result back to the first column
-            PL.iloc[:, tenantAccount_col_no_list[0]] = combined_col
-            
-        tenantAccount_col_no=tenantAccount_col_no_list[0]
-        #st.write("tenantAccount_col_no",tenantAccount_col_no,PL.columns[tenantAccount_col_no])	    
-        #set tenant_account as index of PL
-      
-        PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
+                tenant_account_col_values = tenant_account_col_values.where(tenant_account_col_values != '', current_col)
 
-        entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,entity_list,sheet_name,tenantAccount_col_no) 
+        elif len(tenant_account_col) == 1:
+            tenant_account_col_values=PL.iloc[:, tenant_account_col[0]]
+        tenant_account_col_values=tenant_account_col_values.str.upper().str.strip()
 
+        entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,tenant_account_col,entity_list,sheet_name) 
+	# some tenant account col are in the right side of header, remove these column from tenant_account_col
+        if len(tenant_account_col) > 1:
+            # Find the index of the first non-'0' in new_entity_header
+            first_non_zero_index = next(i for i, value in enumerate(new_entity_header) if value != "0")
+
+            # Filter tenant_account_col to keep only indices less than or equal to the first_non_zero_index
+            updated_tenant_account_col = [index for index in tenant_account_col if index <= first_non_zero_index]
+
+            if len(updated_tenant_account_col)<len(tenant_account_col): 
+                tenant_account_col_values = PL.iloc[:, updated_tenant_account_col[0]].fillna('')
+
+                # Iterate over the rest of the columns and combine them
+                for col_idx in updated_tenant_account_col[1:]:
+                    current_col = PL.iloc[:, col_idx].fillna('')
+                    # Fill missing values in the combined column with values from the current column
+                    tenant_account_col_values = tenant_account_col_values.where(tenant_account_col_values != '', current_col)
+
+	#set tenant_account_col as index of PL
+        PL = PL.set_index(tenant_account_col_values)
+	    
 	#remove row above property header
         PL=PL.iloc[entity_header_row_number+1:,:]
 
@@ -1693,32 +1704,46 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         return pd.DataFrame()
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
-        tenantAccount_col_no_list=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
-        tenant_account_col=tenantAccount_col_no_list  # for pre-compare
-
-        if len(tenantAccount_col_no_list) > 1:
+        tenant_account_col=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
+        
+        if len(tenant_account_col) > 1:
             # Start with the first column
-            combined_col = PL.iloc[:, tenantAccount_col_no_list[0]].fillna('')
+            tenant_account_col_values = PL.iloc[:, tenant_account_col[0]].fillna('')
 
             # Iterate over the rest of the columns and combine them
-            for col_idx in tenantAccount_col_no_list[1:]:
+            for col_idx in tenant_account_col[1:]:
                 current_col = PL.iloc[:, col_idx].fillna('')
                 # Fill missing values in the combined column with values from the current column
-                combined_col = combined_col.where(combined_col != '', current_col)
-            #st.write("combined_col",combined_col)
-            # Assign the combined result back to the first column
-            PL.iloc[:, tenantAccount_col_no_list[0]] = combined_col
-        
-        tenantAccount_col_no=tenantAccount_col_no_list[0]
-        #set tenant_account as index of PL
-        PL = PL.set_index(PL.columns[tenantAccount_col_no], drop=False)
-        date_header=Identify_Month_Row(PL,sheet_name,sheet_type,date_header,tenantAccount_col_no)
+                tenant_account_col_values = tenant_account_col_values.where(tenant_account_col_values != '', current_col)
+            #st.write("tenant_account_col_values",tenant_account_col_values)
+	    
+        date_header=Identify_Month_Row(PL,tenant_account_col_values,tenant_account_col[0],sheet_name,sheet_type,date_header)
         if len(date_header[0])==0:
             return pd.DataFrame()
         if all(x=="0" or x==0 for x in date_header[0]):
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()  
-		
+
+	# some tenant account col are in the right side of month header, remove these column from tenant_account_col
+        if len(tenant_account_col) > 1:
+            # Find the index of the first non-'0' in new_entity_header
+            first_non_zero_index = next(i for i, value in enumerate(date_header[0]) if value != "0" and value != 0)
+
+            # Filter tenant_account_col to keep only indices less than or equal to the first_non_zero_index
+            updated_tenant_account_col = [index for index in tenant_account_col if index <= first_non_zero_index]
+
+            if len(updated_tenant_account_col)<len(tenant_account_col): 
+                tenant_account_col_values = PL.iloc[:, updated_tenant_account_col[0]].fillna('')
+
+                # Iterate over the rest of the columns and combine them
+                for col_idx in updated_tenant_account_col[1:]:
+                    current_col = PL.iloc[:, col_idx].fillna('')
+                    # Fill missing values in the combined column with values from the current column
+                    tenant_account_col_values = tenant_account_col_values.where(tenant_account_col_values != '', current_col)
+
+	#set tenant_account_col_values as index of PL
+        PL = PL.set_index(tenant_account_col_values)
+	    
         #remove row above date, to prevent to map these value as new accounts
         PL=PL.iloc[date_header[1]+1:,:]
 	#remove rows with nan tenant account
