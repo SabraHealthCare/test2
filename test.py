@@ -1712,7 +1712,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenant_account_col=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
-        
+        st.write("tenant_account_col",tenant_account_col)
         if len(tenant_account_col) > 1:
             # Start with the first column
             tenant_account_col_values = PL.iloc[:, tenant_account_col[0]].fillna('')
@@ -1722,7 +1722,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
                 current_col = PL.iloc[:, col_idx].fillna('')
                 # Fill missing values in the combined column with values from the current column
                 tenant_account_col_values = tenant_account_col_values.where(tenant_account_col_values != '', current_col)
-            #st.write("tenant_account_col_values",tenant_account_col_values)
+            st.write("tenant_account_col_values",tenant_account_col_values)
 	    
         date_header=Identify_Month_Row(PL,tenant_account_col_values,tenant_account_col[0],sheet_name,sheet_type,date_header)
         if len(date_header[0])==0:
@@ -1730,7 +1730,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         if all(x=="0" or x==0 for x in date_header[0]):
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()  
-
+        st.write("date_header",date_header)
 	# some tenant account col are in the right side of month header, remove these column from tenant_account_col
         if len(tenant_account_col) > 1:
             # Find the index of the first non-'0' in new_entity_header
@@ -1750,7 +1750,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 
 	#set tenant_account_col_values as index of PL
         PL = PL.set_index(tenant_account_col_values)
-	    
+        st.write("PL11",PL)   
         #remove row above date, to prevent to map these value as new accounts
         PL=PL.iloc[date_header[1]+1:,:]
 	#remove rows with nan tenant account
@@ -1773,16 +1773,14 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
             account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name)        
-        
+        st.write("PL13",PL) 
         #if there are duplicated accounts in P&L, ask for confirming
         # Step 1: Remove all duplicate rows, keeping only unique records based on all column values
         PL.index.name = "Tenant_Account"
-        st.write("PL",PL.index)
+        st.write("PL14",PL.index)
         PL = PL.reset_index(drop=False)
-        st.write("OOOO")
         PL=PL.drop_duplicates(subset=["Tenant_Account", reporting_month])
-        PL = PL.set_index('Tenant_Account')  
-        st.write("PL set back index",PL,PL.index,PL[reporting_month])    
+        PL = PL.set_index('Tenant_Account')    
         # Step 2: Identify any remaining duplicated indices after removing duplicate rows
         dup_tenant_account_all = PL.index[PL.index.duplicated()].unique()
 
@@ -1824,7 +1822,7 @@ def Upload_And_Process(uploaded_file,file_type):
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                 Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
-                st.write("PL11",PL)
+                st.write("PL15",PL)
 	# check census data
         tenant_account_col=[10000]
         for entity_i in total_entity_list: 
