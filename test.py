@@ -1606,10 +1606,10 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         if len(tenant_account_col) > 1:
             # Find the index of the first non-'0' in new_entity_header
             first_non_zero_index = next(i for i, value in enumerate(new_entity_header) if value != "0")
-
+            st.write("before",first_non_zero_index,tenant_account_col)
             # Filter tenant_account_col to keep only indices less than or equal to the first_non_zero_index
             updated_tenant_account_col = [index for index in tenant_account_col if index <= first_non_zero_index]
-
+            st.write("After",updated_tenant_account_col)
             if len(updated_tenant_account_col)<len(tenant_account_col): 
                 tenant_account_col_values = PL.iloc[:, updated_tenant_account_col[0]].fillna('')
 
