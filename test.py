@@ -627,9 +627,13 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
             return pre_date_header
     PL_col_size=PL.shape[1]
-    tenant_account_row_mask = tenantAccount_col_values.isin(\
-        [account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account']) \
-	 if sabra_account != 'NO NEED TO MAP']).tolist()
+
+    # Create a set of tenant accounts that need mapping
+    accounts_to_map = {account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account']) if account_mapping['Sabra_Account'] != 'NO NEED TO MAP'}
+
+    # Create a boolean mask using a list comprehension
+    tenant_account_row_mask = [account in accounts_to_map for account in tenant_account_col_values]
+	
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
 
     #st.write("tenant_account_row_mask",tenant_account_row_mask)
@@ -1433,9 +1437,12 @@ def Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_n
     column_name_list_in_mapping=[str(x).upper().strip() for x in entity_mapping.loc[entity_list]["Column_Name"] if pd.notna(x) and str(x).strip()]
     max_match=[]
 
-    tenant_account_row_mask = tenant_account_col_values.isin(\
-	    [account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account'])\
-	     if sabra_account != 'NO NEED TO MAP']).tolist()
+    # Create a set of tenant accounts that need mapping
+    accounts_to_map = {account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account']) if account_mapping['Sabra_Account'] != 'NO NEED TO MAP'}
+
+    # Create a boolean mask using a list comprehension
+    tenant_account_row_mask = [account in accounts_to_map for account in tenant_account_col_values]
+	
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
     month_mask=[]
