@@ -643,16 +643,16 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     else:
         PL_temp=PL.loc[tenant_account_row_mask]
         first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
-    #valid_col_mask labels all the columns as ([False, False, True,...])
+    #valid_col_mask labels all the columns as ([False, False, True,.True..False...])
 	#1. on the right of tenantAccount_col_no 
 	#2.contain numeric value 
 	#3. not all 0 or nan in tenant_account_row. 
-    #st.write("PL_temp",PL_temp)
+
     valid_col_mask = PL_temp.apply(lambda x: ( pd.to_numeric(x, errors='coerce').notna().any() and \
            not all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)\
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
     valid_col_index=[i for i, mask in enumerate(valid_col_mask) if mask]
-    #st.write("valid_col_mask",valid_col_mask,valid_col_index)
+    st.write("PL_temp",PL_temp,"valid_col_mask",valid_col_mask,valid_col_index)
     if len(valid_col_index)==0: # there is no valid data column
         return [],0,[]
     # nan_num_column is the column whose value is nan or 0 for PL.drop(nan_index)
@@ -1706,13 +1706,12 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 
     # read data from uploaded file
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
-    st.write("PL10",PL)
     if PL.shape[0]<=1:  # sheet is empty or only has one column
         return pd.DataFrame()
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenant_account_col=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
-        st.write("tenant_account_col",tenant_account_col)
+        #st.write("tenant_account_col",tenant_account_col)
         if len(tenant_account_col) > 1:
             # Start with the first column
             tenant_account_col_values = PL.iloc[:, tenant_account_col[0]].fillna('')
@@ -1722,7 +1721,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
                 current_col = PL.iloc[:, col_idx].fillna('')
                 # Fill missing values in the combined column with values from the current column
                 tenant_account_col_values = tenant_account_col_values.where(tenant_account_col_values != '', current_col)
-            st.write("tenant_account_col_values",tenant_account_col_values)
+            #st.write("tenant_account_col_values11",tenant_account_col_values)
 	    
         date_header=Identify_Month_Row(PL,tenant_account_col_values,tenant_account_col[0],sheet_name,sheet_type,date_header)
         if len(date_header[0])==0:
@@ -1749,8 +1748,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
                     tenant_account_col_values = tenant_account_col_values.where(tenant_account_col_values != '', current_col)
 
 	#set tenant_account_col_values as index of PL
-        PL = PL.set_index(tenant_account_col_values)
-        st.write("PL11",PL)   
+        PL = PL.set_index(tenant_account_col_values)  
         #remove row above date, to prevent to map these value as new accounts
         PL=PL.iloc[date_header[1]+1:,:]
 	#remove rows with nan tenant account
@@ -1773,11 +1771,9 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
             account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name)        
-        st.write("PL13",PL) 
         #if there are duplicated accounts in P&L, ask for confirming
         # Step 1: Remove all duplicate rows, keeping only unique records based on all column values
         PL.index.name = "Tenant_Account"
-        st.write("PL14",PL.index)
         PL = PL.reset_index(drop=False)
         PL=PL.drop_duplicates(subset=["Tenant_Account", reporting_month])
         PL = PL.set_index('Tenant_Account')    
