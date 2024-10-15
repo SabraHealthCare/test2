@@ -1586,8 +1586,6 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
     # Start checking process
     if True:   
         tenant_account_col=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
-        #st.write("tenant_account_col",tenant_account_col)
-
         if len(tenant_account_col) > 1:
             # Start with the first column
             tenant_account_col_values = PL.iloc[:, tenant_account_col[0]].fillna('')
@@ -1595,6 +1593,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
             # Iterate over the rest of the columns and combine them
             for col_idx in tenant_account_col[1:]:
                 current_col = PL.iloc[:, col_idx].fillna('')
+
                 # Fill missing values in the combined column with values from the current column
                 tenant_account_col_values = tenant_account_col_values.where(tenant_account_col_values != '', current_col)
 
@@ -1602,7 +1601,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
             tenant_account_col_values=PL.iloc[:, tenant_account_col[0]]
         tenant_account_col_values=tenant_account_col_values.str.upper().str.strip()
 
-        entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,tenant_account_col,entity_list,sheet_name) 
+        entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_name) 
 	# some tenant account col are in the right side of header, remove these column from tenant_account_col
         if len(tenant_account_col) > 1:
             # Find the index of the first non-'0' in new_entity_header
