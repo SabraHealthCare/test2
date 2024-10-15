@@ -633,7 +633,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     
     # Create a boolean mask using a list comprehension
     tenant_account_row_mask = [account in accounts_to_map for account in tenant_account_col_values]
-	
+    st.write("tenant_account_row_mask",tenant_account_row_mask)	
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
 
     #st.write("tenant_account_row_mask",tenant_account_row_mask)
@@ -643,6 +643,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     else:
         PL_temp=PL.loc[tenant_account_row_mask]
         first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
+        st.write("PL_temp",PL_temp,first_tenant_account_row)
     #valid_col_mask labels all the columns as ([False, False, True,.True..False...])
 	#1. on the right of tenantAccount_col_no 
 	#2.contain numeric value 
