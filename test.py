@@ -630,7 +630,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
 
     # Create a set of tenant accounts that need mapping
     accounts_to_map = {account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account']) if sabra_account!= 'NO NEED TO MAP'}
-    
+    st.write("accounts_to_map",tenant_account_col_values)
     # Create a boolean mask using a list comprehension
     tenant_account_row_mask = [account in accounts_to_map for account in tenant_account_col_values]
     st.write("tenant_account_row_mask",tenant_account_row_mask)	
