@@ -2064,7 +2064,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
             Total_PL=Upload_And_Process(uploaded_finance,"Finance")
-
+            st.write("Total_PL1",Total_PL)
         elif BS_separate_excel=="Y": # Finance/BS are in different excel 
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")
             entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
