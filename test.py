@@ -1744,7 +1744,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 
                 # Iterate over the rest of the columns and combine them
                 for col_idx in updated_tenant_account_col[1:]:
-                    current_col = PL.iloc[:, col_idx].fillna('')
+                    current_col = PL.iloc[:, col_idx].fillna('') 
                     # Fill missing values in the combined column with values from the current column
                     tenant_account_col_values = tenant_account_col_values.where(tenant_account_col_values != '', current_col)
 
