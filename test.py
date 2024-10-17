@@ -739,7 +739,6 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
 			     format(reporting_month[4:6],reporting_month[0:4],sheet_name,reporting_month[4:6],reporting_month[0:4]))
                     elif count_reporting_month==1:  # there is only one reporting month in the header
                         return PL_date_header,month_row_index,PL.iloc[month_row_index,:]	
-		
                 else:
                     continue
 			
@@ -758,6 +757,8 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                 continue
 
     if len(candidate_date)>1:
+	# there are duplicated month/year of reporting_month in header, remove the one which has "YTD" , "Year to date"
+        st.write("candidate_date",candidate_date)
         #st.write(",".join([sublist[-1]+1 for sublist in candidate_date]))
         st.error("We detected {} month headers in sheet——'{}'. Please ensure there's only one month header for the data column.".format(len(candidate_date),sheet_name))
         st.stop()
