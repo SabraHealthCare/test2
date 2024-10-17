@@ -1456,11 +1456,13 @@ def Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_n
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
     month_mask=[]
-    #st.write("first_tenant_account_row",first_tenant_account_row)
+    st.write("first_tenant_account_row",first_tenant_account_row)
     # search the row with property column names	
     for row_i in range(first_tenant_account_row):
         canditate_row=list(map(lambda x: str(x).upper().strip() if pd.notna(x) else x,list(PL.iloc[row_i,:])))  
+        st.write("canditate_row",canditate_row)
         match_names = [item for item in canditate_row if item in column_name_list_in_mapping] 
+        st.write("match_names",match_names)
 	# find the property name header row, transferred them into entity id
         if len(match_names)>0 and sorted(match_names)==sorted(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: 
            # property name column header is unique and match with entity mapping
