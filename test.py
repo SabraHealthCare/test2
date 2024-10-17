@@ -1459,7 +1459,7 @@ def Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_n
     st.write("first_tenant_account_row",first_tenant_account_row)
     # search the row with property column names	
     for row_i in range(first_tenant_account_row):
-        candidate_row = list(map(lambda x: str(int(x)).upper().strip() if pd.notna(x) and isinstance(x, float) else str(x).upper().strip(), list(PL.iloc[row_i, :])))
+        canditate_row = list(map(lambda x: str(int(x)).upper().strip() if pd.notna(x) and isinstance(x, float) else str(x).upper().strip(), list(PL.iloc[row_i, :])))
         st.write("canditate_row",canditate_row)
         match_names = [item for item in canditate_row if item in column_name_list_in_mapping] 
         st.write("match_names",match_names)
