@@ -286,7 +286,7 @@ def Initial_Mapping(operator):
     
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")
     account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion","Category"]]
-    
+    st.write("account_mapping",account_mapping)  
     entity_mapping=Read_File_From_Onedrive(mapping_path,entity_mapping_filename,"CSV",entity_mapping_str_col)
     entity_mapping = (Read_File_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
                   .reset_index(drop=True)
@@ -371,6 +371,7 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     #st.write("PL",PL,"account_pool",account_pool)
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else str(x).strip().upper())
+        st.write("candidate_col",candidate_col)
         non_empty_col = candidate_col[candidate_col != '']
         match_count = sum(candidate_col.isin(account_pool))
         #if match_count>3:
@@ -1460,9 +1461,9 @@ def Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_n
     # search the row with property column names	
     for row_i in range(first_tenant_account_row):
         canditate_row = list(map(lambda x: str(int(x)).upper().strip() if pd.notna(x) and isinstance(x, float) else str(x).upper().strip(), list(PL.iloc[row_i, :])))
-        st.write("canditate_row",canditate_row)
+        #st.write("canditate_row",canditate_row)
         match_names = [item for item in canditate_row if item in column_name_list_in_mapping] 
-        st.write("match_names",match_names)
+        #st.write("match_names",match_names)
 	# find the property name header row, transferred them into entity id
         if len(match_names)>0 and sorted(match_names)==sorted(column_name_list_in_mapping) and len(entity_without_propertynamefinance)==0: 
            # property name column header is unique and match with entity mapping
