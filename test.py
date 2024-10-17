@@ -293,7 +293,7 @@ def Initial_Mapping(operator):
                   .query("Operator == @operator")
                   .set_index("ENTITY"))
     entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]] = entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]].astype(str)  
-    st.write("entity_mapping",entity_mapping)
+    #st.write("entity_mapping",entity_mapping)
     return BPC_pull,entity_mapping,account_mapping
 
 	
@@ -1592,7 +1592,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 
 	 
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
-    #st.write("sheet_name",sheet_name,"PL",PL)
+    st.write("sheet_name",sheet_name,"PL",PL)
     # Start checking process
     if True:   
         tenant_account_col=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
