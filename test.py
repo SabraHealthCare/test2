@@ -293,7 +293,7 @@ def Initial_Mapping(operator):
                   .query("Operator == @operator")
                   .set_index("ENTITY"))
     entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]] = entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]].astype(str)  
-    #st.write("entity_mapping",entity_mapping)
+    st.write("entity_mapping",entity_mapping)
     return BPC_pull,entity_mapping,account_mapping
 
 	
