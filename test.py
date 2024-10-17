@@ -737,7 +737,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                     elif count_reporting_month>1:  # there are duplicated months (more than one same months in header)
                         keywords = ["ytd", "year to date", "year-to-date","year_to_date"]
 			# remove the one which has "YTD" , "Year to date" on or above
-			for col_idx in range(len(PL_date_header)):
+                        for col_idx in range(len(PL_date_header)):
     			    # Search for "YTD", "Year to date", or "year-to_date"
     			    if any(str(PL.iloc[row, col_idx]).strip().lower() in keywords for row in range(first_tenant_account_row)):
     			        # Change the corresponding value in `PL_date_header` to 0
