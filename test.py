@@ -734,9 +734,17 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                    
                     if count_reporting_month==0: # there is no reporting_month
                        continue
-                    elif count_reporting_month>1:
-                        st.write("PL_date_header",PL_date_header)
-			# there are duplicated month/year of reporting_month in header, remove the one which has "YTD" , "Year to date"
+                    elif count_reporting_month>1:  # there are duplicated months (more than one same months in header)
+                        keywords = ["ytd", "year to date", "year-to-date","year_to_date"]
+			# remove the one which has "YTD" , "Year to date" on or above
+			for col_idx in range(len(PL_date_header)):
+    			    # Search for "YTD", "Year to date", or "year-to_date"
+    			    if any(str(PL.iloc[row, col_idx]).strip().lower() in keywords for row in range(first_tenant_account_row)):
+    			        # Change the corresponding value in `PL_date_header` to 0
+    			        PL_date_header[col_idx] = "0"
+			    if list(PL_date_header).count(reporting_month)==1:
+       			        return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
+                     
                         st.error("There are more than one '{}/{}' header in sheet '{}'. Only one is allowed to identify the data column of '{}/{}'".\
 			     format(reporting_month[4:6],reporting_month[0:4],sheet_name,reporting_month[4:6],reporting_month[0:4]))
                     elif count_reporting_month==1:  # there is only one reporting month in the header
