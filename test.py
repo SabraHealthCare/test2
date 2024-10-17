@@ -281,9 +281,9 @@ def Initial_Mapping(operator):
     
     #st.write("account_mapping1",account_mapping)  
     # Clean and format account mapping columns
-    account_mapping_cols = ["Sabra_Account", "Sabra_Second_Account", "Tenant_Account"]
+    account_mapping_cols = ["Sabra_Account", "Sabra_Second_Account"]
     account_mapping[account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
-    
+    account_mapping["Tenant_Account"] = account_mapping["Tenant_Account"].applymap(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else str(x).strip().upper())
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")
     account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion","Category"]]
     st.write("account_mapping",account_mapping)  
@@ -369,8 +369,8 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 		
 def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, pre_max_match_col):
     st.write("account_pool",account_pool)
-    for value in account_pool:
-        st.write(value, type(value))
+    #for value in account_pool:
+        #st.write(value, type(value))
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else str(x).strip().upper())
         #st.write("candidate_col",candidate_col)
