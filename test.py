@@ -1460,7 +1460,6 @@ def Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_n
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
     month_mask=[]
-    st.write("first_tenant_account_row",first_tenant_account_row)
     # search the row with property column names	
     for row_i in range(first_tenant_account_row):
         canditate_row = list(map(lambda x: str(int(x)).upper().strip() if pd.notna(x) and isinstance(x, float) else str(x).upper().strip(), list(PL.iloc[row_i, :])))
@@ -1598,7 +1597,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 
 	 
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
-    st.write("sheet_name",sheet_name,"PL",PL)
+    #st.write("sheet_name",sheet_name,"PL",PL)
     # Start checking process
     if True:   
         tenant_account_col=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
@@ -1609,13 +1608,13 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
             # Iterate over the rest of the columns and combine them
             for col_idx in tenant_account_col[1:]:
                 current_col = PL.iloc[:, col_idx].fillna('')
-
+		    
                 # Fill missing values in the combined column with values from the current column
                 tenant_account_col_values = tenant_account_col_values.where(tenant_account_col_values != '', current_col)
 
         elif len(tenant_account_col) == 1:
             tenant_account_col_values=PL.iloc[:, tenant_account_col[0]]
-        tenant_account_col_values=tenant_account_col_values.str.upper().str.strip()
+        tenant_account_col_values = tenant_account_col_values.apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else str(x).strip().upper())
 
         entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_name) 
 	# some tenant account col are in the right side of header, remove these column from tenant_account_col
