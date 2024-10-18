@@ -369,16 +369,13 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 # Parse the df and get filter widgets based for provided columns
 		
 def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, pre_max_match_col):
-    st.write("account_pool",account_pool)
-    #for value in account_pool:
-        #st.write(value, type(value))
+    #st.write("account_pool",account_pool)
+
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else str(x).strip().upper())
         #st.write("candidate_col",candidate_col)
         non_empty_col = candidate_col[candidate_col != '']
         match_count = sum(candidate_col.isin(account_pool))
-        #if match_count>3:
-            #st.write("candidate_col,match_count",candidate_col,match_count)
         return match_count, len(non_empty_col)
     
     # Check the pre-identified columns first
@@ -1459,6 +1456,7 @@ def Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_n
     #st.write("tenant_account_row_mask",tenant_account_row_mask)	
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
+    st.write("first_tenant_account_row",first_tenant_account_row)
     month_mask=[]
     # search the row with property column names	
     for row_i in range(first_tenant_account_row):
@@ -1738,7 +1736,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
                 tenant_account_col_values = tenant_account_col_values.where(tenant_account_col_values != '', current_col)
         elif len(tenant_account_col) == 1:
             tenant_account_col_values=PL.iloc[:, tenant_account_col[0]]
-        tenant_account_col_values=tenant_account_col_values.str.upper().str.strip()    
+        tenant_account_col_values = tenant_account_col_values.apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else str(x).strip().upper())
+    
         date_header=Identify_Month_Row(PL,tenant_account_col_values,tenant_account_col[0],sheet_name,sheet_type,date_header)
         if len(date_header[0])==0:
             return pd.DataFrame()
