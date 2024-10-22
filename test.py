@@ -1331,10 +1331,12 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                     st.dataframe(missing_PL_sheet_property_N[["Property_Name"]],hide_index=True)
                     PL_sheet=st.selectbox("",[""]+PL_sheet_list,key="P&L_N")
                 if missing_occ_sheet_property_N.shape[0]>0:
-                    st.warning("Please provide sheet name for Occupancy:")
+                    st.warning("Please provide Occupancy sheet name for below properties:")
+                    st.dataframe(missing_occ_sheet_property_N[["Property_Name"]],hide_index=True)
                     occ_sheet=st.selectbox("",[""]+PL_sheet_list,key="occ_N")
             if missing_BS_sheet_property_N.shape[0]>0:
-                st.warning("Please provide sheet name for Balance Sheet:")
+                st.warning("Please provide sheet name for for below properties:")
+                st.dataframe(missing_BS_sheet_property_N[["Property_Name"]],hide_index=True)
                 BS_sheet=st.selectbox("",[""]+PL_sheet_list,key="BS_N")         
             submitted = st.form_submit_button("Submit")
             if submitted:
@@ -1344,17 +1346,16 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                         st.stop()
                     else:
                         if missing_PL_sheet_property_N.shape[0]>0:
-                            entity_mapping.loc[:,"Sheet_Name_Finance"]=PL_sheet
+                            entity_mapping.loc[missing_PL_sheet_property_N.index,"Sheet_Name_Finance"]=PL_sheet
                         if missing_occ_sheet_property_N.shape[0]>0:
-                            entity_mapping.loc[:,"Sheet_Name_Occupancy"]=occ_sheet
+                            entity_mapping.loc[missing_occ_sheet_property_N.index,"Sheet_Name_Occupancy"]=occ_sheet
                 elif missing_BS_sheet_property_N.shape[0]>0:
-                    st.write("BS_sheet",BS_sheet,BS_sheet== "")
+                    #st.write("BS_sheet",BS_sheet,BS_sheet== "")
                     if BS_sheet== "":
                         st.error("Please complete Balance Sheet mapping.")
                         st.stop()
                     else:
-                        entity_mapping.loc[:,"Sheet_Name_Balance_Sheet"]=BS_sheet
-                        st.write("BS_sheet",BS_sheet,entity_mapping)
+                        entity_mapping.loc[missing_BS_sheet_property_N.index,"Sheet_Name_Balance_Sheet"]=BS_sheet
             else:
                 st.stop()
     # update entity_mapping in onedrive  
