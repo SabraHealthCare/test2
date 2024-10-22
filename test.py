@@ -1335,7 +1335,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                     st.dataframe(missing_occ_sheet_property_N[["Property_Name"]],hide_index=True)
                     occ_sheet=st.selectbox("",[""]+PL_sheet_list,key="occ_N")
             if missing_BS_sheet_property_N.shape[0]>0:
-                st.warning("Please provide sheet name for for below properties:")
+                st.warning("Please provide Balance sheet name for for below properties:")
                 st.dataframe(missing_BS_sheet_property_N[["Property_Name"]],hide_index=True)
                 BS_sheet=st.selectbox("",[""]+PL_sheet_list,key="BS_N")         
             submitted = st.form_submit_button("Submit")
