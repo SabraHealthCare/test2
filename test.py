@@ -1341,7 +1341,9 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
             submitted = st.form_submit_button("Submit")
             if submitted:
                 if sheet_type=="Finance":
-                    if (missing_PL_sheet_property_N.shape[0]>0 and PL_sheet== "") or (missing_occ_sheet_property_N.shape[0]>0 and occ_sheet== "") or (missing_BS_sheet_property_N.shape[0]>0 and BS_sheet== ""):
+                    if (missing_PL_sheet_property_N.shape[0]>0 and PL_sheet== "")\
+			or (missing_occ_sheet_property_N.shape[0]>0 and occ_sheet== "") \
+			or (missing_BS_sheet_property_N.shape[0]>0 and BS_sheet== ""):
                         st.error("Please complete above mapping.")
                         st.stop()
                     else:
@@ -1349,8 +1351,9 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                             entity_mapping.loc[missing_PL_sheet_property_N.index,"Sheet_Name_Finance"]=PL_sheet
                         if missing_occ_sheet_property_N.shape[0]>0:
                             entity_mapping.loc[missing_occ_sheet_property_N.index,"Sheet_Name_Occupancy"]=occ_sheet
-                elif missing_BS_sheet_property_N.shape[0]>0:
-                    #st.write("BS_sheet",BS_sheet,BS_sheet== "")
+                        if missing_BS_sheet_property_N.shape[0]>0:
+                            entity_mapping.loc[missing_BS_sheet_property_N.index,"Sheet_Name_Balance_Sheet"]=BS_sheet
+                elif sheet_type=="BS" and missing_BS_sheet_property_N.shape[0]>0:
                     if BS_sheet== "":
                         st.error("Please complete Balance Sheet mapping.")
                         st.stop()
