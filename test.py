@@ -1316,7 +1316,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
             
         submitted = st.form_submit_button("Submit")
            
-        if submitted:
+    if submitted:
             if sheet_type=="Finance":
                 if (missing_PL_sheet_property_Y.shape[0]>0 and missing_PL_sheet_property_Y["Sheet_Name_Finance"].isna().any()) or (missing_occ_sheet_property_Y.shape[0]>0 and missing_occ_sheet_property_Y["Sheet_Name_Occupancy"].isna().any()) or (missing_BS_sheet_property_Y.shape[0]>0 and missing_BS_sheet_property_Y["Sheet_Name_Balance_Sheet"].isna().any()):
                     st.error("Please complete above mapping.")
@@ -1360,8 +1360,8 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                         st.stop()
                     else:
                         entity_mapping.loc[missing_BS_sheet_property_N.index,"Sheet_Name_Balance_Sheet"]=BS_sheet
-        else:
-            st.stop()
+    else:
+        st.stop()
                 
              
     # update entity_mapping in onedrive 
