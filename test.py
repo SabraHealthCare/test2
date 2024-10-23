@@ -1,5 +1,5 @@
 import pandas as pd  
-pd.set_option('future.no_silent_downcasting', True) 
+pd.set_option('future.no_silent_downcasting', Truef) 
 import numpy as np 
 from datetime import datetime, timedelta,date
 from openpyxl import load_workbook
@@ -1281,9 +1281,10 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
     if total_missing_Y+total_missing_N==0:        
         return entity_mapping
     
-    if  total_missing_Y>0:
-        with st.form(key=sheet_type+"_Y"):
-            if sheet_type=="Finance":
+
+    with st.form(key=sheet_type):
+        if sheet_type=="Finance":
+            if  total_missing_Y>0:
                 if missing_PL_sheet_property_Y.shape[0]>0:
                     for entity_i in missing_PL_sheet_property_Y.index:
                         st.warning("Please provide P&L sheet name for {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
@@ -1292,12 +1293,28 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                     for entity_i in missing_occ_sheet_property_Y.index:
                         st.warning("Please provide Census sheet name for {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
                         missing_occ_sheet_property_Y.loc[entity_i,"Sheet_Name_Occupancy"]=st.selectbox("Original Census sheet name: {}".format(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"]),[""]+PL_sheet_list,key=entity_i+"occ_Y")
+            if  total_missing_N>0:
+                if missing_PL_sheet_property_N.shape[0]>0:
+                    st.warning("Please provide P&L sheet name for below properties:")
+                    st.dataframe(missing_PL_sheet_property_N[["Property_Name"]],hide_index=True)
+                    PL_sheet=st.selectbox("Original P&L sheet name: {}".format(entity_mapping.loc[missing_PL_sheet_property_N.index[0],"Sheet_Name_Finance"]),[""]+PL_sheet_list,key="P&L_N")
+                if missing_occ_sheet_property_N.shape[0]>0:
+                    st.warning("Please provide Census sheet name for below properties:")
+                    st.dataframe(missing_occ_sheet_property_N[["Property_Name"]],hide_index=True)
+                    occ_sheet=st.selectbox("Original Census sheet name: {}".format(entity_mapping.loc[missing_occ_sheet_property_N.index[0],"Sheet_Name_Occupancy"]),[""]+PL_sheet_list,key="occ_N")
+
+
+        if missing_BS_sheet_property_Y.shape[0]>0:
+            for entity_i in missing_BS_sheet_property_Y.index:
+                st.warning("Please provide Balance Sheet sheet name for {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                missing_BS_sheet_property_Y.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.selectbox("Original Balance Sheet name: {}".format(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]),[""]+PL_sheet_list,key=entity_i+"bs_Y")   
             
-            if missing_BS_sheet_property_Y.shape[0]>0:
-                for entity_i in missing_BS_sheet_property_Y.index:
-                    st.warning("Please provide Balance Sheet sheet name for {}".format(entity_mapping.loc[entity_i,"Property_Name"]))
-                    missing_BS_sheet_property_Y.loc[entity_i,"Sheet_Name_Balance_Sheet"]=st.selectbox("Original Balance Sheet name: {}".format(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]),[""]+PL_sheet_list,key=entity_i+"bs_Y")   
-            submitted = st.form_submit_button("Submit")
+        if missing_BS_sheet_property_N.shape[0]>0:
+            st.warning("Please provide Balance sheet name for for below properties:")
+            st.dataframe(missing_BS_sheet_property_N[["Property_Name"]],hide_index=True)
+            BS_sheet=st.selectbox("Original Balance sheet name: {}".format(entity_mapping.loc[missing_BS_sheet_property_N.index[0],"Sheet_Name_Balance_Sheet"]),[""]+PL_sheet_list,key="BS_N")         
+            
+        submitted = st.form_submit_button("Submit")
            
         if submitted:
             if sheet_type=="Finance":
@@ -1314,53 +1331,39 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                     if missing_BS_sheet_property_Y.shape[0]>0:
                         for entity_i in missing_BS_sheet_property_Y.index:
                             entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]=missing_BS_sheet_property_Y.loc[entity_i,"Sheet_Name_Balance_Sheet"]
-            elif sheet_type=="BS":
-                if (missing_BS_sheet_property_Y.shape[0]>0 and missing_BS_sheet_property_Y["Sheet_Name_Balance_Sheet"].isna().any()):
-                    st.error("Please complete Balance Sheet mapping.")
-                    st.stop()
-                for entity_i in missing_BS_sheet_property_Y.index:
-                    entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]=missing_BS_sheet_property_Y.loc[entity_i,"Sheet_Name_Balance_Sheet"]
-        else:
-            st.stop()
-                
-    if total_missing_N>0:
-        with st.form(key=sheet_type+"_N"):
-            if sheet_type=="Finance":	    
-                if missing_PL_sheet_property_N.shape[0]>0:
-                    st.warning("Please provide P&L sheet name for below properties:")
-                    st.dataframe(missing_PL_sheet_property_N[["Property_Name"]],hide_index=True)
-                    PL_sheet=st.selectbox("Original P&L sheet name: {}".format(entity_mapping.loc[missing_PL_sheet_property_N.index[0],"Sheet_Name_Finance"]),[""]+PL_sheet_list,key="P&L_N")
-                if missing_occ_sheet_property_N.shape[0]>0:
-                    st.warning("Please provide Census sheet name for below properties:")
-                    st.dataframe(missing_occ_sheet_property_N[["Property_Name"]],hide_index=True)
-                    occ_sheet=st.selectbox("Original Census sheet name: {}".format(entity_mapping.loc[missing_occ_sheet_property_N.index[0],"Sheet_Name_Occupancy"]),[""]+PL_sheet_list,key="occ_N")
-            if missing_BS_sheet_property_N.shape[0]>0:
-                st.warning("Please provide Balance sheet name for for below properties:")
-                st.dataframe(missing_BS_sheet_property_N[["Property_Name"]],hide_index=True)
-                BS_sheet=st.selectbox("Original Balance sheet name: {}".format(entity_mapping.loc[missing_BS_sheet_property_N.index[0],"Sheet_Name_Balance_Sheet"]),[""]+PL_sheet_list,key="BS_N")         
-            submitted = st.form_submit_button("Submit")
-            if submitted:
-                if sheet_type=="Finance":
-                    if (missing_PL_sheet_property_N.shape[0]>0 and PL_sheet== "")\
+
+                if (missing_PL_sheet_property_N.shape[0]>0 and PL_sheet== "")\
 			or (missing_occ_sheet_property_N.shape[0]>0 and occ_sheet== "") \
 			or (missing_BS_sheet_property_N.shape[0]>0 and BS_sheet== ""):
                         st.error("Please complete above mapping.")
                         st.stop()
-                    else:
-                        if missing_PL_sheet_property_N.shape[0]>0:
-                            entity_mapping.loc[missing_PL_sheet_property_N.index,"Sheet_Name_Finance"]=PL_sheet
-                        if missing_occ_sheet_property_N.shape[0]>0:
-                            entity_mapping.loc[missing_occ_sheet_property_N.index,"Sheet_Name_Occupancy"]=occ_sheet
-                        if missing_BS_sheet_property_N.shape[0]>0:
-                            entity_mapping.loc[missing_BS_sheet_property_N.index,"Sheet_Name_Balance_Sheet"]=BS_sheet
-                elif sheet_type=="BS" and missing_BS_sheet_property_N.shape[0]>0:
+                else:
+                    if missing_PL_sheet_property_N.shape[0]>0:
+                        entity_mapping.loc[missing_PL_sheet_property_N.index,"Sheet_Name_Finance"]=PL_sheet
+                    if missing_occ_sheet_property_N.shape[0]>0:
+                        entity_mapping.loc[missing_occ_sheet_property_N.index,"Sheet_Name_Occupancy"]=occ_sheet
+                    if missing_BS_sheet_property_N.shape[0]>0:
+                        entity_mapping.loc[missing_BS_sheet_property_N.index,"Sheet_Name_Balance_Sheet"]=BS_sheet
+
+            elif sheet_type=="BS":
+                if (missing_BS_sheet_property_Y.shape[0]>0 and missing_BS_sheet_property_Y["Sheet_Name_Balance_Sheet"].isna().any()):
+                    st.error("Please complete Balance Sheet mapping.")
+                    st.stop()
+		else:
+                    if missing_BS_sheet_property_Y.shape[0]>0:
+                        for entity_i in missing_BS_sheet_property_Y.index:
+                            entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]=missing_BS_sheet_property_Y.loc[entity_i,"Sheet_Name_Balance_Sheet"]
+
+	        if missing_BS_sheet_property_N.shape[0]>0:
                     if BS_sheet== "":
                         st.error("Please complete Balance Sheet mapping.")
                         st.stop()
                     else:
                         entity_mapping.loc[missing_BS_sheet_property_N.index,"Sheet_Name_Balance_Sheet"]=BS_sheet
-            else:
-                st.stop()
+        else:
+            st.stop()
+                
+             
     # update entity_mapping in onedrive 
     st.write("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
     Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,"CSV",None,entity_mapping_str_col)
