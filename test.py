@@ -1323,7 +1323,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
         else:
             st.stop()
                 
-    elif total_missing_N>0:
+    if total_missing_N>0:
         with st.form(key=sheet_type+"_N"):
             if sheet_type=="Finance":	    
                 if missing_PL_sheet_property_N.shape[0]>0:
