@@ -1841,7 +1841,7 @@ def Upload_And_Process(uploaded_file,file_type):
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                 Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
-
+                st.write(entity_i,Total_PL)
 	# check census data
         tenant_account_col=[10000]
         for entity_i in total_entity_list: 
@@ -1916,7 +1916,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 Total_PL = PL_BS.combine_first(Total_PL) if not Total_PL.empty else PL_BS
 
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
-    #st.write("Total_PL",Total_PL)
+    st.write("Total_PL",Total_PL)
     return Total_PL
 def Download_PL_Sample():
     PL_sample_filename = "{}_P&L_sample.xlsx".format(operator)
@@ -2081,7 +2081,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
             Total_PL=Upload_And_Process(uploaded_finance,"Finance")
-            #st.write("Total_PL1",Total_PL)
+            st.write("Total_PL1",Total_PL)
         elif BS_separate_excel=="Y": # Finance/BS are in different excel 
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")
             entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
