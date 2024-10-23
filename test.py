@@ -1365,8 +1365,8 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                 
              
     # update entity_mapping in onedrive 
-    st.write("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
     Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,"CSV",None,entity_mapping_str_col)
+    st.success("Mapping updated. Please keep the sheet names consistent to avoid remapping them each time. ")
     return entity_mapping
 
 # don't use cache
