@@ -1748,6 +1748,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         tenant_account_col_values = tenant_account_col_values.apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else str(x).strip().upper())
     
         date_header=Identify_Month_Row(PL,tenant_account_col_values,tenant_account_col[0],sheet_name,sheet_type,date_header)
+        st.write("date_header",date_header)
         if len(date_header[0])==0:
             return pd.DataFrame()
         if all(x=="0" or x==0 for x in date_header[0]):
