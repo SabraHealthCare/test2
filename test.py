@@ -1538,7 +1538,7 @@ def Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_n
                 elif len(rest_column_names)==0:
                     st.stop()
             elif len(total_missed_entities)>1:
-                st.error("Can't identify the data columns for facilities: {} in sheet {}. Please add their column names and re-upload. If their column name has been updated, please re-map it as indicated below.".format( ",".join(entity_mapping.loc[total_missed_entities, "Property_Name"]),sheet_name))
+                st.error("Can't identify the data columns for facilities: {} in sheet {}. Please add their column names and re-upload.".format( ",".join(entity_mapping.loc[total_missed_entities, "Property_Name"]),sheet_name))
                 if len(rest_column_names)>0:			
                     st.error("If these facilities have new column names, please re-map them as indicated below.") 
                 elif len(rest_column_names)==0:
