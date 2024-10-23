@@ -1354,7 +1354,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                         for entity_i in missing_BS_sheet_property_Y.index:
                             entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]=missing_BS_sheet_property_Y.loc[entity_i,"Sheet_Name_Balance_Sheet"]
 
-	        if missing_BS_sheet_property_N.shape[0]>0:
+                if missing_BS_sheet_property_N.shape[0]>0:
                     if BS_sheet== "":
                         st.error("Please complete Balance Sheet mapping.")
                         st.stop()
