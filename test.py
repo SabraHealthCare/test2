@@ -1727,6 +1727,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 
     # read data from uploaded file
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
+    st.write("read PL",PL)
     if PL.shape[0]<=1:  # sheet is empty or only has one column
         return pd.DataFrame()
     # Start checking process
@@ -1779,7 +1780,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         PL.drop(nan_index, inplace=True)
         #set index as str ,strip,upper
         PL.index=map(lambda x:str(x).strip().upper(),PL.index)
-	    
+        st.write("process PL",PL)    
         # filter columns with month_select
         selected_month_columns = [val in select_months_list for val in date_header[0]]
         PL = PL.loc[:,selected_month_columns]   
@@ -1800,6 +1801,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         PL = PL.reset_index(drop=False)
         PL=PL.drop_duplicates(subset=["Tenant_Account", reporting_month])
         PL = PL.set_index('Tenant_Account')    
+        st.write("Before Map_PL_Sabr 1",PL)
         # Step 2: Identify any remaining duplicated indices after removing duplicate rows
         dup_tenant_account_all = PL.index[PL.index.duplicated()].unique()
 
@@ -1815,6 +1817,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         
         # Map PL accounts and Sabra account
         PL=Map_PL_Sabra(PL,entity_i,sheet_type,account_pool) 
+        st.write("after Map_PL_Sabr",PL)
     return PL
        
 
@@ -1827,6 +1830,7 @@ def Upload_And_Process(uploaded_file,file_type):
     Occupancy_in_one_sheet=[]
     BS_in_one_sheet=[]
     account_pool_full=account_mapping.copy()
+    st.write("account_pool_full",account_pool_full)
     account_pool_patient_days = account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")|(account_mapping["Category"] == "Patient Days")|\
 	                        (account_mapping["Category"] == "Facility Information")|\
 	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS'])) |\
