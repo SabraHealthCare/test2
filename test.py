@@ -2090,7 +2090,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.write("select_months_list0",select_months_list)
             else:
                 select_months_list=select_months_list.append(reporting_month)
-        st.write("select_months_list1",select_months_list)
+                st.write("select_months_list1",select_months_list)
+        st.write("select_months_list2",select_months_list)
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
