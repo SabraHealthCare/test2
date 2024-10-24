@@ -372,8 +372,8 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     st.write("PL",PL)
 
     def get_match_count(col_index):
-        candidate_col = PL.iloc[:, col_index].apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else str(x).strip().upper())
-        st.write("candidate_col",candidate_col)
+        candidate_col = PL.iloc[:, col_index].apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
+	st.write("candidate_col",candidate_col)
         non_empty_col = candidate_col[candidate_col != '']
         match_count = sum(candidate_col.isin(account_pool))
         st.write("match_count",match_count)
