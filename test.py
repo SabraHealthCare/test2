@@ -1785,7 +1785,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         PL.index=map(lambda x:str(x).strip().upper(),PL.index)
         #st.write("process PL",PL)    
         # filter columns with month_select
-        st.write("date_header[0]",date_header[0])
+        st.write("date_header[0]",date_header[0],"select_months_list",select_months_list)
         selected_month_columns = [val in select_months_list for val in date_header[0]]
         st.write("selected_month_columns",selected_month_columns)
         PL = PL.loc[:,selected_month_columns]   
