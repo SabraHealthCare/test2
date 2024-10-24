@@ -373,10 +373,10 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].apply(lambda x: str(int(x)).strip().upper() \
 				if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
-        st.write("candidate_col",candidate_col)
+        #st.write("candidate_col",candidate_col)
         non_empty_col = candidate_col[candidate_col != '']
         match_count = sum(candidate_col.isin(account_pool))
-        st.write("match_count",match_count)
+        #st.write("match_count",match_count)
         return match_count, len(non_empty_col)
     
     # Check the pre-identified columns first
@@ -393,7 +393,7 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     for col in range(min(15, PL.shape[1])):
         match_count, _ = get_match_count(col)
         match_counts.append((match_count, col))
-    st.write("match_counts",match_counts)
+    #st.write("match_counts",match_counts)
     # Sort by match count in descending order
     match_counts.sort(reverse=True, key=lambda x: x[0])
     
@@ -638,14 +638,14 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     #st.write("tenant_account_row_mask",tenant_account_row_mask)	
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
 
-    st.write("tenant_account_row_mask",tenant_account_row_mask)
+    #st.write("tenant_account_row_mask",tenant_account_row_mask)
     if not any(tenant_account_row_mask):  #all the accounts in tenant_account_col are new accounts 
         PL_temp=PL.copy()
         first_tenant_account_row=PL_temp.shape[0]
     else:
         PL_temp=PL.loc[tenant_account_row_mask]
         first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
-        st.write("tenantAccount_col_no",first_tenant_account_row)
+        #st.write("tenantAccount_col_no",first_tenant_account_row)
     #valid_col_mask labels all the columns as ([False, False, True,.True..False...])
     #1. on the right of tenantAccount_col_no 
     #2.contain numeric value 
@@ -655,7 +655,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
            not all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)\
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
     valid_col_index=[i for i, mask in enumerate(valid_col_mask) if mask]
-    st.write("PL_temp",PL_temp,"valid_col_mask",valid_col_mask,valid_col_index)
+    #st.write("PL_temp",PL_temp,"valid_col_mask",valid_col_mask,valid_col_index)
     if len(valid_col_index)==0: # there is no valid data column
         st.write("Didnt detect any data in sheet {}".format(sheet_name))
         return [],0,[]
@@ -669,7 +669,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     max_len=0
     candidate_date=[]
     month_count = month_table.apply(lambda row: (row != 0).sum(), axis=1).tolist()
-    st.write("month_table",month_table)
+    #st.write("month_table",month_table)
     if not all(x==0 for x in month_count):
        # month_sort_index is the index(row number) which contain month/year, and sorted desc. month_sort_index[0] is the row number that contrain most months in PL
         non_zero_indices = [(index, month_c) for index, month_c in enumerate(month_count) if month_c!= 0]
@@ -1000,7 +1000,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
 def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     # remove no need to map from account_mapping
     account_pool=account_pool[account_pool["Sabra_Account"]!= "NO NEED TO MAP" ]
-    #st.write(account_pool)
+    st.write(account_pool)
     
     main_account_mapping = account_pool.loc[account_pool["Sabra_Account"].apply(lambda x: pd.notna(x) and x.upper() != "NO NEED TO MAP")]
         # Concatenate main accounts with second accounts
@@ -1804,7 +1804,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         PL = PL.reset_index(drop=False)
         PL=PL.drop_duplicates(subset=["Tenant_Account", reporting_month])
         PL = PL.set_index('Tenant_Account')    
-        st.write("Before Map_PL_Sabr 1",PL)
+        #st.write("Before Map_PL_Sabr 1",PL)
         # Step 2: Identify any remaining duplicated indices after removing duplicate rows
         dup_tenant_account_all = PL.index[PL.index.duplicated()].unique()
 
