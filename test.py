@@ -1756,7 +1756,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         if all(x=="0" or x==0 for x in date_header[0]):
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()  
-        #st.write("date_header",date_header)
+        st.write("date_header",date_header,date_header[0],date_header[1],date_header[2])
 	# some tenant account col are in the right side of month header, remove these column from tenant_account_col
         if len(tenant_account_col) > 1:
             # Find the index of the first non-'0' in new_entity_header
@@ -1785,7 +1785,9 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         PL.index=map(lambda x:str(x).strip().upper(),PL.index)
         #st.write("process PL",PL)    
         # filter columns with month_select
+        st.write("date_header[0]",date_header[0])
         selected_month_columns = [val in select_months_list for val in date_header[0]]
+        st.write("selected_month_columns",selected_month_columns)
         PL = PL.loc[:,selected_month_columns]   
         PL.columns= [value for value in date_header[0] if value in select_months_list]        
         select_months_list= list(PL.columns)          
