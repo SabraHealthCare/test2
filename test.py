@@ -1987,12 +1987,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if 'selected_month' not in st.session_state:
             st.session_state.selected_month = 'Jan'
         
-        global reporting_month,reporting_month_label,tenant_account_col,date_header
+        global reporting_month,reporting_month_label,tenant_account_col,date_header,select_months_list
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
         #st.write("account_mapping-3",account_mapping,"entity_mapping",entity_mapping)
         reporting_month_label=True  
         tenant_account_col=[10000]
         date_header=[[0],0,[]]
+        select_months_list=[]
         # Calculate the list of years and their indices
         years_range = list(range(current_year, current_year - 2, -1))
         # Calculate the list of months and their indices
@@ -2077,24 +2078,19 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.stop()
         else:
             BS_separate_excel="N"
-        select_months_list=[]
-        st.write("select_months_list0",select_months_list)
+
 	# select_months_list contain the monthes that need to be compared for history data,if it is [], means no need to compare
         st.write("entity_mapping",entity_mapping,"BPC_pull.columns",BPC_pull.columns,"reporting_month",reporting_month)
         if any(entity_mapping["Finance_in_separate_sheets"]=="N"):
             select_months_list=[reporting_month]
-            st.write("select_months_list1",select_months_list)            
+
         else:
             select_months_list =sorted([x for x in BPC_pull.columns if x <reporting_month],reverse=True)
-            st.write("select_months_list2",select_months_list)
             if len(select_months_list)>=previous_monthes_comparison:
-                st.write("previous_monthes_comparison",previous_monthes_comparison,"len(select_months_list)",len(select_months_list))
                 select_months_list=select_months_list[:previous_monthes_comparison]+[reporting_month]  
-                st.write("select_months_list3",select_months_list)
             else:
-                select_months_list.append(reporting_month)
-                st.write("select_months_list4",select_months_list)
-        st.write("select_months_list5",select_months_list)
+                select_months_list=[reporting_month]
+
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
