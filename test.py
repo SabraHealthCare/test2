@@ -1848,7 +1848,7 @@ def Upload_And_Process(uploaded_file,file_type):
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                 Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
-                st.write(entity_i,Total_PL)
+                #st.write(entity_i,Total_PL)
 	# check census data
         tenant_account_col=[10000]
         for entity_i in total_entity_list: 
