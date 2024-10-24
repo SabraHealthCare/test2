@@ -368,7 +368,7 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 # Parse the df and get filter widgets based for provided columns
 		
 def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, pre_max_match_col):
-    st.write("PL",PL)
+    #st.write("PL",PL)
 
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].apply(lambda x: str(int(x)).strip().upper() \
@@ -1783,7 +1783,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         PL.drop(nan_index, inplace=True)
         #set index as str ,strip,upper
         PL.index=map(lambda x:str(x).strip().upper(),PL.index)
-        st.write("process PL",PL)    
+        #st.write("process PL",PL)    
         # filter columns with month_select
         selected_month_columns = [val in select_months_list for val in date_header[0]]
         PL = PL.loc[:,selected_month_columns]   
@@ -1820,7 +1820,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         
         # Map PL accounts and Sabra account
         PL=Map_PL_Sabra(PL,entity_i,sheet_type,account_pool) 
-        st.write("after Map_PL_Sabr",PL)
+        #st.write("after Map_PL_Sabr",PL)
     return PL
        
 
