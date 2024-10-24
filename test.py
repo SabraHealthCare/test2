@@ -2077,10 +2077,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.stop()
         else:
             BS_separate_excel="N"
-
+        select_months_list=[]
 	# select_months_list contain the monthes that need to be compared for history data,if it is [], means no need to compare
-        if all(entity_mapping["Finance_in_separate_sheets"]=="N"):
+        st.write("entity_mapping",entity_mapping,"BPC_pull.columns",BPC_pull.columns,"reporting_month",reporting_month)
+        if any(entity_mapping["Finance_in_separate_sheets"]=="N"):
             select_months_list=[reporting_month]
+            
         else:
             select_months_list =sorted([x for x in BPC_pull.columns if x <reporting_month],reverse=True)
             if len(select_months_list)>=previous_monthes_comparison:
