@@ -2092,7 +2092,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 select_months_list=select_months_list[:previous_monthes_comparison]+[reporting_month]  
                 st.write("select_months_list3",select_months_list)
             else:
-                select_months_list=select_months_list.append(reporting_month)
+                select_months_list.append(reporting_month)
                 st.write("select_months_list4",select_months_list)
         st.write("select_months_list5",select_months_list)
         if BS_separate_excel=="N":  # Finance/BS are in one excel
