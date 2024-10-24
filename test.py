@@ -1757,7 +1757,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         if all(x=="0" or x==0 for x in date_header[0]):
             st.error("Fail to identify Month/Year header in {} sheet '{}', please add it and re-upload.".format(sheet_type_name,sheet_name))
             st.stop()  
-        st.write("date_header",date_header,date_header[0],date_header[1],date_header[2])
+        
 	# some tenant account col are in the right side of month header, remove these column from tenant_account_col
         if len(tenant_account_col) > 1:
             # Find the index of the first non-'0' in new_entity_header
@@ -2089,7 +2089,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             if len(select_months_list)>=previous_monthes_comparison:
                 select_months_list=select_months_list[:previous_monthes_comparison]+[reporting_month]  
             else:
-                select_months_list=[reporting_month]
+                select_months_list.append(reporting_month)
         st.write("select_months_list0",select_months_list)
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
