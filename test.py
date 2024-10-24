@@ -1728,13 +1728,13 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 
     # read data from uploaded file
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
-    st.write("read PL",PL)
+    #st.write("read PL",PL)
     if PL.shape[0]<=1:  # sheet is empty or only has one column
         return pd.DataFrame()
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenant_account_col=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
-        #st.write("tenant_account_col",tenant_account_col)
+        st.write("tenant_account_col0",tenant_account_col)
         if len(tenant_account_col) > 1:
             # Start with the first column
             tenant_account_col_values = PL.iloc[:, tenant_account_col[0]].fillna('')
