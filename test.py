@@ -646,15 +646,15 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
         first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
         #st.write("PL_temp",PL_temp,first_tenant_account_row)
     #valid_col_mask labels all the columns as ([False, False, True,.True..False...])
-	#1. on the right of tenantAccount_col_no 
-	#2.contain numeric value 
-	#3. not all 0 or nan in tenant_account_row. 
+    #1. on the right of tenantAccount_col_no 
+    #2.contain numeric value 
+    #3. not all 0 or nan in tenant_account_row. 
 
     valid_col_mask = PL_temp.apply(lambda x: ( pd.to_numeric(x, errors='coerce').notna().any() and \
            not all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)\
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
     valid_col_index=[i for i, mask in enumerate(valid_col_mask) if mask]
-    #st.write("PL_temp",PL_temp,"valid_col_mask",valid_col_mask,valid_col_index)
+    st.write("PL_temp",PL_temp,"valid_col_mask",valid_col_mask,valid_col_index)
     if len(valid_col_index)==0: # there is no valid data column
         st.write("Didnt detect any data in sheet {}".format(sheet_name))
         return [],0,[]
