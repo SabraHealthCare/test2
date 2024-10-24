@@ -283,8 +283,7 @@ def Initial_Mapping(operator):
     # Clean and format account mapping columns
     account_mapping_cols = ["Sabra_Account", "Sabra_Second_Account"]
     account_mapping[account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
-    account_mapping["Tenant_Account"] = account_mapping["Tenant_Account"].apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else str(x).strip().upper())
-	
+    account_mapping["Tenant_Account"] = account_mapping["Tenant_Account"].apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")
     account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion","Category"]]
     #st.write("account_mapping",account_mapping)  
@@ -1623,8 +1622,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 
         elif len(tenant_account_col) == 1:
             tenant_account_col_values=PL.iloc[:, tenant_account_col[0]]
-        tenant_account_col_values = tenant_account_col_values.apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else str(x).strip().upper())
-
+        
+        tenant_account_col_values = tenant_account_col_values.apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
         entity_header_row_number,new_entity_header=Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_name) 
 	# some tenant account col are in the right side of header, remove these column from tenant_account_col
         if len(tenant_account_col) > 1:
@@ -1748,7 +1747,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
                 tenant_account_col_values = tenant_account_col_values.where(tenant_account_col_values != '', current_col)
         elif len(tenant_account_col) == 1:
             tenant_account_col_values=PL.iloc[:, tenant_account_col[0]]
-        tenant_account_col_values = tenant_account_col_values.apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else str(x).strip().upper())
+        tenant_account_col_values = tenant_account_col_values.apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
         st.write("tenant_account_col_values",tenant_account_col_values)
         date_header=Identify_Month_Row(PL,tenant_account_col_values,tenant_account_col[0],sheet_name,sheet_type,date_header)
         st.write("date_header",date_header)
