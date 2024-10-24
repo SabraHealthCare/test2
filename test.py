@@ -644,7 +644,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     else:
         PL_temp=PL.loc[tenant_account_row_mask]
         first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
-        #st.write("PL_temp",PL_temp,first_tenant_account_row)
+        st.write("tenantAccount_col_no",first_tenant_account_row)
     #valid_col_mask labels all the columns as ([False, False, True,.True..False...])
     #1. on the right of tenantAccount_col_no 
     #2.contain numeric value 
