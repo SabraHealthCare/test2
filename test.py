@@ -2085,9 +2085,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             
         else:
             select_months_list =sorted([x for x in BPC_pull.columns if x <reporting_month],reverse=True)
+            st.write("select_months_list0",select_months_list)
             if len(select_months_list)>=previous_monthes_comparison:
+                st.write("previous_monthes_comparison",previous_monthes_comparison,"len(select_months_list)",len(select_months_list))
                 select_months_list=select_months_list[:previous_monthes_comparison]+[reporting_month]  
-                st.write("select_months_list0",select_months_list)
+                st.write("select_months_list1",select_months_list)
             else:
                 select_months_list=select_months_list.append(reporting_month)
                 st.write("select_months_list1",select_months_list)
