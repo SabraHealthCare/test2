@@ -43,7 +43,7 @@ discrepancy_filename="Total_Diecrepancy_Review.csv"
 monthly_reporting_filename="Total monthly reporting.csv"
 operator_list_filename="Operator_list.csv"
 BPC_account_filename="Sabra_account_list.csv"
-previous_monthes_comparison=2
+previous_monthes_comparison=0
 availble_unit_accounts=["A_ACH","A_IL","A_ALZ","A_SNF","A_ALF","A_BH","A_IRF","A_LTACH","A_SP_HOSP"]
 month_dic_word={10:["october","oct"],11:["november","nov"],12:["december","dec"],1:["january","jan"],\
                    2:["february","feb"],3:["march","mar"],4:["april","apr"],\
@@ -1717,7 +1717,6 @@ def Get_Previous_Months(reporting_month,full_date_header):
 #no cache    
 def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):  
     global account_mapping,reporting_month,tenant_account_col,date_header,select_months_list
-    st.write("select_months_list",select_months_list)
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
 
@@ -1787,7 +1786,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         #st.write("process PL",PL)    
         # filter columns with month_select
         selected_month_columns = [val in select_months_list for val in date_header[0]]
-        st.write("selected_month_columns",selected_month_columns)
+        #st.write("selected_month_columns",selected_month_columns)
         PL = PL.loc[:,selected_month_columns]   
         PL.columns= [value for value in date_header[0] if value in select_months_list]        
         select_months_list= list(PL.columns)          
@@ -2081,7 +2080,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
 	# select_months_list contain the monthes that need to be compared for history data,if it is [], means no need to compare
         
-        if any(entity_mapping["Finance_in_separate_sheets"]=="N"):
+        if any(entity_mapping["Finance_in_separate_sheets"]=="N") or previous_monthes_comparison==0:
             select_months_list=[reporting_month]
 
         else:
@@ -2090,7 +2089,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 select_months_list=select_months_list[:previous_monthes_comparison]+[reporting_month]  
             else:
                 select_months_list.append(reporting_month)
-        st.write("select_months_list0",select_months_list)
+        
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
