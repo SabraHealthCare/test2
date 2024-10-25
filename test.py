@@ -918,7 +918,7 @@ def Manage_Entity_Mapping(operator):
     return entity_mapping
 
 # no cache 
-def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
+def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type_name="False"):
     global account_mapping
     st.warning("Please complete mapping for below new accounts:")
     count=len(new_tenant_account_list)
@@ -926,13 +926,14 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False"):
     Sabra_second_account_list=[np.nan] * count
     Sabra_main_account_value=[np.nan] * count
     Sabra_second_account_value=[np.nan] * count
-   
-    with st.form(key=new_tenant_account_list[0]):
+
+	
+    with st.form(key=new_tenant_account_list[0]): 
         for i in range(count):
             if sheet_name=="False":
                 st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
             else:
-                st.markdown("## Map **'{}'** in '{}' to Sabra account".format(new_tenant_account_list[i],sheet_name)) 
+                st.markdown("## Map **'{}'** （in {} sheet - '{}'） to Sabra account".format(new_tenant_account_list[i],sheet_type_name,sheet_name)) 
             col1,col2=st.columns(2) 
             with col1:
                 st.write("Sabra main account")
@@ -1598,7 +1599,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
     elif sheet_type=="Sheet_Name_Occupancy":
         sheet_type_name="Occupancy"
     elif sheet_type=="Sheet_Name_Balance_Sheet":
-        sheet_type_name="Balance Sheet"
+        sheet_type_name="Balance"
 
     # read data from uploaded file
     excel_file = pd.ExcelFile(uploaded_file)
@@ -1670,7 +1671,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         # remove duplicate new account
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
-            account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name)
+            account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)
 		
         #if there are duplicated accounts in P&L, ask for confirming
         # Step 1: Remove all duplicate rows, keeping only unique records based on all column values
@@ -1798,7 +1799,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         new_tenant_account_list=list(filter(lambda x: x not in list(account_mapping["Tenant_Account"]),PL.index))
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
-            account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name)        
+            account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)        
         #if there are duplicated accounts in P&L, ask for confirming
         # Step 1: Remove all duplicate rows, keeping only unique records based on all column values
         PL.index.name = "Tenant_Account"
