@@ -738,7 +738,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                     if count_reporting_month==0: # there is no reporting_month
                        continue
                     elif count_reporting_month>1:  # there are duplicated months (more than one same months in header)
-                        keywords = ["ytd", "year to date", "year-to-date","year_to_date"]
+                        keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period"]
 			# remove the one which has "YTD" , "Year to date" on or above
                         for col_idx in range(len(PL_date_header)):
     			    # Search for "YTD", "Year to date", or "year-to_date"
@@ -787,7 +787,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
 
             for col_i in valid_col_index:
                 column = PL.iloc[0:first_tenant_account_row, col_i].reset_index(drop=True)
-                if column.astype(str).str.contains('current month', case=False, na=False).any():
+                if column.astype(str).str.contains('current month|current period', case=False, na=False).any():
                     current_month_cols.append(col_i)
                     current_month_rows = column.index[column.astype(str).str.contains('current month', case=False, na=False)][0]
                 elif sheet_type=="Sheet_Name_Occupancy" and column.astype(str).str.contains('#\\s*of\\s*days|total', case=False, na=False).any():
