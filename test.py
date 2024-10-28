@@ -1851,35 +1851,25 @@ def Upload_And_Process(uploaded_file,file_type):
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                 Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
                 #st.write(entity_i,Total_PL)
-	# check census data****************************************************************************************
+	
+	    
+	# check census data****************************************************************************************    
         tenant_account_col=[10000]
-
         for entity_i in total_entity_list:
             sheet_name_finance = str(entity_mapping.loc[entity_i, "Sheet_Name_Finance"])
             sheet_name_occupancy = str(entity_mapping.loc[entity_i, "Sheet_Name_Occupancy"]).strip()
     
             # Check if sheet_name_occupancy is valid, not "nan", and different from sheet_name_finance
-            if (
-        sheet_name_occupancy 
-        and sheet_name_occupancy.lower() != "nan"
-        and sheet_name_occupancy != sheet_name_finance
-        and entity_mapping.loc[entity_i, "Occupancy_in_separate_sheets"] == "Y"
-    ):
+            if (sheet_name_occupancy \
+                and sheet_name_occupancy.lower() != "nan"\
+                and sheet_name_occupancy != sheet_name_finance\
+                and entity_mapping.loc[entity_i, "Occupancy_in_separate_sheets"] == "Y" ):
 
-	    
-	    
-        for entity_i in total_entity_list: 
-            sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
-            sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
-            if not pd.isna(sheet_name_occupancy) \
-                and sheet_name_occupancy is not None \
-                and sheet_name_occupancy!=" " \
-                and sheet_name_occupancy!="nan"	and sheet_name_occupancy!=sheet_name_finance \
-                and entity_mapping.loc[entity_i,"Occupancy_in_separate_sheets"]=="Y":
-	
                 PL_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
                 if not PL_occ.empty:
                     Total_PL=PL_occ.combine_first(Total_PL)
+			
+	# check BS data******************************		
         tenant_account_col=[10000]
         for entity_i in total_entity_list: 
             if  entity_mapping.loc[entity_i,"BS_separate_excel"]=="N": 
