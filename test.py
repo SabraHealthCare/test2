@@ -89,7 +89,7 @@ def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     msg = MIMEMultipart('mixed')
     msg['Subject'] = subject
     msg['From'] = "Sabra_reporting@sabrahealth.com"
-    msg['To'] = receiver_email_list[-1]
+    msg['To'] = receiver_email_list
     
     html_part = MIMEText(email_body, 'html')
     # Attach both plain text and HTML messages
@@ -102,7 +102,7 @@ def Send_Confirmation_Email(receiver_email_list, subject, email_body):
         mailServer.starttls()
         mailServer.ehlo()
         mailServer.login(username, password)
-        mailServer.sendmail("sli@sabrahealth.com", receiver_email_list, msg.as_string())
+        mailServer.sendmail("sli@sabrahealth.com", "twarner@sabrahealth.com",receiver_email_list, msg.as_string())
         mailServer.close()
     except Exception as e:
         st.write( f"Failed to send confirmation email.")
@@ -1022,14 +1022,12 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
 	
     PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
                     PL.merge(main_account_mapping_filtered,   on="Tenant_Account", how="right")])
-    if sheet_type=="Sheet_Name_Finance":  
-        st.write("PL",PL)
+
     #Remove blank or missing "Sabra_Account" values
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
 
     PL.dropna(subset=["Sabra_Account"], inplace=True)
-    if sheet_type=="Sheet_Name_Finance":  
-        st.write("PL",PL)
+	
     # Conversion column
     PL = PL.reset_index(drop=True)
     conversion = PL["Conversion"].fillna(np.nan)
@@ -1238,7 +1236,7 @@ def Submit_Upload():
             Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
 
     subject = "Confirmation of {} {} reporting".format(operator,reporting_month_display)
-    receiver_email_list=[operator_email,"sli@sabrahealth.com"]
+    receiver_email_list=[operator_email,"twarner@sabrahealth.com","sli@sabrahealth.com"]
     # Send the confirmation email
     email_body= f"""
     <html>
