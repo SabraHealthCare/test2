@@ -368,7 +368,7 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 # Parse the df and get filter widgets based for provided columns
 		
 def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, pre_max_match_col):
-    #st.write("PL",PL,"account_pool",account_pool)
+    st.write("PL",PL,"account_pool",account_pool)
 
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].apply(lambda x: str(int(x)).strip().upper() \
