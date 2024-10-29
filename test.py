@@ -368,7 +368,7 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 # Parse the df and get filter widgets based for provided columns
 		
 def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, pre_max_match_col):
-    st.write("PL",PL,"account_pool",account_pool)
+    #st.write("PL",PL,"account_pool",account_pool)
 
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].apply(lambda x: str(int(x)).strip().upper() \
@@ -1012,7 +1012,7 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     
     if second_account_mapping.shape[0]>0:
         second_account_mapping = second_account_mapping[second_account_mapping["Sabra_Account"].str.strip() != ""]
-
+    
     # Ensure index name consistency
     PL.index.name = "Tenant_Account"
     PL = PL.reset_index(drop=False)
@@ -1022,12 +1022,14 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
 	
     PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
                     PL.merge(main_account_mapping_filtered,   on="Tenant_Account", how="right")])
-
+    if sheet_type=="Sheet_Name_Finance":  
+        st.write("PL",PL)
     #Remove blank or missing "Sabra_Account" values
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
 
     PL.dropna(subset=["Sabra_Account"], inplace=True)
-
+    if sheet_type=="Sheet_Name_Finance":  
+        st.write("PL",PL)
     # Conversion column
     PL = PL.reset_index(drop=True)
     conversion = PL["Conversion"].fillna(np.nan)
