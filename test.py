@@ -608,7 +608,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         previous_A_unit=previous_A_unit.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
         previous_A_unit=previous_A_unit.rename(columns={"A_unit":reporting_month})
         reporting_month_data  = pd.concat([reporting_month_data, previous_A_unit], axis=0)
-        st.write("reporting_month_data",reporting_month_data)
+        #st.write("reporting_month_data",reporting_month_data)
         if previous_A_unit.shape[0]>1:
             st.error("The following properties are missing operating beds. Historical data has been used to fill in the gaps. If this information is incorrect, please update the operating beds in the P&L and re-upload.")
         elif previous_A_unit.shape[0]==1:
@@ -1156,6 +1156,7 @@ def View_Summary():
         st.dataframe(missing_category.style.applymap(color_missing, subset=[reporting_month_display]).hide(axis="index"))
 
         email_body+= f"<p> No data detected for below properties and accounts:</p>{missing_category.to_html(index=False)}"
+    st.write("reporting_month_data",reporting_month_data)
     reporting_month_data =reporting_month_data.pivot_table(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=reporting_month,aggfunc='last')
     reporting_month_data.reset_index(drop=False,inplace=True)
 
@@ -2106,7 +2107,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
             Total_PL=Upload_And_Process(uploaded_finance,"Finance")
-            st.write("Total_PL1",Total_PL)
+            #st.write("Total_PL1",Total_PL)
         elif BS_separate_excel=="Y": # Finance/BS are in different excel 
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")
             entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
