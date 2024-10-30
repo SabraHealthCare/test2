@@ -1196,15 +1196,14 @@ def View_Summary():
         st.markdown(styled_table, unsafe_allow_html=True)
         st.write("")
         if len(reporting_month_data.columns)>3:
-            summary_for_email = reporting_month_data[(reporting_month_data["Sabra_Account"].\
-                              isin(["Total - Patient Days", "Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"]))\
-		              | (reporting_month_data["Sabra_Account"].str.startswith("Operating Beds-"))]\
-                               [["Sabra_Account", "Total"] + list(entity_columns)]
-        else: 
-            summary_for_email= reporting_month_data[(reporting_month_data["Sabra_Account"].\
+            show_column=["Sabra_Account", "Total"]
+	else:
+	    show_column=["Sabra_Account"]
+        
+        summary_for_email= reporting_month_data[(reporting_month_data["Sabra_Account"].\
 		               isin(["Total - Patient Days","Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"]))\
 	                       | (reporting_month_data["Sabra_Account"].str.startswith("Operating Beds-"))]\
-		                [["Sabra_Account"]+list(entity_columns)]
+		                [show_column + list(entity_columns)]
 		
         summary_for_email["Sabra_Account"] = summary_for_email["Sabra_Account"].str.replace("Total - ", "", regex=False)
         st.write("reporting_month_data",reporting_month_data,"summary_for_email",summary_for_email)	
