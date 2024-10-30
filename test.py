@@ -600,7 +600,6 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         check_patient_days_display.columns.name=None
         check_patient_days_display=check_patient_days_display.rename(columns={"Property_Name": "Property"})
         st.dataframe(check_patient_days_display.style.map(color_missing, subset=["Patient Days","Operating Beds"]).format(precision=0, thousands=","),hide_index=True)
-        
         email_body= f" <p>Please pay attention to the improper entries in the patient days:</p>{check_patient_days_display.to_html(index=False)}"+"<ul>"+error_for_email+"</ul>"	
     if len(properties_fill_Aunit)>0:    
         BPC_pull_reset = BPC_pull.reset_index()
@@ -609,20 +608,13 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         previous_A_unit=previous_A_unit.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
         previous_A_unit=previous_A_unit.rename(columns={"A_unit":reporting_month})
         reporting_month_data  = pd.concat([reporting_month_data, previous_A_unit], axis=0)
+        st.write("reporting_month_data",reporting_month_data)
         if previous_A_unit.shape[0]>1:
             st.error("The following properties are missing operating beds. Historical data has been used to fill in the gaps. If this information is incorrect, please update the operating beds in the P&L and re-upload.")
         elif previous_A_unit.shape[0]==1:
             st.error("{} is missing operating beds. Historical data has been used to fill in the missing info as shown below. If this data is incorrect, please add the operating beds and re-upload P&L.".format(properties_fill_Aunit[0]))
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
-        st.write(previous_A_unit_display) 
-        st.write("Total_PL index",Total_PL.index,"Total_PL",Total_PL)
-        # Set index for `previous_A_unit` and filter to `reporting_month`
-        previous_A_unit_filtered = previous_A_unit.set_index(["ENTITY", "Sabra_Account"])[reporting_month]
-        st.write("previous_A_unit_filtered",previous_A_unit_filtered)
-        # Replace missing or zero values in `Total_PL` with values from `previous_A_unit_filtered`
-        Total_PL = Total_PL.combine_first(previous_A_unit_filtered)
-        st.write("Total_PL2",Total_PL)   
-        #Total_PL=pd.concat([Total_PL, previous_A_unit.set_index(["ENTITY","Sabra_Account"])[reporting_month]], axis=0)
+        Total_PL=pd.concat([Total_PL, previous_A_unit.set_index(["ENTITY","Sabra_Account"])[reporting_month]], axis=0)
     return reporting_month_data,Total_PL,email_body
 
 
