@@ -617,6 +617,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
             st.error("{} is missing operating beds. Historical data has been used to fill in the missing info as shown below. If this data is incorrect, please add the operating beds and re-upload P&L.".format(properties_fill_Aunit[0]))
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
         Total_PL=pd.concat([Total_PL, previous_A_unit.set_index(["ENTITY","Sabra_Account"])[reporting_month]], axis=0)
+        st.write("Total_PL3",Total_PL)
         Total_PL = Total_PL[~((Total_PL[reporting_month].isin([0, None])) & Total_PL["BPC_Account_Name"].str.startswith("A_"))]
     return reporting_month_data,Total_PL,email_body
 
