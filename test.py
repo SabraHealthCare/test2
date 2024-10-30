@@ -1197,7 +1197,7 @@ def View_Summary():
         st.write("")
         if len(reporting_month_data.columns)>3:
             show_column=["Sabra_Account", "Total"]
-	else:
+        else:
 	    show_column=["Sabra_Account"]
         
         summary_for_email= reporting_month_data[(reporting_month_data["Sabra_Account"].\
