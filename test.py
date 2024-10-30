@@ -89,7 +89,7 @@ def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     msg = MIMEMultipart('mixed')
     msg['Subject'] = subject
     msg['From'] = "Sabra_reporting@sabrahealth.com"
-    msg['To'] = receiver_email_list
+    msg['To'] =  ", ".join(receiver_email_list)
     
     html_part = MIMEText(email_body, 'html')
     # Attach both plain text and HTML messages
@@ -102,7 +102,7 @@ def Send_Confirmation_Email(receiver_email_list, subject, email_body):
         mailServer.starttls()
         mailServer.ehlo()
         mailServer.login(username, password)
-        mailServer.sendmail("sli@sabrahealth.com", "twarner@sabrahealth.com",receiver_email_list, msg.as_string())
+        mailServer.sendmail("Sabra_reporting@sabrahealth.com", receiver_email_list, msg.as_string())
         mailServer.close()
     except Exception as e:
         st.write( f"Failed to send confirmation email.")
