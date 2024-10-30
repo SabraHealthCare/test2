@@ -1198,7 +1198,7 @@ def View_Summary():
         if len(reporting_month_data.columns)>3:
             show_column=["Sabra_Account", "Total"]
         else:
-	    show_column=["Sabra_Account"]
+            show_column=["Sabra_Account"]
         
         summary_for_email= reporting_month_data[(reporting_month_data["Sabra_Account"].\
 		               isin(["Total - Patient Days","Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"]))\
