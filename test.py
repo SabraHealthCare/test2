@@ -615,7 +615,14 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
             st.error("{} is missing operating beds. Historical data has been used to fill in the missing info as shown below. If this data is incorrect, please add the operating beds and re-upload P&L.".format(properties_fill_Aunit[0]))
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
         st.write(previous_A_unit_display) 
-        Total_PL=pd.concat([Total_PL, previous_A_unit.set_index(["ENTITY","Sabra_Account"])[reporting_month]], axis=0)
+
+        # Set index for `previous_A_unit` and filter to `reporting_month`
+        previous_A_unit_filtered = previous_A_unit.set_index(["ENTITY", "Sabra_Account"])[reporting_month]
+
+        # Replace missing or zero values in `Total_PL` with values from `previous_A_unit_filtered`
+        Total_PL = Total_PL.combine_first(previous_A_unit_filtered)
+        st.write("Total_PL2",Total_PL)   
+        #Total_PL=pd.concat([Total_PL, previous_A_unit.set_index(["ENTITY","Sabra_Account"])[reporting_month]], axis=0)
     return reporting_month_data,Total_PL,email_body
 
 
@@ -1026,9 +1033,7 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
 
     #Remove blank or missing "Sabra_Account" values
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
-
     PL.dropna(subset=["Sabra_Account"], inplace=True)
-    #st.write("PL",PL)
     # Conversion column
     PL = PL.reset_index(drop=True)
     conversion = PL["Conversion"].fillna(np.nan)
@@ -1859,7 +1864,7 @@ def Upload_And_Process(uploaded_file,file_type):
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                 Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
-                st.write("Total_PL",entity_i,Total_PL)
+                #st.write("Total_PL",entity_i,Total_PL)
 	
 	    
 	# check census data****************************************************************************************    
@@ -2109,7 +2114,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
             Total_PL=Upload_And_Process(uploaded_finance,"Finance")
-            #st.write("Total_PL1",Total_PL)
+            st.write("Total_PL1",Total_PL)
         elif BS_separate_excel=="Y": # Finance/BS are in different excel 
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")
             entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
