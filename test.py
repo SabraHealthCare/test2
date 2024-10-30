@@ -933,8 +933,11 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
         for i in range(count):
             if sheet_name=="False":
                 st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
-            else:
+	    elif sheet_type_name != "Occupancy":
                 st.markdown("## Map **'{}'** （in {} sheet - '{}'） to Sabra account".format(new_tenant_account_list[i],sheet_type_name,sheet_name)) 
+            else :   
+                st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i],sheet_type_name,sheet_name)) 
+     
             col1,col2=st.columns(2) 
             with col1:
                 st.write("Sabra main account")
@@ -991,8 +994,6 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
     # Create a dropdown for the last column
     #decision = st.selectbox(f"Select for Row {index}", options=["Yes", "No"], index=0, key=index)
                 
-
-	    
         account_mapping=pd.concat([account_mapping, new_accounts_df],ignore_index=True)
         Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion"]],operator,"XLSX",None,account_mapping_str_col)
         st.success("New accounts mapping were successfully saved.")   
