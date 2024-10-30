@@ -933,7 +933,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
         for i in range(count):
             if sheet_name=="False":
                 st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
-	    elif sheet_type_name != "Occupancy":
+            elif sheet_type_name != "Occupancy":
                 st.markdown("## Map **'{}'** （in {} sheet - '{}'） to Sabra account".format(new_tenant_account_list[i],sheet_type_name,sheet_name)) 
             else :   
                 st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i],sheet_type_name,sheet_name)) 
