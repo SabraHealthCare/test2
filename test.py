@@ -618,7 +618,10 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
         Total_PL=pd.concat([Total_PL, previous_A_unit.set_index(["ENTITY","Sabra_Account"])[reporting_month]], axis=0)
         st.write("Total_PL3",Total_PL)
-        Total_PL = Total_PL[~((Total_PL[reporting_month].isin([0, None])) & Total_PL["Sabra_Account"].str.startswith("A_"))]
+        Total_PL = Total_PL[~((Total_PL[reporting_month].isin([0, None])) \
+			      & (Total_PL.index.get_level_values("Sabra_Account").str.startswith("A_")))]
+
+        #Total_PL = Total_PL[~((Total_PL[reporting_month].isin([0, None])) & Total_PL["Sabra_Account"].str.startswith("A_"))]
         st.write("Total_PL3",Total_PL)
     return reporting_month_data,Total_PL,email_body
 
