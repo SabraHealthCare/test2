@@ -1028,7 +1028,7 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
 
     PL.dropna(subset=["Sabra_Account"], inplace=True)
-    st.write("PL",PL)
+    #st.write("PL",PL)
     # Conversion column
     PL = PL.reset_index(drop=True)
     conversion = PL["Conversion"].fillna(np.nan)
@@ -1859,7 +1859,7 @@ def Upload_And_Process(uploaded_file,file_type):
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                 Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
-                #st.write(entity_i,Total_PL)
+                st.write("Total_PL",entity_i,Total_PL)
 	
 	    
 	# check census data****************************************************************************************    
