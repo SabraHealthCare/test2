@@ -1028,7 +1028,7 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
 
     PL.dropna(subset=["Sabra_Account"], inplace=True)
-	
+    st.write("PL",PL)
     # Conversion column
     PL = PL.reset_index(drop=True)
     conversion = PL["Conversion"].fillna(np.nan)
