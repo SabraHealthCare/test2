@@ -612,7 +612,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         # delete the original operating beds if they are 0 or none. otherwise there will be two A_SNF, one has value 0
         Total_PL = Total_PL[~((Total_PL[reporting_month].isin([0, None])) \
 			      & (Total_PL.index.get_level_values("Sabra_Account").str.startswith("A_")))]
-        st.write("previous_A_unit",previous_A_unit,previous_A_unit.index)
+        #st.write("previous_A_unit",previous_A_unit,previous_A_unit.index)
         # check the filled operating beds and corresponding patient days
         for property_i in properties_fill_Aunit:
             try:
@@ -635,7 +635,8 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
                 st.error("Error："+error_message)
                 problem_properties.append(property_i)
                 error_for_email+="<li> "+error_message+"</li>"
-	        #check_patient_days.
+	        check_patient_days.loc[(property_i,"Operating Beds"),reporting_month]=operating_beds_i
+	
     if len(problem_properties)>0:
         check_patient_days_display=check_patient_days.loc[(problem_properties,slice(None)),reporting_month].reset_index(drop=False)
         check_patient_days_display=check_patient_days_display.pivot_table(index=["Property_Name"],columns="Category", values=reporting_month,aggfunc='last').astype(int)  
