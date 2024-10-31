@@ -617,7 +617,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
             except:
                 patient_day_i=0
             try:
-                operating_beds_i=previous_A_unit.loc[previous_A_unit["Property_Name"]==property_i & "Operating Beds"),reporting_month]
+                operating_beds_i=previous_A_unit#.loc[previous_A_unit["Property_Name"]==property_i & "Operating Beds"),reporting_month]
             except:
                 operating_beds_i=0
             if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
