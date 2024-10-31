@@ -558,7 +558,7 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
 def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month,email_body):
     #check patient days,fill missing operating beds to reporting_month_data
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
-    st.write("check_patient_days",check_patient_days,check_patient_days.index)
+    #st.write("check_patient_days",check_patient_days,check_patient_days.index)
     month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
     problem_properties=[]
     properties_fill_Aunit=[]
