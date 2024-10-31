@@ -558,6 +558,7 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
 def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month,email_body):
     #check patient days,fill missing operating beds to reporting_month_data
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
+    st.write("check_patient_days",check_patient_days,check_patient_days.index)
     month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
     problem_properties=[]
     properties_fill_Aunit=[]
@@ -599,6 +600,8 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         reporting_month_data = reporting_month_data[\
                             ~((reporting_month_data[reporting_month].isin([0, None])) & reporting_month_data["BPC_Account_Name"].str.startswith("A_"))]
         #st.write("reporting_month_data",reporting_month_data)
+
+	    
         if previous_A_unit.shape[0]>1:
             st.error("The following properties are missing operating beds. Historical data has been used to fill in the gaps. If this information is incorrect, please update the operating beds in the P&L and re-upload.")
         elif previous_A_unit.shape[0]==1:
@@ -623,14 +626,16 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
             if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
                 continue
             elif patient_day_i>0 and operating_beds_i==0:
-                st.error("{} has {} patient days while its operating beds is missing. Please add its operating beds and re-upload. ")
+                error_message="{} miss operating beds. Please add its operating beds and re-upload.".format(property_i)
+                st.error("Error："+error_message)
                 problem_properties.append(property_i)
+	        error_for_email+="<li> "+error_message+"</li>"
             elif operating_beds_i>0 and patient_day_i>operating_beds_i*month_days:
                 error_message="The number of patient days for {} exceeds its available days (Operating Beds * {}). This will result in incorrect occupancy.".format(property_i,month_days)		
                 st.error("Error："+error_message)
                 problem_properties.append(property_i)
                 error_for_email+="<li> "+error_message+"</li>"
-	
+	        #check_patient_days.
     if len(problem_properties)>0:
         check_patient_days_display=check_patient_days.loc[(problem_properties,slice(None)),reporting_month].reset_index(drop=False)
         check_patient_days_display=check_patient_days_display.pivot_table(index=["Property_Name"],columns="Category", values=reporting_month,aggfunc='last').astype(int)  
