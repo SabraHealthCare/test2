@@ -635,7 +635,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
                 st.error("Error："+error_message)
                 problem_properties.append(property_i)
                 error_for_email+="<li> "+error_message+"</li>"
-	        check_patient_days.loc[(property_i,"Operating Beds"),reporting_month]=operating_beds_i
+                check_patient_days.loc[(property_i,"Operating Beds"),reporting_month]=operating_beds_i
 	
     if len(problem_properties)>0:
         check_patient_days_display=check_patient_days.loc[(problem_properties,slice(None)),reporting_month].reset_index(drop=False)
