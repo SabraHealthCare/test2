@@ -571,7 +571,6 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
             patient_day_i=0
         try:
             operating_beds_i=check_patient_days.loc[(property_i,"Operating Beds"),reporting_month]
-           
         except:
             operating_beds_i=0
         if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
@@ -590,17 +589,6 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
             error_for_email+="<li> "+error_message+"</li>"
         elif patient_day_i>0 and operating_beds_i==0:
             properties_fill_Aunit.append(property_i)
-    if len(problem_properties)>0:
-        check_patient_days_display=check_patient_days.loc[(problem_properties,slice(None)),reporting_month].reset_index(drop=False)
-        check_patient_days_display=check_patient_days_display.pivot_table(index=["Property_Name"],columns="Category", values=reporting_month,aggfunc='last').astype(int)  
-        check_patient_days_display.reset_index(inplace=True)  
-        if "Operating Beds" not in check_patient_days_display.columns:
-            check_patient_days_display["Operating Beds"]=0
-            miss_all_A_unit=True
-        check_patient_days_display.columns.name=None
-        check_patient_days_display=check_patient_days_display.rename(columns={"Property_Name": "Property"})
-        st.dataframe(check_patient_days_display.style.map(color_missing, subset=["Patient Days","Operating Beds"]).format(precision=0, thousands=","),hide_index=True)
-        email_body= f" <p>Please pay attention to the improper entries in the patient days:</p>{check_patient_days_display.to_html(index=False)}"+"<ul>"+error_for_email+"</ul>"	
     if len(properties_fill_Aunit)>0:    
         BPC_pull_reset = BPC_pull.reset_index()
         # Apply filtering and selection
@@ -616,12 +604,53 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         elif previous_A_unit.shape[0]==1:
             st.error("{} is missing operating beds. Historical data has been used to fill in the missing info as shown below. If this data is incorrect, please add the operating beds and re-upload P&L.".format(properties_fill_Aunit[0]))
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
+        st.write(previous_A_unit_display) 
         Total_PL=pd.concat([Total_PL, previous_A_unit.set_index(["ENTITY","Sabra_Account"])[reporting_month]], axis=0)
-       
+        # delete the original operating beds if they are 0 or none. otherwise there will be two A_SNF, one has value 0
         Total_PL = Total_PL[~((Total_PL[reporting_month].isin([0, None])) \
 			      & (Total_PL.index.get_level_values("Sabra_Account").str.startswith("A_")))]
+        st.write("previous_A_unit",previous_A_unit,previous_A_unit.index)
+        # check the filled operating beds and corresponding patient days
+        for property_i in properties_fill_Aunit:
+            try:
+                patient_day_i=check_patient_days.loc[(property_i,"Patient Days"),reporting_month]
+            except:
+                patient_day_i=0
+            try:
+                operating_beds_i=previous_A_unit.loc[previous_A_unit["Property_Name"]==property_i & "Operating Beds"),reporting_month]
+            except:
+                operating_beds_i=0
+            if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
+                continue
+            elif operating_beds_i>0 and patient_day_i>operating_beds_i*month_days:
+                error_message="The number of patient days for {} exceeds its available days (Operating Beds * {}). This will result in incorrect occupancy.".format(property_i,month_days)		
+                st.error("Error："+error_message)
+                problem_properties.append(property_i)
+                error_for_email+="<li> "+error_message+"</li>"
+            elif operating_beds_i==0 and patient_day_i==0:
+                zero_patient_days.append(property_i)
+            elif patient_day_i==0 and operating_beds_i>0:
+                error_message="{} is missing patient days. If this facility is not currently functioning or in operation, please remove the number of operating beds associated with it.".format(property_i)
+                st.error("Error: "+error_message)
+                problem_properties.append(property_i)   
+                error_for_email+="<li> "+error_message+"</li>"
+            elif patient_day_i>0 and operating_beds_i==0:
+                properties_fill_Aunit.append(property_i)
 
-        #Total_PL = Total_PL[~((Total_PL[reporting_month].isin([0, None])) & Total_PL["Sabra_Account"].str.startswith("A_"))]
+	
+
+	
+    if len(problem_properties)>0:
+        check_patient_days_display=check_patient_days.loc[(problem_properties,slice(None)),reporting_month].reset_index(drop=False)
+        check_patient_days_display=check_patient_days_display.pivot_table(index=["Property_Name"],columns="Category", values=reporting_month,aggfunc='last').astype(int)  
+        check_patient_days_display.reset_index(inplace=True)  
+        if "Operating Beds" not in check_patient_days_display.columns:
+            check_patient_days_display["Operating Beds"]=0
+            miss_all_A_unit=True
+        check_patient_days_display.columns.name=None
+        check_patient_days_display=check_patient_days_display.rename(columns={"Property_Name": "Property"})
+        st.dataframe(check_patient_days_display.style.map(color_missing, subset=["Patient Days","Operating Beds"]).format(precision=0, thousands=","),hide_index=True)
+        email_body= f" <p>Please pay attention to the improper entries in the patient days:</p>{check_patient_days_display.to_html(index=False)}"+"<ul>"+error_for_email+"</ul>"	
     
     return reporting_month_data,Total_PL,email_body
 
