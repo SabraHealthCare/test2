@@ -617,28 +617,19 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
             except:
                 patient_day_i=0
             try:
-                operating_beds_i=previous_A_unit#.loc[previous_A_unit["Property_Name"]==property_i & "Operating Beds"),reporting_month]
+                operating_beds_i=previous_A_unit.loc[previous_A_unit["Property_Name"] == property_i, reporting_month].sum()
             except:
                 operating_beds_i=0
             if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
                 continue
+            elif patient_day_i>0 and operating_beds_i==0:
+                st.error("{} has {} patient days while its operating beds is missing. Please add its operating beds and re-upload. ")
+                problem_properties.append(property_i)
             elif operating_beds_i>0 and patient_day_i>operating_beds_i*month_days:
                 error_message="The number of patient days for {} exceeds its available days (Operating Beds * {}). This will result in incorrect occupancy.".format(property_i,month_days)		
                 st.error("Error："+error_message)
                 problem_properties.append(property_i)
                 error_for_email+="<li> "+error_message+"</li>"
-            elif operating_beds_i==0 and patient_day_i==0:
-                zero_patient_days.append(property_i)
-            elif patient_day_i==0 and operating_beds_i>0:
-                error_message="{} is missing patient days. If this facility is not currently functioning or in operation, please remove the number of operating beds associated with it.".format(property_i)
-                st.error("Error: "+error_message)
-                problem_properties.append(property_i)   
-                error_for_email+="<li> "+error_message+"</li>"
-            elif patient_day_i>0 and operating_beds_i==0:
-                properties_fill_Aunit.append(property_i)
-
-	
-
 	
     if len(problem_properties)>0:
         check_patient_days_display=check_patient_days.loc[(problem_properties,slice(None)),reporting_month].reset_index(drop=False)
