@@ -629,7 +629,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
                 error_message="{} miss operating beds. Please add its operating beds and re-upload.".format(property_i)
                 st.error("Error："+error_message)
                 problem_properties.append(property_i)
-	        error_for_email+="<li> "+error_message+"</li>"
+                error_for_email+="<li> "+error_message+"</li>"
             elif operating_beds_i>0 and patient_day_i>operating_beds_i*month_days:
                 error_message="The number of patient days for {} exceeds its available days (Operating Beds * {}). This will result in incorrect occupancy.".format(property_i,month_days)		
                 st.error("Error："+error_message)
