@@ -558,7 +558,7 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
 def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month,email_body):
     #check patient days,fill missing operating beds to reporting_month_data
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
-    st.write("check_patient_days",check_patient_days,check_patient_days.index)
+    #st.write("check_patient_days",check_patient_days,check_patient_days.index)
     month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
     problem_properties=[]
     properties_fill_Aunit=[]
@@ -599,8 +599,12 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         reporting_month_data  = pd.concat([reporting_month_data, previous_A_unit], axis=0)
         reporting_month_data = reporting_month_data[\
                             ~((reporting_month_data[reporting_month].isin([0, None])) & reporting_month_data["BPC_Account_Name"].str.startswith("A_"))]
-        #st.write("reporting_month_data",reporting_month_data)
 
+        Total_PL=pd.concat([Total_PL, previous_A_unit.set_index(["ENTITY","Sabra_Account"])[reporting_month]], axis=0)
+        # delete the original operating beds if they are 0 or none. otherwise there will be two A_SNF, one has value 0
+        Total_PL = Total_PL[~((Total_PL[reporting_month].isin([0, None])) \
+			      & (Total_PL.index.get_level_values("Sabra_Account").str.startswith("A_")))]
+	    
         if previous_A_unit.shape[0]>1:
             st.error("The following properties are missing operating beds. Historical data has been used to fill in the gaps. If this information is incorrect, please update the operating beds in the P&L and re-upload.")
         elif previous_A_unit.shape[0]==1:
@@ -608,10 +612,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
         st.write(previous_A_unit_display) 
 	    
-        Total_PL=pd.concat([Total_PL, previous_A_unit.set_index(["ENTITY","Sabra_Account"])[reporting_month]], axis=0)
-        # delete the original operating beds if they are 0 or none. otherwise there will be two A_SNF, one has value 0
-        Total_PL = Total_PL[~((Total_PL[reporting_month].isin([0, None])) \
-			      & (Total_PL.index.get_level_values("Sabra_Account").str.startswith("A_")))]
+
 
         # check the filled operating beds and corresponding patient days
         for property_i in properties_fill_Aunit:
@@ -643,16 +644,13 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         check_patient_days_display.reset_index(inplace=True)  
         if "Operating Beds" not in check_patient_days_display.columns:
             check_patient_days_display["Operating Beds"]=0
-            miss_all_A_unit=True
+
         check_patient_days_display.columns.name=None
         check_patient_days_display=check_patient_days_display.rename(columns={"Property_Name": "Property"})
         st.dataframe(check_patient_days_display.style.map(color_missing, subset=["Patient Days","Operating Beds"]).format(precision=0, thousands=","),hide_index=True)
         email_body= f" <p>Please pay attention to the improper entries in the patient days:</p>{check_patient_days_display.to_html(index=False)}"+"<ul>"+error_for_email+"</ul>"	
-    
     return reporting_month_data,Total_PL,email_body
 
-
-    
 @st.cache_data  
 def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_name,sheet_type,pre_date_header): 
     #st.write("sheet_name",sheet_name)
