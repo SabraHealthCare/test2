@@ -558,7 +558,7 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
 def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month,email_body):
     #check patient days,fill missing operating beds to reporting_month_data
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
-    #st.write("check_patient_days",check_patient_days,check_patient_days.index)
+    st.write("check_patient_days",check_patient_days,check_patient_days.index)
     month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
     problem_properties=[]
     properties_fill_Aunit=[]
@@ -601,18 +601,18 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
                             ~((reporting_month_data[reporting_month].isin([0, None])) & reporting_month_data["BPC_Account_Name"].str.startswith("A_"))]
         #st.write("reporting_month_data",reporting_month_data)
 
-	    
         if previous_A_unit.shape[0]>1:
             st.error("The following properties are missing operating beds. Historical data has been used to fill in the gaps. If this information is incorrect, please update the operating beds in the P&L and re-upload.")
         elif previous_A_unit.shape[0]==1:
             st.error("{} is missing operating beds. Historical data has been used to fill in the missing info as shown below. If this data is incorrect, please add the operating beds and re-upload P&L.".format(properties_fill_Aunit[0]))
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
         st.write(previous_A_unit_display) 
+	    
         Total_PL=pd.concat([Total_PL, previous_A_unit.set_index(["ENTITY","Sabra_Account"])[reporting_month]], axis=0)
         # delete the original operating beds if they are 0 or none. otherwise there will be two A_SNF, one has value 0
         Total_PL = Total_PL[~((Total_PL[reporting_month].isin([0, None])) \
 			      & (Total_PL.index.get_level_values("Sabra_Account").str.startswith("A_")))]
-        #st.write("previous_A_unit",previous_A_unit,previous_A_unit.index)
+
         # check the filled operating beds and corresponding patient days
         for property_i in properties_fill_Aunit:
             try:
@@ -626,7 +626,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
             if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
                 continue
             elif patient_day_i>0 and operating_beds_i==0:
-                error_message="{} miss operating beds. Please add its operating beds and re-upload.".format(property_i)
+                error_message="{} is missing operating beds. Please add its operating beds and re-upload.".format(property_i)
                 st.error("Error："+error_message)
                 problem_properties.append(property_i)
                 error_for_email+="<li> "+error_message+"</li>"
