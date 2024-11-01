@@ -1274,7 +1274,6 @@ def Submit_Upload():
             Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
 
     subject = "Confirmation of {} {} reporting".format(operator,reporting_month_display)
-    st.write("operator_email",operator_email)
     receiver_email_list=[operator_email,"twarner@sabrahealth.com","sli@sabrahealth.com"]
     # Send the confirmation email
     email_body= f"""
@@ -2018,6 +2017,7 @@ if st.session_state["authentication_status"] is False:
 #------------------------------------------operator account----------------------------------------------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
     operator_email = st.session_state['email']  # Accessing the email
+    st.write("operator_email",operator_email)
     operator=st.session_state["operator"]
     st.title(operator)
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
