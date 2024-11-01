@@ -2031,7 +2031,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.session_state.selected_year = current_year
         if 'selected_month' not in st.session_state:
             st.session_state.selected_month = 'Jan'
-        st.write("operator_email",operator_email)        
+        #st.write("operator_email",operator_email)        
         global reporting_month,reporting_month_label,tenant_account_col,date_header,select_months_list
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
         #st.write("account_mapping-3",account_mapping,"entity_mapping",entity_mapping)
