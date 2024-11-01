@@ -1279,7 +1279,7 @@ def Submit_Upload():
 	
     receiver_email_list=[operator_email,"twarner@sabrahealth.com","sli@sabrahealth.com"]
     if '@*' in operator_email:
-        st.write("Please update email address (Menu - Edit Account) to ensure you receive confirmation email.")
+        st.write("Please update email address (in 'Menu' - 'Edit Account') to ensure you receive confirmation email.")
     # Append these unique values to receiver_list
     receiver_email_list.extend(unique_asset_managers)
     #st.write(receiver_email_list)
