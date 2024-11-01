@@ -1278,10 +1278,11 @@ def Submit_Upload():
     unique_asset_managers = entity_mapping['Asset_Manager'].unique()
 	
     receiver_email_list=[operator_email,"twarner@sabrahealth.com","sli@sabrahealth.com"]
-
+    if '@*' in operator_email:
+        st.write("Please update email address (Menu - Edit Account) to ensure you receive confirmation email.")
     # Append these unique values to receiver_list
     receiver_email_list.extend(unique_asset_managers)
-    st.write(receiver_email_list)
+    #st.write(receiver_email_list)
     # Send the confirmation email
     email_body= f"""
     <html>
@@ -1292,7 +1293,7 @@ def Submit_Upload():
     </body>
     </html>"""
 
-    #Send_Confirmation_Email(receiver_email_list, subject, email_body)    
+    Send_Confirmation_Email(receiver_email_list, subject, email_body)    
 
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
