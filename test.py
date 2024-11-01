@@ -1274,7 +1274,14 @@ def Submit_Upload():
             Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
 
     subject = "Confirmation of {} {} reporting".format(operator,reporting_month_display)
+    # Get 'Asset_Manager' from entity_mapping
+    unique_asset_managers = entity_mapping['Asset_Manager'].unique()
+	
     receiver_email_list=[operator_email,"twarner@sabrahealth.com","sli@sabrahealth.com"]
+
+    # Append these unique values to receiver_list
+    receiver_email_list.extend(unique_asset_managers)
+    st.write(receiver_email_list)
     # Send the confirmation email
     email_body= f"""
     <html>
@@ -1285,7 +1292,7 @@ def Submit_Upload():
     </body>
     </html>"""
 
-    Send_Confirmation_Email(receiver_email_list, subject, email_body)    
+    #Send_Confirmation_Email(receiver_email_list, subject, email_body)    
 
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
