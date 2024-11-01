@@ -1274,6 +1274,7 @@ def Submit_Upload():
             Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
 
     subject = "Confirmation of {} {} reporting".format(operator,reporting_month_display)
+    st.write("operator_email",operator_email)
     receiver_email_list=[operator_email,"twarner@sabrahealth.com","sli@sabrahealth.com"]
     # Send the confirmation email
     email_body= f"""
