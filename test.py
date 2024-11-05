@@ -621,7 +621,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
     
             # Try to retrieve patient days
             if (property_i, "Patient Days") in check_patient_days.index:
-            patient_day_i = check_patient_days.loc[(property_i, "Patient Days"), reporting_month]
+                patient_day_i = check_patient_days.loc[(property_i, "Patient Days"), reporting_month]
     
             # Try to retrieve operating beds
             if property_i in previous_A_unit["Property_Name"].values:
