@@ -418,12 +418,10 @@ def Get_Year(single_string):
     return 0,0
 
 def Get_Month_Year(single_string):
-    #st.write("single_string0",single_string)
     if pd.isna(single_string):
         return 0,0
     if isinstance(single_string, datetime):
         return int(single_string.month),int(single_string.year)
-
     if isinstance(single_string, (int,float)) and single_string not in year_dic:
         return 0,0
     
@@ -439,9 +437,10 @@ def Get_Month_Year(single_string):
     for month_i ,month_words in month_dic_word.items():#[10,11,3...12]
         for  month_word in month_words: # month_word is element of ['december','dec',"nov",...]
             if month_word in single_string:  # month is words ,like Jan Feb... year is optional
-                remaining=single_string.replace(month_word,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("asof","").replace("actual","").replace("mtd","")
+                remaining=single_string.replace(month_word,"").replace("/","").replace("-","").replace(" ","").replace("_","")
+                remaining=remaining.replace("asof","").replace("actual","").replace("mtd","")
                 #st.write("remaining",remaining)
-                #if there are more than 3 other char in the string, this string is not month 
+                #if there are more than 3 other char left in the string, this string is not month 
                 if len(remaining)<3:  
                     return month_i,year
 			
@@ -453,7 +452,8 @@ def Get_Month_Year(single_string):
     for month_i, month_nums  in month_dic_num.items(): 
         for month_num in month_nums:
             if month_num in single_string:  # month is number ,like 01/, 02/,   year is Mandatory
-                remaining=single_string.replace(month_num,"").replace("/","").replace("-","").replace(" ","").replace("_","").replace("asof","").replace("actual","")
+                remaining=single_string.replace(month_num,"").replace("/","").replace("-","").replace(" ","").replace("_","")
+                remaining=remaining.replace("asof","").replace("actual","").replace("mtd","")
                 #if there are more than 3 other char in the string, this string is not month 
                 if len(remaining)<3: 
                     return month_i,year	
@@ -592,11 +592,12 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
             properties_fill_Aunit.append(property_i)
     if len(properties_fill_Aunit)>0:    
         BPC_pull_reset = BPC_pull.reset_index()
-        # Apply filtering and selection
+
         previous_A_unit = BPC_pull_reset.loc[(BPC_pull_reset["Sabra_Account"].str.startswith("A_")) &(BPC_pull_reset["Property_Name"].isin(properties_fill_Aunit)),["ENTITY","Property_Name","Sabra_Account","A_unit"]]
         previous_A_unit=previous_A_unit.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
         previous_A_unit=previous_A_unit.rename(columns={"A_unit":reporting_month})
         reporting_month_data  = pd.concat([reporting_month_data, previous_A_unit], axis=0)
+	# delete oiginal A_ account in reporting_month_data if original A_ account value is 0 or None
         reporting_month_data = reporting_month_data[\
                             ~((reporting_month_data[reporting_month].isin([0, None])) & reporting_month_data["BPC_Account_Name"].str.startswith("A_"))]
 
@@ -612,18 +613,20 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
         st.write(previous_A_unit_display) 
 	    
-
-
         # check the filled operating beds and corresponding patient days
         for property_i in properties_fill_Aunit:
-            try:
-                patient_day_i=check_patient_days.loc[(property_i,"Patient Days"),reporting_month]
-            except:
-                patient_day_i=0
-            try:
-                operating_beds_i=previous_A_unit.loc[previous_A_unit["Property_Name"] == property_i, reporting_month].sum()
-            except:
-                operating_beds_i=0
+            # Initialize patient_day_i and operating_beds_i to 0
+            patient_day_i = 0
+            operating_beds_i = 0
+    
+            # Try to retrieve patient days
+            if (property_i, "Patient Days") in check_patient_days.index:
+            patient_day_i = check_patient_days.loc[(property_i, "Patient Days"), reporting_month]
+    
+            # Try to retrieve operating beds
+            if property_i in previous_A_unit["Property_Name"].values:
+                operating_beds_i = previous_A_unit.loc[previous_A_unit["Property_Name"] == property_i, reporting_month].sum()
+    
             if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
                 continue
             elif patient_day_i>0 and operating_beds_i==0:
