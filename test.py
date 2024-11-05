@@ -292,11 +292,11 @@ def Initial_Mapping(operator):
                   .query("Operator == @operator") 
                   .set_index("ENTITY"))
     entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]] = entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]].astype(str)  
-    mapping_info_list=["LEASE_NAME","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Finance_in_separate_sheets","Occupancy_in_separate_sheets","Balance_in_separate_sheets","BS_separate_excel","Column_Name"]
-    for col in mapping_info_list:
+
+    for col in ["Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]:
         entity_mapping[col] = entity_mapping[col].apply(lambda x: x.replace("'","") if pd.notna(x) else x)
 
-    st.write("entity_mapping",entity_mapping)
+    #st.write("entity_mapping",entity_mapping)
     return BPC_pull,entity_mapping,account_mapping
 
 	
