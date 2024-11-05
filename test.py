@@ -286,17 +286,17 @@ def Initial_Mapping(operator):
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")
     account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion","Category"]]
     #st.write("account_mapping",account_mapping)  
-    #entity_mapping=Read_File_From_Onedrive(mapping_path,entity_mapping_filename,"CSV",entity_mapping_str_col)
+
     entity_mapping = (Read_File_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
                   .reset_index(drop=True)
                   .query("Operator == @operator") 
                   .set_index("ENTITY"))
     entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]] = entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]].astype(str)  
-    st.write("entity_mapping",entity_mapping)
+    #st.write("entity_mapping",entity_mapping)
     for col in ["Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]:
         entity_mapping[col] = entity_mapping[col].apply(lambda x: x.replace("'","") if pd.notna(x) else x)
 
-    st.write("entity_mapping",entity_mapping)
+    #st.write("entity_mapping",entity_mapping)
     return BPC_pull,entity_mapping,account_mapping
 
 	
