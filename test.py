@@ -289,7 +289,7 @@ def Initial_Mapping(operator):
     #entity_mapping=Read_File_From_Onedrive(mapping_path,entity_mapping_filename,"CSV",entity_mapping_str_col)
     entity_mapping = (Read_File_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
                   .reset_index(drop=True)
-                  .query("Operator == @operator")
+                  .query("Operator == @operator") 
                   .set_index("ENTITY"))
     entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]] = entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]].astype(str)  
     mapping_info_list=["LEASE_NAME","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Finance_in_separate_sheets","Occupancy_in_separate_sheets","Balance_in_separate_sheets","BS_separate_excel","Column_Name"]
