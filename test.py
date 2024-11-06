@@ -64,7 +64,7 @@ PL_path="Documents/Tenant Monthly Uploading/Tenant P&L"
 mapping_path="Documents/Tenant Monthly Uploading/Tenant Mapping"
 master_template_path="Documents/Tenant Monthly Uploading/Master Template"
 email_body=""
-today=date.today()
+today= datetime.now(pytz.timezone('America/Los_Angeles')).date()
 current_year= today.year
 current_month= today.month
 
