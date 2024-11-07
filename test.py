@@ -568,22 +568,32 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
     zero_patient_days=[]
     total_property_list=reporting_month_data["Property_Name"].unique()
     error_for_email=""
+
     for property_i in total_property_list:
-        try:
-            patient_day_i=check_patient_days.loc[(property_i,"Patient Days"),reporting_month]
-        except:
-            patient_day_i=0
-        try:
-            operating_beds_i=check_patient_days.loc[(property_i,"Operating Beds"),reporting_month]
-        except:
-            operating_beds_i=0
-        if patient_day_i>0 and operating_beds_i*month_days>patient_day_i:
+        # Initialize values to 0
+        patient_day_i = 0
+        operating_beds_i = 0
+
+        # Try to retrieve patient days if it exists in the index
+        if (property_i, "Patient Days") in check_patient_days.index:
+            patient_day_i = check_patient_days.loc[(property_i, "Patient Days"), reporting_month]
+
+        # Try to retrieve operating beds if it exists in the index
+        if (property_i, "Operating Beds") in check_patient_days.index:
+            operating_beds_i = check_patient_days.loc[(property_i, "Operating Beds"), reporting_month]
+
+
+        # Perform validations
+        if patient_day_i > 0 and operating_beds_i * month_days > patient_day_i:
             continue
-        elif operating_beds_i>0 and patient_day_i>operating_beds_i*month_days:
-            error_message="The number of patient days for {} exceeds its available days (Operating Beds * {}). This will result in incorrect occupancy.".format(property_i,month_days)		
-            st.error("Error："+error_message)
+        elif operating_beds_i > 0 and patient_day_i > operating_beds_i * month_days:
+            error_message = (\
+            f"The number of patient days for {property_i} exceeds its available days "\
+            f"(Operating Beds * {month_days}). This will result in incorrect occupancy." )
+            st.error("Error: " + error_message)
             problem_properties.append(property_i)
-            error_for_email+="<li> "+error_message+"</li>"
+            error_for_email += f"<li>{error_message}</li>"
+      
         elif operating_beds_i==0 and patient_day_i==0:
             zero_patient_days.append(property_i)
         elif patient_day_i==0 and operating_beds_i>0:
@@ -593,9 +603,9 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
             error_for_email+="<li> "+error_message+"</li>"
         elif patient_day_i>0 and operating_beds_i==0:
             properties_fill_Aunit.append(property_i)
+		
     if len(properties_fill_Aunit)>0:    
         BPC_pull_reset = BPC_pull.reset_index()
-
         previous_A_unit = BPC_pull_reset.loc[(BPC_pull_reset["Sabra_Account"].str.startswith("A_")) &(BPC_pull_reset["Property_Name"].isin(properties_fill_Aunit)),["ENTITY","Property_Name","Sabra_Account","A_unit"]]
         previous_A_unit=previous_A_unit.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
         previous_A_unit=previous_A_unit.rename(columns={"A_unit":reporting_month})
@@ -616,7 +626,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
         st.write(previous_A_unit_display) 
 	    
-        # check the filled operating beds and corresponding patient days
+        # check the filled operating beds and corresponding patient days    
         for property_i in properties_fill_Aunit:
             # Initialize patient_day_i and operating_beds_i to 0
             patient_day_i = 0
