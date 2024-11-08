@@ -1670,8 +1670,11 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 	 
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
     #st.write("sheet_name",sheet_name,"PL",PL)
+
+    if PL.shape[0]<=1:  # sheet is empty or only has one column
+        return pd.DataFrame()
     # Start checking process
-    if True:   
+    else:  
         tenant_account_col=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
         if len(tenant_account_col) > 1:
             # Start with the first column
