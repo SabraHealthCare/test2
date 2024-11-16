@@ -291,7 +291,8 @@ def Initial_Mapping(operator):
                   .reset_index(drop=True)
                   .query("Operator == @operator") 
                   .set_index("ENTITY"))
-    entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF","Reporting_Month"]] = entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF","Reporting_Month"]].astype(str)  
+    st.write("entity_mapping",entity_mapping)
+    #entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF","Reporting_Month"]] = entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF","Reporting_Month"]].astype(str)  
     st.write("entity_mapping",entity_mapping)
     for col in ["Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]:
         entity_mapping[col] = entity_mapping[col].apply(lambda x: x.replace("'","") if pd.notna(x) else x)
