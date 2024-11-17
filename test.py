@@ -21,7 +21,7 @@ from msal import ConfidentialClientApplication
 import requests
 from itertools import product
 from pandas.errors import EmptyDataError
-import pytz
+import pytz 
 import chardet
 from pandas.errors import EmptyDataError
 import re
