@@ -2071,7 +2071,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.session_state.selected_month = int(reporting_month[-2:])
             else:
                 st.session_state.selected_month = current_month
-        st.write("st.session_state.selected_month",st.session_state.selected_month)    
+        st.write("st.session_state.selected_month",st.session_state.selected_month)  
+        st.write("current_month",current_month)  	    
 	#st.write("account_mapping-3",account_mapping,"entity_mapping",entity_mapping)
         reporting_month_label=True  
         tenant_account_col=[10000]
