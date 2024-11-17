@@ -2063,12 +2063,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if 'selected_year' not in st.session_state:
             if reporting_month is not None and reporting_month[0:2]=='20':
                 st.session_state.selected_year = int(reporting_month[0:4])
-	    else:
+            else:
                 st.session_state.selected_year = current_year    
         if 'selected_month' not in st.session_state:
             if reporting_month is not None and reporting_month[-2:].isdigit() and 0 <= int(reporting_month[-2:]) <= 12:
                 st.session_state.selected_month = int(reporting_month[-2:])
-	    else:
+            else:
                 st.session_state.selected_month = current_month
 	    
 	#st.write("account_mapping-3",account_mapping,"entity_mapping",entity_mapping)
