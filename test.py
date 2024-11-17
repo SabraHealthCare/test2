@@ -268,6 +268,7 @@ def Initial_Mapping(operator):
             .set_index(["ENTITY", "Sabra_Account"])
             .dropna(axis=1, how='all')
             .rename(columns=str))
+	
     # Read account mapping file from OneDrive
     account_mapping_all = Read_File_From_Onedrive(mapping_path,account_mapping_filename,"XLSX",account_mapping_str_col)
     # Handle case where there's only one row and it corresponds to a template
@@ -291,9 +292,9 @@ def Initial_Mapping(operator):
                   .reset_index(drop=True)
                   .query("Operator == @operator") 
                   .set_index("ENTITY"))
-    st.write("entity_mapping",entity_mapping)
-    #entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF","Reporting_Month"]] = entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF","Reporting_Month"]].astype(str)  
-    st.write("entity_mapping",entity_mapping)
+ 
+    entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]] = entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]].astype(str)  
+    #st.write("entity_mapping",entity_mapping)
     for col in ["Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]:
         entity_mapping[col] = entity_mapping[col].apply(lambda x: x.replace("'","") if pd.notna(x) else x)
 
@@ -2055,14 +2056,22 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             current_date=str(current_year)+"0"+str(current_month)
         else:
             current_date=str(current_year)+str(current_month)
-        if 'selected_year' not in st.session_state:
-            st.session_state.selected_year = current_year
-        if 'selected_month' not in st.session_state:
-            st.session_state.selected_month = 'Jan'
-        #st.write("operator_email",operator_email)        
+      
         global reporting_month,reporting_month_label,tenant_account_col,date_header,select_months_list
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
-        #st.write("account_mapping-3",account_mapping,"entity_mapping",entity_mapping)
+        reporting_month = BPC_pull["Reporting_Month"].dropna().iloc[0] if not BPC_pull["Reporting_Month"].dropna().empty else None
+        if 'selected_year' not in st.session_state:
+            if reporting_month is not None and reporting_month[0:2]=='20':
+                st.session_state.selected_year = int(reporting_month[0:4])
+	    else:
+                st.session_state.selected_year = current_year    
+        if 'selected_month' not in st.session_state:
+            if reporting_month is not None and reporting_month[-2:].isdigit() and 0 <= int(reporting_month[-2:]) <= 12:
+                st.session_state.selected_month = int(reporting_month[-2:])
+	    else:
+                st.session_state.selected_month = current_month
+	    
+	#st.write("account_mapping-3",account_mapping,"entity_mapping",entity_mapping)
         reporting_month_label=True  
         tenant_account_col=[10000]
         date_header=[[0],0,[]]
