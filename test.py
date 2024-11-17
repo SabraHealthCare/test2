@@ -2060,7 +2060,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         global reporting_month,reporting_month_label,tenant_account_col,date_header,select_months_list
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
         reporting_month = (str(int(BPC_pull["Reporting_Month"].dropna().iloc[0])) if not BPC_pull["Reporting_Month"].dropna().empty else None)
-	st.write("reporting_month",reporting_month)
+        st.write("reporting_month",reporting_month)
         if 'selected_year' not in st.session_state:
             if reporting_month is not None and reporting_month[0:2]=='20':
                 st.session_state.selected_year = int(reporting_month[0:4])
