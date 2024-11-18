@@ -268,14 +268,14 @@ def Initial_Mapping(operator):
             .set_index(["ENTITY", "Sabra_Account"])
             .dropna(axis=1, how='all')
             .rename(columns=str))
-    st.write("BPC_pull",BPC_pull)
+    #st.write("BPC_pull",BPC_pull)
     # Read account mapping file from OneDrive
     account_mapping_all = Read_File_From_Onedrive(mapping_path,account_mapping_filename,"XLSX",account_mapping_str_col)
-    st.write("account_mapping_filename",account_mapping_filename,"mapping_path",mapping_path,"account_mapping_all",account_mapping_all)    
-# Handle case where there's only one row and it corresponds to a template
+    #st.write("account_mapping_filename",account_mapping_filename,"mapping_path",mapping_path,"account_mapping_all",account_mapping_all)    
+    # Handle case where there's only one row and it corresponds to a template
     account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
-    #st.write("template",account_mapping_all[account_mapping_all["Operator"] == "Template"])
-    #st.write(account_mapping["Sabra_Account"].values[0])
+
+    st.write(account_mapping["Sabra_Account"].values[0])
     if account_mapping.shape[0] == 1 and account_mapping["Sabra_Account"].values[0] == 'TEMPLATE':
         account_mapping = account_mapping_all[account_mapping_all["Operator"] == "Template"].copy()
         account_mapping["Operator"] = operator	
