@@ -271,7 +271,8 @@ def Initial_Mapping(operator):
 	
     # Read account mapping file from OneDrive
     account_mapping_all = Read_File_From_Onedrive(mapping_path,account_mapping_filename,"XLSX",account_mapping_str_col)
-    # Handle case where there's only one row and it corresponds to a template
+    st.write(account_mapping_all)    
+# Handle case where there's only one row and it corresponds to a template
     account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
     #st.write("template",account_mapping_all[account_mapping_all["Operator"] == "Template"])
     #st.write(account_mapping["Sabra_Account"].values[0])
