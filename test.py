@@ -268,7 +268,7 @@ def Initial_Mapping(operator):
             .set_index(["ENTITY", "Sabra_Account"])
             .dropna(axis=1, how='all')
             .rename(columns=str))
-	
+    st.write("BPC_pull",BPC_pull)
     # Read account mapping file from OneDrive
     account_mapping_all = Read_File_From_Onedrive(mapping_path,account_mapping_filename,"XLSX",account_mapping_str_col)
     st.write("account_mapping_filename",account_mapping_filename,"mapping_path",mapping_path,"account_mapping_all",account_mapping_all)    
