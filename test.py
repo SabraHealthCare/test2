@@ -2183,10 +2183,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 select_months_list=select_months_list[:previous_monthes_comparison]+[reporting_month]  
             else:
                 select_months_list.append(reporting_month)
-
-        # Display a persistent warning message
         placeholder.warning("⚠️ Reminder: Please make sure to click the 'Confirm and Upload' button at the bottom of the report to complete the upload!")
 	
+        
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
