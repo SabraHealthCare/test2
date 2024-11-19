@@ -2185,7 +2185,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 select_months_list.append(reporting_month)
         placeholder = st.empty()
         placeholder.markdown("""
-        <div style="background-color: #fce77e; padding: 10px; border-radius: 5px;">
+        <div style="background-color: #fff1ad; padding: 10px; border-radius: 5px;">
             ⚠️ <b style="font-size: 18px;">Reminder:</b> Please make sure to click the 
             '<b style="font-size: 18px;">Confirm and Upload</b>' button at the bottom of the report 
             to complete the upload!
