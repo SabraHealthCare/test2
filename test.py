@@ -2166,6 +2166,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.markdown("✔️ :green[Balance sheet selected]")
             else:
                 st.write("Balance sheet wasn't upload.")
+                st.stop()
                 
         else:
             BS_separate_excel="N"
