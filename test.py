@@ -32,7 +32,6 @@ from email.mime.multipart import MIMEMultipart
 #---------------------------define parameters--------------------------
 st.set_page_config(
    initial_sidebar_state="expanded",  layout="wide")
-placeholder = st.empty()
 st.title("Sabra HealthCare Monthly Reporting App")
 
 sheet_name_discrepancy="Discrepancy_Review"
@@ -1263,7 +1262,7 @@ def View_Summary():
 # no cache
 def Submit_Upload():
     global Total_PL,reporting_month,email_body  
-    placeholder.empty()
+
     upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
     upload_reporting_month["TIME"]=reporting_month
     upload_reporting_month=upload_reporting_month.rename(columns={reporting_month:"Amount"})
@@ -1275,6 +1274,7 @@ def Submit_Upload():
 
     if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,"CSV",None,None):
         st.success("{} {} reporting data was uploaded successfully!".format(operator,reporting_month[4:6]+"/"+reporting_month[0:4]))
+        placeholder.empty()
     else: 
         st.write(" ")  #----------record into error report------------------------	
         # save original tenant P&L to OneDrive
@@ -2183,6 +2183,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 select_months_list=select_months_list[:previous_monthes_comparison]+[reporting_month]  
             else:
                 select_months_list.append(reporting_month)
+        placeholder = st.empty()
         placeholder.warning("⚠️ Reminder: Please make sure to click the 'Confirm and Upload' button at the bottom of the report to complete the upload!")
 	
         
