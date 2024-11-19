@@ -2184,8 +2184,15 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             else:
                 select_months_list.append(reporting_month)
         placeholder = st.empty()
-        placeholder.markdown("⚠️ **Reminder:** Please make sure to click the '<b style=\"font-size: 18px;\">Confirm and Upload</b>' button at the bottom of the report to complete the upload!",unsafe_allow_html=True)
-         
+        placeholder.markdown("""
+        <div style="background-color: #ffcc00; padding: 10px; border-radius: 5px;">
+            ⚠️ <b style="font-size: 18px;">Reminder:</b> Please make sure to click the 
+            '<b style="font-size: 18px;">Confirm and Upload</b>' button at the bottom of the report 
+            to complete the upload!
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
