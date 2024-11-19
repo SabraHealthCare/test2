@@ -273,8 +273,8 @@ def Initial_Mapping(operator):
     #st.write("account_mapping_filename",account_mapping_filename,"mapping_path",mapping_path,"account_mapping_all",account_mapping_all)    
     # Handle case where there's only one row and it corresponds to a template
     account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
-    st.write(account_mapping)
-    st.write(account_mapping["Sabra_Account"].values[0])
+    #st.write(account_mapping)
+    #st.write(account_mapping["Sabra_Account"].values[0])
     if account_mapping.shape[0] == 1 and account_mapping["Sabra_Account"].values[0] == 'TEMPLATE':
         account_mapping = account_mapping_all[account_mapping_all["Operator"] == "Template"].copy()
         account_mapping["Operator"] = operator	
@@ -286,7 +286,7 @@ def Initial_Mapping(operator):
     account_mapping["Tenant_Account"] = account_mapping["Tenant_Account"].apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")
     account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion","Category"]]
-    st.write("account_mapping",account_mapping)  
+    #st.write("account_mapping",account_mapping)  
 
     entity_mapping = (Read_File_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
                   .reset_index(drop=True)
