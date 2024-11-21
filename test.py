@@ -754,8 +754,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                 if  len_of_continuous==len(continuous_check_bool) \
 		or len_of_continuous>=10 \
 		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2) \
-		or (len_of_continuous<=2 and len_of_continuous>=1 and len_of_non_continuous==1)\
-                or month_count[month_row_index]<3\
+                or month_count[month_row_index]<=3\
                 or all(x == 0 for x in inv) :
 		    #check the corresponding year
                     if max_match_year>0:
