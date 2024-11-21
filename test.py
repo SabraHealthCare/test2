@@ -1168,6 +1168,7 @@ def color_missing(data):
 
 def View_Summary(): 
     global Total_PL,reporting_month_data,reporting_month,email_body
+    
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
@@ -1234,7 +1235,14 @@ def View_Summary():
         reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
     else:
         reporting_month_data=reporting_month_data[["Sabra_Account"]+list(entity_columns)]   
-
+        placeholder = st.empty()
+        placeholder.markdown("""
+            <div style="background-color: #fff1ad; padding: 10px; border-radius: 5px;">
+            ⚠️ <b style="font-size: 18px;">Reminder:</b> Please make sure to click the 
+            '<b style="font-size: 18px;">Confirm and Upload</b>' button at the bottom of the report 
+            to complete the upload!
+            </div>
+            """,unsafe_allow_html=True)
     with st.expander("{} {} reporting".format(operator,reporting_month_display) ,expanded=True):
         ChangeWidgetFontSize("{} {} reporting".format(operator,reporting_month_display), '25px')
         download_report(reporting_month_data,"Report")
@@ -2184,16 +2192,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 select_months_list=select_months_list[:previous_monthes_comparison]+[reporting_month]  
             else:
                 select_months_list.append(reporting_month)
-        placeholder = st.empty()
-        placeholder.markdown("""
-        <div style="background-color: #fff1ad; padding: 10px; border-radius: 5px;">
-            ⚠️ <b style="font-size: 18px;">Reminder:</b> Please make sure to click the 
-            '<b style="font-size: 18px;">Confirm and Upload</b>' button at the bottom of the report 
-            to complete the upload!
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+        
         if BS_separate_excel=="N":  # Finance/BS are in one excel
             entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
             #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
