@@ -1235,8 +1235,8 @@ def View_Summary():
         reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
     else:
         reporting_month_data=reporting_month_data[["Sabra_Account"]+list(entity_columns)]   
-        placeholder = st.empty()
-        placeholder.markdown("""
+    placeholder = st.empty()
+    placeholder.markdown("""
             <div style="background-color: #fff1ad; padding: 10px; border-radius: 5px;">
             ⚠️ <b style="font-size: 18px;">Reminder:</b> Please make sure click the 
             '<b style="font-size: 18px;">Confirm and Upload</b>' button at the bottom of the report 
