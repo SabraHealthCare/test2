@@ -671,6 +671,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
 
 @st.cache_data  
 def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_name,sheet_type,pre_date_header): 
+
     #st.write("sheet_name",sheet_name)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     #st.write("pre_date_header",pre_date_header)
@@ -678,7 +679,8 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
             return pre_date_header
     PL_col_size=PL.shape[1]
-
+    if sheet_name=="BS":
+        st.write("PL",PL)
     # Create a set of tenant accounts that need mapping
     accounts_to_map = [account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account']) if sabra_account!= 'NO NEED TO MAP']
     #st.write("tenant_account_col_values",tenant_account_col_values,"accounts_to_map",accounts_to_map)
@@ -686,7 +688,6 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     tenant_account_row_mask = [account in accounts_to_map for account in tenant_account_col_values]
     #st.write("tenant_account_row_mask",tenant_account_row_mask)	
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
-
     #st.write("tenant_account_row_mask",tenant_account_row_mask)
     if not any(tenant_account_row_mask):  #all the accounts in tenant_account_col are new accounts 
         PL_temp=PL.copy()
@@ -718,13 +719,15 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     max_len=0
     candidate_date=[]
     month_count = month_table.apply(lambda row: (row != 0).sum(), axis=1).tolist()
-    #st.write("month_table",month_table)
+    if sheet_name=="BS":
+        #st.write("PL",PL)
+        st.write("month_table",month_table)
     if not all(x==0 for x in month_count):
        # month_sort_index is the index(row number) which contain month/year, and sorted desc. month_sort_index[0] is the row number that contrain most months in PL
         non_zero_indices = [(index, month_c) for index, month_c in enumerate(month_count) if month_c!= 0]
         sorted_non_zero_indices = sorted(non_zero_indices, key=lambda x: x[1], reverse=True)
         month_sort_index = [index for index, month_c in sorted_non_zero_indices]
-	    
+
         for month_row_index in month_sort_index: 
             month_row=list(month_table.iloc[month_row_index,])
             month_list=list(filter(lambda x:x!=0,month_row))
