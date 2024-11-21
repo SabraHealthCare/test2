@@ -1238,7 +1238,7 @@ def View_Summary():
         placeholder = st.empty()
         placeholder.markdown("""
             <div style="background-color: #fff1ad; padding: 10px; border-radius: 5px;">
-            ⚠️ <b style="font-size: 18px;">Reminder:</b> Please make sure to click the 
+            ⚠️ <b style="font-size: 18px;">Reminder:</b> Please make sure click the 
             '<b style="font-size: 18px;">Confirm and Upload</b>' button at the bottom of the report 
             to complete the upload!
             </div>
@@ -2192,30 +2192,30 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 select_months_list=select_months_list[:previous_monthes_comparison]+[reporting_month]  
             else:
                 select_months_list.append(reporting_month)
-        
-        if BS_separate_excel=="N":  # Finance/BS are in one excel
-            entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
-            #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
-            Total_PL=Upload_And_Process(uploaded_finance,"Finance")
-            #st.write("Total_PL1",Total_PL)
-        elif BS_separate_excel=="Y": # Finance/BS are in different excel 
-            entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")
-            entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
+        with st.spinner("Processing... Please wait!"):
+            if BS_separate_excel=="N":  # Finance/BS are in one excel
+                entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
+                #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
+                Total_PL=Upload_And_Process(uploaded_finance,"Finance")
+                #st.write("Total_PL1",Total_PL)
+            elif BS_separate_excel=="Y": # Finance/BS are in different excel 
+                entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")
+                entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
 
-            # process Finance 
-            Total_PL=Upload_And_Process(uploaded_finance,"Finance")
-            #st.write("Total_PL",Total_PL)
-	    # process BS 
-            Total_BL=Upload_And_Process(uploaded_BS,"BS")
-	    # combine Finance and BS
-            Total_PL=Total_BL.combine_first(Total_PL)
-            #Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
-        if len(Total_PL.columns)==1:
-            Total_PL.columns=[reporting_month]
+                # process Finance 
+                Total_PL=Upload_And_Process(uploaded_finance,"Finance")
+                #st.write("Total_PL",Total_PL)
+	        # process BS 
+                Total_BL=Upload_And_Process(uploaded_BS,"BS")
+	        # combine Finance and BS
+                Total_PL=Total_BL.combine_first(Total_PL)
+                #Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
+            if len(Total_PL.columns)==1:
+                Total_PL.columns=[reporting_month]
 
-        elif len(Total_PL.columns)>1 and BPC_pull.shape[0]>0:  # there are previous months in P&L
-            #diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail,reporting_month)
-            diff_BPC_PL=Compare_PL_Sabra(Total_PL,reporting_month)
+            elif len(Total_PL.columns)>1 and BPC_pull.shape[0]>0:  # there are previous months in P&L
+                #diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail,reporting_month)
+                diff_BPC_PL=Compare_PL_Sabra(Total_PL,reporting_month)
    
 	# 1 Summary
         View_Summary()
