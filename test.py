@@ -1168,7 +1168,7 @@ def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
 
 def View_Summary(): 
-    global Total_PL,reporting_month_data,reporting_month,email_body,placeholder
+    global Total_PL,reporting_month_data,reporting_month,email_body
     
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
@@ -2160,10 +2160,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.clicked = button_initial_state
                     st.session_state.selected_year = selected_year
                     st.session_state.selected_month = selected_month
-                    st.write("st.session_state.selected_month after confirm",st.session_state.selected_month)
+                    #st.write("st.session_state.selected_month after confirm",st.session_state.selected_month)
                     
         reporting_month_display=str(selected_month)+" "+str(selected_year)
-        reporting_month=str(selected_year)+month_map[selected_month]	    
+        reporting_month=str(selected_year)+month_map[selected_month]
+
+        st.write("reporting_month",reporting_month)
         col1, col2 = st.columns([1,3])   
         with col1:
             if 'uploaded_finance' in locals() and uploaded_finance:
