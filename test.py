@@ -2109,6 +2109,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col2:    
                     selected_month = st.selectbox("Month", months_range, index=months_range.index(st.session_state.selected_month))
                     st.session_state.selected_month = selected_month
+                    st.write("st.session_state.selected_month",st.session_state.selected_month)
                 with col1:
                     st.write("Upload P&L:")
                     uploaded_finance=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
@@ -2126,8 +2127,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.cache_data.clear()
                     st.cache_resource.clear()
                     st.session_state.clicked = button_initial_state
-                    #st.session_state.selected_year = selected_year
-                    #st.session_state.selected_month = selected_month
+                    st.session_state.selected_year = selected_year
+                    st.session_state.selected_month = selected_month
 
         elif BS_separate_excel=="Y":	 
             with st.form("upload_form", clear_on_submit=True):
