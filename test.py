@@ -531,7 +531,7 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
         if date_of_assumption<today and date_of_assumption.month<today.month:
             report_year_start=report_year
         elif date_of_assumption>=today:
-            report_year_start=report_year-1
+            report_year_start=int(report_year)-1
         for i in range(month_len):
             add_year[i]=report_year_start-year_change
             if i<month_len-1 and add_year[i+1]==12:
@@ -542,7 +542,7 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
         if date_of_assumption<today:
             report_year_start=report_year
         elif date_of_assumption>=today:
-            report_year_start=report_year-1
+            report_year_start=int(report_year)-1
         for i in range(-1,month_len*(-1)-1,-1):
             add_year[i]=report_year_start-year_change
             if i>month_len*(-1) and add_year[i-1]==12:
