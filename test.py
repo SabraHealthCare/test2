@@ -2071,7 +2071,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
       
         global reporting_month,reporting_month_label,tenant_account_col,date_header,select_months_list
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
-        reporting_month = BPC_pull["Reporting_Month"].dropna().iloc[0] if not BPC_pull["Reporting_Month"].dropna().empty else None
+        #reporting_month = BPC_pull["Reporting_Month"].dropna().iloc[0] if not BPC_pull["Reporting_Month"].dropna().empty else None
         #st.write("reporting_month",reporting_month)
         months_range = list(month_map.keys())
         if 'selected_year' not in st.session_state:
@@ -2110,7 +2110,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.write("st.session_state.selected_year",st.session_state.selected_year)
                    
                 with col2:    
-                    selected_month = st.selectbox("Month", months_range, index=months_range.index(st.session_state.selected_month))
+                    selected_month = st.selectbox("Month", months_range)#, index=months_range.index(st.session_state.selected_month))
                     if selected_month != st.session_state.selected_month:
                         st.session_state.selected_month = selected_month
                         st.write("st.session_state.selected_month",st.session_state.selected_month)
@@ -2141,7 +2141,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col1:
                     selected_year = st.selectbox("Year", years_range,index=years_range.index(st.session_state.selected_year))
                 with col2:    
-                    selected_month = st.selectbox("Month", months_range)#,index=months_range.index(st.session_state.selected_month))
+                    selected_month = st.selectbox("Month", months_range)  #,index=months_range.index(st.session_state.selected_month))
                 col1, col2, col3 = st.columns([1, 1, 1])
                 with col1:
                     st.write("Upload P&L:")
