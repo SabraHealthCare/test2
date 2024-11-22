@@ -744,7 +744,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                         max_match_year=len(year_match)
                     else:
                         continue
-  
+            st.write("month_count[month_row_index]",month_count[month_row_index])
             if month_count[month_row_index]>1:   # if there are more than one month in the header	    
 	        #check month continuous, there are at most two types of differences in the month list which are in 1,-1,11,-11 
                 inv=[int(month_list[month_i+1])-int(month_list[month_i]) for month_i in range(month_len-1) ]
