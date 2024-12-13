@@ -1168,7 +1168,7 @@ def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
 
 def View_Summary(): 
-    global Total_PL,reporting_month_data,reporting_month,email_body
+    global Total_PL,reporting_month_data,reporting_month,email_body,placeholder
     
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
@@ -1284,7 +1284,7 @@ def Submit_Upload(total_email_body):
 
     if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,"CSV",None,None):
         st.success("{} {} reporting data was uploaded successfully!".format(operator,reporting_month[4:6]+"/"+reporting_month[0:4]))
-        #placeholder.empty()
+        placeholder.empty()
     else: 
         st.write(" ")  #----------record into error report------------------------	
         # save original tenant P&L to OneDrive
