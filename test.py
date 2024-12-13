@@ -1323,7 +1323,7 @@ def Submit_Upload(total_email_body):
     </body>
     </html>"""
 
-    #Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
+    Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
     if email_body!="":
         Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body)    
 
