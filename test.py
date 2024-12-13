@@ -1267,11 +1267,11 @@ def View_Summary():
         summary_for_email["Sabra_Account"] = summary_for_email["Sabra_Account"].str.replace("Total - ", "", regex=False)
         #st.write("reporting_month_data",reporting_month_data,"summary_for_email",summary_for_email)	
         summary_for_email.columns.name = None 
-        email_body=f"<p>Here is the summary for your reference:</p>{summary_for_email.to_html(index=False)}"+email_body
-        
+        total_email_body=f"<p>Here is the summary for your reference:</p>{summary_for_email.to_html(index=False)}"+email_body
+        return total_email_body
 # no cache
-def Submit_Upload():
-    global Total_PL,reporting_month,email_body,placeholder
+def Submit_Upload(total_email_body):
+    global Total_PL,reporting_month,placeholder
 
     upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
     upload_reporting_month["TIME"]=reporting_month
@@ -1312,18 +1312,20 @@ def Submit_Upload():
         st.write("Please update email address (in 'Menu' - 'Edit Account') to ensure you receive confirmation email.")
     # Append these unique values to receiver_list
     receiver_email_list.extend(unique_asset_managers)
-    #st.write(receiver_email_list)
+  
     # Send the confirmation email
-    email_body= f"""
+    format_total_email_body= f"""
     <html>
     <body>
         <p>Dear {operator} team,</p>
-	<p>Thanks for submitting {operator} {reporting_month_display} reporting data.</p>"""+email_body+f"""<p>Best regards,</p>
+	<p>Thanks for submitting {operator} {reporting_month_display} reporting data.</p>"""+total_email_body+f"""<p>Best regards,</p>
         <p>Sabra Healthcare REIT.</p>
     </body>
     </html>"""
 
-    Send_Confirmation_Email(receiver_email_list, subject, email_body)    
+    Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
+    if email_body!="":
+        (["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display, email_body)    
 
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
@@ -2216,14 +2218,14 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 diff_BPC_PL=Compare_PL_Sabra(Total_PL,reporting_month)
    
 	# 1 Summary
-        View_Summary()
+        total_email_body=View_Summary()
         # Define the button and handle the click event
         if st.button(f'Confirm and upload {reporting_month_display} reporting', key='reporting_month', help="Click and wait a few seconds for the confirmation message."):
             st.session_state.clicked['submit_report'] = True
 
         # Perform the upload action here and check for discrepancies
         if st.session_state.clicked['submit_report']:
-            Submit_Upload()
+            Submit_Upload(total_email_body)
             # Discrepancy of Historic Data
             if len(Total_PL.columns) > 1 and BPC_pull.shape[0] > 0:
                 with st.expander("Discrepancy for Historic Data", expanded=True):
