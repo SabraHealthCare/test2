@@ -2304,7 +2304,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             st.subheader("Summary")
             data=Read_File_From_Onedrive(master_template_path,monthly_reporting_filename,"CSV")
             
-            if data:
+            if data is False or data.empty:
+                st.warning("The master template is empty or invalid. Please check the file in onedrive.")
+            else:
                 data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
                 data["Upload_Check"]=""
                 # summary for operator upload
