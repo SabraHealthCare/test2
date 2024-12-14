@@ -2344,7 +2344,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                         filtered_data = data.merge(selected_reports,on=["TIME", "Operator", "Latest_Upload_Time"])
                                
                         # Convert result_data to CSV
-                        csv = result_data.to_csv(index=False).encode('utf-8')
+                        csv = filtered_data.to_csv(index=False).encode('utf-8')
                         st.download_button(label="Download reporting data",data=csv,file_name="Operator reporting data.csv",mime="text/csv")
 
                     else:
