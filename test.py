@@ -2273,7 +2273,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
-# ----------------for Sabra account--------------------	    
+# ---------------------------------------- Sabra Admin account----------------------------------------------------------	    
 elif st.session_state["authentication_status"] and st.session_state["operator"]=="Sabra":
     operator_list=Read_File_From_Onedrive(mapping_path,operator_list_filename,"CSV")
     menu=["Review Monthly reporting","Review New Mapping","Edit Account","Register","Logout"]
@@ -2303,25 +2303,53 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     elif choice=="Review Monthly reporting":
             st.subheader("Summary")
             data=Read_File_From_Onedrive(master_template_path,monthly_reporting_filename,"CSV")
-            #if data is None:  # empty file
-            if True:
+            
+            if data:
                 data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
                 data["Upload_Check"]=""
                 # summary for operator upload
                 data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
-                col1,col2,col3=st.columns((2,1,1))
+                col1,col2,col3=st.columns((2,1,1)) 
+             
+                # show uploading summary
                 summary=data[["TIME","Operator","Latest_Upload_Time"]].drop_duplicates()
                 summary = summary.sort_values(by="Latest_Upload_Time", ascending=False)
-
-                with col1:
+                summary = summary.reset_index(drop=True)  # Reset index to create a numeric index
+                summary["Index"] = summary.index + 1      # Add a column with 1-based indices
+                with st.container():
                     st.dataframe(
-			    summary,
-			    column_config={
-			        "TIME": "Reporting month",
-			        "Latest_Upload_Time":"Latest submit time"},
-			    hide_index=True)
+                        summary,
+                        column_config={
+                        "TIME": "Reporting month",
+                        "Latest_Upload_Time": "Latest submit time",
+                        "Index": "Record Number"},
+                        hide_index=True)
+
+                # download reporting data with EPM formula
                 st.write("")
-                st.subheader("Download reporting data with EPM Formula")    
-		    
-                download_file=data.to_csv(index=False).encode('utf-8')
-                st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
+                st.subheader("Download reporting data with EPM Formula")   
+
+                selected_indices = st.multiselect(
+                    "Select indices to download",
+                    options=summary["Index"].tolist(),
+                    format_func=lambda x: f"Record {x}")
+
+                # Button to download
+                if st.button("Download selected reports"):
+                    if selected_indices:
+                        # Filter data based on selected indices
+                        selected_reports = summary[summary["Index"].isin(selected_indices)]
+                        filtered_data = data.merge(selected_reports,on=["TIME", "Operator", "Latest_Upload_Time"])
+                               
+                        # Convert result_data to CSV
+                        csv = result_data.to_csv(index=False).encode('utf-8')
+                        st.download_button(label="Download reporting data",data=csv,file_name="Operator reporting data.csv",mime="text/csv")
+
+                    else:
+                        st.warning("Please select at least one record to download.")
+
+
+
+	    
+
+               
