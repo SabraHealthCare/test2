@@ -2336,19 +2336,30 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                     options=summary["Index"].tolist(),
                     format_func=lambda x: f"Record {x}")
 
-                # Button to download
-                if st.button("Download selected reports"):
-                    if selected_indices:
-                        # Filter data based on selected indices
-                        selected_reports = summary[summary["Index"].isin(selected_indices)]
-                        filtered_data = data.merge(selected_reports,on=["TIME", "Operator", "Latest_Upload_Time"])
-                               
-                        # Convert result_data to CSV
-                        csv = filtered_data.to_csv(index=False).encode('utf-8')
-                        st.download_button(label="Download reporting data",data=csv,file_name="Operator reporting data.csv",mime="text/csv")
+                # Use session state to manage button clicks
+                if "show_download" not in st.session_state:
+                    st.session_state.show_download = False
 
+                # Button to select index
+                if st.button("Select index"):
+                    if selected_indices:
+                        st.session_state.show_download = True
                     else:
                         st.warning("Please select at least one record to download.")
+
+                # Display the download button if indices are selected
+                if st.session_state.show_download:
+                    selected_reports = summary[summary["Index"].isin(selected_indices)]
+                    filtered_data = data.merge(selected_reports, on=["TIME", "Operator", "Latest_Upload_Time"])
+    
+                    # Convert result_data to CSV
+                    csv = filtered_data.to_csv(index=False).encode('utf-8')
+                    st.download_button(
+                        label="Download reporting data",
+                        data=csv,
+                        file_name="Operator_reporting_data.csv",
+                        mime="text/csv"
+                    )
 
 
 
