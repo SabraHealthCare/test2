@@ -2365,8 +2365,8 @@ def Create_EPM_Formula(summary,upload_data,selected_indices):
         letter = ""
         col_number+=1
         while col_number > 0:
-        col_number, remainder = divmod(col_number - 1, 26)
-        letter = chr(65 + remainder) + letter
+            col_number, remainder = divmod(col_number - 1, 26)
+            letter = chr(65 + remainder) + letter
         return letter 
 
     entity_mapping = (
