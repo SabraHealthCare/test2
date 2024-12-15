@@ -2382,7 +2382,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             col1,col2=st.columns([1,2])
             with col1:
                 selected_indices = st.multiselect(
-                    "Select indices to download",
+                    "Select index(es) to download reports",
                     options=summary["Index"].tolist())
 
             # Use session state to manage button clicks
@@ -2390,11 +2390,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.session_state.show_download = False
 
             # Button to select index
-            if st.button("Select index"):
+            if st.button("Confirm selections"):
                 if selected_indices:
                     st.session_state.show_download = True
                 else:
-                    st.warning("Please select at least one record to download.")
+                    st.warning("Please select at least one index No. to download.")
 
             # Display the download button if indices are selected
             if st.session_state.show_download:
