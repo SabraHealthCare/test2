@@ -2396,19 +2396,19 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 else:
                     st.warning("Please select at least one index No. to download.")
 
-            # Display the download button if indices are selected
-            if st.session_state.show_download:
-                selected_reports = summary[summary["Index"].isin(selected_indices)]
-                filtered_data = data.merge(selected_reports, on=["TIME", "Operator", "Latest_Upload_Time"])
-                upload_data_EPM_fomula=Create_EPM_Formula(summary,filtered_data,selected_indices)
-                # Convert result_data to CSV
-                csv = upload_data_EPM_fomula.to_csv(index=False).encode('utf-8')
-                st.download_button(
+                # Display the download button if index are selected
+                if st.session_state.show_download:
+                    selected_reports = summary[summary["Index"].isin(selected_indices)]
+                    filtered_data = data.merge(selected_reports, on=["TIME", "Operator", "Latest_Upload_Time"])
+                    upload_data_EPM_fomula=Create_EPM_Formula(summary,filtered_data,selected_indices)
+                    # Convert result_data to CSV
+                    csv = upload_data_EPM_fomula.to_csv(index=False).encode('utf-8')
+                    st.download_button(
                         label="Download reporting data",
                         data=csv,
                         file_name="Operator_reporting_data.csv",
                         mime="text/csv"
-                    )
+                        )
 
      
 
