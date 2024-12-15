@@ -2370,15 +2370,17 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.dataframe(
                         summary,
                         column_config={
+			"Index":"Index No.",
+			"Operator":"Operator",
                         "TIME": "Reporting month",
-                        "Latest_Upload_Time": "Latest submit time",
-                        "Index": "Record Number"},
+                        "Latest_Upload_Time": "Latest submit time"},
                         hide_index=True)
 
-                # download reporting data with EPM formula
+            
+	    # download reporting data with EPM formula
             st.write("")
             st.subheader("Download selected reports with EPM Formula")   
-            col1,col2=st.columns([1,3])
+            col1,col2=st.columns([1,2])
             with col1:
                 selected_indices = st.multiselect(
                     "Select indices to download",
@@ -2389,12 +2391,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.session_state.show_download = False
 
             # Button to select index
-            with col2:
-                if st.button("Select index"):
-                    if selected_indices:
-                        st.session_state.show_download = True
-                    else:
-                        st.warning("Please select at least one record to download.")
+            if st.button("Select index"):
+                if selected_indices:
+                    st.session_state.show_download = True
+                else:
+                    st.warning("Please select at least one record to download.")
 
             # Display the download button if indices are selected
             if st.session_state.show_download:
