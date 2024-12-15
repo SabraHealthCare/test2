@@ -2352,15 +2352,14 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 	    
         st.subheader("Uploading Summary")
         data=Read_File_From_Onedrive(master_template_path,monthly_reporting_filename,"CSV")
-            
+
         if data is False or data.empty:
             st.warning("The master template is empty or invalid. Please check the file in onedrive.")
         else:
             data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
             data["Upload_Check"]=""
-            # summary for operator upload
-            col1,col2,col3=st.columns((2,1,1)) 
-             
+            data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])-1]))
+
             # show uploading summary
             summary=data[["TIME","Operator","Latest_Upload_Time"]].drop_duplicates()
             summary = summary.sort_values(by="Latest_Upload_Time", ascending=False)
