@@ -2301,25 +2301,74 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         authenticator.logout('Logout', 'main')
 
     elif choice=="Review Monthly reporting":
-            st.subheader("Summary")
-            data=Read_File_From_Onedrive(master_template_path,monthly_reporting_filename,"CSV")
+        def Create_EPM_Formula(summary,upload_data,selected_indices):
+            def colnum_letter(col_number):
+                letter = ""
+                col_number+=1
+                while col_number > 0:
+                    col_number, remainder = divmod(col_number - 1, 26)
+                    letter = chr(65 + remainder) + letter
+                return letter 
+
+            entity_mapping = (
+                Read_File_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
+                .reset_index(drop=True))
+
+            # Filter where "Operator" matches any value in the operator list
+            operator_list=upload_data["Operator"].unique()
+            entity_mapping = entity_mapping[entity_mapping["Operator"].isin(operator_list)]
+ 
+            upload_data=upload_data.fillna(0)
+            upload_data['Amount']=upload_data['Amount'].astype(float)
+        
+            upload_data=upload_data.merge(entity_mapping[["ENTITY","Operator","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on=["ENTITY","Operator"],how="left")
+            upload_data["TIME"]=upload_data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],list(month_map.keys())[int(str(x)[4:6])-1]))
+
+            entity_list=upload_data["ENTITY"].unique()
+            upload_data["EPM_Formula"]=""
+            upload_data["Upload_Check"]=""
+            row_size=upload_data.shape[0]
+            col_name_list=list(upload_data.columns)
+            time_col_letter=colnum_letter(col_name_list.index("TIME"))
+            entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
+            account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
+            facility_col_letter=colnum_letter(col_name_list.index("FACILITY_TYPE"))
+            state_col_letter=colnum_letter(col_name_list.index("GEOGRAPHY"))
+            leasename_col_letter=colnum_letter(col_name_list.index("LEASE_NAME"))
+            inv_col_letter=colnum_letter(col_name_list.index("INV_TYPE"))
+            data_col_letter=colnum_letter(col_name_list.index("Amount"))    
+            EPM_Formula_col_letter=colnum_letter(col_name_list.index("EPM_Formula"))
+            upload_Check_col_letter=colnum_letter(col_name_list.index("Upload_Check"))
+            for r in range(2,row_size+2):
+                upload_formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
+		    format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
+            upload_data.loc[r-2,"EPM_Formula"]=upload_formula
+            upload_check_formula="={}{}={}{}".format(EPM_Formula_col_letter,r,data_col_letter,r)
+            upload_data.loc[r-2,"Upload_Check"]=upload_check_formula
+            upload_data["""="Consistence check:"&AND({}2:{}{})""".format(upload_Check_col_letter,upload_Check_col_letter,row_size+1)]=""
+            return upload_data         
+
+
+	    
+        st.subheader("Uploading Summary")
+        data=Read_File_From_Onedrive(master_template_path,monthly_reporting_filename,"CSV")
             
-            if data is False or data.empty:
-                st.warning("The master template is empty or invalid. Please check the file in onedrive.")
-            else:
-                data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
-                data["Upload_Check"]=""
-                # summary for operator upload
-                data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
-                col1,col2,col3=st.columns((2,1,1)) 
+        if data is False or data.empty:
+            st.warning("The master template is empty or invalid. Please check the file in onedrive.")
+        else:
+            data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
+            data["Upload_Check"]=""
+            # summary for operator upload
+            data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
+            col1,col2,col3=st.columns((2,1,1)) 
              
-                # show uploading summary
-                summary=data[["TIME","Operator","Latest_Upload_Time"]].drop_duplicates()
-                summary = summary.sort_values(by="Latest_Upload_Time", ascending=False)
-                summary = summary.reset_index(drop=True)  # Reset index to create a numeric index
-                summary["Index"] = summary.index + 1      # Add a column with 1-based indices
-                with st.container():
-                    st.dataframe(
+            # show uploading summary
+            summary=data[["TIME","Operator","Latest_Upload_Time"]].drop_duplicates()
+            summary = summary.sort_values(by="Latest_Upload_Time", ascending=False)
+            summary = summary.reset_index(drop=True)  # Reset index to create a numeric index
+            summary["Index"] = summary.index + 1      # Add a column with 1-based indices
+            with st.container():
+                st.dataframe(
                         summary,
                         column_config={
                         "TIME": "Reporting month",
@@ -2328,84 +2377,39 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                         hide_index=True)
 
                 # download reporting data with EPM formula
-                st.write("")
-                st.subheader("Download reporting data with EPM Formula")   
+            st.write("")
+            st.subheader("Download reporting data with EPM Formula")   
 
-                selected_indices = st.multiselect(
+            selected_indices = st.multiselect(
                     "Select indices to download",
                     options=summary["Index"].tolist())
 
-                # Use session state to manage button clicks
-                if "show_download" not in st.session_state:
-                    st.session_state.show_download = False
+            # Use session state to manage button clicks
+            if "show_download" not in st.session_state:
+                st.session_state.show_download = False
 
-                # Button to select index
-                if st.button("Select index"):
-                    if selected_indices:
-                        st.session_state.show_download = True
-                    else:
-                        st.warning("Please select at least one record to download.")
+            # Button to select index
+            if st.button("Select index"):
+                if selected_indices:
+                    st.session_state.show_download = True
+                else:
+                    st.warning("Please select at least one record to download.")
 
-                # Display the download button if indices are selected
-                if st.session_state.show_download:
-                    selected_reports = summary[summary["Index"].isin(selected_indices)]
-                    filtered_data = data.merge(selected_reports, on=["TIME", "Operator", "Latest_Upload_Time"])
-                    upload_data_EPM_fomula=Create_EPM_Formula(summary,filtered_data,selected_indices)
-                    # Convert result_data to CSV
-                    csv = upload_data_EPM_fomula.to_csv(index=False).encode('utf-8')
-                    st.download_button(
+            # Display the download button if indices are selected
+            if st.session_state.show_download:
+                selected_reports = summary[summary["Index"].isin(selected_indices)]
+                filtered_data = data.merge(selected_reports, on=["TIME", "Operator", "Latest_Upload_Time"])
+                upload_data_EPM_fomula=Create_EPM_Formula(summary,filtered_data,selected_indices)
+                # Convert result_data to CSV
+                csv = upload_data_EPM_fomula.to_csv(index=False).encode('utf-8')
+                st.download_button(
                         label="Download reporting data",
                         data=csv,
                         file_name="Operator_reporting_data.csv",
                         mime="text/csv"
                     )
 
-def Create_EPM_Formula(summary,upload_data,selected_indices):
-    def colnum_letter(col_number):
-        letter = ""
-        col_number+=1
-        while col_number > 0:
-            col_number, remainder = divmod(col_number - 1, 26)
-            letter = chr(65 + remainder) + letter
-        return letter 
-
-    entity_mapping = (
-        Read_File_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
-        .reset_index(drop=True))
-
-    # Filter where "Operator" matches any value in the operator list
-    operator_list=upload_data["Operator"].unique()
-    entity_mapping = entity_mapping[entity_mapping["Operator"].isin(operator_list)]
- 
-    upload_data=upload_data.fillna(0)
-    upload_data['Amount']=upload_data['Amount'].astype(float)
-        
-    upload_data=upload_data.merge(entity_mapping[["ENTITY","Operator","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on=["ENTITY","Operator"],how="left")
-    upload_data["TIME"]=upload_data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],list(month_map.keys())[int(str(x)[4:6])-1]))
-
-    entity_list=upload_data["ENTITY"].unique()
-    upload_data["EPM_Formula"]=""
-    upload_data["Upload_Check"]=""
-    row_size=upload_data.shape[0]
-    col_name_list=list(upload_data.columns)
-    time_col_letter=colnum_letter(col_name_list.index("TIME"))
-    entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
-    account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
-    facility_col_letter=colnum_letter(col_name_list.index("FACILITY_TYPE"))
-    state_col_letter=colnum_letter(col_name_list.index("GEOGRAPHY"))
-    leasename_col_letter=colnum_letter(col_name_list.index("LEASE_NAME"))
-    inv_col_letter=colnum_letter(col_name_list.index("INV_TYPE"))
-    data_col_letter=colnum_letter(col_name_list.index("Amount"))    
-    EPM_Formula_col_letter=colnum_letter(col_name_list.index("EPM_Formula"))
-    upload_Check_col_letter=colnum_letter(col_name_list.index("Upload_Check"))
-    for r in range(2,row_size+2):
-        upload_formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
-		    format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
-    upload_data.loc[r-2,"EPM_Formula"]=upload_formula
-    upload_check_formula="={}{}={}{}".format(EPM_Formula_col_letter,r,data_col_letter,r)
-    upload_data.loc[r-2,"Upload_Check"]=upload_check_formula
-    upload_data["""="Consistence check:"&AND({}2:{}{})""".format(upload_Check_col_letter,upload_Check_col_letter,row_size+1)]=""
-    return upload_data              
+     
 
 
 
