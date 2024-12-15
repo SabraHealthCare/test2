@@ -2322,9 +2322,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             upload_data['Amount']=upload_data['Amount'].astype(float)
         
             upload_data=upload_data.merge(entity_mapping[["ENTITY","Operator","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]],on=["ENTITY","Operator"],how="left")
-            st.write("upload_data[TIME]",upload_data["TIME"])
-            upload_data["TIME"]=upload_data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],list(month_map.keys())[int(str(x)[4:6])-1]))
-
+            
             entity_list=upload_data["ENTITY"].unique()
             upload_data["EPM_Formula"]=""
             upload_data["Upload_Check"]=""
@@ -2361,7 +2359,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
             data["Upload_Check"]=""
             # summary for operator upload
-            data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
             col1,col2,col3=st.columns((2,1,1)) 
              
             # show uploading summary
