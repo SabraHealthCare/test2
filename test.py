@@ -2359,7 +2359,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
             data["Upload_Check"]=""
 
-            #data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])-1]))
+            data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
 
             # show uploading summary
             summary=data[["TIME","Operator","Latest_Upload_Time"]].drop_duplicates()
