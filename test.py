@@ -2377,9 +2377,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
                 # download reporting data with EPM formula
             st.write("")
-            st.subheader("Download reporting data with EPM Formula")   
-
-            selected_indices = st.multiselect(
+            st.subheader("Download selected reports with EPM Formula")   
+            col1,col2=st.columns([1,3])
+            with col1:
+                selected_indices = st.multiselect(
                     "Select indices to download",
                     options=summary["Index"].tolist())
 
@@ -2388,11 +2389,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.session_state.show_download = False
 
             # Button to select index
-            if st.button("Select index"):
-                if selected_indices:
-                    st.session_state.show_download = True
-                else:
-                    st.warning("Please select at least one record to download.")
+            with col2:
+                if st.button("Select index"):
+                    if selected_indices:
+                        st.session_state.show_download = True
+                    else:
+                        st.warning("Please select at least one record to download.")
 
             # Display the download button if indices are selected
             if st.session_state.show_download:
