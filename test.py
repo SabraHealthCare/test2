@@ -2368,10 +2368,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             summary["Index"] = summary.index + 1      # Add a column with 1-based indices
             with st.container():
                 st.dataframe(
-                        summary,
+                        summary[["Index","Operator","TIME","Latest_Upload_Time"]],
                         column_config={
 			"Index":"Index No.",
-			"Operator":"Operator",
                         "TIME": "Reporting month",
                         "Latest_Upload_Time": "Latest submit time"},
                         hide_index=True)
