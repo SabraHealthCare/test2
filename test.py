@@ -2375,7 +2375,7 @@ def Create_EPM_Formula(summary,upload_data,selected_indices):
 
     # Filter where "Operator" matches any value in the operator list
     operator_list=upload_data["Operator"].unique()
-    entity_mapping = entity_mapping[entity_mapping["Operator"].isin(operator_list)
+    entity_mapping = entity_mapping[entity_mapping["Operator"].isin(operator_list)]
  
     upload_data=upload_data.fillna(0)
     upload_data['Amount']=upload_data['Amount'].astype(float)
