@@ -2339,6 +2339,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             data_col_letter=colnum_letter(col_name_list.index("Amount"))    
             EPM_Formula_col_letter=colnum_letter(col_name_list.index("EPM_Formula"))
             upload_Check_col_letter=colnum_letter(col_name_list.index("Upload_Check"))
+            st.write("row_size",row_size)
             for r in range(2,row_size+2):
                 upload_formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
 		    format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
