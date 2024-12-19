@@ -1307,12 +1307,13 @@ def Submit_Upload(total_email_body):
     # Get 'Asset_Manager' from entity_mapping
     unique_asset_managers = entity_mapping['Asset_Manager'].unique()
     #receiver_email_list=[operator_email,"twarner@sabrahealth.com","sli@sabrahealth.com"]
+    st.write("*************************************operator_email",operator_email)
     receiver_email_list=[operator_email,"sli@sabrahealth.com"]
     if '@*' in operator_email:
         st.write("Please update email address (in 'Menu' - 'Edit Account') to ensure you receive confirmation email.")
     # Append these unique values to receiver_list
     #receiver_email_list.extend(unique_asset_managers)
-  
+    st.write("*************************************receiver_email_list",receiver_email_list)
     # Send the confirmation email
     format_total_email_body= f"""
     <html>
