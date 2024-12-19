@@ -2061,7 +2061,7 @@ if st.session_state["authentication_status"] is False:
 #------------------------------------------operator account----------------------------------------------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
     operator_email = st.session_state['email']  # Accessing the email
-    st.writea("********************operator_email",operator_email)
+    st.write("********************operator_email",operator_email)
     operator=st.session_state["operator"]
     st.title(operator)
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
