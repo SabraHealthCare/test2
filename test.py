@@ -1306,16 +1306,14 @@ def Submit_Upload(total_email_body):
     subject = "Confirmation of {} {} reporting".format(operator,reporting_month_display)
     # Get 'Asset_Manager' from entity_mapping
     unique_asset_managers = entity_mapping['Asset_Manager'].unique()
-    #receiver_email_list=[operator_email,"twarner@sabrahealth.com","sli@sabrahealth.com"]
-
-    st.write("*************************************operator_email",operator_email)
-    #receiver_email_list=[operator_email,"sli@sabrahealth.com"]
-    receiver_email_list=operator_email.split(",") + ["sli@sabrahealth.com"]
+ 
+    receiver_email_list = operator_email.split(",") + ["twarner@sabrahealth.com", "sli@sabrahealth.com"]
+    
     if '@*' in operator_email:
         st.write("Please update email address (in 'Menu' - 'Edit Account') to ensure you receive confirmation email.")
     # Append these unique values to receiver_list
-    #receiver_email_list.extend(unique_asset_managers)
-    st.write("*************************************receiver_email_list",receiver_email_list)
+    receiver_email_list.extend(unique_asset_managers)
+  
     # Send the confirmation email
     format_total_email_body= f"""
     <html>
@@ -2063,7 +2061,7 @@ if st.session_state["authentication_status"] is False:
 #------------------------------------------operator account----------------------------------------------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
     operator_email = st.session_state['email']  # Accessing the email
-    st.write("********************operator_email",operator_email)
+    
     operator=st.session_state["operator"]
     st.title(operator)
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
