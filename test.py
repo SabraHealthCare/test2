@@ -1173,7 +1173,7 @@ def View_Summary():
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
-    st.write("Total_PL",Total_PL,Total_PL.index)
+    #st.write("Total_PL",Total_PL,Total_PL.index)
 
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
@@ -1755,8 +1755,19 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         # remove duplicate new account
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
-            st.write("new_tenant_account_list",new_tenant_account_list)	
+            #st.write("new_tenant_account_list",new_tenant_account_list)	
             account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)
+            
+	    # Update account pool
+	    if sheet_type=="Sheet_Name_Finance":
+                account_pool=account_mapping.copy()
+	    elif sheet_type=="Sheet_Name_Occupancy":
+                account_pool = account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")|(account_mapping["Category"] == "Patient Days")|\
+	                        (account_mapping["Category"] == "Facility Information")|\
+	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS'])) |\
+	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]	  
+	    elif sheet_type=="Sheet_Name_Balance_Sheet":
+                account_pool= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]	
 
         #if there are duplicated accounts in P&L, ask for confirming
         # Step 1: Remove all duplicate rows, keeping only unique records based on all column values
@@ -1764,7 +1775,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         PL = PL.reset_index(drop=False)
         PL=PL.drop_duplicates()
         PL = PL.set_index('Tenant_Account')  
-        st.write("PL before mapping2",PL)
+        
         # Step 2: Identify any remaining duplicated indices after removing duplicate rows
         dup_tenant_account_all = PL.index[PL.index.duplicated()].unique()
 
@@ -1884,7 +1895,18 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
         new_tenant_account_list=list(filter(lambda x: x not in list(account_mapping["Tenant_Account"]),PL.index))
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
-            account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)        
+            account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)   
+            # Update account pool
+	    if sheet_type=="Sheet_Name_Finance":
+                account_pool=account_mapping.copy()
+	    elif sheet_type=="Sheet_Name_Occupancy":
+                account_pool = account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")|(account_mapping["Category"] == "Patient Days")|\
+	                        (account_mapping["Category"] == "Facility Information")|\
+	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS'])) |\
+	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]	  
+	    elif sheet_type=="Sheet_Name_Balance_Sheet":
+                account_pool= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]	
+
         #if there are duplicated accounts in P&L, ask for confirming
         # Step 1: Remove all duplicate rows, keeping only unique records based on all column values
         PL.index.name = "Tenant_Account"
@@ -1926,7 +1948,7 @@ def Upload_And_Process(uploaded_file,file_type):
 	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS'])) |\
 	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]	  
     account_pool_balance_sheet= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]	
-    #st.write("account_pool_full",account_pool_full)
+
     # ****Finance and BS in one excel****
     if file_type=="Finance":
         tenant_account_col=[10000]
