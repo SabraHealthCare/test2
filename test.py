@@ -1749,21 +1749,22 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         # remove rows with all nan/0 value
         #PL=PL.loc[(PL!= 0).any(axis=1),:]
         PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
-
+        st.write("PL before mapping1",PL)	
         # mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Account"]),PL.index))
         # remove duplicate new account
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
+            st.write("new_tenant_account_list",new_tenant_account_list)	
             account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)
-		
+
         #if there are duplicated accounts in P&L, ask for confirming
         # Step 1: Remove all duplicate rows, keeping only unique records based on all column values
         PL.index.name = "Tenant_Account"
         PL = PL.reset_index(drop=False)
         PL=PL.drop_duplicates()
         PL = PL.set_index('Tenant_Account')  
-      
+        st.write("PL before mapping2",PL)
         # Step 2: Identify any remaining duplicated indices after removing duplicate rows
         dup_tenant_account_all = PL.index[PL.index.duplicated()].unique()
 
@@ -1778,7 +1779,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
        
         # Map PL accounts and Sabra account
 	# map sabra account with tenant account, groupby sabra account
-        #st.write("sheet_type",sheet_type,"PL",PL,"account_pool",account_pool)
+        st.write("sheet_type",sheet_type,"PL",PL,"account_pool",account_pool)
         PL=Map_PL_Sabra(PL,entity_list,sheet_type,account_pool) # index are ('ENTITY',"Sabra_Account")
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
