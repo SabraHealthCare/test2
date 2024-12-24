@@ -1790,7 +1790,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
        
         # Map PL accounts and Sabra account
 	# map sabra account with tenant account, groupby sabra account
-        st.write("sheet_type",sheet_type,"PL",PL,"account_pool",account_pool)
+        #st.write("sheet_type",sheet_type,"PL",PL,"account_pool",account_pool)
         PL=Map_PL_Sabra(PL,entity_list,sheet_type,account_pool) # index are ('ENTITY',"Sabra_Account")
         PL.rename(columns={"value":reporting_month},inplace=True)
         #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
