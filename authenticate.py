@@ -700,8 +700,8 @@ class Authenticate:
             if st.button('Update'):
                 if len(new_value) > 0:
                     if field =="Username":
-                        if new_value not in self.credentials['usernames'] :
-                            if self.validator.validate_username(username):
+                        if new_value.lower() not in self.credentials['usernames'] :
+                              if self.validator.validate_username(username):
                                     st.success("Username updated successfully")
                                     self.credentials['usernames'][new_value] = self.credentials['usernames'].pop(self.username)
                                     self.username=new_value
@@ -711,7 +711,7 @@ class Authenticate:
                                     self.cookie_manager.set(self.cookie_name, self.token,
                                                         expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
                                     self.save_credentials_to_yaml(config)
-                                    #st.success("Username updated successfully")
+                                    st.success("Username updated successfully")
                                     return True
                             else:
                                 raise RegisterError('Username is not valid')
