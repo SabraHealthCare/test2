@@ -714,7 +714,7 @@ class Authenticate:
                                     #st.success("Username updated successfully")
                                     return True
                             else:
-                                aise RegisterError('Username is not valid')
+                                raise RegisterError('Username is not valid')
                         else:
                             raise RegisterError('Username already be taken')
 
