@@ -15,6 +15,6 @@ streamlit_authenticator
 sendgrid
 Pillow
 msal
-requests==2.32.0  # Updated to a secure version
+requests>=2.32.1  # Updated to a secure version
 chardet
 git+https://github.com/streamlit/files-connection
