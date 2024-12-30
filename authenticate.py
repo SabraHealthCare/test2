@@ -713,12 +713,12 @@ class Authenticate:
                                     self.save_credentials_to_yaml(config)
                                     #st.success("Username updated successfully")
                                     return True
-                                else:
-                                    raise RegisterError('Username is not valid')
                             else:
-                                raise RegisterError('Username already be taken')
+                                aise RegisterError('Username is not valid')
+                        else:
+                            raise RegisterError('Username already be taken')
 
-                        elif field =='Email':
+                    elif field =='Email':
                             if new_value != self.credentials['usernames'][self.username][field]:
                                 if self.validator.validate_email(new_value):
                                     self._update_entry(self.username, field, new_value)
@@ -730,5 +730,5 @@ class Authenticate:
                                     raise RegisterError('New email is not valid')
                             else:
                                 raise UpdateError('New and current email are the same')
-                    elif len(new_value) == 0:
-                        raise UpdateError('New {} not provided'.format(field))
+                elif len(new_value) == 0:
+                    raise UpdateError('New {} not provided'.format(field))
