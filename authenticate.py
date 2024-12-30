@@ -713,8 +713,8 @@ class Authenticate:
                                     self.save_credentials_to_yaml(config)
                                     st.success("Username updated successfully")
                                     return True
-                            else:
-                                raise RegisterError('Username is not valid')
+                              else:
+                                  raise RegisterError('Username is not valid')
                         else:
                             raise RegisterError('Username already be taken')
 
