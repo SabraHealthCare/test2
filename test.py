@@ -1052,6 +1052,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
 	
 #@st.cache_data 
 def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
+    st.write("PL before mapping",PL)
     # remove no need to map from account_mapping
     account_pool=account_pool[account_pool["Sabra_Account"]!= "NO NEED TO MAP" ]
     #st.write(account_pool)
@@ -1121,7 +1122,7 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
         PL=PL.drop(["Conversion"], axis=1)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='ENTITY')     
         PL=PL.drop(["Tenant_Account"], axis=1)
-
+    st.write("PL after mapping",PL)
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first 
