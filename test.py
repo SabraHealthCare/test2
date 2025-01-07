@@ -606,7 +606,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         elif patient_day_i>0 and operating_beds_i==0:
             properties_fill_Aunit.append(property_i)
 		
-    if len(properties_fill_Aunit)>0:    
+    if len(properties_fill_Aunit)>0 and not BPC_pull.empty:    
         BPC_pull_reset = BPC_pull.reset_index()
         previous_A_unit = BPC_pull_reset.loc[(BPC_pull_reset["Sabra_Account"].str.startswith("A_")) &(BPC_pull_reset["Property_Name"].isin(properties_fill_Aunit)),["ENTITY","Property_Name","Sabra_Account","A_unit"]]
         previous_A_unit=previous_A_unit.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
