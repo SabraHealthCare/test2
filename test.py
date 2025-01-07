@@ -2100,7 +2100,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
         if not BPC_pull.empty:
             reporting_month = BPC_pull["Reporting_Month"].dropna().iloc[0] if not BPC_pull["Reporting_Month"].dropna().empty else None
-	else:
+        else:
             reporting_month = None		
 	#st.write("reporting_month",reporting_month)
         months_range = list(month_map.keys())
