@@ -1052,7 +1052,6 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
 	
 #@st.cache_data 
 def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
-    st.write("PL before mapping",PL)
     # remove no need to map from account_mapping
     account_pool=account_pool[account_pool["Sabra_Account"]!= "NO NEED TO MAP" ]
     #st.write(account_pool)
@@ -1079,7 +1078,6 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     #Remove blank or missing "Sabra_Account" values
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
     PL.dropna(subset=["Sabra_Account"], inplace=True)
-    st.write("PL after mapping",PL)
     # Conversion column
     PL = PL.reset_index(drop=True)
     conversion = PL["Conversion"].fillna(np.nan)
@@ -1101,7 +1099,6 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
                     PL.loc[idx, month] *= multiplier
                 else:
                     continue
-
         PL=PL.drop(["Conversion","Tenant_Account"], axis=1)
         PL["ENTITY"]=entity	    
 
@@ -1124,7 +1121,7 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
         PL=PL.drop(["Conversion"], axis=1)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='ENTITY')     
         PL=PL.drop(["Tenant_Account"], axis=1)
-    #st.write("PL after mapping",PL)
+
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first 
@@ -1293,7 +1290,7 @@ def Submit_Upload(total_email_body):
         st.write(" ")  #----------record into error report------------------------	
         # save original tenant P&L to OneDrive
     if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
-        st.write("unsuccess ")  #----------record into error report------------------------	
+        st.write("upload unsuccessfully ")  #----------record into error report------------------------	
 
     if BS_separate_excel=="Y":
         # save tenant BS to OneDrive
@@ -2101,10 +2098,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
       
         global reporting_month,reporting_month_label,tenant_account_col,date_header,select_months_list
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
-        if not BPC_pull.empty:
-            reporting_month = BPC_pull["Reporting_Month"].dropna().iloc[0] if not BPC_pull["Reporting_Month"].dropna().empty else None
-	else:
-            reporting_month = None
+        reporting_month = BPC_pull["Reporting_Month"].dropna().iloc[0] if not BPC_pull["Reporting_Month"].dropna().empty else None
+        
 	#st.write("reporting_month",reporting_month)
         months_range = list(month_map.keys())
         if 'selected_year' not in st.session_state:
@@ -2440,8 +2435,3 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                         mime="text/csv"
                         )
 
-     
-
-
-
-               
