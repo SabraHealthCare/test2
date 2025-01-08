@@ -2191,10 +2191,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.write("P&L wasn't upload.")
                 st.stop()
 
-            
-            if reporting_month>=current_date:
-                st.error("The reporting month should precede the current month.")
-                st.stop()
+        if reporting_month>=current_date:
+            st.error("The reporting month should precede the current month.")
+            st.stop()
         entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=reporting_month) & ((entity_mapping["DATE_SOLD_PAYOFF"]=="N")|(entity_mapping["DATE_SOLD_PAYOFF"]>=reporting_month))),]
         if "Y" in entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values:                     
             BS_separate_excel="Y"
