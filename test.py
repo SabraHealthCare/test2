@@ -2101,7 +2101,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
       
         global reporting_month,reporting_month_label,tenant_account_col,date_header,select_months_list
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
-        #st.write("BPC_pull,entity_mapping,account_mapping",BPC_pull,entity_mapping,account_mapping)
+        st.write("BPC_pull,entity_mapping,account_mapping",BPC_pull,entity_mapping,account_mapping)
+        st.write("entity_mapping.index",entity_mapping.index)
         if not BPC_pull.empty:
             reporting_month = BPC_pull["Reporting_Month"].dropna().iloc[0] if not BPC_pull["Reporting_Month"].dropna().empty else None
         else:
