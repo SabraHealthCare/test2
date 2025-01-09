@@ -1935,6 +1935,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 
 # no cache
 def Upload_And_Process(uploaded_file,file_type):
+    st.write("entity_mapping",entity_mapping,entity_mapping.index)
     global  tenant_account_col
     Total_PL=pd.DataFrame()
     #Total_PL_detail=pd.DataFrame()
