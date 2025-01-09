@@ -1169,7 +1169,7 @@ def color_missing(data):
 
 def View_Summary(): 
     global Total_PL,reporting_month_data,reporting_month,email_body,placeholder
-    st.write("view summary Total_PL",Total_PL)
+    #st.write("view summary Total_PL",Total_PL)
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
@@ -1951,10 +1951,12 @@ def Upload_And_Process(uploaded_file,file_type):
 
     # ****Finance and BS in one excel****
     if file_type=="Finance":
+        st.write(1111111111111111111111111111111111)
         tenant_account_col=[10000]
         for entity_i in total_entity_list:   # entity_i is the entity code S number
 	    # properties are in seperate sheet 
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
+                st.write(22222222222222222222222)
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                 Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
                 st.write("Total_PL",entity_i,Total_PL)
@@ -2037,7 +2039,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 Total_PL = PL_BS.combine_first(Total_PL) if not Total_PL.empty else PL_BS
 
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
-    st.write("Total_PL",Total_PL)
+    #st.write("Total_PL",Total_PL)
     return Total_PL
 def Download_PL_Sample():
     PL_sample_filename = "{}_P&L_sample.xlsx".format(operator)
