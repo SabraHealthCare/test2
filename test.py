@@ -1939,6 +1939,7 @@ def Upload_And_Process(uploaded_file,file_type):
     Total_PL=pd.DataFrame()
     #Total_PL_detail=pd.DataFrame()
     total_entity_list=list(entity_mapping.index)
+    st.write("total_entity_list",total_entity_list)
     Occupancy_in_one_sheet=[]
     BS_in_one_sheet=[]
     account_pool_full=account_mapping.copy()
