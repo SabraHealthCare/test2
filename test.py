@@ -1951,10 +1951,10 @@ def Upload_And_Process(uploaded_file,file_type):
 
     # ****Finance and BS in one excel****
     if file_type=="Finance":
-        st.write(1111111111111111111111111111111111)
         tenant_account_col=[10000]
         for entity_i in total_entity_list:   # entity_i is the entity code S number
 	    # properties are in seperate sheet 
+            st.write("Finance_in_separate_sheets",entity_i,entity_mapping.loc[entity_i,"Finance_in_separate_sheets"])
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 st.write(22222222222222222222222)
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
