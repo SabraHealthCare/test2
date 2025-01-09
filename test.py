@@ -1169,7 +1169,7 @@ def color_missing(data):
 
 def View_Summary(): 
     global Total_PL,reporting_month_data,reporting_month,email_body,placeholder
-    
+    st.write("view summary Total_PL",Total_PL)
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
