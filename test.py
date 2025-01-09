@@ -1957,7 +1957,7 @@ def Upload_And_Process(uploaded_file,file_type):
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                 Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
-                #st.write("Total_PL",entity_i,Total_PL)
+                st.write("Total_PL",entity_i,Total_PL)
 	
 	    
 	# check census data****************************************************************************************    
@@ -2037,7 +2037,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 Total_PL = PL_BS.combine_first(Total_PL) if not Total_PL.empty else PL_BS
 
     Total_PL = Total_PL.sort_index()  #'ENTITY',"Sabra_Account" are the multi-index of Total_Pl
-    #st.write("Total_PL",Total_PL)
+    st.write("Total_PL",Total_PL)
     return Total_PL
 def Download_PL_Sample():
     PL_sample_filename = "{}_P&L_sample.xlsx".format(operator)
@@ -2098,7 +2098,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
       
         global reporting_month,reporting_month_label,tenant_account_col,date_header,select_months_list
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
-        st.write("BPC_pull,entity_mapping,account_mapping",BPC_pull,entity_mapping,account_mapping)
+        #st.write("BPC_pull,entity_mapping,account_mapping",BPC_pull,entity_mapping,account_mapping)
         if not BPC_pull.empty:
             reporting_month = BPC_pull["Reporting_Month"].dropna().iloc[0] if not BPC_pull["Reporting_Month"].dropna().empty else None
         else:
