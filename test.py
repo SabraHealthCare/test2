@@ -2117,7 +2117,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.session_state.selected_year = current_year    
         
         #st.write("current_month",current_month)  	    
-	
+        st.write("entity_mapping",entity_mapping)
         reporting_month_label=True  
         tenant_account_col=[10000]
         date_header=[[0],0,[]]
@@ -2188,7 +2188,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.selected_year = selected_year
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
-
+        st.write("entity_mapping3",entity_mapping)
         col1, col2 = st.columns([1,3])   
         with col1:
             if 'uploaded_finance' in locals() and uploaded_finance:
@@ -2212,7 +2212,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 
         else:
             BS_separate_excel="N"
-
+        st.write("entity_mapping4",entity_mapping)
 	# select_months_list contain the monthes that need to be compared for history data,if it is [], means no need to compare
         
         if any(entity_mapping["Finance_in_separate_sheets"]=="N") or previous_monthes_comparison==0:
@@ -2226,11 +2226,14 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 select_months_list.append(reporting_month)
         with st.spinner("Processing... Please wait!"):
             if BS_separate_excel=="N":  # Finance/BS are in one excel
+                st.write("entity_mapping5",entity_mapping)
                 entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
+                st.write("entity_mapping6",entity_mapping)
                 #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
                 Total_PL=Upload_And_Process(uploaded_finance,"Finance")
                 #st.write("Total_PL1",Total_PL)
             elif BS_separate_excel=="Y": # Finance/BS are in different excel 
+
                 entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")
                 entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
 
