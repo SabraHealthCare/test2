@@ -283,7 +283,9 @@ def Initial_Mapping(operator):
     # Clean and format account mapping columns
     account_mapping_cols = ["Sabra_Account", "Sabra_Second_Account"]
     account_mapping[account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
-    st.write("account_mapping2",account_mapping)  
+    st.write("account_mapping2",account_mapping) 
+    if "Category" in account_mapping.columns:
+        account_mapping = account_mapping.drop(columns="Category")
     account_mapping["Tenant_Account"] = account_mapping["Tenant_Account"].apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")
     st.write("account_mapping3",account_mapping)  
