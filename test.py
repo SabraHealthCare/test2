@@ -2191,6 +2191,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.markdown("✔️ :green[P&L selected]")
         elif (BS_separate_excel == "Y" and not uploaded_BS and not uploaded_finance and uploaded_other_docs)\
 	    or (BS_separate_excel != "Y" and not uploaded_finance and uploaded_other_docs):
+            for file in uploaded_other_docs: 
+	        # create new file name by adding reporting_month at the end of original filename    
+                original_file_name = file.name
+                file_name, file_extension = original_file_name.rsplit('.', 1)
+                new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
+                Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
             st.success("Ancillary files for {} uploaded: {} files".format(reporting_month_display, len(uploaded_other_docs)))
             st.warning("Please note that you have only uploaded ancillary files without any monthly reporting data.")
 
