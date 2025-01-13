@@ -2220,7 +2220,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.markdown("✔️ :green[Balance sheet selected]")
             else:
                 if uploaded_other_docs: 
-                    st.error("You have only uploaded ancillary files without any monthly reporting data.")
+                    st.error("You have only uploaded ancillary files without any monthly reporting data. Please upload Balance Sheet if you want to upload monthly reporting data.")
                 else:
                     st.error("Please upload Balance sheet.")
                 st.stop()
