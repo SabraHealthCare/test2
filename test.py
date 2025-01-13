@@ -283,14 +283,12 @@ def Initial_Mapping(operator):
     # Clean and format account mapping columns
     account_mapping_cols = ["Sabra_Account", "Sabra_Second_Account"]
     account_mapping[account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
-    st.write("account_mapping2",account_mapping) 
+    account_mapping["Tenant_Account"] = account_mapping["Tenant_Account"].apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
     if "Category" in account_mapping.columns:
         account_mapping = account_mapping.drop(columns="Category")
-    account_mapping["Tenant_Account"] = account_mapping["Tenant_Account"].apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")
-    st.write("account_mapping3",account_mapping)  
     account_mapping = account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion","Category"]]
-    st.write("account_mapping4",account_mapping)  
+    #st.write("account_mapping",account_mapping)  
 
     entity_mapping = (Read_File_From_Onedrive(mapping_path, entity_mapping_filename, "CSV", entity_mapping_str_col)
                   .reset_index(drop=True)
@@ -1173,7 +1171,7 @@ def color_missing(data):
 
 def View_Summary(): 
     global Total_PL,reporting_month_data,reporting_month,email_body,placeholder
-    #st.write("view summary Total_PL",Total_PL)
+    
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
@@ -1939,12 +1937,10 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 
 # no cache
 def Upload_And_Process(uploaded_file,file_type):
-    st.write("entity_mapping",entity_mapping,entity_mapping.index)
     global  tenant_account_col
     Total_PL=pd.DataFrame()
     #Total_PL_detail=pd.DataFrame()
     total_entity_list=list(entity_mapping.index)
-    st.write("total_entity_list",total_entity_list)
     Occupancy_in_one_sheet=[]
     BS_in_one_sheet=[]
     account_pool_full=account_mapping.copy()
@@ -1960,12 +1956,10 @@ def Upload_And_Process(uploaded_file,file_type):
         tenant_account_col=[10000]
         for entity_i in total_entity_list:   # entity_i is the entity code S number
 	    # properties are in seperate sheet 
-            st.write("Finance_in_separate_sheets",entity_i,entity_mapping.loc[entity_i,"Finance_in_separate_sheets"])
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
-                st.write(22222222222222222222222)
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
                 Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
-                st.write("Total_PL",entity_i,Total_PL)
+                #st.write("Total_PL",entity_i,Total_PL)
 	
 	    
 	# check census data****************************************************************************************    
@@ -2106,8 +2100,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
       
         global reporting_month,reporting_month_label,tenant_account_col,date_header,select_months_list
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
-        st.write("BPC_pull,entity_mapping,account_mapping",BPC_pull,entity_mapping,account_mapping)
-        st.write("entity_mapping.index",entity_mapping.index)
         if not BPC_pull.empty:
             reporting_month = BPC_pull["Reporting_Month"].dropna().iloc[0] if not BPC_pull["Reporting_Month"].dropna().empty else None
         else:
@@ -2121,7 +2113,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.session_state.selected_year = current_year    
         
         #st.write("current_month",current_month)  	    
-        st.write("entity_mapping",entity_mapping)
+	
         reporting_month_label=True  
         tenant_account_col=[10000]
         date_header=[[0],0,[]]
@@ -2192,7 +2184,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.selected_year = selected_year
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
-        st.write("entity_mapping3",entity_mapping)
+
         col1, col2 = st.columns([1,3])   
         with col1:
             if 'uploaded_finance' in locals() and uploaded_finance:
@@ -2216,7 +2208,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 
         else:
             BS_separate_excel="N"
-        st.write("entity_mapping4",entity_mapping)
+
 	# select_months_list contain the monthes that need to be compared for history data,if it is [], means no need to compare
         
         if any(entity_mapping["Finance_in_separate_sheets"]=="N") or previous_monthes_comparison==0:
@@ -2230,14 +2222,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 select_months_list.append(reporting_month)
         with st.spinner("Processing... Please wait!"):
             if BS_separate_excel=="N":  # Finance/BS are in one excel
-                st.write("entity_mapping5",entity_mapping)
                 entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
-                st.write("entity_mapping6",entity_mapping)
                 #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
                 Total_PL=Upload_And_Process(uploaded_finance,"Finance")
                 #st.write("Total_PL1",Total_PL)
             elif BS_separate_excel=="Y": # Finance/BS are in different excel 
-
                 entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")
                 entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
 
