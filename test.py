@@ -2209,7 +2209,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         else:   
             if uploaded_other_docs: 
                 st.error("You have only uploaded ancillary files without any monthly reporting data.")
-	    else:
+            else:
                 st.error("Please upload P&L.")
             st.stop()
         entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=reporting_month) & ((entity_mapping["DATE_SOLD_PAYOFF"]=="N")|(entity_mapping["DATE_SOLD_PAYOFF"]>=reporting_month))),]
