@@ -2184,9 +2184,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.selected_year = selected_year
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
-
-        col1, col2 = st.columns([1,3])   
-        st.write("uploaded_finance",uploaded_finance,"BS_separate_excel",BS_separate_excel)
+	    
+        col1, col2 = st.columns([1, 3])  
         if 'uploaded_finance' in locals() and uploaded_finance:
             st.markdown("✔️ :green[P&L selected]")
         elif (BS_separate_excel == "Y" and not uploaded_BS and not uploaded_finance and uploaded_other_docs)\
