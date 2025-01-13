@@ -2199,7 +2199,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.success("Ancillary files for {} uploaded: {} files".format(reporting_month_display, len(uploaded_other_docs)))
             st.warning("Please note that you have only uploaded ancillary files without any monthly reporting data.")
             receiver = ["sli@sabrahealth.com"]#"twarner@sabrahealth.com"
-            Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files".format(len(uploaded_other_docs))):
+            Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded".format(len(uploaded_other_docs)))
             st.stop()
         else:   
             st.error("P&L wasn't upload.")
