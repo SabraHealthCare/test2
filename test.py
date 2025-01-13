@@ -2207,7 +2207,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if 'uploaded_finance' in locals() and uploaded_finance:
             st.markdown("✔️ :green[P&L selected]")
         else:   
-            st.warning("P&L wasn't upload. Please note that you have only uploaded ancillary files without any monthly reporting data.")
+            st.error("Please upload P&L.")
+            if uploaded_other_docs: 
+                st.error("You have only uploaded ancillary files without any monthly reporting data.")
             st.stop()
         entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=reporting_month) & ((entity_mapping["DATE_SOLD_PAYOFF"]=="N")|(entity_mapping["DATE_SOLD_PAYOFF"]>=reporting_month))),]
         if "Y" in entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values:                     
@@ -2216,7 +2218,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col2:
                     st.markdown("✔️ :green[Balance sheet selected]")
             else:
-                st.error("Balance sheet wasn't upload. Please note that you have only uploaded ancillary files without any monthly reporting data.")
+                st.error("Please upload Balance sheet.")
+                if uploaded_other_docs: 
+                    st.error("You have only uploaded ancillary files without any monthly reporting data.")
                 st.stop()
         else:
             BS_separate_excel="N"
