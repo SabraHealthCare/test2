@@ -2188,7 +2188,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.error("The reporting month should precede the current month.")
             st.stop()	
 		
-        if uploaded_other_docs:
+        if uploaded_other_docs: 
             filename_list=[]
             for file in uploaded_other_docs: 
 	        # create new file name by adding reporting_month at the end of original filename    
