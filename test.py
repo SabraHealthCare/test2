@@ -2221,11 +2221,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         else:
             BS_separate_excel="N"
 
-        if (BS_separate_excel == "Y" and not uploaded_BS and not uploaded_finance and uploaded_other_docs)\
-	    or (BS_separate_excel != "Y" and not uploaded_finance and uploaded_other_docs):
 	
 	# select_months_list contain the monthes that need to be compared for history data,if it is [], means no need to compare
-        
         if any(entity_mapping["Finance_in_separate_sheets"]=="N") or previous_monthes_comparison==0:
             select_months_list=[reporting_month]
 
