@@ -2213,6 +2213,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.error("Please upload P&L.")
             st.stop()
         entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=reporting_month) & ((entity_mapping["DATE_SOLD_PAYOFF"]=="N")|(entity_mapping["DATE_SOLD_PAYOFF"]>=reporting_month))),]
+
+        st.write("111111111",entity_mapping,entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values)
+
+	    
         if "Y" in entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values:                     
             BS_separate_excel="Y"
             if 'uploaded_BS' in locals() and uploaded_BS:
