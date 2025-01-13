@@ -2186,12 +2186,15 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         reporting_month=str(selected_year)+month_map[selected_month]
 
         col1, col2 = st.columns([1,3])   
-        with col1:
-            if 'uploaded_finance' in locals() and uploaded_finance:
-                st.markdown("✔️ :green[P&L selected]")
-            else:
-                st.write("P&L wasn't upload.")
-                st.stop()
+        if 'uploaded_finance' in locals() and uploaded_finance:
+            st.markdown("✔️ :green[P&L selected]")
+        elif (BS_separate_excel == "Y" and not uploaded_BS and not uploaded_finance and uploaded_other_docs)\
+	    or (BS_separate_excel != "Y" and not uploaded_finance and uploaded_other_docs):
+            st.success("Ancillary files uploaded: {len(uploaded_other_docs)} files")
+            st.stop()
+        else:   
+            st.write("P&L wasn't upload.")
+            st.stop()
 
         if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
