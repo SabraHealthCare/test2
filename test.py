@@ -2227,6 +2227,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	
         else:
             BS_separate_excel="N"
+            st.write("11111111111111111")
 
 	
 	# select_months_list contain the monthes that need to be compared for history data,if it is [], means no need to compare
