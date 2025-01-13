@@ -2201,7 +2201,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
             st.stop()
         else:   
-            st.write("P&L wasn't upload.")
+            st.error("P&L wasn't upload.")
             st.stop()
 
         if reporting_month>=current_date:
@@ -2214,7 +2214,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col2:
                     st.markdown("✔️ :green[Balance sheet selected]")
             else:
-                st.write("Balance sheet wasn't upload.")
+                st.error("Balance sheet wasn't upload.")
                 st.stop()
                 
         else:
