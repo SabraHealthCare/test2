@@ -2191,7 +2191,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.markdown("✔️ :green[P&L selected]")
         elif (BS_separate_excel == "Y" and not uploaded_BS and not uploaded_finance and uploaded_other_docs)\
 	    or (BS_separate_excel != "Y" and not uploaded_finance and uploaded_other_docs):
-            st.success("Ancillary files uploaded: {} files".format(len(uploaded_other_docs)))
+            st.success("Ancillary files for {} uploaded: {} files".format(reporting_month_display, len(uploaded_other_docs)))
+            st.warning("Please note that you have only uploaded ancillary files without any monthly reporting data.")
+
             st.stop()
         else:   
             st.write("P&L wasn't upload.")
