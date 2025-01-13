@@ -1,4 +1,3 @@
-
 import pandas as pd  
 pd.set_option('future.no_silent_downcasting', True) 
 import numpy as np  
@@ -2201,7 +2200,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 filename_list.append(original_file_name)
             st.success("Ancillary files for {} uploaded: {} files".format(reporting_month_display, len(uploaded_other_docs)))
             st.warning("Please note that you have only uploaded ancillary files without any monthly reporting data.")
-            receiver = ["twarner@sabrahealth.com","sli@sabrahealth.com"]
+            unique_asset_managers = entity_mapping['Asset_Manager'].unique()
+           
+            receiver = operator_email.split(",") + ["twarner@sabrahealth.com", "sli@sabrahealth.com"]
+            receiver.extend(unique_asset_managers)
+		    
             Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
             st.stop()
         else:   
@@ -2450,5 +2453,4 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                         label="Download reporting data",
                         data=csv,
                         file_name="Operator_reporting_data.csv",
-                        mime="text/csv"
-                        )
+                        mime="text/csv")
