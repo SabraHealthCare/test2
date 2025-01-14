@@ -2213,10 +2213,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.error("Please upload P&L.")
             st.stop()
         entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=reporting_month) & ((entity_mapping["DATE_SOLD_PAYOFF"]=="N")|(entity_mapping["DATE_SOLD_PAYOFF"]>=reporting_month))),]
-
-        st.write("111111111",entity_mapping,entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values)
-
-	    
+        if entity_mapping.empty:
+            st.write("The reporting month is not valid as it either exceeds the sold date or precedes the acquisition date for the properties.")
+            st.stop()
         if "Y" in entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values:                     
             BS_separate_excel="Y"
             if 'uploaded_BS' in locals() and uploaded_BS:
@@ -2231,7 +2230,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	
         else:
             BS_separate_excel="N"
-            st.write("11111111111111111")
+
 
 	
 	# select_months_list contain the monthes that need to be compared for history data,if it is [], means no need to compare
