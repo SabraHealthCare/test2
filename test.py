@@ -2203,6 +2203,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.success("Ancillary files for {} uploaded: {} files".format(reporting_month_display, len(uploaded_other_docs)))
             
         col1, col2 = st.columns([1,3])  
+        with col1:
         if 'uploaded_finance' in locals() and uploaded_finance:
             st.markdown("✔️ :green[P&L selected]")
         else:   
@@ -2230,6 +2231,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     #receiver.extend(unique_asset_managers)	    
                     Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))    
                 else:
+                    with col2:
+                    st.markdown("✖ :Red[Balance sheet is not uploaded ]")
                     st.error("Please upload Balance sheet.")
                 st.stop()
         else:
