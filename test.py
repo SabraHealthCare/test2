@@ -2204,19 +2204,19 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             
         col1, col2 = st.columns([1,3])  
         with col1:
-        if 'uploaded_finance' in locals() and uploaded_finance:
-            st.markdown("✔️ :green[P&L selected]")
-        else:   
-            if uploaded_other_docs: 
-                st.error("You have only uploaded ancillary files without any monthly reporting data.")
-                unique_asset_managers = entity_mapping['Asset_Manager'].unique()
-                receiver = operator_email.split(",") + ["sli@sabrahealth.com"]  #"twarner@sabrahealth.com", 
-                #receiver.extend(unique_asset_managers)	    
-                Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
+            if 'uploaded_finance' in locals() and uploaded_finance:
+                st.markdown("✔️ :green[P&L selected]")
+            else:   
+                if uploaded_other_docs: 
+                    st.error("You have only uploaded ancillary files without any monthly reporting data.")
+                    unique_asset_managers = entity_mapping['Asset_Manager'].unique()
+                    receiver = operator_email.split(",") + ["sli@sabrahealth.com"]  #"twarner@sabrahealth.com", 
+                    #receiver.extend(unique_asset_managers)	    
+                    Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
   
-            else:
-                st.error("Please upload P&L.")
-            st.stop()
+                else:
+                    st.error("Please upload P&L.")
+                st.stop()
         
         if "Y" in entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values:                     
             BS_separate_excel="Y"
