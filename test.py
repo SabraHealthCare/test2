@@ -1275,7 +1275,6 @@ def View_Summary():
 # no cache
 def Submit_Upload(total_email_body):
     global Total_PL,reporting_month,placeholder
-
     upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
     upload_reporting_month["TIME"]=reporting_month
     upload_reporting_month=upload_reporting_month.rename(columns={reporting_month:"Amount"})
@@ -2207,9 +2206,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 receiver.extend(unique_asset_managers)	    
                 Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
             else:
-                st.markdown("❌ :red[P&L is not uploaded ]")
+                st.markdown(":red[P&L is not uploaded ]")
             st.stop()
-        #st.write("entity_mapping",entity_mapping,entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values)        
+        
         if "Y" in entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values:                     
             BS_separate_excel="Y"
             if 'uploaded_BS' in locals() and uploaded_BS:
