@@ -1298,14 +1298,7 @@ def Submit_Upload(total_email_body):
         # save tenant BS to OneDrive
         if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
             st.write(" unsuccess")  #----------record into error report------------------------	
-    if uploaded_other_docs:
-        for file in uploaded_other_docs: 
-	    # create new file name by adding reporting_month at the end of original filename    
-            original_file_name = file.name
-            file_name, file_extension = original_file_name.rsplit('.', 1)
-            new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
-            Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
-
+    
     subject = "Confirmation of {} {} reporting".format(operator,reporting_month_display)
     # Get 'Asset_Manager' from entity_mapping
     unique_asset_managers = entity_mapping['Asset_Manager'].unique()
