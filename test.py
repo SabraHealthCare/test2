@@ -2206,7 +2206,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 unique_asset_managers = entity_mapping['Asset_Manager'].unique()
                 receiver = operator_email.split(",") + ["sli@sabrahealth.com"]  #"twarner@sabrahealth.com", 
                 #receiver.extend(unique_asset_managers)	    
-                Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
+                #Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
             else:
                 st.markdown("❌ :red[P&L is not uploaded ]")
             st.stop()
@@ -2224,7 +2224,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     unique_asset_managers = entity_mapping['Asset_Manager'].unique()
                     receiver = operator_email.split(",") + ["sli@sabrahealth.com"]  #"twarner@sabrahealth.com", 
                     #receiver.extend(unique_asset_managers)	    
-                    Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))    
+                    #Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))    
                 st.stop()
         else:
             BS_separate_excel="N"
