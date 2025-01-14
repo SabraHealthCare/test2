@@ -2187,7 +2187,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
             st.stop()	
-		
+        entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=reporting_month) & ((entity_mapping["DATE_SOLD_PAYOFF"]=="N")|(entity_mapping["DATE_SOLD_PAYOFF"]>=reporting_month))),]
+        if entity_mapping.empty:
+            st.write("The reporting month is not valid as it either exceeds the sold date or precedes the acquisition date for the properties.")
+            st.stop()
         if uploaded_other_docs: 
             filename_list=[]
             for file in uploaded_other_docs: 
@@ -2198,24 +2201,22 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
                 filename_list.append(original_file_name)
             st.success("Ancillary files for {} uploaded: {} files".format(reporting_month_display, len(uploaded_other_docs)))
-            unique_asset_managers = entity_mapping['Asset_Manager'].unique()
-            receiver = operator_email.split(",") + ["sli@sabrahealth.com"]  #"twarner@sabrahealth.com", 
-            #receiver.extend(unique_asset_managers)	    
-            Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
-  
-        col1, col2 = st.columns([1, 3])  
+            
+        col1, col2 = st.columns([1,3])  
         if 'uploaded_finance' in locals() and uploaded_finance:
             st.markdown("✔️ :green[P&L selected]")
         else:   
             if uploaded_other_docs: 
                 st.error("You have only uploaded ancillary files without any monthly reporting data.")
+                unique_asset_managers = entity_mapping['Asset_Manager'].unique()
+                receiver = operator_email.split(",") + ["sli@sabrahealth.com"]  #"twarner@sabrahealth.com", 
+                #receiver.extend(unique_asset_managers)	    
+                Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
+  
             else:
                 st.error("Please upload P&L.")
             st.stop()
-        entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=reporting_month) & ((entity_mapping["DATE_SOLD_PAYOFF"]=="N")|(entity_mapping["DATE_SOLD_PAYOFF"]>=reporting_month))),]
-        if entity_mapping.empty:
-            st.write("The reporting month is not valid as it either exceeds the sold date or precedes the acquisition date for the properties.")
-            st.stop()
+        
         if "Y" in entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values:                     
             BS_separate_excel="Y"
             if 'uploaded_BS' in locals() and uploaded_BS:
@@ -2224,19 +2225,19 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             else:
                 if uploaded_other_docs: 
                     st.error("You have only uploaded ancillary files without any monthly reporting data. Please upload Balance Sheet if you want to upload monthly reporting data.")
+                    unique_asset_managers = entity_mapping['Asset_Manager'].unique()
+                    receiver = operator_email.split(",") + ["sli@sabrahealth.com"]  #"twarner@sabrahealth.com", 
+                    #receiver.extend(unique_asset_managers)	    
+                    Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))    
                 else:
                     st.error("Please upload Balance sheet.")
                 st.stop()
-	
         else:
             BS_separate_excel="N"
-
-
 	
 	# select_months_list contain the monthes that need to be compared for history data,if it is [], means no need to compare
         if any(entity_mapping["Finance_in_separate_sheets"]=="N") or previous_monthes_comparison==0:
             select_months_list=[reporting_month]
-
         else:
             select_months_list =sorted([x for x in BPC_pull.columns if x <reporting_month],reverse=True)
             if len(select_months_list)>=previous_monthes_comparison:
