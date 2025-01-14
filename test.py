@@ -2210,7 +2210,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 else:
                     st.error("Please upload P&L.")
                 st.stop()
-        
+        st.write("entity_mapping",entity_mapping,entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values)        
         if "Y" in entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values:                     
             BS_separate_excel="Y"
             if 'uploaded_BS' in locals() and uploaded_BS:
