@@ -2196,20 +2196,20 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.success("Ancillary files for {} uploaded: {} files".format(reporting_month_display, len(uploaded_other_docs)))
             
         col1, col2 = st.columns([1,3])  
-        with col1:
-            if 'uploaded_finance' in locals() and uploaded_finance:
+
+        if 'uploaded_finance' in locals() and uploaded_finance:
+            with col1:
                 st.markdown("✔️ :green[P&L selected]")
-            else:   
-                if uploaded_other_docs: 
-                    st.error("You have only uploaded ancillary files without any monthly reporting data.")
-                    unique_asset_managers = entity_mapping['Asset_Manager'].unique()
-                    receiver = operator_email.split(",") + ["sli@sabrahealth.com"]  #"twarner@sabrahealth.com", 
-                    #receiver.extend(unique_asset_managers)	    
-                    Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
-  
-                else:
-                    st.markdown("❌ :red[P&L is not uploaded ]")
-                st.stop()
+        else:   
+            if uploaded_other_docs: 
+                st.error("You have only uploaded ancillary files without any monthly reporting data.")
+                unique_asset_managers = entity_mapping['Asset_Manager'].unique()
+                receiver = operator_email.split(",") + ["sli@sabrahealth.com"]  #"twarner@sabrahealth.com", 
+                #receiver.extend(unique_asset_managers)	    
+                Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
+            else:
+                st.markdown("❌ :red[P&L is not uploaded ]")
+            st.stop()
         st.write("entity_mapping",entity_mapping,entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values)        
         if "Y" in entity_mapping["BS_separate_excel"][pd.notna(entity_mapping["BS_separate_excel"])].values:                     
             BS_separate_excel="Y"
