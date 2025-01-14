@@ -2227,7 +2227,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     with col2:
                         st.markdown("✖ :Red[Balance sheet is not uploaded ]")
                         st.error("Please upload Balance sheet.")
-                    st.stop()
+                st.stop()
         else:
             BS_separate_excel="N"
 	
