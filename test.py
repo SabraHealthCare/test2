@@ -2189,7 +2189,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.stop()	
         entity_mapping=entity_mapping.loc[((entity_mapping["DATE_ACQUIRED"]<=reporting_month) & ((entity_mapping["DATE_SOLD_PAYOFF"]=="N")|(entity_mapping["DATE_SOLD_PAYOFF"]>=reporting_month))),]
         if entity_mapping.empty:
-            st.write("The reporting month is not valid as it either exceeds the sold date or precedes the acquisition date for the properties.")
+            st.error("The reporting month is not valid as it either exceeds the sold date or precedes the acquisition date for the properties.")
             st.stop()
         if uploaded_other_docs: 
             filename_list=[]
