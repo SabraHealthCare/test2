@@ -2225,8 +2225,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))    
                 else:
                     with col2:
-                        st.markdown("✖ :Red[Balance sheet is not uploaded ]")
-                        st.error("Please upload Balance sheet.")
+                        st.markdown("✔️ :green[Balance sheet is not uploaded ]")
                 st.stop()
         else:
             BS_separate_excel="N"
