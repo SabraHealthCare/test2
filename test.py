@@ -2320,6 +2320,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 # ---------------------------------------- Sabra Admin account----------------------------------------------------------	    
 elif st.session_state["authentication_status"] and st.session_state["operator"]=="Sabra":
     operator_list=Read_File_From_Onedrive(mapping_path,operator_list_filename,"CSV")
+
     menu=["Review Monthly reporting","Review New Mapping","Edit Account","Register","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
 
@@ -2332,6 +2333,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             st.error(e)
     
     elif choice=="Register":
+        st.write("operator_list",operator_list)
         col1,col2=st.columns(2)
         with col1:
             operator= st.selectbox('Select Operator',(operator_list["Operator"]))
