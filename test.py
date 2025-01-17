@@ -728,10 +728,11 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
         non_zero_indices = [(index, month_c) for index, month_c in enumerate(month_count) if month_c!= 0]
         sorted_non_zero_indices = sorted(non_zero_indices, key=lambda x: x[1], reverse=True)
         month_sort_index = [index for index, month_c in sorted_non_zero_indices]
-
+        st.write("month_sort_index",month_sort_index)
         for month_row_index in month_sort_index: 
             month_row=list(month_table.iloc[month_row_index,])
             month_list=list(filter(lambda x:x!=0,month_row))
+            st.write("month_row",month_row)
             month_len=len(month_list)
             max_match_year=0
             for i in [0,1,-1]:  # identify year in corresponding month row, or above(-1) or below (+1) month row
@@ -760,17 +761,18 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
 		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2) \
                 or month_count[month_row_index]<=3\
                 or all(x == 0 for x in inv) :
+			
 		    #check the corresponding year
                     if max_match_year>0:
                         #st.write("max_match_year",max_match_year,"year_table",year_table)
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                        
+                        st.write("PL_date_header",PL_date_header)
 		        
                         if reporting_month not in list(PL_date_header):
                             #year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                             PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
-                            st.write("PL_date_header2",PL_date_header)         
+                            #st.write("PL_date_header2",PL_date_header)         
                     elif max_match_year==0:  # there is no year for all the months
 		        #fill year to month
                         PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
@@ -813,6 +815,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
         
             # only one month in header, all the rows that have multiple months were out
             elif month_count[month_row_index]==1:
+        
                 col_month = next((col_no for col_no, val_month in enumerate(month_table.iloc[month_row_index, :]) if val_month != 0), 0)
                 if month_table.iloc[month_row_index,col_month]!=int(reporting_month[4:]):
                     continue
