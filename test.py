@@ -728,11 +728,11 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
         non_zero_indices = [(index, month_c) for index, month_c in enumerate(month_count) if month_c!= 0]
         sorted_non_zero_indices = sorted(non_zero_indices, key=lambda x: x[1], reverse=True)
         month_sort_index = [index for index, month_c in sorted_non_zero_indices]
-        st.write("month_sort_index",month_sort_index)
+        #st.write("month_sort_index",month_sort_index)
         for month_row_index in month_sort_index: 
             month_row=list(month_table.iloc[month_row_index,])
             month_list=list(filter(lambda x:x!=0,month_row))
-            st.write("month_row",month_row)
+            #st.write("month_row",month_row)
             month_len=len(month_list)
             max_match_year=0
             for i in [0,1,-1]:  # identify year in corresponding month row, or above(-1) or below (+1) month row
@@ -767,7 +767,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                         #st.write("max_match_year",max_match_year,"year_table",year_table)
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                        st.write("PL_date_header",PL_date_header)
+                        #st.write("PL_date_header",PL_date_header)
 		        
                         if reporting_month not in list(PL_date_header):
                             #year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
@@ -794,8 +794,8 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                    
                     if count_reporting_month==0: # there is no reporting_month
                        continue
-                    elif count_reporting_month>1:  # there are duplicated months (more than one same months in header)
-                        keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period"]
+                    elif count_reporting_month>1:  # there are duplicated months (more than one reporting months in header)
+                        keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period","Period Ending"]
 			# remove the one which has "YTD" , "Year to date" on or above
                         for col_idx in range(len(PL_date_header)):
     			    # Search for "YTD", "Year to date", or "year-to_date"
