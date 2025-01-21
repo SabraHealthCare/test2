@@ -275,12 +275,12 @@ def Initial_Mapping(operator):
     # Handle case where there's only one row and it corresponds to a template
     account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
     #st.write(account_mapping)
-    #st.write(account_mapping["Sabra_Account"].values[0])
+    st.write(account_mapping["Sabra_Account"].values[0])
     if account_mapping.shape[0] == 1 and account_mapping["Sabra_Account"].values[0] == 'TEMPLATE':
         account_mapping = account_mapping_all[account_mapping_all["Operator"] == "Template"].copy()
         account_mapping["Operator"] = operator	
     
-    #st.write("account_mapping1",account_mapping)  
+    st.write("account_mapping1",account_mapping)  
     # Clean and format account mapping columns
     account_mapping_cols = ["Sabra_Account", "Sabra_Second_Account"]
     account_mapping[account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
@@ -297,7 +297,7 @@ def Initial_Mapping(operator):
                   .set_index("ENTITY"))
  
     entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]] = entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]].astype(str)  
-    #st.write("entity_mapping",entity_mapping)
+    st.write("entity_mapping",entity_mapping)
     for col in ["Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]:
         entity_mapping[col] = entity_mapping[col].apply(lambda x: x.replace("'","") if pd.notna(x) else x)
 
