@@ -685,12 +685,12 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
 
     # Create a set of tenant accounts that need mapping
     accounts_to_map = [account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account']) if sabra_account!= 'NO NEED TO MAP']
-    #st.write("tenant_account_col_values",tenant_account_col_values,"accounts_to_map",accounts_to_map)
+    st.write("tenant_account_col_values",tenant_account_col_values,"accounts_to_map",accounts_to_map)
     # Create a boolean mask using a list comprehension
     tenant_account_row_mask = [account in accounts_to_map for account in tenant_account_col_values]
-    #st.write("tenant_account_row_mask",tenant_account_row_mask)	
+    
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
-    #st.write("tenant_account_row_mask",tenant_account_row_mask)
+    st.write("tenant_account_row_mask",tenant_account_row_mask)
     if not any(tenant_account_row_mask):  #all the accounts in tenant_account_col are new accounts 
         PL_temp=PL.copy()
         first_tenant_account_row=PL_temp.shape[0]
