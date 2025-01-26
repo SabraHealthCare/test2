@@ -732,7 +732,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
         for month_row_index in month_sort_index: 
             month_row=list(month_table.iloc[month_row_index,])
             month_list=list(filter(lambda x:x!=0,month_row))
-            #st.write("month_row",month_row)
+            st.write("month_row",month_row)
             month_len=len(month_list)
             max_match_year=0
             for i in [0,1,-1]:  # identify year in corresponding month row, or above(-1) or below (+1) month row
