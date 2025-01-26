@@ -722,7 +722,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     candidate_date=[]
     month_count = month_table.apply(lambda row: (row != 0).sum(), axis=1).tolist()
     
-    st.write("month_table",month_table)
+    st.write("month_table",month_table,"year_table",year_table)
     if not all(x==0 for x in month_count):
        # month_sort_index is the index(row number) which contain month/year, and sorted desc. month_sort_index[0] is the row number that contrain most months in PL
         non_zero_indices = [(index, month_c) for index, month_c in enumerate(month_count) if month_c!= 0]
@@ -761,14 +761,14 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
 		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2) \
                 or month_count[month_row_index]<=3\
                 or all(x == 0 for x in inv) :
-			
+		    st.write("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
 		    #check the corresponding year
                     if max_match_year>0:
-                        #st.write("max_match_year",max_match_year,"year_table",year_table)
+                        st.write("max_match_year",max_match_year,"year_table",year_table)
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                         st.write("PL_date_header",PL_date_header)
-		        
+                        st.write("reporting_month in list(PL_date_header)",reporting_month in list(PL_date_header))
                         if reporting_month not in list(PL_date_header):
                             #year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                             PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
