@@ -804,14 +804,14 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                             return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
                                 
                         else:
-                            duplicate_rm_columns = PL.columns[PL.iloc[PL_date_header] == reporting_month].tolist()
+                            duplicate_rm_columns = PL.columns[PL_date_header == reporting_month].tolist()
                             st.write("  duplicate_rm_columns  ",duplicate_rm_columns)
                             # Compare the data below the month_row_index for these columns
-                            for i, col in enumerate(duplicate_rm_columns):
+                            for i, col_idx in enumerate(duplicate_rm_columns):
                                 if i > 0:# Skip the first column since it's the one we're comparing others to
-                                    st.write("PL[col]",PL[col])
+                                    st.write("PL[col_idx]",PL[col_idx])
                                     # Extract values below month_row_index  
-                                    values_below = PL[col].iloc[month_row_index + 1:].values
+                                    values_below = PL[col_idx].iloc[month_row_index + 1:].values
                                     st.write("values_below",values_below)        
                                     # Compare the values in this column with the first matching column
                                
