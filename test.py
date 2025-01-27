@@ -1677,30 +1677,11 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         sheet_type_name="Balance"
 
     # read data from uploaded file
+    excel_file = pd.ExcelFile(uploaded_file)
 
-
-
-    sheet = load_workbook(uploaded_file, data_only=True)[sheet_name]
-
-    # Identify hidden columns
-    hidden_columns = []
-    for col_idx in range(1, sheet.max_column + 1):  # Iterate over all columns
-        col_letter = sheet.cell(row=1, column=col_idx).column_letter  # Convert index to letter
-        if col_letter in sheet.column_dimensions and sheet.column_dimensions[col_letter].hidden:
-            hidden_columns.append(col_idx - 1)  # Store 0-based index of hidden columns
-
-    # Identify visible column indices
-
-
-    # Read the entire sheet into pandas DataFrame
+	 
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
-    visible_columns = [col for col in range(PL.shape[1]) if col not in hidden_columns]
-    st.write("PL",PL)
-    # Filter out hidden columns
-    st.write("visible_columns in Multiple",visible_columns)
-    PL = PL.iloc[:, visible_columns]
-
-    st.write("exclude hidden column: PL",PL)
+    #st.write("sheet_name",sheet_name,"PL",PL)
 
     if PL.shape[0]<=1:  # sheet is empty or only has one column
         return pd.DataFrame()
@@ -1775,10 +1756,10 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
             if sheet_type=="Sheet_Name_Finance":
                 account_pool=account_mapping.copy()
             elif sheet_type=="Sheet_Name_Occupancy":
-                account_pool = account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")|\
-		                               (account_mapping["Category"].isin(["Patient Days", "Operating Expenses", "Facility Information"]))|\
-	                                       (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS'])) |\
-	                                       (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]	  
+                account_pool = account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")|(account_mapping["Category"] == "Patient Days")|\
+	                        (account_mapping["Category"] == "Facility Information")|\
+	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS'])) |\
+	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]	  
             elif sheet_type=="Sheet_Name_Balance_Sheet":
                 account_pool= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]	
 
@@ -1837,27 +1818,9 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
     elif sheet_type=="Sheet_Name_Balance_Sheet":
         sheet_type_name="Balance"
 
-    sheet = load_workbook(uploaded_file, data_only=True)[sheet_name]
-
-    # Identify hidden columns
-    # Detect hidden columns
-    hidden_columns = []
-    for col_idx in range(1, sheet.max_column + 1):  # Iterate over all columns
-        col_letter = sheet.cell(row=1, column=col_idx).column_letter  # Get column letter
-        # Check if the column is hidden; if not listed, assume not hidden
-        if sheet.column_dimensions.get(col_letter, None) and sheet.column_dimensions[col_letter].hidden:
-            hidden_columns.append(col_idx - 1)  # Store 0-based index of hidden columns
-
-
-    # Read the entire sheet into pandas DataFrame
-    PL = pd.read_excel(uploaded_file, sheet_name=sheet_name, header=None)
-    st.write("PL",PL)
-    
-    # Filter out hidden columns
-    visible_columns = [col for col in range(PL.shape[1]) if col not in hidden_columns]
-    st.write("visible_columns in single",visible_columns)
-    PL = PL.iloc[:, visible_columns]	
-    st.write("exclude hidden column: PL",PL)
+    # read data from uploaded file
+    PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
+    #st.write("read PL",PL)
     if PL.shape[0]<=1:  # sheet is empty or only has one column
         return pd.DataFrame()
     # Start checking process
