@@ -808,10 +808,11 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                                 for i, col in enumerate(matching_columns):
                                     # Extract values below month_row_index  
                                     values_below = PL[col].iloc[month_row_index + 1:].values
-        
+                                    st.write("values_below",values_below)        
                                     # Compare the values in this column with the first matching column
                                     if i > 0:  # Skip the first column since it's the one we're comparing others to
                                         first_col_values_below = PL[matching_columns[0]].iloc[month_row_index + 1:].values
+                                        st.write("first_col_values_below",first_col_values_below)     
                                         if (values_below == first_col_values_below).all():
                                             # If the values are the same, set the value of the current column in month_row_index to 0
                                             PL.at[month_row_index, col] = 0
