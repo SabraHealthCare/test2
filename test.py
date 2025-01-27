@@ -809,17 +809,17 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                             # Compare the data below the month_row_index for these columns
                             for i, col_idx in enumerate(duplicate_rm_columns):
                                 if i > 0:# Skip the first column since it's the one we're comparing others to
-                                    st.write("PL[col_idx]",PL[col_idx])
+                                    st.write("PL_temp[col_idx]",PL_temp[col_idx])
                                     # Extract values below month_row_index  
-                                    values_below = PL[col_idx].iloc[month_row_index + 1:].values
+                                    values_below = PL_temp[col_idx].iloc[month_row_index + 1:].values
                                     st.write("values_below",values_below)        
                                     # Compare the values in this column with the first matching column
                                
-                                    first_col_values_below = PL[duplicate_rm_columns[0]].iloc[month_row_index + 1:].values
+                                    first_col_values_below = PL_temp[duplicate_rm_columns[0]].iloc[month_row_index + 1:].values
                                     st.write("first_col_values_below",first_col_values_below)     
                                     if (values_below == first_col_values_below).all():
                                         # If the values are the same, set the value of the current column in month_row_index to 0
-                                        PL_date_header[col] = "0"
+                                        PL_date_header[col_idx] = "0"
                                     else:
                                         # If values are different
                                         st.error("There are more than one '{}/{}' header in sheet '{}'. Only one is allowed to identify the data column of '{}/{}'".\
