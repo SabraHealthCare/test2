@@ -1699,6 +1699,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
     st.write("PL",PL)
     # Filter out hidden columns
     st.write("visible_columns in Multiple",visible_columns)
+    visible_columns = [col for col in visible_columns if col < PL.shape[1]]
     PL = PL.iloc[:, visible_columns]	
     st.write("exclude hidden column: PL",PL)
 
@@ -1842,20 +1843,19 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
     # Identify hidden columns
     hidden_columns = {
         col_letter: col.hidden
-        for col_letter, col in sheet.column_dimensions.items()
-    }
+        for col_letter, col in sheet.column_dimensions.items()}
 
-    # Identify visible column indices
+    # Identify visible column indices within the valid range of columns
     visible_columns = [
         idx for idx, col in enumerate(sheet.iter_cols(1, sheet.max_column), start=0)
-        if not hidden_columns.get(col[0].column_letter, False)
-    ]
+        if not hidden_columns.get(col[0].column_letter, False)]
 
     # Read the entire sheet into pandas DataFrame
     PL = pd.read_excel(uploaded_file, sheet_name=sheet_name, header=None)
     st.write("PL",PL)
     st.write("visible_columns in single",visible_columns)
     # Filter out hidden columns
+    visible_columns = [col for col in visible_columns if col < PL.shape[1]]
     PL = PL.iloc[:, visible_columns]	
 
     st.write("exclude hidden column: PL",PL)
