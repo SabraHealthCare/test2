@@ -800,7 +800,9 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                                 PL_date_header[col_idx] = "0"
                             if list(PL_date_header).count(reporting_month)==1:
                                 return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
-                     
+                        st.write("PL_date_header,month_row_index,PL.iloc[month_row_index,:]",PL_date_header,month_row_index,PL.iloc[month_row_index,:])
+                        
+			    
                         st.error("There are more than one '{}/{}' header in sheet '{}'. Only one is allowed to identify the data column of '{}/{}'".\
 			     format(reporting_month[4:6],reporting_month[0:4],sheet_name,reporting_month[4:6],reporting_month[0:4]))
                     elif count_reporting_month==1:  # there is only one reporting month in the header
