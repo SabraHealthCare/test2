@@ -793,7 +793,8 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                     elif count_reporting_month>1:  # there are duplicated months (more than one same months in header)
                         keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period"]
 			# remove the one which has "YTD" , "Year to date" on or above
-                        duplicate_rm_columns = PL.columns[PL.iloc[PL_date_header] == reporting_month].tolist()
+                        duplicate_rm_columns = PL.columns[PL_date_header == reporting_month].tolist()
+                        st.write("duplicate_rm_columns",duplicate_rm_columns)
                         for col_idx in duplicate_rm_columns:
     			    # Search for "YTD", "Year to date", or "year-to_date"
                             if any(str(PL.iloc[row, col_idx]).strip().lower() in keywords for row in range(first_tenant_account_row)):
