@@ -1840,11 +1840,14 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
     sheet = load_workbook(uploaded_file, data_only=True)[sheet_name]
 
     # Identify hidden columns
+    # Detect hidden columns
     hidden_columns = []
     for col_idx in range(1, sheet.max_column + 1):  # Iterate over all columns
-        col_letter = sheet.cell(row=1, column=col_idx).column_letter  # Convert index to letter
-        if col_letter in sheet.column_dimensions and sheet.column_dimensions[col_letter].hidden:
+        col_letter = sheet.cell(row=1, column=col_idx).column_letter  # Get column letter
+        # Check if the column is hidden; if not listed, assume not hidden
+        if sheet.column_dimensions.get(col_letter, None) and sheet.column_dimensions[col_letter].hidden:
             hidden_columns.append(col_idx - 1)  # Store 0-based index of hidden columns
+
 
     # Read the entire sheet into pandas DataFrame
     PL = pd.read_excel(uploaded_file, sheet_name=sheet_name, header=None)
@@ -1854,7 +1857,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
     visible_columns = [col for col in range(PL.shape[1]) if col not in hidden_columns]
     st.write("visible_columns in single",visible_columns)
     PL = PL.iloc[:, visible_columns]	
-
     st.write("exclude hidden column: PL",PL)
     if PL.shape[0]<=1:  # sheet is empty or only has one column
         return pd.DataFrame()
