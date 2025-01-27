@@ -800,17 +800,30 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                                 PL_date_header[col_idx] = "0"
                             if list(PL_date_header).count(reporting_month)==1:
                                 return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
-                        st.write("PL_date_header,month_row_index,PL.iloc[month_row_index,:]",PL_date_header,month_row_index,PL.iloc[month_row_index,:])
-                        
-			    
-                        st.error("There are more than one '{}/{}' header in sheet '{}'. Only one is allowed to identify the data column of '{}/{}'".\
-			     format(reporting_month[4:6],reporting_month[0:4],sheet_name,reporting_month[4:6],reporting_month[0:4]))
+                                st.write("PL_date_header,month_row_index,PL.iloc[month_row_index,:]",PL_date_header,month_row_index,PL.iloc[month_row_index,:])
+			    else:
+				matching_columns = PL.columns[PL_date_header == reporting_month]
+    
+                                # Compare the data below the month_row_index for these columns
+                                for i, col in enumerate(matching_columns):
+                                    # Extract values below month_row_index  
+                                    values_below = PL[col].iloc[month_row_index + 1:].values
+        
+                                    # Compare the values in this column with the first matching column
+                                    if i > 0:  # Skip the first column since it's the one we're comparing others to
+                                        first_col_values_below = PL[matching_columns[0]].iloc[month_row_index + 1:].values
+                                        if (values_below == first_col_values_below).all():
+                                            # If the values are the same, set the value of the current column in month_row_index to 0
+                                            PL.at[month_row_index, col] = 0
+                                        else:
+                                            # If values are different
+                                            st.error("There are more than one '{}/{}' header in sheet '{}'. Only one is allowed to identify the data column of '{}/{}'".\
+			                         format(reporting_month[4:6],reporting_month[0:4],sheet_name,reporting_month[4:6],reporting_month[0:4]))
                     elif count_reporting_month==1:  # there is only one reporting month in the header
                         return PL_date_header,month_row_index,PL.iloc[month_row_index,:]	
                 else:
                     continue
-			
-        
+
             # only one month in header, all the rows that have multiple months were out
             elif month_count[month_row_index]==1:
                 col_month = next((col_no for col_no, val_month in enumerate(month_table.iloc[month_row_index, :]) if val_month != 0), 0)
