@@ -1,4 +1,3 @@
-
 import pandas as pd  
 pd.set_option('future.no_silent_downcasting', True)  
 import numpy as np  
@@ -275,12 +274,12 @@ def Initial_Mapping(operator):
     # Handle case where there's only one row and it corresponds to a template
     account_mapping = account_mapping_all[account_mapping_all["Operator"]==operator]
     #st.write(account_mapping)
-    st.write(account_mapping["Sabra_Account"].values[0])
+    #st.write(account_mapping["Sabra_Account"].values[0])
     if account_mapping.shape[0] == 1 and account_mapping["Sabra_Account"].values[0] == 'TEMPLATE':
         account_mapping = account_mapping_all[account_mapping_all["Operator"] == "Template"].copy()
         account_mapping["Operator"] = operator	
     
-    st.write("account_mapping1",account_mapping)  
+    #st.write("account_mapping1",account_mapping)  
     # Clean and format account mapping columns
     account_mapping_cols = ["Sabra_Account", "Sabra_Second_Account"]
     account_mapping[account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
@@ -297,7 +296,7 @@ def Initial_Mapping(operator):
                   .set_index("ENTITY"))
  
     entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]] = entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]].astype(str)  
-    st.write("entity_mapping",entity_mapping)
+    #st.write("entity_mapping",entity_mapping)
     for col in ["Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]:
         entity_mapping[col] = entity_mapping[col].apply(lambda x: x.replace("'","") if pd.notna(x) else x)
 
@@ -675,7 +674,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
 @st.cache_data  
 def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_name,sheet_type,pre_date_header): 
 
-    st.write("sheet_name",sheet_name,"PL",PL)
+    #st.write("sheet_name",sheet_name)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     #st.write("pre_date_header",pre_date_header)
     if len(pre_date_header[2])!=0:
@@ -685,12 +684,12 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
 
     # Create a set of tenant accounts that need mapping
     accounts_to_map = [account for account, sabra_account in zip(account_mapping['Tenant_Account'], account_mapping['Sabra_Account']) if sabra_account!= 'NO NEED TO MAP']
-    st.write("tenant_account_col_values",tenant_account_col_values,"accounts_to_map",accounts_to_map)
+    #st.write("tenant_account_col_values",tenant_account_col_values,"accounts_to_map",accounts_to_map)
     # Create a boolean mask using a list comprehension
     tenant_account_row_mask = [account in accounts_to_map for account in tenant_account_col_values]
-    
+    #st.write("tenant_account_row_mask",tenant_account_row_mask)	
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
-    st.write("tenant_account_row_mask",tenant_account_row_mask)
+    #st.write("tenant_account_row_mask",tenant_account_row_mask)
     if not any(tenant_account_row_mask):  #all the accounts in tenant_account_col are new accounts 
         PL_temp=PL.copy()
         first_tenant_account_row=PL_temp.shape[0]
@@ -715,25 +714,22 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     #nan_num_column = [all(val == 0 or pd.isna(val) or not isinstance(val, (int, float)) for val in PL.drop(nan_index).iloc[:, i]) for i in range(PL.drop(nan_index).shape[1])]
     month_table=pd.DataFrame(0,index=range(first_tenant_account_row), columns=range(PL_col_size))
     year_table=pd.DataFrame(0,index=range(first_tenant_account_row), columns=range(PL_col_size))
-
     for row_i in range(first_tenant_account_row): # only search month/year above the first tenant account row
         for col_i in valid_col_index:  # only search the columns that contain numberic data and on the right of tenantAccount_col_no
             month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i]) 
     max_len=0
     candidate_date=[]
     month_count = month_table.apply(lambda row: (row != 0).sum(), axis=1).tolist()
-    
-    st.write("month_table",month_table,"year_table",year_table)
+    #st.write("month_table",month_table)
     if not all(x==0 for x in month_count):
        # month_sort_index is the index(row number) which contain month/year, and sorted desc. month_sort_index[0] is the row number that contrain most months in PL
         non_zero_indices = [(index, month_c) for index, month_c in enumerate(month_count) if month_c!= 0]
         sorted_non_zero_indices = sorted(non_zero_indices, key=lambda x: x[1], reverse=True)
         month_sort_index = [index for index, month_c in sorted_non_zero_indices]
-        #st.write("month_sort_index",month_sort_index)
+
         for month_row_index in month_sort_index: 
             month_row=list(month_table.iloc[month_row_index,])
             month_list=list(filter(lambda x:x!=0,month_row))
-            st.write("month_row",month_row)
             month_len=len(month_list)
             max_match_year=0
             for i in [0,1,-1]:  # identify year in corresponding month row, or above(-1) or below (+1) month row
@@ -762,14 +758,13 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
 		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2) \
                 or month_count[month_row_index]<=3\
                 or all(x == 0 for x in inv) :
-
 		    #check the corresponding year
                     if max_match_year>0:
-                        st.write("max_match_year",max_match_year,"year_table",year_table)
+                        #st.write("max_match_year",max_match_year,"year_table",year_table)
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                        st.write("PL_date_header",PL_date_header)
-                        st.write("reporting_month in list(PL_date_header)",reporting_month in list(PL_date_header))
+                        
+		        
                         if reporting_month not in list(PL_date_header):
                             #year_table.iloc[month_row_index,]=Fill_Year_To_Header(list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
                             PL_date_header=Fill_Year_To_Header(PL,month_row_index,list(month_table.iloc[month_row_index,]),sheet_name,reporting_month)
@@ -795,8 +790,8 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                    
                     if count_reporting_month==0: # there is no reporting_month
                        continue
-                    elif count_reporting_month>1:  # there are duplicated months (more than one reporting months in header)
-                        keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period","period ending"]
+                    elif count_reporting_month>1:  # there are duplicated months (more than one same months in header)
+                        keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period"]
 			# remove the one which has "YTD" , "Year to date" on or above
                         for col_idx in range(len(PL_date_header)):
     			    # Search for "YTD", "Year to date", or "year-to_date"
@@ -816,7 +811,6 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
         
             # only one month in header, all the rows that have multiple months were out
             elif month_count[month_row_index]==1:
-        
                 col_month = next((col_no for col_no, val_month in enumerate(month_table.iloc[month_row_index, :]) if val_month != 0), 0)
                 if month_table.iloc[month_row_index,col_month]!=int(reporting_month[4:]):
                     continue
@@ -1308,7 +1302,7 @@ def Submit_Upload(total_email_body):
     # Get 'Asset_Manager' from entity_mapping
     unique_asset_managers = entity_mapping['Asset_Manager'].unique()
  
-    receiver_email_list = operator_email.split(",") + ["twarner@sabrahealth.com", "sli@sabrahealth.com"]
+    receiver_email_list = operator_email.split(",") + ["twarner@sabrahealth.com","sli@sabrahealth.com","sabra_reporting@sabrahealth.com"]
     
     if '@*' in operator_email:
         st.write("Please update email address (in 'Menu' - 'Edit Account') to ensure you receive confirmation email.")
