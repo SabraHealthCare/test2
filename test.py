@@ -803,9 +803,10 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                                 st.write("PL_date_header,month_row_index,PL.iloc[month_row_index,:]",PL_date_header,month_row_index,PL.iloc[month_row_index,:])
                             else:
                                 matching_columns = PL.columns[PL_date_header == reporting_month]
-    
+                                st.write("  matching_columns  ",matching_columns)
                                 # Compare the data below the month_row_index for these columns
                                 for i, col in enumerate(matching_columns):
+                                    st.write("PL[col]",PL[col])
                                     # Extract values below month_row_index  
                                     values_below = PL[col].iloc[month_row_index + 1:].values
                                     st.write("values_below",values_below)        
