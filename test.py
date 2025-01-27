@@ -1677,11 +1677,29 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         sheet_type_name="Balance"
 
     # read data from uploaded file
-    excel_file = pd.ExcelFile(uploaded_file)
 
-	 
+
+
+    sheet = load_workbook(uploaded_file, data_only=True)[sheet_name]
+
+    # Identify hidden columns
+    hidden_columns = {
+        col_letter: col.hidden
+        for col_letter, col in sheet.column_dimensions.items()
+    }
+
+    # Identify visible column indices
+    visible_columns = [
+        idx for idx, col in enumerate(sheet.iter_cols(1, sheet.max_column), start=0)
+        if not hidden_columns.get(col[0].column_letter, False)
+    ]
+
+    # Read the entire sheet into pandas DataFrame
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
-    #st.write("sheet_name",sheet_name,"PL",PL)
+    st.write("PL",PL)
+    # Filter out hidden columns
+    PL = PL.iloc[:, visible_columns]	
+    st.write("exclude hidden column: PL",PL)
 
     if PL.shape[0]<=1:  # sheet is empty or only has one column
         return pd.DataFrame()
