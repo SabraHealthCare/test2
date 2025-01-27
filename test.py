@@ -673,10 +673,10 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
 
 @st.cache_data  
 def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_name,sheet_type,pre_date_header): 
-
     #st.write("sheet_name",sheet_name)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     #st.write("pre_date_header",pre_date_header)
+    st.write("PL",PL,"pre_date_header[1]",pre_date_header[1],"pre_date_header[2]",pre_date_header[2])
     if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
             return pre_date_header
@@ -794,29 +794,24 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                         keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period"]
 			# remove the one which has "YTD" , "Year to date" on or above
                         duplicate_rm_columns = PL.columns[PL_date_header == reporting_month].tolist()
-                        st.write("duplicate_rm_columns",duplicate_rm_columns)
+                
                         for col_idx in duplicate_rm_columns:
     			    # Search for "YTD", "Year to date", or "year-to_date"
                             if any(str(PL.iloc[row, col_idx]).strip().lower() in keywords for row in range(first_tenant_account_row)):
     			        # Change the corresponding value in `PL_date_header` to 0
                                 PL_date_header[col_idx] = "0"
                         if list(PL_date_header).count(reporting_month)==1:
-                            return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
-                                
+                            return PL_date_header,month_row_index,PL.iloc[month_row_index,:]      
                         else:
                             duplicate_rm_columns = PL.columns[PL_date_header == reporting_month].tolist()
-                            st.write("  duplicate_rm_columns  ",duplicate_rm_columns)
                             # Compare the data below the month_row_index for these columns
                             for i, col_idx in enumerate(duplicate_rm_columns):
                                 if i > 0:# Skip the first column since it's the one we're comparing others to
-                                    st.write("PL_temp[col_idx]",PL_temp[col_idx])
                                     # Extract values below month_row_index  
-                                    values_below = PL_temp[col_idx].iloc[month_row_index + 1:].values
-                                    st.write("values_below",values_below)        
+                                    values_below = PL_temp[col_idx].iloc[month_row_index + 1:].values        
                                     # Compare the values in this column with the first matching column
                                
-                                    first_col_values_below = PL_temp[duplicate_rm_columns[0]].iloc[month_row_index + 1:].values
-                                    st.write("first_col_values_below",first_col_values_below)     
+                                    first_col_values_below = PL_temp[duplicate_rm_columns[0]].iloc[month_row_index + 1:].values  
                                     if (values_below == first_col_values_below).all():
                                         # If the values are the same, set the value of the current column in month_row_index to 0
                                         PL_date_header[col_idx] = "0"
