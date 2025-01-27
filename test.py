@@ -676,8 +676,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     #st.write("sheet_name",sheet_name)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     #st.write("pre_date_header",pre_date_header)
-    st.write("PL",PL,"pre_date_header[1]",pre_date_header[1],"pre_date_header[2]",pre_date_header[2])
-    if len(pre_date_header[2])!=0:
+    if len(pre_date_header[2])!=0 and PL.shape[0]>=pre_date_header[1]:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
             return pre_date_header
     PL_col_size=PL.shape[1]
