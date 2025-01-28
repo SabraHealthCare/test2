@@ -1775,7 +1775,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
                 account_pool=account_mapping.copy()
             elif sheet_type=="Sheet_Name_Occupancy":
                 account_pool = account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")|\
-		                (account_mapping["Category"].isin(["Facility Information","Patient Days","Operating Expenses","Labor Expenses"])|\
+		                (account_mapping["Category"].isin(["Facility Information","Patient Days","Operating Expenses","Labor Expenses"]))|\
 	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS'])) |\
 	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS']))]	  
             elif sheet_type=="Sheet_Name_Balance_Sheet":
