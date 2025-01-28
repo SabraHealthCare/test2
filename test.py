@@ -1970,7 +1970,9 @@ def Upload_And_Process(uploaded_file,file_type):
 	    # properties are in seperate sheet 
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
-                Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
+                #Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
+                Total_PL = Total_PL.add(PL, fill_value=0) if not Total_PL.empty else PL
+
                 #st.write("Total_PL",entity_i,Total_PL)
 	
 	    
@@ -1988,7 +1990,8 @@ def Upload_And_Process(uploaded_file,file_type):
 
                 PL_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
                 if not PL_occ.empty:
-                    Total_PL=PL_occ.combine_first(Total_PL)
+                    #Total_PL=PL_occ.combine_first(Total_PL)
+                    Total_PL = Total_PL.add(PL_occ, fill_value=0) if not Total_PL.empty else PL_occ
 			
 	# check BS data******************************		
         tenant_account_col=[10000]
@@ -2013,7 +2016,9 @@ def Upload_And_Process(uploaded_file,file_type):
                 tenant_account_col=[10000]
                 entity_list_finance_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_in_onesheet].tolist()
                 PL=Read_Clean_PL_Multiple(entity_list_finance_in_onesheet,"Sheet_Name_Finance",uploaded_file,account_pool_full,sheet_name_finance_in_onesheet)
-                Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
+                #Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
+                Total_PL = Total_PL.add(PL, fill_value=0) if not Total_PL.empty else PL
+
 
 	# census
         sheet_list_occupancy_in_onesheet = entity_mapping[(entity_mapping["Occupancy_in_separate_sheets"]=="N")&(~pd.isna(entity_mapping["Sheet_Name_Occupancy"]))&(entity_mapping["Sheet_Name_Occupancy"]!="nan")]["Sheet_Name_Occupancy"].unique()
@@ -2023,7 +2028,8 @@ def Upload_And_Process(uploaded_file,file_type):
                 entity_list_occupancy_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Occupancy"]==sheet_name_occupancy_in_onesheet].tolist()	
                 PL_Occ=Read_Clean_PL_Multiple(entity_list_occupancy_in_onesheet,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days,sheet_name_occupancy_in_onesheet)
                 if PL_Occ.shape[0]>0:
-                    Total_PL=PL_Occ.combine_first(Total_PL)
+                    #Total_PL=PL_Occ.combine_first(Total_PL)
+                    Total_PL = Total_PL.add(PL_Occ, fill_value=0) if not Total_PL.empty else PL_Occ
 		    
 	# balance sheet
         sheet_list_bs_in_onesheet = entity_mapping[(entity_mapping["Balance_in_separate_sheets"]=="N")&(entity_mapping["BS_separate_excel"]=="N")&(~pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))&(entity_mapping["Sheet_Name_Balance_Sheet"]!="nan")]["Sheet_Name_Balance_Sheet"].unique()
