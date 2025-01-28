@@ -1778,7 +1778,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 		                (account_mapping["Category"].isin(["Facility Information","Patient Days","Operating Expenses"]))|\
 	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS','T_NURSING_LABOR','T_N_CONTRACT_LABOR','T_OTHER_NN_LABOR'])) |\
 	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS','T_NURSING_LABOR','T_N_CONTRACT_LABOR','T_OTHER_NN_LABOR']))]
-              
+                st.write("Occ pool",account_pool) 
             elif sheet_type=="Sheet_Name_Balance_Sheet":
                 account_pool= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]	
 
@@ -1917,6 +1917,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
 	                        (account_mapping["Category"] == "Facility Information")|\
 	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS','T_NURSING_LABOR','T_N_CONTRACT_LABOR','T_OTHER_NN_LABOR'])) |\
 	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS','T_NURSING_LABOR','T_N_CONTRACT_LABOR','T_OTHER_NN_LABOR']))]	  
+                st.write("Occ pool",account_pool) 
             elif sheet_type=="Sheet_Name_Balance_Sheet":
                 account_pool= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]	
 
