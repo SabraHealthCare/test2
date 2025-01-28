@@ -282,8 +282,16 @@ def Initial_Mapping(operator):
     #st.write("account_mapping1",account_mapping)  
     # Clean and format account mapping columns
     account_mapping_cols = ["Sabra_Account", "Sabra_Second_Account"]
-    account_mapping.loc[:,account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
-    account_mapping.loc[:,"Tenant_Account"] = account_mapping["Tenant_Account"].apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
+    account_mapping.loc[:, account_mapping_cols] = account_mapping[account_mapping_cols].apply(
+    lambda col: col.map(lambda x: x.upper().strip() if pd.notna(x) else x)
+)
+
+    account_mapping.loc[:, "Tenant_Account"] = account_mapping["Tenant_Account"].map(
+    lambda x: str(int(x)).strip().upper()
+    if pd.notna(x) and isinstance(x, float)
+    else (str(x).strip().upper() if pd.notna(x) else x)
+)
+	
     if "Category" in account_mapping.columns:
         account_mapping = account_mapping.drop(columns="Category")
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")
@@ -1593,7 +1601,8 @@ def Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_n
         if len(duplicate_check)>0:
 	    # there may has more than one month for each property, only find the column of reporting month
             # Check reporting month above first_tenant_account_row
-            mask_table = PL.iloc[0:first_tenant_account_row,:].applymap(Is_Reporting_Month)
+            mask_table = PL.iloc[0:first_tenant_account_row, :].apply(lambda col: col.map(Is_Reporting_Month))
+
             month_counts=pd.Series(np.sum(mask_table.values, axis=1))		
             if all(month_count==0 for month_count in month_counts): # there is no month
                 st.error("Detected duplicated column names—— {} in sheet '{}'. Please fix and re-upload.".format(", ".join(f"'{item}'" for item in duplicate_check),sheet_name))
