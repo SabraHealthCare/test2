@@ -728,7 +728,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     max_len=0
     candidate_date=[]
     month_count = month_table.apply(lambda row: (row != 0).sum(), axis=1).tolist()
-    st.write("month_table",month_table)
+    #st.write("month_table",month_table)
     if not all(x==0 for x in month_count):
        # month_sort_index is the index(row number) which contain month/year, and sorted desc. month_sort_index[0] is the row number that contrain most months in PL
         non_zero_indices = [(index, month_c) for index, month_c in enumerate(month_count) if month_c!= 0]
@@ -1777,7 +1777,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
                 account_pool = account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")|\
 		                (account_mapping["Category"].isin(["Facility Information","Patient Days","Operating Expenses"]))|\
 	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS','T_NURSING_LABOR','T_N_CONTRACT_LABOR','T_OTHER_NN_LABOR'])) |\
-	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS','T_NURSING_LABOR','T_N_CONTRACT_LABOR','T_OTHER_NN_LABOR']))]	  
+	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS','T_NURSING_LABOR','T_N_CONTRACT_LABOR','T_OTHER_NN_LABOR']))]
+                st.write("occ account pool",account_pool)
             elif sheet_type=="Sheet_Name_Balance_Sheet":
                 account_pool= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]	
 
