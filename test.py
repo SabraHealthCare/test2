@@ -282,8 +282,8 @@ def Initial_Mapping(operator):
     #st.write("account_mapping1",account_mapping)  
     # Clean and format account mapping columns
     account_mapping_cols = ["Sabra_Account", "Sabra_Second_Account"]
-    account_mapping[account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
-    account_mapping["Tenant_Account"] = account_mapping["Tenant_Account"].apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
+    account_mapping.loc[:,account_mapping_cols] = account_mapping[account_mapping_cols].applymap(lambda x: x.upper().strip() if pd.notna(x) else x)
+    account_mapping.loc[:,"Tenant_Account"] = account_mapping["Tenant_Account"].apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
     if "Category" in account_mapping.columns:
         account_mapping = account_mapping.drop(columns="Category")
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")
@@ -298,7 +298,7 @@ def Initial_Mapping(operator):
     entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]] = entity_mapping[["DATE_ACQUIRED", "DATE_SOLD_PAYOFF"]].astype(str)  
     #st.write("entity_mapping",entity_mapping)
     for col in ["Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]:
-        entity_mapping[col] = entity_mapping[col].apply(lambda x: x.replace("'","") if pd.notna(x) else x)
+        entity_mapping.loc[:, col] = entity_mapping[col].apply(lambda x: x.replace("'","") if pd.notna(x) else x)
 
     #st.write("entity_mapping",entity_mapping)
     return BPC_pull,entity_mapping,account_mapping
