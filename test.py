@@ -2157,7 +2157,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     
                 with col1:
                     st.write("Upload P&L:")
-                    uploaded_finance=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
+                    uploaded_finance = st.file_uploader("Upload your finance file", type={"xlsx"}, accept_multiple_files=False,key="Finance_upload",label_visibility="hidden")
                 with col2:
                     st.write("Other Documents:")
                     uploaded_other_docs = st.file_uploader( "Optional", 
@@ -2186,10 +2186,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 col1, col2, col3 = st.columns([1, 1, 1])
                 with col1:
                     st.write("Upload P&L:")
-                    uploaded_finance=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
+                    uploaded_finance=st.file_uploader("1",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
                 with col2:
                     st.write("Upload Balance Sheet:")
-                    uploaded_BS=st.file_uploader("",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
+                    uploaded_BS=st.file_uploader("2",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
                 with col3:
                     st.write("Other Documents:")
                     uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
