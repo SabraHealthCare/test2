@@ -1958,7 +1958,7 @@ def Upload_And_Process(uploaded_file,file_type):
     account_pool_full=account_mapping.copy()
     #st.write("account_pool_full",account_pool_full)
     account_pool_patient_days = account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")|\
-	                        (account_mapping["Category"].isin(["Patient Days","Facility Information","Operating Expenses"])|\
+	                        (account_mapping["Category"].isin(["Patient Days","Facility Information","Operating Expenses"]))|\
 	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS','T_NURSING_LABOR','T_N_CONTRACT_LABOR','T_OTHER_NN_LABOR'])) |\
 	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS','T_NURSING_LABOR','T_N_CONTRACT_LABOR','T_OTHER_NN_LABOR']))]	  
     account_pool_balance_sheet= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]	
