@@ -291,7 +291,7 @@ def Initial_Mapping(operator):
     if pd.notna(x) and isinstance(x, float)
     else (str(x).strip().upper() if pd.notna(x) else x)
 )
-	
+
     if "Category" in account_mapping.columns:
         account_mapping = account_mapping.drop(columns="Category")
     account_mapping=account_mapping.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")
@@ -681,10 +681,11 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
 
 @st.cache_data  
 def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_name,sheet_type,pre_date_header): 
+
     #st.write("sheet_name",sheet_name)
     #pre_date_header is the date_header from last PL. in most cases all the PL has same date_header, so check it first
     #st.write("pre_date_header",pre_date_header)
-    if len(pre_date_header[2])!=0 and PL.shape[0]>=pre_date_header[1]:
+    if len(pre_date_header[2])!=0:
         if PL.iloc[pre_date_header[1],:].equals(pre_date_header[2]):
             return pre_date_header
     PL_col_size=PL.shape[1]
@@ -715,7 +716,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     valid_col_index=[i for i, mask in enumerate(valid_col_mask) if mask]
     #st.write("PL_temp",PL_temp,"valid_col_mask",valid_col_mask,valid_col_index)
     if len(valid_col_index)==0: # there is no valid data column
-        st.write("Didnt detect any data in sheet {}".format(sheet_name))
+        st.write("Didn't detect any data in sheet {}".format(sheet_name))
         return [],0,[]
     # nan_num_column is the column whose value is nan or 0 for PL.drop(nan_index)
     #nan_num_column = [all(val == 0 or pd.isna(val) or not isinstance(val, (int, float)) for val in PL.drop(nan_index).iloc[:, i]) for i in range(PL.drop(nan_index).shape[1])]
@@ -799,43 +800,23 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                        continue
                     elif count_reporting_month>1:  # there are duplicated months (more than one same months in header)
                         keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period","period ending"]
-			# remove the one which has "YTD" , "Year to date" on or above
-                        duplicate_rm_columns = [i for i, value in enumerate(PL_date_header) if value == reporting_month]
-                        
-                        st.write("duplicate_rm_columns",duplicate_rm_columns)
-                
-                        for col_idx in duplicate_rm_columns:
+			# remove the one which has "YTD" , "Year to date"... on or above
+                        for col_idx in range(len(PL_date_header)):
     			    # Search for "YTD", "Year to date", or "year-to_date"
                             if any(str(PL.iloc[row, col_idx]).strip().lower() in keywords for row in range(first_tenant_account_row)):
     			        # Change the corresponding value in `PL_date_header` to 0
                                 PL_date_header[col_idx] = "0"
-                        if list(PL_date_header).count(reporting_month)==1:
-                            return PL_date_header,month_row_index,PL.iloc[month_row_index,:]      
-                        else:
-                            duplicate_rm_columns = PL.columns[PL_date_header == reporting_month].tolist()
-                            # Compare the data below the month_row_index for these columns
-                            for i, col_idx in enumerate(duplicate_rm_columns):
-                                if i > 0:# Skip the first column since it's the one we're comparing others to
-                                    # Extract values below month_row_index  
-                                    values_below = PL_temp[col_idx].iloc[month_row_index + 1:].values        
-                                    # Compare the values in this column with the first matching column
-                               
-                                    first_col_values_below = PL_temp[duplicate_rm_columns[0]].iloc[month_row_index + 1:].values  
-                                    if (values_below == first_col_values_below).all():
-                                        # If the values are the same, set the value of the current column in month_row_index to 0
-                                        PL_date_header[col_idx] = "0"
-                                    else:
-                                        # If values are different
-                                        st.error("There are more than one '{}/{}' header in sheet '{}'. Only one is allowed to identify the data column of '{}/{}'".\
-			                         format(reporting_month[4:6],reporting_month[0:4],sheet_name,reporting_month[4:6],reporting_month[0:4]))
-                                        st.stop()
                             if list(PL_date_header).count(reporting_month)==1:
-                                return PL_date_header,month_row_index,PL.iloc[month_row_index,:]	
+                                return PL_date_header,month_row_index,PL.iloc[month_row_index,:]
+                     
+                        st.error("There are more than one '{}/{}' header in sheet '{}'. Only one is allowed to identify the data column of '{}/{}'".\
+			     format(reporting_month[4:6],reporting_month[0:4],sheet_name,reporting_month[4:6],reporting_month[0:4]))
                     elif count_reporting_month==1:  # there is only one reporting month in the header
                         return PL_date_header,month_row_index,PL.iloc[month_row_index,:]	
                 else:
                     continue
-
+			
+        
             # only one month in header, all the rows that have multiple months were out
             elif month_count[month_row_index]==1:
                 col_month = next((col_no for col_no, val_month in enumerate(month_table.iloc[month_row_index, :]) if val_month != 0), 0)
@@ -861,7 +842,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
 	# if there is only one column contains numeric data, identify this column as reporting month     
 	# search "current month" as reporting month
 
-        if len(valid_col_index) > 1 or len(valid_col_index) ==0:
+        if len(valid_col_index) > 1:
 	    # search "current month" as reporting month
             current_month_cols=[]
 
@@ -933,17 +914,17 @@ def Manage_Entity_Mapping(operator):
                     st.write("")
                     st.write(entity_mapping.loc[entity_i,"Property_Name"])
                 with col2:
-                    new_value=st.text_input("1",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Finance"],key="P&L"+entity_i)  
+                    new_value=st.text_input("new Financial sheet name",label_visibility="hidden",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Finance"],key="P&L"+entity_i)  
                     if new_value:
                         entity_mapping_updation.loc[entity_i,"Sheet_Name_Finance"]=new_value
                 with col3: 
                     if not pd.isna(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"]):
-                        new_value=st.text_input("2",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="Census"+entity_i)
+                        new_value=st.text_input("New Occ sheet name",label_visibility="hidden",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="Census"+entity_i)
                         if new_value:
                             entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=new_value
                 with col4:
                     if not pd.isna(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]):
-                        new_value=st.text_input("3",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
+                        new_value=st.text_input("New BS sheet name",label_visibility="hidden",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
                         if new_value:
                             entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=new_value
             submitted = st.form_submit_button("Submit")
@@ -973,21 +954,21 @@ def Manage_Entity_Mapping(operator):
                     st.write("")
                     st.write(entity_mapping.loc[entity_i,"Property_Name"])
                 with col2:
-                    new_value=st.text_input("4",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Finance"],key="PL"+entity_i)  
+                    new_value=st.text_input("New Property name",label_visibility="hidden",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Finance"],key="PL"+entity_i)  
                     if new_value:
                         entity_mapping_updation.loc[entity_i,"Sheet_Name_Finance"]=new_value
                 with col3: 
                     if not pd.isna(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"]):
-                        new_value=st.text_input("5",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="CS"+entity_i)  
+                        new_value=st.text_input("New Occ sheet name",label_visibility="hidden",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="CS"+entity_i)  
                         if new_value:
                             entity_mapping_updation.loc[entity_i,"Sheet_Name_Occupancy"]=new_value
                 with col4:
                     if not pd.isna(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]):
-                        new_value=st.text_input("6",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
+                        new_value=st.text_input("New BS sheet name",label_visibility="hidden",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
                         if new_value:
                             entity_mapping_updation.loc[entity_i,"Sheet_Name_Balance_Sheet"]=new_value
                 with col5:
-                    new_value=st.text_input("7",placeholder =entity_mapping.loc[entity_i,"Column_Name"],key="CN"+entity_i) 
+                    new_value=st.text_input("New column name",label_visibility="hidden",placeholder =entity_mapping.loc[entity_i,"Column_Name"],key="CN"+entity_i) 
                     if new_value:
                         entity_mapping_updation.loc[entity_i,"Column_Name"]=new_value
             submitted = st.form_submit_button("Submit")
@@ -2159,7 +2140,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     
                 with col1:
                     st.write("Upload P&L:")
-                    uploaded_finance = st.file_uploader("Upload your finance file", type={"xlsx"}, accept_multiple_files=False,key="Finance_upload",label_visibility="hidden")
+                    uploaded_finance=st.file_uploader("Upload your finance file",label_visibility="hidden",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
                 with col2:
                     st.write("Other Documents:")
                     uploaded_other_docs = st.file_uploader( "Optional", 
@@ -2188,10 +2169,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 col1, col2, col3 = st.columns([1, 1, 1])
                 with col1:
                     st.write("Upload P&L:")
-                    uploaded_finance=st.file_uploader("1",type={"xlsx"},accept_multiple_files=False,key="Finance_upload")
+                    uploaded_finance=st.file_uploader("upload financial",type={"xlsx"},accept_multiple_files=False,label_visibility="hidden",key="Finance_upload")
                 with col2:
                     st.write("Upload Balance Sheet:")
-                    uploaded_BS=st.file_uploader("2",type={"xlsx"},accept_multiple_files=False,key="BS_upload")
+                    uploaded_BS=st.file_uploader("uploadBS",type={"xlsx"},accept_multiple_files=False,key="BS_upload",label_visibility="hidden")
                 with col3:
                     st.write("Other Documents:")
                     uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
