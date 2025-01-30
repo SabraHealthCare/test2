@@ -768,7 +768,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                 or all(x == 0 for x in inv) :
 		    #check the corresponding year
                     if max_match_year>0:
-                        st.write("max_match_year",max_match_year,"year_table",year_table)
+                        #st.write("max_match_year",max_match_year,"year_table",year_table)
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                         
@@ -800,9 +800,9 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                        continue
                     elif count_reporting_month>1:  # there are duplicated months (more than one same months in header)
                         keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period","period ending"]
-                        st.write("count_reporting_month",count_reporting_month)
+                        #st.write("count_reporting_month",count_reporting_month)
                         duplicate_rm_columns = PL.columns[PL_date_header == reporting_month].tolist()
-                        st.write("duplicate_rm_columns",duplicate_rm_columns,"PL_date_header",PL_date_header)
+                        #st.write("duplicate_rm_columns",duplicate_rm_columns,"PL_date_header",PL_date_header)
 
                         for col_idx in duplicate_rm_columns:
     			    # Search for "YTD", "Year to date", or "year-to_date"
