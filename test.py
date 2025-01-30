@@ -2048,7 +2048,7 @@ def Upload_And_Process(uploaded_file,file_type):
                 if PL_Occ.shape[0]>0:
                     if operator!="Ignite": 
                         Total_PL=PL_Occ.combine_first(Total_PL)
-		    else:
+                    else:
                         Total_PL = Total_PL.add(PL_Occ, fill_value=0) if not Total_PL.empty else PL_Occ
 		    
 	# balance sheet
