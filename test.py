@@ -768,7 +768,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                 or all(x == 0 for x in inv) :
 		    #check the corresponding year
                     if max_match_year>0:
-                        #st.write("max_match_year",max_match_year,"year_table",year_table)
+                        st.write("max_match_year",max_match_year,"year_table",year_table)
                         PL_date_header=year_table.iloc[month_row_index,].apply(lambda x:str(int(x)))+\
                                                       month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
                         
@@ -800,20 +800,32 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                        continue
                     elif count_reporting_month>1:  # there are duplicated months (more than one same months in header)
                         keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period","period ending"]
-			
+                        st.write("count_reporting_month",count_reporting_month)
                         duplicate_rm_columns = PL.columns[PL_date_header == reporting_month].tolist()
-                        # Compare the data below the month_row_index for these columns
-                        for i, col_idx in enumerate(duplicate_rm_columns):
-                            if i > 0:# Skip the first column since it's the one we're comparing others to
-                                # Extract values below month_row_index  
-                                values_below = PL_temp[col_idx].iloc[month_row_index + 1:].values        
-                                # Compare the values in this column with the first matching column
+                        st.write("duplicate_rm_columns",duplicate_rm_columns,"PL_date_header",PL_date_header)
+
+                        for col_idx in duplicate_rm_columns:
+    			    # Search for "YTD", "Year to date", or "year-to_date"
+                            if any(str(PL.iloc[row, col_idx]).strip().lower() in keywords for row in range(first_tenant_account_row)):
+    			        # Change the corresponding value in `PL_date_header` to 0
+                                PL_date_header[col_idx] = "0"
+                        if len(duplicate_rm_columns)==1:
+                            return PL_date_header,month_row_index,PL.iloc[month_row_index,:]      
+			else:
+                            duplicate_rm_columns = PL.columns[PL_date_header == reporting_month].tolist()
+                            if len(duplicate_rm_columns)==1>1:
+                                # Compare the data below the month_row_index for these columns
+                            for i, col_idx in enumerate(duplicate_rm_columns):
+                                if i > 0:# Skip the first column since it's the one we're comparing others to
+                                    # Extract values below month_row_index  
+                                    values_below = PL_temp[col_idx].iloc[month_row_index + 1:].values        
+                                    # Compare the values in this column with the first matching column
                                
-                                first_col_values_below = PL_temp[duplicate_rm_columns[0]].iloc[month_row_index + 1:].values  
-                                if (values_below == first_col_values_below).all():
+                                    first_col_values_below = PL_temp[duplicate_rm_columns[0]].iloc[month_row_index + 1:].values  
+                                    if (values_below == first_col_values_below).all():
                                         # If the values are the same, set the value of the current column in month_row_index to 0
                                         PL_date_header[col_idx] = "0"
-                                else:
+                                    else:
                                         # If values are different
                                         st.error("There are more than one '{}/{}' header in sheet '{}'. Only one is allowed to identify the data column of '{}/{}'".\
 			                         format(reporting_month[4:6],reporting_month[0:4],sheet_name,reporting_month[4:6],reporting_month[0:4]))
@@ -1093,7 +1105,7 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
 	
     PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
                     PL.merge(main_account_mapping_filtered,   on="Tenant_Account", how="right")])
-    st.write("PL mapping",PL)
+    #st.write("PL mapping",PL)
     #Remove blank or missing "Sabra_Account" values
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
     PL.dropna(subset=["Sabra_Account"], inplace=True)
@@ -1319,7 +1331,7 @@ def Submit_Upload(total_email_body):
     # Get 'Asset_Manager' from entity_mapping
     unique_asset_managers = entity_mapping['Asset_Manager'].unique()
  
-    receiver_email_list = operator_email.split(",") + ["twarner@sabrahealth.com","sli@sabrahealth.com","sabra_reporting@sabrahealth.com"]
+    receiver_email_list = operator_email.split(",") + ["twarner@sabrahealth.com","sli@sabrahealth.com","jmanalastas@sabrahealth.com","sabra_reporting@sabrahealth.com"]
     
     if '@*' in operator_email:
         st.write("Please update email address (in 'Menu' - 'Edit Account') to ensure you receive confirmation email.")
