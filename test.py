@@ -644,11 +644,11 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
             patient_day_i = 0
             operating_beds_i = 0
     
-            # Try to retrieve patient days
+            # retrieve patient days
             if (property_i, "Patient Days") in check_patient_days.index:
                 patient_day_i = check_patient_days.loc[(property_i, "Patient Days"), reporting_month]
     
-            # Try to retrieve operating beds
+            # retrieve operating beds
             if property_i in previous_A_unit["Property_Name"].values:
                 operating_beds_i = previous_A_unit.loc[previous_A_unit["Property_Name"] == property_i, reporting_month].sum()
     
@@ -1982,8 +1982,10 @@ def Upload_And_Process(uploaded_file,file_type):
 	    # properties are in seperate sheet 
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
-                #Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
-                Total_PL = Total_PL.add(PL, fill_value=0) if not Total_PL.empty else PL
+                if operator!="Ignite":
+                    Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
+                else:
+                    Total_PL = Total_PL.add(PL, fill_value=0) if not Total_PL.empty else PL
 
                 #st.write("Total_PL",entity_i,Total_PL)
 	
@@ -2002,8 +2004,10 @@ def Upload_And_Process(uploaded_file,file_type):
 
                 PL_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
                 if not PL_occ.empty:
-                    #Total_PL=PL_occ.combine_first(Total_PL)
-                    Total_PL = Total_PL.add(PL_occ, fill_value=0) if not Total_PL.empty else PL_occ
+                    if operator!="Ignite":
+                        Total_PL=PL_occ.combine_first(Total_PL)
+                    else:
+                        Total_PL = Total_PL.add(PL_occ, fill_value=0) if not Total_PL.empty else PL_occ
 			
 	# check BS data******************************		
         tenant_account_col=[10000]
@@ -2028,8 +2032,10 @@ def Upload_And_Process(uploaded_file,file_type):
                 tenant_account_col=[10000]
                 entity_list_finance_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_in_onesheet].tolist()
                 PL=Read_Clean_PL_Multiple(entity_list_finance_in_onesheet,"Sheet_Name_Finance",uploaded_file,account_pool_full,sheet_name_finance_in_onesheet)
-                #Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
-                Total_PL = Total_PL.add(PL, fill_value=0) if not Total_PL.empty else PL
+                if operator!="Ignite":               
+                    Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
+		else:
+                    Total_PL = Total_PL.add(PL, fill_value=0) if not Total_PL.empty else PL
 
 
 	# census
@@ -2040,8 +2046,10 @@ def Upload_And_Process(uploaded_file,file_type):
                 entity_list_occupancy_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Occupancy"]==sheet_name_occupancy_in_onesheet].tolist()	
                 PL_Occ=Read_Clean_PL_Multiple(entity_list_occupancy_in_onesheet,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days,sheet_name_occupancy_in_onesheet)
                 if PL_Occ.shape[0]>0:
-                    #Total_PL=PL_Occ.combine_first(Total_PL)
-                    Total_PL = Total_PL.add(PL_Occ, fill_value=0) if not Total_PL.empty else PL_Occ
+                    if operator!="Ignite": 
+                        Total_PL=PL_Occ.combine_first(Total_PL)
+		    else:
+                        Total_PL = Total_PL.add(PL_Occ, fill_value=0) if not Total_PL.empty else PL_Occ
 		    
 	# balance sheet
         sheet_list_bs_in_onesheet = entity_mapping[(entity_mapping["Balance_in_separate_sheets"]=="N")&(entity_mapping["BS_separate_excel"]=="N")&(~pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))&(entity_mapping["Sheet_Name_Balance_Sheet"]!="nan")]["Sheet_Name_Balance_Sheet"].unique()
@@ -2057,7 +2065,7 @@ def Upload_And_Process(uploaded_file,file_type):
         tenant_account_col=[10000]
         for entity_i in total_entity_list: 
             if entity_mapping.loc[entity_i,"Balance_in_separate_sheets"]=="Y":
-                PL_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
+                PL_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)             
                 Total_PL = PL_BS.combine_first(Total_PL) if not Total_PL.empty else PL_BS
 
         sheet_list_bs_in_onesheet = entity_mapping[(entity_mapping["Balance_in_separate_sheets"]=="N")&(~pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))&(entity_mapping["Sheet_Name_Balance_Sheet"]!="nan")]["Sheet_Name_Balance_Sheet"].unique()
@@ -2288,9 +2296,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 Total_PL=Upload_And_Process(uploaded_finance,"Finance")
                 #st.write("Total_PL",Total_PL)
 	        # process BS 
-                Total_BL=Upload_And_Process(uploaded_BS,"BS")
+                Total_BS=Upload_And_Process(uploaded_BS,"BS")
 	        # combine Finance and BS
-                Total_PL=Total_BL.combine_first(Total_PL)
+                Total_PL=Total_BS.combine_first(Total_PL)
                 #Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
             if len(Total_PL.columns)==1:
                 Total_PL.columns=[reporting_month]
