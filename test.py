@@ -811,7 +811,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                                 PL_date_header[col_idx] = "0"
                         if len(duplicate_rm_columns)==1:
                             return PL_date_header,month_row_index,PL.iloc[month_row_index,:]      
-			else:
+                        else:
                             duplicate_rm_columns = PL.columns[PL_date_header == reporting_month].tolist()
                             if len(duplicate_rm_columns)==1>1:
                                 # Compare the data below the month_row_index for these columns
