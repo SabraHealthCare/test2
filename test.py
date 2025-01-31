@@ -1348,9 +1348,9 @@ def Submit_Upload(total_email_body):
     </body>
     </html>"""
 
-    Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
+    #Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
     if email_body!="":
-        Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body)    
+        #Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body)    
 
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
@@ -2250,7 +2250,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 unique_asset_managers = entity_mapping['Asset_Manager'].unique()
                 receiver = operator_email.split(",") + ["twarner@sabrahealth.com", "sli@sabrahealth.com"]  
                 receiver.extend(unique_asset_managers)	    
-                Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
+                #Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
             else:
                 st.markdown(":red[P&L is not uploaded ]")
             st.stop()
