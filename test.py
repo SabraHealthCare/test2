@@ -762,10 +762,10 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                 len_of_continuous=sum(continuous_check_bool)
                 len_of_non_continuous=len(continuous_check_bool)-len_of_continuous
                 if  len_of_continuous==len(continuous_check_bool) \
-		or len_of_continuous>=10 \
-		or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2) \
-                or month_count[month_row_index]<=3\
-                or all(x == 0 for x in inv) :
+		    or len_of_continuous>=10 \
+		    or (len_of_continuous<10 and len_of_continuous>=3 and len_of_non_continuous<=2) \
+                    or month_count[month_row_index]<=3\
+                    or all(x == 0 for x in inv) :
 		    #check the corresponding year
                     if max_match_year>0:
                         #st.write("max_match_year",max_match_year,"year_table",year_table)
@@ -800,38 +800,35 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                        continue
                     elif count_reporting_month>1:  # there are duplicated months (more than one same months in header)
                         keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period","period ending"]
-                        #st.write("count_reporting_month",count_reporting_month)
-                        duplicate_rm_columns = PL.columns[PL_date_header == reporting_month].tolist()
-                        #st.write("duplicate_rm_columns",duplicate_rm_columns,"PL_date_header",PL_date_header)
-
+                        duplicate_rm_columns = PL.columns[PL_date_header == reporting_month].tolist()  # the column index for duplicated reporting months
+                
                         for col_idx in duplicate_rm_columns:
     			    # Search for "YTD", "Year to date", or "year-to_date"
                             if any(str(PL.iloc[row, col_idx]).strip().lower() in keywords for row in range(first_tenant_account_row)):
     			        # Change the corresponding value in `PL_date_header` to 0
                                 PL_date_header[col_idx] = "0"
+                        duplicate_rm_columns = PL.columns[PL_date_header == reporting_month].tolist()
                         if len(duplicate_rm_columns)==1:
                             return PL_date_header,month_row_index,PL.iloc[month_row_index,:]      
-                        else:
-                            duplicate_rm_columns = PL.columns[PL_date_header == reporting_month].tolist()
-                            if len(duplicate_rm_columns)>1:
-                                # Compare the data below the month_row_index for these columns
-                                for i, col_idx in enumerate(duplicate_rm_columns):
-                                    if i > 0:# Skip the first column since it's the one we're comparing others to
-                                        # Extract values below month_row_index  
-                                        values_below = PL_temp[col_idx].iloc[month_row_index + 1:].values        
-                                        # Compare the values in this column with the first matching column
+                        elif len(duplicate_rm_columns)>1:
+                            # Compare the data below the month_row_index for these columns
+                            for i, col_idx in enumerate(duplicate_rm_columns):
+                                if i > 0:# Skip the first column since it's the one we're comparing others to
+                                    # Extract values below month_row_index  
+                                    values_below = PL_temp[col_idx].iloc[month_row_index + 1:].values        
+                                    # Compare the values in this column with the first matching column
                                
-                                        first_col_values_below = PL_temp[duplicate_rm_columns[0]].iloc[month_row_index + 1:].values  
-                                        if (values_below == first_col_values_below).all():
-                                            # If the values are the same, set the value of the current column in month_row_index to 0
-                                            PL_date_header[col_idx] = "0"
-                                        else:
-                                            # If values are different
-                                            st.error("There are more than one '{}/{}' header in sheet '{}'. Only one is allowed to identify the data column of '{}/{}'".\
+                                    first_col_values_below = PL_temp[duplicate_rm_columns[0]].iloc[month_row_index + 1:].values  
+                                    if (values_below == first_col_values_below).all():
+                                        # If the values are the same, set the value of the current column in month_row_index to 0
+                                        PL_date_header[col_idx] = "0"
+                                    else:
+                                        # If values are different
+                                        st.error("There are more than one '{}/{}' header in sheet '{}'. Only one is allowed to identify the data column of '{}/{}'".\
 			                         format(reporting_month[4:6],reporting_month[0:4],sheet_name,reporting_month[4:6],reporting_month[0:4]))
-                                            st.stop()
-                        if list(PL_date_header).count(reporting_month)==1:
-                            return PL_date_header,month_row_index,PL.iloc[month_row_index,:]	
+                                        st.stop()
+                            if list(PL_date_header).count(reporting_month)==1:
+                                return PL_date_header,month_row_index,PL.iloc[month_row_index,:]	
                     elif count_reporting_month==1:  # there is only one reporting month in the header
                         return PL_date_header,month_row_index,PL.iloc[month_row_index,:]	
                 else:
@@ -1347,11 +1344,11 @@ def Submit_Upload(total_email_body):
         <p>Sabra Healthcare REIT.</p>
     </body>
     </html>"""
-
-    #Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
-    if email_body!="":
-        Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body)    
-
+    if not st.session_state.email_sent:
+        Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
+        if email_body!="":
+            Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body)    
+        st.session_state.email_sent = True
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
     try:
@@ -2149,7 +2146,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.session_state.selected_year = int(reporting_month[0:4])
             else:
                 st.session_state.selected_year = current_year    
-        
+        if "email_sent" not in st.session_state:
+            st.session_state.email_sent = False
         #st.write("current_month",current_month)  	    
 	
         reporting_month_label=True  
@@ -2193,7 +2191,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.cache_resource.clear()
                     st.session_state.clicked = button_initial_state
                     st.session_state.selected_year = selected_year
-                    
+                    st.session_state.email_sent = False
 
         elif BS_separate_excel=="Y":	 
             with st.form("upload_form", clear_on_submit=True):
@@ -2220,6 +2218,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.cache_resource.clear()
                     st.session_state.clicked = button_initial_state
                     st.session_state.selected_year = selected_year
+
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
         if reporting_month>=current_date:
@@ -2249,8 +2248,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.error("You have only uploaded ancillary files without any monthly reporting data.")
                 unique_asset_managers = entity_mapping['Asset_Manager'].unique()
                 receiver = operator_email.split(",") + ["twarner@sabrahealth.com", "sli@sabrahealth.com"]  
-                receiver.extend(unique_asset_managers)	    
-                #Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
+                receiver.extend(unique_asset_managers)	 
+                if not st.session_state.email_sent:
+                    Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
+                    st.session_state.email_sent = True
             else:
                 st.markdown(":red[P&L is not uploaded ]")
             st.stop()
@@ -2267,8 +2268,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.error("You have only uploaded ancillary files without any monthly reporting data. Please upload Balance Sheet if you want to upload monthly reporting data.")
                     unique_asset_managers = entity_mapping['Asset_Manager'].unique()
                     receiver = operator_email.split(",") + ["twarner@sabrahealth.com", "sli@sabrahealth.com"] 
-                    receiver.extend(unique_asset_managers)	    
-                    Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))    
+                    receiver.extend(unique_asset_managers)	
+                    if not st.session_state.email_sent:
+                        Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))    
+                        st.session_state.email_sent = True
                 st.stop()
         else:
             BS_separate_excel="N"
