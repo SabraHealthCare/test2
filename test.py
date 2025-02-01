@@ -1352,7 +1352,8 @@ def Submit_Upload(total_email_body):
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
     try:
-        PL_sheet_list = load_workbook(uploaded_file, data_only=True).sheetnames        
+        wb = load_workbook(uploaded_file, data_only=True)
+        PL_sheet_list = wb.sheetnames        
     except TypeError as e:
         # Check if the specific TypeError message matches
         error_message = str(e)
@@ -1471,7 +1472,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
     # update entity_mapping in onedrive 
     Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,"CSV",None,entity_mapping_str_col)
     st.success("Mapping updated. Please keep the sheet names consistent to avoid remapping them each time. ")
-    return entity_mapping
+    return entity_mapping,wb
 
 # don't use cache
 def View_Discrepancy(): 
@@ -1709,11 +1710,24 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
 	 
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
     #st.write("sheet_name",sheet_name,"PL",PL)
-
     if PL.shape[0]<=1:  # sheet is empty or only has one column
         return pd.DataFrame()
-    # Start checking process
-    else:  
+    else:
+        ws=wb[sheet_name]
+        # Create a list to store hidden labels
+        hidden_labels = []
+        # Iterate over rows and check if they are hidden
+        for row_idx in range(1, PL.shape[0] + 1):    # Excel rows start from 1
+            if ws.row_dimensions[row_idx].hidden:
+                hidden_labels.append(1)  # Hidden row
+            else:
+                hidden_labels.append(0)  # Non-hidden row
+
+        # Ensure the lengths match before adding the column
+        PL["hidden label"] = hidden_labels
+        st.write("PL with hidden label",PL)
+
+        # Start checking process  
         tenant_account_col=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
         if len(tenant_account_col) > 1:
             # Start with the first column
@@ -1957,7 +1971,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
        
 
 # no cache
-def Upload_And_Process(uploaded_file,file_type):
+def Upload_And_Process(uploaded_file,wb,file_type):
     global  tenant_account_col
     Total_PL=pd.DataFrame()
     #Total_PL_detail=pd.DataFrame()
@@ -2287,19 +2301,18 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 select_months_list.append(reporting_month)
         with st.spinner("Processing... Please wait!"):
             if BS_separate_excel=="N":  # Finance/BS are in one excel
-                entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
-                #Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
-                Total_PL=Upload_And_Process(uploaded_finance,"Finance")
+                entity_mapping,finance_wb=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
+                Total_PL=Upload_And_Process(uploaded_finance,finance_wb,"Finance")
                 #st.write("Total_PL1",Total_PL)
             elif BS_separate_excel=="Y": # Finance/BS are in different excel 
-                entity_mapping=Check_Sheet_Name_List(uploaded_finance,"Finance")
-                entity_mapping=Check_Sheet_Name_List(uploaded_BS,"BS")
+                entity_mapping,finance_wb=Check_Sheet_Name_List(uploaded_finance,"Finance")
+                entity_mapping,bs_wb=Check_Sheet_Name_List(uploaded_BS,"BS")
 
                 # process Finance 
-                Total_PL=Upload_And_Process(uploaded_finance,"Finance")
+                Total_PL=Upload_And_Process(uploaded_finance,finance_wb,"Finance")
                 #st.write("Total_PL",Total_PL)
 	        # process BS 
-                Total_BS=Upload_And_Process(uploaded_BS,"BS")
+                Total_BS=Upload_And_Process(uploaded_BS,bs_wb,"BS")
 	        # combine Finance and BS
                 Total_PL=Total_BS.combine_first(Total_PL)
                 #Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
