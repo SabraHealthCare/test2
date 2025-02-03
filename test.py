@@ -1856,8 +1856,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
         return pd.DataFrame()
     if operator in operators_remove_hidden_rowcol:
         ws=wb[sheet_name]
-       
-        # Convert Excel 1-based row indices to Pandas 0-based indices
         visible_rows = [row - 1 for row in range(1, PL.shape[0] + 1) if not ws.row_dimensions[row].hidden]
 
         # Convert Excel column indices (1-based) to Pandas 0-based indices
@@ -1866,7 +1864,11 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
         # Ensure indices exist before filtering
         if visible_rows and visible_cols:
             PL = PL.iloc[visible_rows, visible_cols]
-            #st.write("PL with hidden label",PL)
+            # Reset the column indices to be continuous (0, 1, 2, ...)
+            PL.columns = range(len(PL.columns))  # Reindex columns
+
+	
+        
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenant_account_col=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
