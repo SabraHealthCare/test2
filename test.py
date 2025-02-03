@@ -66,6 +66,7 @@ email_body=""
 today= datetime.now(pytz.timezone('America/Los_Angeles')).date()
 current_year= today.year
 current_month= today.month
+operators_remove_hidden_rowcol=["Ignite"]
 
 # Acquire a token using client credentials flow
 app = ConfidentialClientApplication(
@@ -1865,20 +1866,17 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
     #st.write("read PL",PL)
     if PL.shape[0]<=1:  # sheet is empty or only has one column
         return pd.DataFrame()
-    else:
+    if operator in operators_remove_hidden_rowcol:
         ws=wb[sheet_name]
         # Create a list to store hidden labels
-        hidden_labels = []
-        # Iterate over rows and check if they are hidden
-        for row_idx in range(1, PL.shape[0] + 1):    # Excel rows start from 1
-            if ws.row_dimensions[row_idx].hidden:
-                hidden_labels.append(1)  # Hidden row
-            else:
-                hidden_labels.append(0)  # Non-hidden row
+        visible_rows = [row for row in range(1, PL.shape[0] + 1) if not ws.row_dimensions[row].hidden]
+    
+        # Get visible column indices
+        visible_cols = [col for col in range(PL.shape[1]) if not ws.column_dimensions.get(openpyxl.utils.get_column_letter(col + 1), {}).hidden]
 
-        # Ensure the lengths match before adding the column
-        PL["hidden label"] = hidden_labels
-        st.write("PL with hidden label",PL)
+        # Filter DataFrame to include only visible rows and columns
+        PL = PL.iloc[visible_rows, visible_cols]
+        #st.write("PL with hidden label",PL)
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenant_account_col=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
@@ -1959,12 +1957,12 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
                 account_pool= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]	
 
         #if there are duplicated accounts in P&L, ask for confirming
-        # Step 1: Remove all duplicate rows, keeping only unique records based on all column values
+        # Step 1: Remove all duplicate rows(both of account and responding value are same) keeping only unique records based on column values
         PL.index.name = "Tenant_Account"
         PL = PL.reset_index(drop=False)
         PL=PL.drop_duplicates(subset=["Tenant_Account", reporting_month])
         PL = PL.set_index('Tenant_Account')    
-        #st.write("Before Map_PL_Sabr 1",PL)
+        
         # Step 2: Identify any remaining duplicated indices after removing duplicate rows
         dup_tenant_account_all = PL.index[PL.index.duplicated()].unique()
 
