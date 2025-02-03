@@ -1866,6 +1866,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
             PL = PL.iloc[visible_rows, visible_cols]
             # Reset the column indices to be continuous (0, 1, 2, ...)
             PL.columns = range(len(PL.columns))  # Reindex columns
+            st.write("PL row index", PL.index,"PL.columns",PL.columns)
 
 	
         
