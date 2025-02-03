@@ -2312,7 +2312,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             if len(select_months_list)>=previous_monthes_comparison:
                 select_months_list=select_months_list[:previous_monthes_comparison]+[reporting_month]  
             else:
-                select_months_list.append(reporting_month)
+                select_months_list.append(reporting_month) 
         with st.spinner("Processing... Please wait!"):
             if BS_separate_excel=="N":  # Finance/BS are in one excel
                 entity_mapping,finance_wb=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
