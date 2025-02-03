@@ -1848,7 +1848,7 @@ def Get_Previous_Months(reporting_month,full_date_header):
     return month_select
 
 #no cache    
-def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):  
+def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):  
     global account_mapping,reporting_month,tenant_account_col,date_header,select_months_list
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
@@ -1865,7 +1865,6 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,account_pool):
     #st.write("read PL",PL)
     if PL.shape[0]<=1:  # sheet is empty or only has one column
         return pd.DataFrame()
-
     else:
         ws=wb[sheet_name]
         # Create a list to store hidden labels
@@ -2007,7 +2006,7 @@ def Upload_And_Process(uploaded_file,wb,file_type):
         for entity_i in total_entity_list:   # entity_i is the entity code S number
 	    # properties are in seperate sheet 
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
-                PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,account_pool_full)
+                PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,wb,account_pool_full)
                 if operator!="Ignite":
                     Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
                 else:
@@ -2028,7 +2027,7 @@ def Upload_And_Process(uploaded_file,wb,file_type):
                 and sheet_name_occupancy != sheet_name_finance\
                 and entity_mapping.loc[entity_i, "Occupancy_in_separate_sheets"] == "Y" ):
 
-                PL_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file,account_pool_patient_days) 
+                PL_occ=Read_Clean_PL_Single(entity_i,"Sheet_Name_Occupancy",uploaded_file,wb,account_pool_patient_days) 
                 if not PL_occ.empty:
                     if operator!="Ignite":
                         Total_PL=PL_occ.combine_first(Total_PL)
@@ -2046,7 +2045,7 @@ def Upload_And_Process(uploaded_file,wb,file_type):
                        and sheet_name_balance!="nan" \
                        and sheet_name_balance!=sheet_name_finance \
                        and entity_mapping.loc[entity_i,"Balance_in_separate_sheets"]=="Y":
-                    PL_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)
+                    PL_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,wb,account_pool_balance_sheet)
                     if PL_BS.shape[0]>0:
                         Total_PL=PL_BS.combine_first(Total_PL)
         
@@ -2091,7 +2090,7 @@ def Upload_And_Process(uploaded_file,wb,file_type):
         tenant_account_col=[10000]
         for entity_i in total_entity_list: 
             if entity_mapping.loc[entity_i,"Balance_in_separate_sheets"]=="Y":
-                PL_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,account_pool_balance_sheet)             
+                PL_BS=Read_Clean_PL_Single(entity_i,"Sheet_Name_Balance_Sheet",uploaded_file,wb,account_pool_balance_sheet)             
                 Total_PL = PL_BS.combine_first(Total_PL) if not Total_PL.empty else PL_BS
 
         sheet_list_bs_in_onesheet = entity_mapping[(entity_mapping["Balance_in_separate_sheets"]=="N")&(~pd.isna(entity_mapping["Sheet_Name_Balance_Sheet"]))&(entity_mapping["Sheet_Name_Balance_Sheet"]!="nan")]["Sheet_Name_Balance_Sheet"].unique()
