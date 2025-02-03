@@ -1384,7 +1384,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
         total_missing_N=missing_BS_sheet_property_N.shape[0]
 
     if total_missing_Y+total_missing_N==0:        
-        return entity_mapping
+        return entity_mapping,wb
     
 
     with st.form(key=sheet_type):
