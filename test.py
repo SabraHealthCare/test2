@@ -4,6 +4,7 @@ import numpy as np
 from datetime import datetime, timedelta,date
 from openpyxl import load_workbook
 from openpyxl.utils.dataframe import dataframe_to_rows 
+from openpyxl.utils import get_column_letter
 import streamlit as st             
 from io import BytesIO
 from io import StringIO
@@ -1872,8 +1873,9 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
         visible_rows = [row for row in range(1, PL.shape[0] + 1) if not ws.row_dimensions[row].hidden]
     
         # Get visible column indices
-        visible_cols = [col for col in range(PL.shape[1]) if not ws.column_dimensions.get(openpyxl.utils.get_column_letter(col + 1), {}).hidden]
+        visible_cols = [col for col in range(PL.shape[1]) if not ws.column_dimensions[get_column_letter(col + 1)].hidden]
 
+	    
         # Filter DataFrame to include only visible rows and columns
         PL = PL.iloc[visible_rows, visible_cols]
         #st.write("PL with hidden label",PL)
