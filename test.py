@@ -391,10 +391,10 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
         candidate_col = PL.iloc[:, col_index].apply(lambda x: str(int(x)).strip().upper() \
 				if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
         #st.write("candidate_col",candidate_col)
-        non_empty_col = candidate_col[candidate_col != '']
+        #non_empty_col = candidate_col[candidate_col != '']
         match_count = sum(candidate_col.isin(account_pool))
         #st.write("match_count",match_count)
-        return match_count, len(non_empty_col)
+        return match_count
     
     # Check the pre-identified columns first
     if pre_max_match_col != [10000] and pre_max_match_col[0] < PL.shape[1] and len(pre_max_match_col)==1:
@@ -408,7 +408,7 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     # If pre-identified columns are not sufficient, search for potential matches across the first 15 columns
     match_counts = []
     for col in range(min(15, PL.shape[1])):
-        match_count, _ = get_match_count(col)
+        match_count= get_match_count(col)
         match_counts.append((match_count, col))
     st.write("match_counts",match_counts)
     # Sort by match count in descending order
@@ -1984,13 +1984,13 @@ def Upload_And_Process(uploaded_file,wb,file_type):
     Occupancy_in_one_sheet=[]
     BS_in_one_sheet=[]
     account_pool_full=account_mapping.copy()
-    #st.write("account_pool_full",account_pool_full)
+    st.write("account_pool_full",account_pool_full)
     account_pool_patient_days = account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")|\
 	                        (account_mapping["Category"].isin(["Patient Days","Facility Information","Operating Expenses"]))|\
 	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS','T_NURSING_LABOR','T_N_CONTRACT_LABOR','T_OTHER_NN_LABOR'])) |\
 	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS','T_NURSING_LABOR','T_N_CONTRACT_LABOR','T_OTHER_NN_LABOR']))]	  
     account_pool_balance_sheet= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]	
-
+    st.write("account_pool_patient_days",account_pool_patient_days,"account_pool_balance_sheet",account_pool_balance_sheet)
     # ****Finance and BS in one excel****
     if file_type=="Finance":
         tenant_account_col=[10000]
