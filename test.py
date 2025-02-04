@@ -385,7 +385,7 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 # Parse the df and get filter widgets based for provided columns
 		
 def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, pre_max_match_col):
-    st.write("PL",PL,"account_pool",account_pool)
+    #st.write("PL",PL,"account_pool",account_pool)
 
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].apply(lambda x: str(int(x)).strip().upper() \
@@ -402,7 +402,7 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
             match_count, non_empty_count = get_match_count(pre_max_match_col[i])
             if match_count > 0 and (match_count > 1 or match_count / non_empty_count > 0.2):
                 if i == len(pre_max_match_col)-1:
-                    st.write("_______________________________use pre_max_match_col_______________________:",pre_max_match_col)
+                    #st.write("_______________________________use pre_max_match_col_______________________:",pre_max_match_col)
                     return pre_max_match_col
     
     # If pre-identified columns are not sufficient, search for potential matches across the first 15 columns
@@ -410,7 +410,7 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     for col in range(min(15, PL.shape[1])):
         match_count, _ = get_match_count(col)
         match_counts.append((match_count, col))
-    st.write("match_counts",match_counts)
+    #st.write("match_counts",match_counts)
     # Sort by match count in descending order
     match_counts.sort(reverse=True, key=lambda x: x[0])
     
@@ -803,7 +803,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                     elif count_reporting_month>1:  # there are duplicated months (more than one same months in header)
                         keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period","period ending"]
                         duplicate_rm_columns = PL.columns[PL_date_header == reporting_month].tolist()  # the column index for duplicated reporting months
-                        st.write("PL",PL)
+                        #st.write("PL",PL)
                         for col_idx in duplicate_rm_columns:
     			    # Search for "YTD", "Year to date", or "year-to_date"
                             if any(str(PL.iloc[row, col_idx]).strip().lower() in keywords for row in range(first_tenant_account_row)):
