@@ -385,7 +385,7 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 # Parse the df and get filter widgets based for provided columns
 		
 def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, pre_max_match_col):
-    #st.write("PL",PL,"account_pool",account_pool)
+    st.write("PL",PL,"account_pool",account_pool)
 
     def get_match_count(col_index):
         candidate_col = PL.iloc[:, col_index].apply(lambda x: str(int(x)).strip().upper() \
@@ -402,7 +402,7 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
             match_count, non_empty_count = get_match_count(pre_max_match_col[i])
             if match_count > 0 and (match_count > 1 or match_count / non_empty_count > 0.2):
                 if i == len(pre_max_match_col)-1:
-                    #st.write("_______________________________use pre_max_match_col_______________________:",pre_max_match_col)
+                    st.write("_______________________________use pre_max_match_col_______________________:",pre_max_match_col)
                     return pre_max_match_col
     
     # If pre-identified columns are not sufficient, search for potential matches across the first 15 columns
@@ -410,7 +410,7 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     for col in range(min(15, PL.shape[1])):
         match_count, _ = get_match_count(col)
         match_counts.append((match_count, col))
-    #st.write("match_counts",match_counts)
+    st.write("match_counts",match_counts)
     # Sort by match count in descending order
     match_counts.sort(reverse=True, key=lambda x: x[0])
     
@@ -716,7 +716,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
            not all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)\
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
     valid_col_index=[i for i, mask in enumerate(valid_col_mask) if mask]
-    #st.write("PL_temp",PL_temp,"valid_col_mask",valid_col_mask,valid_col_index)
+    st.write("PL_temp",PL_temp,"valid_col_mask",valid_col_mask,valid_col_index)
     if len(valid_col_index)==0: # there is no valid data column
         st.write("Didn't detect any data in sheet {}".format(sheet_name))
         return [],0,[]
