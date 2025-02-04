@@ -391,10 +391,10 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
         candidate_col = PL.iloc[:, col_index].apply(lambda x: str(int(x)).strip().upper() \
 				if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
         #st.write("candidate_col",candidate_col)
-        #non_empty_col = candidate_col[candidate_col != '']
+        non_empty_col = candidate_col[candidate_col != '']
         match_count = sum(candidate_col.isin(account_pool))
         #st.write("match_count",match_count)
-        return match_count
+        return match_count, len(non_empty_col)
     
     # Check the pre-identified columns first
     if pre_max_match_col != [10000] and pre_max_match_col[0] < PL.shape[1] and len(pre_max_match_col)==1:
@@ -408,7 +408,7 @@ def Identify_Tenant_Account_Col(PL, sheet_name, sheet_type_name, account_pool, p
     # If pre-identified columns are not sufficient, search for potential matches across the first 15 columns
     match_counts = []
     for col in range(min(15, PL.shape[1])):
-        match_count= get_match_count(col)
+        match_count, _ = get_match_count(col)
         match_counts.append((match_count, col))
     st.write("match_counts",match_counts)
     # Sort by match count in descending order
@@ -716,7 +716,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
            not all((v == 0 or pd.isna(v) or isinstance(v, str) or not isinstance(v, (int, float))) for v in x)\
          ) if PL_temp.columns.get_loc(x.name) > tenantAccount_col_no else False, axis=0)
     valid_col_index=[i for i, mask in enumerate(valid_col_mask) if mask]
-    st.write("PL_temp",PL_temp,"valid_col_mask",valid_col_mask,valid_col_index)
+    #st.write("PL_temp",PL_temp,"valid_col_mask",valid_col_mask,valid_col_index)
     if len(valid_col_index)==0: # there is no valid data column
         st.write("Didn't detect any data in sheet {}".format(sheet_name))
         return [],0,[]
