@@ -1866,10 +1866,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
             PL = PL.iloc[visible_rows, visible_cols]
             # Reset the column indices to be continuous (0, 1, 2, ...)
             PL.columns = range(len(PL.columns))  # Reindex columns
-            st.write("PL row index", PL.index,"PL.columns",PL.columns)
-
-	
-        
+               
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenant_account_col=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
@@ -1945,7 +1942,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
 	                        (account_mapping["Category"] == "Facility Information")|\
 	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS','T_NURSING_LABOR','T_N_CONTRACT_LABOR','T_OTHER_NN_LABOR'])) |\
 	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS','T_NURSING_LABOR','T_N_CONTRACT_LABOR','T_OTHER_NN_LABOR']))]	  
-                st.write("Occ pool",account_pool) 
+                #st.write("Occ pool",account_pool) 
             elif sheet_type=="Sheet_Name_Balance_Sheet":
                 account_pool= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]	
 
@@ -1984,13 +1981,13 @@ def Upload_And_Process(uploaded_file,wb,file_type):
     Occupancy_in_one_sheet=[]
     BS_in_one_sheet=[]
     account_pool_full=account_mapping.copy()
-    st.write("account_pool_full",account_pool_full)
+    #st.write("account_pool_full",account_pool_full)
     account_pool_patient_days = account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")|\
 	                        (account_mapping["Category"].isin(["Patient Days","Facility Information","Operating Expenses"]))|\
 	                        (account_mapping["Sabra_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS','T_NURSING_LABOR','T_N_CONTRACT_LABOR','T_OTHER_NN_LABOR'])) |\
 	                        (account_mapping["Sabra_Second_Account"].isin(['T_NURSING_HOURS', 'T_N_CONTRACT_HOURS', 'T_OTHER_HOURS','T_NURSING_LABOR','T_N_CONTRACT_LABOR','T_OTHER_NN_LABOR']))]	  
     account_pool_balance_sheet= account_mapping[(account_mapping["Sabra_Account"] == "NO NEED TO MAP")| (account_mapping["Category"]=="Balance Sheet")]	
-    st.write("account_pool_patient_days",account_pool_patient_days,"account_pool_balance_sheet",account_pool_balance_sheet)
+    #st.write("account_pool_patient_days",account_pool_patient_days,"account_pool_balance_sheet",account_pool_balance_sheet)
     # ****Finance and BS in one excel****
     if file_type=="Finance":
         tenant_account_col=[10000]
@@ -2400,7 +2397,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             st.error(e)
     
     elif choice=="Register":
-        st.write("operator_list",operator_list)
+        #st.write("operator_list",operator_list)
         col1,col2=st.columns(2)
         with col1:
             operator= st.selectbox('Select Operator',(operator_list["Operator"]))
