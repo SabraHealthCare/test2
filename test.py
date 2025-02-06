@@ -1317,7 +1317,7 @@ def View_Summary():
         summary_for_email["Sabra_Account"] = summary_for_email["Sabra_Account"].str.replace(r"^Total - ", "", regex=True)
         summary_for_email.rename(columns={"Sabra_Account": reporting_month_display }, inplace=True)
 
-        st.write("reporting_month_data",reporting_month_data,"summary_for_email",summary_for_email)	
+        #st.write("reporting_month_data",reporting_month_data,"summary_for_email",summary_for_email)	
         summary_for_email.columns.name = None 
         total_email_body=f"<p>Here is the summary for your reference:</p>{summary_for_email.to_html(index=False)}"+email_body
         return total_email_body
