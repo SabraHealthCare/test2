@@ -1277,7 +1277,7 @@ def View_Summary():
             """,unsafe_allow_html=True)
     with st.expander("{} {} reporting".format(operator,reporting_month_display) ,expanded=True):
         ChangeWidgetFontSize("{} {} reporting".format(operator,reporting_month_display), '25px')
-        col1,col2=st.columns()
+        col1,col2=st.columns(2)
         with col1:
             download_report(reporting_month_data,"Report")
         with col2:
