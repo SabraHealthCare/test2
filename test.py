@@ -1315,6 +1315,7 @@ def View_Summary():
 
         # Remove "Total - " from the Sabra_Account column
         summary_for_email["Sabra_Account"] = summary_for_email["Sabra_Account"].str.replace(r"^Total - ", "", regex=True)
+        summary_for_email.rename(columns={"Sabra_Account": reporting_month_display }, inplace=True)
 
         st.write("reporting_month_data",reporting_month_data,"summary_for_email",summary_for_email)	
         summary_for_email.columns.name = None 
