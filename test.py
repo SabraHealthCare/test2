@@ -1294,12 +1294,27 @@ def View_Summary():
         else:
             show_column=["Sabra_Account"]
         
-        summary_for_email= reporting_month_data[(reporting_month_data["Sabra_Account"].\
-		               isin(["Total - Patient Days","Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"]))\
-	                       | (reporting_month_data["Sabra_Account"].str.startswith("Operating Beds-"))]\
-		                [show_column + list(entity_columns)]
-		
-        summary_for_email["Sabra_Account"] = summary_for_email["Sabra_Account"].str.replace("Total - ", "", regex=False)
+        #summary_for_email= reporting_month_data[(reporting_month_data["Sabra_Account"].\
+		               #isin(["Total - Patient Days","Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"]))\
+	                       #| (reporting_month_data["Sabra_Account"].str.startswith("Operating Beds-"))]\
+		                #[show_column + list(entity_columns)]
+	    
+
+        summary_for_email = reporting_month_data[
+                          (reporting_month_data["Sabra_Account"].isin([
+                          "Total - Patient Days", 
+                          "Total - Revenue", 
+                          "Total - Operating Expenses", 
+                          "Total - Non-Operating Expenses"
+                          ])) |
+                          ((reporting_month_data["Sabra_Account"].str.startswith("Operating Beds-")) & 
+                          (~reporting_month_data["Total"].isna()) & 
+                          (reporting_month_data["Total"] != 0))
+                          ][show_column + list(entity_columns)].copy()  # Create a copy to modify data safely
+
+        # Remove "Total - " from the Sabra_Account column
+        summary_for_email["Sabra_Account"] = summary_for_email["Sabra_Account"].str.replace(r"^Total - ", "", regex=True)
+
         #st.write("reporting_month_data",reporting_month_data,"summary_for_email",summary_for_email)	
         summary_for_email.columns.name = None 
         total_email_body=f"<p>Here is the summary for your reference:</p>{summary_for_email.to_html(index=False)}"+email_body
@@ -1337,7 +1352,7 @@ def Submit_Upload(total_email_body):
     receiver_email_list = operator_email.split(",") + ["twarner@sabrahealth.com","sli@sabrahealth.com","jmanalastas@sabrahealth.com","sabra_reporting@sabrahealth.com"]
     
     if '@*' in operator_email:
-        st.write("Please update email address (in 'Menu' - 'Edit Account') to ensure you receive confirmation email.")
+        st.error("Please update email address (in 'Menu' - 'Edit Account') to ensure you receive confirmation email.")
     # Append these unique values to receiver_list
     receiver_email_list.extend(unique_asset_managers)
   
@@ -1351,7 +1366,8 @@ def Submit_Upload(total_email_body):
     </body>
     </html>"""
     if not st.session_state.email_sent:
-        Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
+        Send_Confirmation_Email(["sli@sabrahealth.com"], subject, format_total_email_body)    
+        #Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
         if email_body!="":
             Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body)    
         st.session_state.email_sent = True
