@@ -1277,7 +1277,11 @@ def View_Summary():
             """,unsafe_allow_html=True)
     with st.expander("{} {} reporting".format(operator,reporting_month_display) ,expanded=True):
         ChangeWidgetFontSize("{} {} reporting".format(operator,reporting_month_display), '25px')
-        download_report(reporting_month_data,"Report")
+        col1,col2=st.columns()
+        with col1:
+            download_report(reporting_month_data,"Report")
+        with col2:
+            download_report(entity_mapping,"account mapping")
         reporting_month_data=reporting_month_data.apply(Format_Value)
         reporting_month_data=reporting_month_data.fillna(0).infer_objects(copy=False)
         reporting_month_data=reporting_month_data.replace(0,'')
