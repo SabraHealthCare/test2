@@ -1308,8 +1308,9 @@ def View_Summary():
                           "Total - Non-Operating Expenses"
                           ])) |
                           ((reporting_month_data["Sabra_Account"].str.startswith("Operating Beds-")) & 
-                          (~reporting_month_data["Total"].isna()) & 
-                          (reporting_month_data["Total"] != 0))
+                          (reporting_month_data["Total"].notna()) &  # Ensures "Total" is not NaN
+                          (reporting_month_data["Total"] != 0) & 
+                          (reporting_month_data["Total"] != ""))
                           ][show_column + list(entity_columns)].copy()  # Create a copy to modify data safely
 
         # Remove "Total - " from the Sabra_Account column
