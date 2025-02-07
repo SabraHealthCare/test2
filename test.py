@@ -994,6 +994,7 @@ def Manage_Entity_Mapping(operator):
                         entity_mapping_updation.loc[entity_i,"Column_Name"]=new_value
             submitted = st.form_submit_button("Submit")
             if submitted:
+                entity_mapping.update(entity_mapping_updation)
                 Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,"CSV",None,entity_mapping_str_col)
                 st.success("Updates mapping successfully!")
         st.write("new entity mapping",entity_mapping)
