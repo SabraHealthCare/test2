@@ -996,6 +996,7 @@ def Manage_Entity_Mapping(operator):
             if submitted:
                 Update_File_Onedrive(mapping_path,entity_mapping_filename,entity_mapping,operator,"CSV",None,entity_mapping_str_col)
                 st.success("Updates mapping successfully!")
+        st.write("new entity mapping",entity_mapping)
     return entity_mapping
 
 # no cache 
