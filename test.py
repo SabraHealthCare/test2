@@ -1462,15 +1462,14 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                                 st.error(f"The sheet names for {row['Property_Name']} are supposed to be different.")
                                 st.stop()
                         for entity_i in missing_PL_sheet_property_Y.index: 
-                            st.write(missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"],entity_mapping.loc[:,"Sheet_Name_Finance"])
-                            if missing_PL_sheet_property_Y.loc[entity_i, "Sheet_Name_Finance"] in entity_mapping["Sheet_Name_Finance"].values:
-                                property = entity_mapping.loc[entity_mapping["Sheet_Name_Finance"] == "N", "Property_Name"].iloc[0]
-                                #st.error("The sheet {missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"]} is for facility {property}, please select another sheet for facility {missing_PL_sheet_property_Y.loc[entity_i,"Property_Name"]}")
-                                st.error(f"The sheet {missing_PL_sheet_property_Y.loc[entity_i, 'Sheet_Name_Finance']} is for facility {property}, please select another sheet for facility {missing_PL_sheet_property_Y.loc[entity_i, 'Property_Name']}")
-
-                                st.write(missing_PL_sheet_property_Y,missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"])    
+                            new_finance_sheet_name=missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"]
+                            st.write(new_finance_sheet_name,entity_mapping.loc[:,"Sheet_Name_Finance"])
+                            if new_finance_sheet_name in entity_mapping["Sheet_Name_Finance"].values:
+                                property = entity_mapping.loc[entity_mapping["Sheet_Name_Finance"] == new_finance_sheet_name, "Property_Name"].iloc[0]
+                              
+                                st.error(f"The '{new_finance_sheet_name}' sheet is for {property}, please choose another sheet for {missing_PL_sheet_property_Y.loc[entity_i, 'Property_Name']}")
                                 st.stop()
-                            entity_mapping.loc[entity_i,"Sheet_Name_Finance"]=missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"] 
+                            entity_mapping.loc[entity_i,"Sheet_Name_Finance"]=new_finance_sheet_name
 	
                     if missing_occ_sheet_property_Y.shape[0]>0:
                         for entity_i in missing_occ_sheet_property_Y.index:
