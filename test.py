@@ -1464,7 +1464,10 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                         for entity_i in missing_PL_sheet_property_Y.index: 
                             if missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"] in entity_mapping.loc[:,"Sheet_Name_Finance"]:
                                 property = entity_mapping.loc[entity_mapping["Sheet_Name_Finance"] == "N", "Property_Name"].iloc[0]
-                                st.error(f"The sheet {missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"]} is for facility {property}, please select another sheet for facility {missing_PL_sheet_property_Y.loc[entity_i,"Property_Name"]}")
+                                #st.error("The sheet {missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"]} is for facility {property}, please select another sheet for facility {missing_PL_sheet_property_Y.loc[entity_i,"Property_Name"]}")
+                                st.write(missing_PL_sheet_property_Y,missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"])
+
+				    
                                 st.stop()
                             entity_mapping.loc[entity_i,"Sheet_Name_Finance"]=missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"] 
 	
