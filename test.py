@@ -1455,13 +1455,12 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                     if missing_PL_sheet_property_Y.shape[0]>0:
 	                # each property in seperate sheet, so the sheet names should be unique
                         duplicates = missing_PL_sheet_property_Y[missing_PL_sheet_property_Y.duplicated('Sheet_Name_Finance', keep=False)]
-                        st.write("duplicates",duplicates)
                         # Group by 'Sheet_Name_Finance' and get corresponding 'Property Name'
-                        grouped = duplicates.groupby("Sheet_Name_Finance")["Property Name"].apply(lambda x: ', '.join(x)).reset_index()
-                        st.write("duplicates",duplicates,"grouped",grouped)
-                        for _, row in grouped.iterrows():
-                            st.error(f"The sheet names for {row['Property_Name']} are supposed to be different.")
-                            st.stop()
+                        if not duplicates.empty:
+                            grouped = duplicates.groupby("Sheet_Name_Finance")["Property Name"].apply(lambda x: ', '.join(x)).reset_index()
+                            for _, row in grouped.iterrows():
+                                st.error(f"The sheet names for {row['Property_Name']} are supposed to be different.")
+                                st.stop()
                         for entity_i in missing_PL_sheet_property_Y.index: 
                             if missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"] in entity_mapping.loc[:,"Sheet_Name_Finance"]:
                                 property = entity_mapping.loc[entity_mapping["Sheet_Name_Finance"] == "N", "Property_Name"].iloc[0]
