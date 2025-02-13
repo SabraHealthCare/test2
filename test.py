@@ -1263,11 +1263,10 @@ def View_Summary():
                 reporting_month_data.loc[i,set_empty]=np.nan
 
     entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
-    if len(reporting_month_data.columns)>3:  # if there are more than one property, add total column
-        reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
-        reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
-    else:
-        reporting_month_data=reporting_month_data[["Sabra_Account"]+list(entity_columns)]   
+   
+    reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
+    reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
+	
     placeholder = st.empty()
     placeholder.markdown("""
             <div style="background-color: #fff1ad; padding: 10px; border-radius: 5px;">
