@@ -1457,7 +1457,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                         duplicates = missing_PL_sheet_property_Y[missing_PL_sheet_property_Y.duplicated('Sheet_Name_Finance', keep=False)]
                         # Group by 'Sheet_Name_Finance' and get corresponding 'Property Name'
                         if not duplicates.empty:
-                            grouped = duplicates.groupby("Sheet_Name_Finance")["Property Name"].apply(lambda x: ', '.join(x)).reset_index()
+                            grouped = duplicates.groupby("Sheet_Name_Finance")["Property_Name"].apply(lambda x: ', '.join(x)).reset_index()
                             for _, row in grouped.iterrows():
                                 st.error(f"The sheet names for {row['Property_Name']} are supposed to be different.")
                                 st.stop()
