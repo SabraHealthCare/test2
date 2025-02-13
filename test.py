@@ -1459,9 +1459,14 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                         grouped = duplicates.groupby("Sheet_Name_Finance")["Property Name"].apply(lambda x: ', '.join(x)).reset_index()
 
                         for _, row in grouped.iterrows():
-                            st.error(f"The sheet names for {row['Property Name']} are supposed to be different.")
+                            st.error(f"The sheet names for {row['Property_Name']} are supposed to be different.")
                             st.stop()
                         for entity_i in missing_PL_sheet_property_Y.index: 
+                            if missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"] in entity_mapping.loc[:,"Sheet_Name_Finance"]:
+                                property = entity_mapping.loc[entity_mapping["Sheet_Name_Finance"] == "N", "Property_Name"].iloc[0]
+                                st.error(f"The sheet {missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"]} is \
+				      for facility {property}, please select another sheet for facility {missing_PL_sheet_property_Y.loc[entity_i,"Property_Name"]}")
+                                st.stop()
                             entity_mapping.loc[entity_i,"Sheet_Name_Finance"]=missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"] 
 	
                     if missing_occ_sheet_property_Y.shape[0]>0:
