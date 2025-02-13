@@ -1459,7 +1459,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                         if not duplicates.empty:
                             grouped = duplicates.groupby("Sheet_Name_Finance")["Property_Name"].apply(lambda x: ', '.join(x)).reset_index()
                             for _, row in grouped.iterrows():
-                                st.error(f"The sheet names for {row['Property_Name']} are supposed to be different.")
+                                st.error(f"The sheet names are supposed to be different for {row['Property_Name']} .")
                                 st.stop()
                         for entity_i in missing_PL_sheet_property_Y.index: 
                             new_finance_sheet_name=missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"]
