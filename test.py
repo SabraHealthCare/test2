@@ -1463,10 +1463,8 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                                 st.stop()
                         for entity_i in missing_PL_sheet_property_Y.index: 
                             new_finance_sheet_name=missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"]
-                            st.write(new_finance_sheet_name,entity_mapping.loc[:,"Sheet_Name_Finance"])
                             if new_finance_sheet_name in entity_mapping["Sheet_Name_Finance"].values:
                                 property = entity_mapping.loc[entity_mapping["Sheet_Name_Finance"] == new_finance_sheet_name, "Property_Name"].iloc[0]
-                              
                                 st.error(f"The '{new_finance_sheet_name}' sheet is for {property}, please choose another sheet for {missing_PL_sheet_property_Y.loc[entity_i, 'Property_Name']}")
                                 st.stop()
                             entity_mapping.loc[entity_i,"Sheet_Name_Finance"]=new_finance_sheet_name
