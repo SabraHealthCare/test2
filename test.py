@@ -1455,6 +1455,7 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
                     if missing_PL_sheet_property_Y.shape[0]>0:
 	                # each property in seperate sheet, so the sheet names should be unique
                         duplicates = missing_PL_sheet_property_Y[missing_PL_sheet_property_Y.duplicated('Sheet_Name_Finance', keep=False)]
+                        st.write("duplicates",duplicates)
                         # Group by 'Sheet_Name_Finance' and get corresponding 'Property Name'
                         grouped = duplicates.groupby("Sheet_Name_Finance")["Property Name"].apply(lambda x: ', '.join(x)).reset_index()
                         st.write("duplicates",duplicates,"grouped",grouped)
