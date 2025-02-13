@@ -1351,7 +1351,7 @@ def Submit_Upload(total_email_body):
     # Get 'Asset_Manager' from entity_mapping
     unique_asset_managers = entity_mapping['Asset_Manager'].unique()
  
-    receiver_email_list = operator_email.split(",") + ["twarner@sabrahealth.com","sli@sabrahealth.com","jmanalastas@sabrahealth.com","sabra_reporting@sabrahealth.com"]
+    receiver_email_list = operator_email.split(",") + ["twarner@sabrahealth.com","sli@sabrahealth.com","jmanalastas@sabrahealth.com"]
     
     if '@*' in operator_email:
         st.error("Please update email address (in 'Menu' - 'Edit Account') to ensure you receive confirmation email.")
