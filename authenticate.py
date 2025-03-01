@@ -173,8 +173,8 @@ class Authenticate:
                 return False
     def send_email(self, username: str, email: str, random_password: str):
         username_smtp = 'sabrahealth.com'  
-        password_smtp = 'b1bpwmzxs9hnbpkM' 
-    
+        password_smtp = 'b1bpwmzxs9hnbpkM'      
+        st.write("*****************************************************")    
         body = f"""
             Hi {username},
         
@@ -317,12 +317,9 @@ class Authenticate:
                 if st.session_state.clicked["forgot_password_button"]:
                     try:
                         username_forgot_pw, email_forgot_password, random_password = self.forgot_password('Forgot password')
-                        st.write(0,random_password)
                         if username_forgot_pw:
-                            st.write(1,random_password)
                             self.save_credentials_to_yaml(config)
                             self.send_email(username_forgot_pw,email_forgot_password,random_password)
-                            st.write(2,random_password)
            
                     except Exception as e:
                         st.error(e)
@@ -671,38 +668,48 @@ class Authenticate:
 
         st.write("")
         st.subheader("Edit Your Profile")
-        field = st.selectbox('Select field need to be updated', ['Username', 'Email','Password'])
+        col1,col2=st.columns(2)
+        with col1:
+            field = st.selectbox('Select field need to be updated', ['Username', 'Email','Password']).lower()
+            if field=='password':
+                # Creating a password reset widget
+                try:
+                    reset_password_form = st.form('Reset password')
+                    reset_password_form.subheader('Reset password')    
+                    self.password = reset_password_form.text_input('Current password', type='password')
+                    new_password = reset_password_form.text_input('New password', type='password')
+                    new_password_repeat = reset_password_form.text_input('Repeat password', type='password')
 
-        if field == 'Password':
-            with st.form('Reset Password'):
-                current_password = st.text_input('Current password', type='password')
-                new_password = st.text_input('New password', type='password')
-                confirm_password = st.text_input('Confirm new password', type='password')
-                if st.form_submit_button('Reset Password'):
-                    if self._check_credentials(current_password):
-                        if new_password == confirm_password:
-                            if new_password != current_password:
-                                self._update_password(self.username, new_password)
-                                self.save_credentials_to_yaml(config)
-                                st.success("Password updated successfully")
-                                return True
+                    if reset_password_form.form_submit_button('Reset'):
+                        if self._check_credentials(inplace=False):
+                            if len(new_password) > 0:
+                                if new_password == new_password_repeat:
+                                    if self.password != new_password: 
+                                        #if self.Password_Validity(new_password):
+                                            self._update_password(self.username, new_password)
+                                            self.save_credentials_to_yaml(config)
+                                            return True                                          
+                                    else:
+                                        raise ResetError('New and current passwords are the same')
+                                else:
+                                    raise ResetError('Passwords do not match')
                             else:
-                                raise ResetError('New and current passwords are the same')
+                                raise ResetError('No new password provided')
                         else:
-                            raise ResetError('Passwords do not match')
-                    else:
-                        raise ResetError('No new password provided')
-                else:
-                    raise CredentialsError('password')
+                            raise CredentialsError('password')
+                except Exception as e:
+                    st.error(e)
+            else:
+                new_value = st.text_input('New {}'.format(field))
 
-        else:
-            new_value = st.text_input('New {}'.format(field))
-            if st.button('Update'):
-                if len(new_value) > 0:
-                    if field =="Username":
-                        if new_value.lower() not in self.credentials['usernames'] :
-                              if self.validator.validate_username(username):
-                                    st.success("Username updated successfully")
+                if st.button('Update'):
+                    if len(new_value) > 0:
+                        if field=="username":
+                            existing_usernames_lower = {k.lower() for k in self.credentials['usernames']}
+                            if new_value.lower() not in existing_usernames_lower:
+                            #if new_value not in self.credentials['usernames'] :
+                                if self.validator.validate_username(username):
+
                                     self.credentials['usernames'][new_value] = self.credentials['usernames'].pop(self.username)
                                     self.username=new_value
                                     st.session_state['username'] = self.username
@@ -713,12 +720,12 @@ class Authenticate:
                                     self.save_credentials_to_yaml(config)
                                     st.success("Username updated successfully")
                                     return True
-                              else:
-                                  raise RegisterError('Username is not valid')
-                        else:
-                            raise RegisterError('Username already be taken')
+                                else:
+                                    raise RegisterError('Username is not valid')
+                            else:
+                                raise RegisterError('Username already be taken')
 
-                    elif field =='Email':
+                        elif field=='email':
                             if new_value != self.credentials['usernames'][self.username][field]:
                                 if self.validator.validate_email(new_value):
                                     self._update_entry(self.username, field, new_value)
@@ -730,5 +737,5 @@ class Authenticate:
                                     raise RegisterError('New email is not valid')
                             else:
                                 raise UpdateError('New and current email are the same')
-                elif len(new_value) == 0:
-                    raise UpdateError('New {} not provided'.format(field))
+                    elif len(new_value) == 0:
+                        raise UpdateError('New {} not provided'.format(field))
