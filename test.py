@@ -2503,13 +2503,17 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             st.warning("The master template is empty or invalid. Please check the file in onedrive.")
         else:
             data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
-            data["Upload_Check"]=""
 
             data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
 
             # show uploading summary
             summary=data[["TIME","Operator","Latest_Upload_Time"]].drop_duplicates()
-            summary = summary.sort_values(by="Latest_Upload_Time", ascending=False)
+
+            summary['Latest_Upload_Time'] = summary['Latest_Upload_Time'].apply(
+    lambda x: pd.to_datetime(x, format="%m/%d/%Y %H:%M", errors='coerce') 
+    if len(x.split(' ')[0].split('/')) == 3 else pd.to_datetime(x, format="%Y-%m-%d %H:%M", errors='coerce'))
+            summary = summary.sort_values(by='Latest_Upload_Time', ascending=True, na_position='last')
+            #summary = summary.sort_values(by="Latest_Upload_Time", ascending=False)
             summary = summary.reset_index(drop=True)  # Reset index to create a numeric index
             summary["Index"] = summary.index + 1      # Add a column with 1-based indices
             with st.container():
