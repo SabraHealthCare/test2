@@ -2512,7 +2512,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             summary['Latest_Upload_Time'] = summary['Latest_Upload_Time'].apply(
     lambda x: pd.to_datetime(x, format="%m/%d/%Y %H:%M", errors='coerce') 
     if len(x.split(' ')[0].split('/')) == 3 else pd.to_datetime(x, format="%Y-%m-%d %H:%M", errors='coerce'))
-            summary = summary.sort_values(by='Latest_Upload_Time', ascending=True, na_position='last')
+            summary = summary.sort_values(by='Latest_Upload_Time', ascending=False, na_position='last')
             #summary = summary.sort_values(by="Latest_Upload_Time", ascending=False)
             summary = summary.reset_index(drop=True)  # Reset index to create a numeric index
             summary["Index"] = summary.index + 1      # Add a column with 1-based indices
