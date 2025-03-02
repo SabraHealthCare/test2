@@ -2513,7 +2513,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     lambda x: pd.to_datetime(x, format="%m/%d/%Y %H:%M", errors='coerce') 
     if len(x.split(' ')[0].split('/')) == 3 else pd.to_datetime(x, format="%Y-%m-%d %H:%M", errors='coerce'))
             summary = summary.sort_values(by='Latest_Upload_Time', ascending=False, na_position='last')
-            #summary = summary.sort_values(by="Latest_Upload_Time", ascending=False)
+
             summary = summary.reset_index(drop=True)  # Reset index to create a numeric index
             summary["Index"] = summary.index + 1      # Add a column with 1-based indices
             with st.container():
@@ -2549,7 +2549,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 # Display the download button if index are selected
                 if st.session_state.show_download:
                     selected_reports = summary[summary["Index"].isin(selected_indices)]
-                    filtered_data = data.merge(selected_reports, on=["TIME", "Operator", "Latest_Upload_Time"])
+                    filtered_data = data.merge(selected_reports, on=["TIME", "Operator"])
                     upload_data_EPM_fomula=Create_EPM_Formula(summary,filtered_data,selected_indices)
                     # Convert result_data to CSV
                     csv = upload_data_EPM_fomula.to_csv(index=False).encode('utf-8')
