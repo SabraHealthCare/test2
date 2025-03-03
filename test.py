@@ -30,10 +30,66 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+# SharePoint credentials and site details
+SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with scheme
+SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full site URL
+SHAREPOINT_FOLDER = "Asset Management/01_Operators"  # Relative folder path
+#USERNAME = "sli@sabrahealth.com"  # Replace with your SharePoint username
+#PASSWORD = "June2022SL!"
+
+
+
 #---------------------------define parameters--------------------------
 st.set_page_config(
    initial_sidebar_state="expanded",  layout="wide")
 st.title("Sabra HealthCare Monthly Reporting App")
+
+# Function to upload file to SharePoint
+def upload_to_sharepoint(file_path, folder):
+    try:
+        # Authenticate with SharePoint
+        authcookie = Office365(SHAREPOINT_URL, username="sli@sabrahealth.com", password="June2022SL!").GetCookies()
+        site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
+        
+        # Access the folder
+        folder = site.Folder(folder)
+        
+        # Upload the file
+        with open(file_path, "rb") as file_content:
+            folder.upload_file(file_content, os.path.basename(file_path))
+        
+        return True, "File uploaded successfully!"
+    except Exception as e:
+        return False, f"Error uploading file: {e}"
+
+
+
+# Function to upload file to SharePoint
+def upload_to_sharepoint(file, folder):
+    try:
+        # Save the file temporarily
+        temp_file_path = os.path.join(".", file.name)
+        with open(temp_file_path, "wb") as f:
+            f.write(file.getbuffer())
+        
+        # Authenticate with SharePoint
+        authcookie = Office365(SHAREPOINT_URL, username=USERNAME, password=PASSWORD).GetCookies()
+        site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
+        
+        # Access the folder
+        folder = site.Folder(folder)
+        
+        # Upload the file
+        with open(temp_file_path, "rb") as file_content:
+            folder.upload_file(file_content, file.name)
+        
+        # Clean up
+        os.remove(temp_file_path)
+        return True, "File uploaded successfully!"
+    except Exception as e:
+        return False, f"Error uploading file: {e}"
+
+
 
 sheet_name_discrepancy="Discrepancy_Review"
 account_mapping_filename="Account_Mapping.xlsx"
@@ -2287,7 +2343,24 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 original_file_name = file.name
                 file_name, file_extension = original_file_name.rsplit('.', 1)
                 new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
-                Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
+
+
+		    
+                temp_file_path = os.path.join(".", file.name)
+                with open(temp_file_path, "wb") as f:
+                    f.write(file.getbuffer())
+                st.write("Uploading file to SharePoint...")
+                success, message = upload_to_sharepoint(temp_file_path, SHAREPOINT_FOLDER)
+        
+                if success:
+                    st.success(message)
+                else:
+                    st.error(message)
+        
+
+
+		    
+                #Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
                 filename_list.append(original_file_name)
             st.success("Ancillary files for {} uploaded: {} files".format(reporting_month_display, len(uploaded_other_docs)))
             
@@ -2503,7 +2576,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             st.warning("The master template is empty or invalid. Please check the file in onedrive.")
         else:
             data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
-
             data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
 
             # show uploading summary
