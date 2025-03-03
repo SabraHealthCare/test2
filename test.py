@@ -29,48 +29,11 @@ import re
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import os
-from shareplum import Site
-from shareplum import Office365
-from shareplum.site import Version
-
-# SharePoint credentials and site details
-SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with scheme
-SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full site URL
-SHAREPOINT_FOLDER = "Asset Management/01_Operators"  # Relative folder path
-#USERNAME = "sli@sabrahealth.com"  # Replace with your SharePoint username
-#PASSWORD = "June2022SL!"
-
-
 
 #---------------------------define parameters--------------------------
 st.set_page_config(
    initial_sidebar_state="expanded",  layout="wide")
 st.title("Sabra HealthCare Monthly Reporting App")
-
-# Function to upload file to SharePoint
-def upload_to_sharepoint(file_path, folder):
-    try:
-        # Authenticate with SharePoint
-        authcookie = Office365(SHAREPOINT_URL, username="sli@sabrahealth.com", password="June2022SL!").GetCookies()
-        site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
-        
-        # Access the folder
-        folder = site.Folder(folder)
-        
-        # Upload the file
-        with open(file_path, "rb") as file_content:
-            folder.upload_file(file_content, os.path.basename(file_path))
-        
-        return True, "File uploaded successfully!"
-    except Exception as e:
-        return False, f"Error uploading file: {e}"
-
-
-
-
-
-
 
 sheet_name_discrepancy="Discrepancy_Review"
 account_mapping_filename="Account_Mapping.xlsx"
@@ -100,6 +63,14 @@ user_id= '62d4a23f-e25f-4da2-9b52-7688740d9d48'  # shali's user id of onedrive
 PL_path="Documents/Tenant Monthly Uploading/Tenant P&L"
 mapping_path="Documents/Tenant Monthly Uploading/Tenant Mapping"
 master_template_path="Documents/Tenant Monthly Uploading/Master Template"
+
+# SharePoint credentials and site details
+SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with scheme
+SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full site URL
+SHAREPOINT_FOLDER = "Asset Management/01_Operators"  # Relative folder path
+sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
+sharepoint_password = "June2022SL!"
+
 email_body=""
 today= datetime.now(pytz.timezone('America/Los_Angeles')).date()
 current_year= today.year
@@ -119,6 +90,30 @@ headers = {'Authorization': 'Bearer ' + access_token,}
 account_mapping_str_col=["Tenant_Account","Tenant_Account"]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
 
+#Upload file to SharePoint
+#sharepoint_folder:"Asset Management/01_Operators/..."
+#file:uploaded_file
+def Upload_To_Sharepoint(file, sharepoint_folder):
+    try:
+        temp_file_path = os.path.join(".", file.name)
+        with open(temp_file_path, "wb") as f:
+            f.write(file.getbuffer())
+        # Authenticate with SharePoint
+        authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
+        site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
+        
+        # Access the sharepoint_folder
+        sharepoint_folder = site.Folder(sharepoint_folder)
+        
+        # Upload the file
+        with open(temp_file_path, "rb") as file_content:
+            sharepoint_folder.upload_file(file_content, file.name)
+        # Clean up
+        os.remove(temp_file_path)
+        return True, "File uploaded successfully!"
+    except Exception as e:
+        return False, f"Error uploading file: {e}"
+	    
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
     password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password, not the API_key
@@ -1405,8 +1400,8 @@ def Submit_Upload(total_email_body):
     </body>
     </html>"""
     if not st.session_state.email_sent:
-        Send_Confirmation_Email(["sli@sabrahealth.com"], subject, format_total_email_body)    
-        #Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
+        #Send_Confirmation_Email(["sli@sabrahealth.com"], subject, format_total_email_body)    
+        Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
         if email_body!="":
             Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body)    
         st.session_state.email_sent = True
@@ -2211,7 +2206,7 @@ if st.session_state["authentication_status"] is False:
 #------------------------------------------operator account----------------------------------------------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
     operator_email = st.session_state['email']  # Accessing the email
-    #st.write("operator_email",operator_email)
+    
     operator=st.session_state["operator"]
     st.title(operator)
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
@@ -2321,28 +2316,21 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             filename_list=[]
             for file in uploaded_other_docs: 
 	        # create new file name by adding reporting_month at the end of original filename    
-                original_file_name = file.name
-                file_name, file_extension = original_file_name.rsplit('.', 1)
-                new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
+                #original_file_name = file.name
+                #file_name, file_extension = original_file_name.rsplit('.', 1)
+                #new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
 
-
-		    
-                temp_file_path = os.path.join(".", original_file_name)
-                with open(temp_file_path, "wb") as f:
-                    f.write(file.getbuffer())
+                                
                 st.write("Uploading file to SharePoint...")
-                success, message = upload_to_sharepoint(temp_file_path, SHAREPOINT_FOLDER)
+                success, message = Upload_To_Sharepoint(file, SHAREPOINT_FOLDER)
         
                 if success:
                     st.success(message)
                 else:
                     st.error(message)
-        
-
-
 		    
                 #Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
-                filename_list.append(original_file_name)
+                #filename_list.append(original_file_name)
             st.success("Ancillary files for {} uploaded: {} files".format(reporting_month_display, len(uploaded_other_docs)))
             
         col1, col2 = st.columns([1,3])  
@@ -2557,16 +2545,17 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             st.warning("The master template is empty or invalid. Please check the file in onedrive.")
         else:
             data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
+            data["Upload_Check"]=""
+
             data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
 
             # show uploading summary
             summary=data[["TIME","Operator","Latest_Upload_Time"]].drop_duplicates()
-
             summary['Latest_Upload_Time'] = summary['Latest_Upload_Time'].apply(
     lambda x: pd.to_datetime(x, format="%m/%d/%Y %H:%M", errors='coerce') 
     if len(x.split(' ')[0].split('/')) == 3 else pd.to_datetime(x, format="%Y-%m-%d %H:%M", errors='coerce'))
             summary = summary.sort_values(by='Latest_Upload_Time', ascending=False, na_position='last')
-
+            
             summary = summary.reset_index(drop=True)  # Reset index to create a numeric index
             summary["Index"] = summary.index + 1      # Add a column with 1-based indices
             with st.container():
