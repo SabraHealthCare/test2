@@ -29,6 +29,7 @@ import re
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import os
 
 #---------------------------define parameters--------------------------
 st.set_page_config(
