@@ -29,6 +29,10 @@ import re
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import os
+from shareplum import Site
+from shareplum import Office365
+from shareplum.site import Version
 
 # SharePoint credentials and site details
 SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with scheme
