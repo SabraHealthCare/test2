@@ -2350,7 +2350,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
 
 		    
-                temp_file_path = os.path.join(".", file.name)
+                temp_file_path = os.path.join(".", original_file_name)
                 with open(temp_file_path, "wb") as f:
                     f.write(file.getbuffer())
                 st.write("Uploading file to SharePoint...")
