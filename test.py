@@ -68,30 +68,7 @@ def upload_to_sharepoint(file_path, folder):
 
 
 
-# Function to upload file to SharePoint
-def upload_to_sharepoint(file, folder):
-    try:
-        # Save the file temporarily
-        temp_file_path = os.path.join(".", file.name)
-        with open(temp_file_path, "wb") as f:
-            f.write(file.getbuffer())
-        
-        # Authenticate with SharePoint
-        authcookie = Office365(SHAREPOINT_URL, username=USERNAME, password=PASSWORD).GetCookies()
-        site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
-        
-        # Access the folder
-        folder = site.Folder(folder)
-        
-        # Upload the file
-        with open(temp_file_path, "rb") as file_content:
-            folder.upload_file(file_content, file.name)
-        
-        # Clean up
-        os.remove(temp_file_path)
-        return True, "File uploaded successfully!"
-    except Exception as e:
-        return False, f"Error uploading file: {e}"
+
 
 
 
