@@ -29,6 +29,10 @@ import re
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import streamlit as st
+from shareplum import Site
+from shareplum import Office365
+from shareplum.site import Version
 import os
 
 #---------------------------define parameters--------------------------
