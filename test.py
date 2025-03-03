@@ -2379,8 +2379,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 receiver = operator_email.split(",") + ["twarner@sabrahealth.com", "sli@sabrahealth.com"]  
                 receiver.extend(unique_asset_managers)	 
                 if not st.session_state.email_sent:
-                    Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
-                    st.session_state.email_sent = True
+                    #Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
+                    #st.session_state.email_sent = True
             else:
                 st.markdown(":red[P&L is not uploaded ]")
             st.stop()
