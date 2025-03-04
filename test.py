@@ -72,7 +72,7 @@ master_template_path="Documents/Tenant Monthly Uploading/Master Template"
 # SharePoint credentials and site details
 SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with scheme
 SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full site URL
-SHAREPOINT_FOLDER = "Asset Management/01_Operators"  # Relative folder path
+#SHAREPOINT_FOLDER = "Asset Management/01_Operators"  # Relative folder path
 sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
 sharepoint_password = "June2022SL!"
 
@@ -2324,9 +2324,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 #original_file_name = file.name
                 #file_name, file_extension = original_file_name.rsplit('.', 1)
                 #new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
-
-                                
-                st.write("Uploading file to SharePoint...")
+   
+                month_folder=".{} {}".format(month_map[selected_month],selected_month)
+	        st.write("month_folder",month_folder)
+                SHAREPOINT_FOLDER = "Asset Management//01_Operators//{}//Financials & Covenant Analysis//_Facility Financials//{}//{}".format(operator,str(selected_year),month_folder)"
                 success, message = Upload_To_Sharepoint(file, SHAREPOINT_FOLDER)
         
                 if success:
