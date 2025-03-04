@@ -95,30 +95,54 @@ headers = {'Authorization': 'Bearer ' + access_token,}
 account_mapping_str_col=["Tenant_Account","Tenant_Account"]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
 
+
+def ensure_folder_exists(site, folder_path):
+    try:
+        # Split the folder path into parts
+        folders = folder_path.split("/")
+        
+        # Start from the root folder 
+        current_folder = site.Folder(folders[0])
+      
+        # Traverse the remaining folder structure
+        for folder in folders[1:]:
+            try:
+                # Try to access the folder
+                current_folder = current_folder.Folder(folder)
+               
+            except Exception:
+                # If the folder doesn't exist, create it
+                current_folder.create_folder(folder)
+                current_folder = current_folder.Folder(folder)
+        
+        return current_folder
+    except Exception as e:
+        raise
+
 #Upload file to SharePoint
 #sharepoint_folder:"Asset Management/01_Operators/..."
 #file:uploaded_file
-def Upload_To_Sharepoint(file, sharepoint_folder):
+def Upload_To_Sharepoint(file, folder_path):
     try:
-        temp_file_path = os.path.join(".", file.name)
-        with open(temp_file_path, "wb") as f:
-            f.write(file.getbuffer())
         # Authenticate with SharePoint
-        authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
+        authcookie = Office365(SHAREPOINT_URL, username=USERNAME, password=PASSWORD).GetCookies()
+        
+        # Connect to the SharePoint site
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
         
-        # Access the sharepoint_folder
-        sharepoint_folder = site.Folder(sharepoint_folder)
+        # Ensure the folder exists
+        folder = ensure_folder_exists(site, folder_path)
+        
+        # Read the file content from the UploadedFile object
+        file_content = file.read()  # Read the file content as bytes
+        file_name = file.name  # Get the file name
         
         # Upload the file
-        with open(temp_file_path, "rb") as file_content:
-            sharepoint_folder.upload_file(file_content, file.name)
-        # Clean up
-        os.remove(temp_file_path)
+        folder.upload_file(file_content, file_name)
         return True, "File uploaded successfully!"
     except Exception as e:
         return False, f"Error uploading file: {e}"
-	    
+
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
     password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password, not the API_key
