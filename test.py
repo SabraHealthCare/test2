@@ -2327,7 +2327,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
    
                 month_folder=".{} {}".format(month_map[selected_month],selected_month)
                 st.write("month_folder",month_folder)
-                SHAREPOINT_FOLDER = "Asset Management//01_Operators//{}//Financials & Covenant Analysis//_Facility Financials//{}//{}".format(operator,str(selected_year),month_folder)"
+                SHAREPOINT_FOLDER = "Asset Management//01_Operators//{}//Financials & Covenant Analysis//_Facility Financials//{}//{}".format(operator,str(selected_year),month_folder)
                 success, message = Upload_To_Sharepoint(file, SHAREPOINT_FOLDER)
         
                 if success:
