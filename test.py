@@ -125,7 +125,7 @@ def ensure_folder_exists(site, folder_path):
 def Upload_To_Sharepoint(file, folder_path):
     try:
         # Authenticate with SharePoint
-        authcookie = Office365(SHAREPOINT_URL, username=USERNAME, password=PASSWORD).GetCookies()
+        authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
         
         # Connect to the SharePoint site
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
