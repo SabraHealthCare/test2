@@ -2369,9 +2369,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     {''.join(f'<li>{file}</li>' for file in ancillary_upload_message)}  
                 </ul>
 	        """
-	    elif ancillary_upload_message==[]:
-                email_body+=
-	        f"""<p><strong>Error during SharePoint upload process. Files are not uploaded</p> """
+            elif ancillary_upload_message==[]:
+                email_body+=f"""<p><strong>Error during SharePoint upload process. Files are not uploaded</p> """
 
         col1, col2 = st.columns([1,3])  
         if 'uploaded_finance' in locals() and uploaded_finance:
