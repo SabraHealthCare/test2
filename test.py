@@ -2363,8 +2363,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             if success:
                 st.success("Ancillary files for {} uploaded: {} files".format(reporting_month_display, len(uploaded_other_docs)))
             elif not success and ancillary_upload_message!=[]:
-                email_body+=
-	        f"""
+                email_body+=f"""
 	        <p><strong>{len(ancillary_upload_message)}</strong> files failed to upload:</p>  
                 <ul>  
                     {''.join(f'<li>{file}</li>' for file in ancillary_upload_message)}  
