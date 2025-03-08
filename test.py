@@ -2362,7 +2362,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             success,ancillary_upload_message = Upload_To_Sharepoint(uploaded_other_docs, SHAREPOINT_FOLDER)
             if success:
                 st.success("Ancillary files for {} uploaded: {} files".format(reporting_month_display, len(uploaded_other_docs)))
-	    elif not success and ancillary_upload_message!=[] :         
+            elif not success and ancillary_upload_message!=[]:
                 email_body+=
 	        f"""
 	        <p><strong>{len(ancillary_upload_message)}</strong> files failed to upload:</p>  
