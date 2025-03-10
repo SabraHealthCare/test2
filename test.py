@@ -127,37 +127,44 @@ def Upload_To_Sharepoint(files, folder_path,new_names=None):
     try:
         # Authenticate with SharePoint
         authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
-        
+        st.write("Authentication successful.")
+	    
         # Connect to the SharePoint site
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
-
+        st.write("Connected to SharePoint site.")
+	    
         # Ensure the folder exists
         folder = ensure_folder_exists(site, folder_path)
-        st.write("folder",folder)		
+        st.write("Folder ensured:", folder)		
         success_files = []
         failed_files = []
         for file in files:
             try:
                 # Read the file content from the UploadedFile object
                 file_content = file.read()  # Read the file content as bytes
+                st.write(f"Read file content for '{file.name}'.")
 
                 if new_names and len(files)==1:
                     file_name = new_names  # Use the new name
                 else:
                     file_name = file.name  # Use the original name
-                
+                st.write(f"Uploading file '{file_name}'.")
                 # Upload the file
                 folder.upload_file(file_content, file_name)
+                st.write(f"Successfully uploaded '{file_name}'.")
                 success_files.append(file.name)
             except Exception as e:
                 st.error(f"Error uploading file '{file.name}': {e}")
                 failed_files.append((file.name, str(e)))
         
         if len(failed_files) == 0:
+            st.write("All files uploaded successfully.")
             return True,success_files
         else:
+            st.write(f"Failed to upload {len(failed_files)} files.")
             return False, failed_files
     except Exception as e:
+        st.error(f"Unexpected error: {e}")
         return False,[]
 	    
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
