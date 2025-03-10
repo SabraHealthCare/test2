@@ -132,7 +132,7 @@ def Upload_To_Sharepoint(files, folder_path,new_names=None):
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
 
         # Ensure the folder exists
-        folder = ensure_folder_exists(site, folder_path）
+        folder = ensure_folder_exists(site, folder_path)
         st.write("folder",folder)		
         success_files = []
         failed_files = []
