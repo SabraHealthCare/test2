@@ -101,17 +101,21 @@ def ensure_folder_exists(site, folder_path):
     Ensure the folder exists in SharePoint. If not, create it.
     """
     try:
+        # Ensure the folder path starts with a slash
+        if not folder_path.startswith("/"):
+            folder_path = "/" + folder_path
+        
         # Get the root folder of the site
         root_folder = site.web.get_folder_by_server_relative_url("/")
-        
+        st.write(f"Root folder retrieved: {root_folder}")
+
         # Ensure the folder path exists
         folder = root_folder.ensure_folder_path(folder_path).execute_query()
         st.write(f"Folder '{folder_path}' ensured.")
         return folder
     except Exception as e:
-        st.error(f"Error ensuring folder exists: {e}")
+        st.error(f"Error ensuring folder exists: {str(e)}")
         raise
-
 #Upload file to SharePoint
 #sharepoint_folder:"Asset Management/01_Operators/..."
 #file:uploaded_file
