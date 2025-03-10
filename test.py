@@ -2360,6 +2360,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.stop()
         if uploaded_other_docs: 
             success,ancillary_upload_message = Upload_To_Sharepoint(uploaded_other_docs, SHAREPOINT_FOLDER)
+            st.write("success,ancillary_upload_message",success,ancillary_upload_message)
             if success:
                 st.success("Ancillary files for {} uploaded: {} files".format(reporting_month_display, len(uploaded_other_docs)))
             elif not success and ancillary_upload_message!=[]:
