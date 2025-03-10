@@ -123,15 +123,17 @@ def ensure_folder_exists(site, folder_path):
 #sharepoint_folder:"Asset Management/01_Operators/..."
 #file:uploaded_file
 def Upload_To_Sharepoint(files, folder_path,new_names=None):
+    st.write("files, folder_path",files, folder_path)
     try:
         # Authenticate with SharePoint
         authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
         
         # Connect to the SharePoint site
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
-        
+
         # Ensure the folder exists
-        folder = ensure_folder_exists(site, folder_path)
+        folder = ensure_folder_exists(site, folder_path）
+        st.write("folder",folder)		
         success_files = []
         failed_files = []
         for file in files:
