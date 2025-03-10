@@ -137,25 +137,42 @@ def ensure_folder_exists(site, folder_path):
 
 def Upload_To_Sharepoint(file, sharepoint_folder):
     try:
+        # Save the file temporarily
         temp_file_path = os.path.join(".", file.name)
         with open(temp_file_path, "wb") as f:
             f.write(file.getbuffer())
+        st.write(f"1, Temporary file saved: {temp_file_path}")
+
         # Authenticate with SharePoint
         authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
+        st.write("2, Authentication successful.")
+
+        # Connect to the SharePoint site
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
-        
-        # Access the sharepoint_folder
+        st.write("3, Connected to SharePoint site.")
+
+        # Ensure the folder path is a valid server-relative URL
+        if not sharepoint_folder.startswith("/"):
+            sharepoint_folder = "/" + sharepoint_folder
+        st.write(f"4, Folder path: {sharepoint_folder}")
+
+        # Access the folder
         sharepoint_folder = site.Folder(sharepoint_folder)
-        
+        st.write("5, Folder accessed successfully.")
+
         # Upload the file
         with open(temp_file_path, "rb") as file_content:
             sharepoint_folder.upload_file(file_content, file.name)
+        st.write("6, File uploaded successfully.")
+
         # Clean up
         os.remove(temp_file_path)
+        st.write("7, Temporary file removed.")
+
         return True, "File uploaded successfully!"
     except Exception as e:
+        st.error(f"Error uploading file: {e}")
         return False, f"Error uploading file: {e}"
-
 #Upload file to SharePoint
 #file:uploaded_file
 def Upload_To_Sharepoint1(files, folder_path,new_names=None):
