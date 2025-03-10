@@ -132,7 +132,6 @@ def ensure_folder_exists(site, folder_path):
         st.error(f"Error ensuring folder exists: {str(e)}")
         raise
 #Upload file to SharePoint
-#sharepoint_folder:"Asset Management/01_Operators/..."
 #file:uploaded_file
 def Upload_To_Sharepoint(files, folder_path,new_names=None):
     st.write("files, folder_path",files, folder_path)
@@ -2371,8 +2370,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         reporting_month=str(selected_year)+month_map[selected_month]
 	# sharepoint folder path
         month_folder_name=".{} {}".format(month_map[selected_month],selected_month)
-        SHAREPOINT_FOLDER = "/Asset%20Management/01_Operators/Nexus%20Systems/Financials%20%26%20Covenant%20Analysis/_Facility%20Financials/2024/.12%20Dec"
-	    
+        #SHAREPOINT_FOLDER = "/Asset%20Management/01_Operators/Nexus%20Systems/Financials%20%26%20Covenant%20Analysis/_Facility%20Financials/2024/.12%20Dec"
+        SHAREPOINT_FOLDER = "/Asset Management/01_Operators
 	#"Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/{}".format(operator,str(selected_year),month_folder_name)
         if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
