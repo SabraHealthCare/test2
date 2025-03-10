@@ -72,7 +72,7 @@ master_template_path="Documents/Tenant Monthly Uploading/Master Template"
 # SharePoint credentials and site details
 SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with scheme
 SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full site URL
-#SHAREPOINT_FOLDER = "Asset Management/01_Operators"  # Relative folder path
+
 sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
 sharepoint_password = "June2022SL!"
 
@@ -109,10 +109,25 @@ def ensure_folder_exists(site, folder_path):
         root_folder = site.web.get_folder_by_server_relative_url("/")
         st.write(f"Root folder retrieved: {root_folder}")
 
-        # Ensure the folder path exists
-        folder = root_folder.ensure_folder_path(folder_path).execute_query()
+        # Split the folder path into parts
+        folder_parts = folder_path.strip("/").split("/")
+        current_folder = root_folder
+
+        # Traverse or create the folder structure
+        for part in folder_parts:
+            try:
+                # Check if the subfolder exists
+                subfolder = current_folder.folders.get_by_url(part)
+                subfolder.get().execute_query()
+                st.write(f"Subfolder '{part}' already exists.")
+            except Exception:
+                # Create the subfolder if it doesn't exist
+                subfolder = current_folder.folders.add(part).execute_query()
+                st.write(f"Created subfolder '{part}'.")
+            current_folder = subfolder
+
         st.write(f"Folder '{folder_path}' ensured.")
-        return folder
+        return current_folder
     except Exception as e:
         st.error(f"Error ensuring folder exists: {str(e)}")
         raise
@@ -2356,7 +2371,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         reporting_month=str(selected_year)+month_map[selected_month]
 	# sharepoint folder path
         month_folder_name=".{} {}".format(month_map[selected_month],selected_month)
-        SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/{}".format(operator,str(selected_year),month_folder_name)
+        SHAREPOINT_FOLDER = "/Asset%20Management/01_Operators/Nexus%20Systems/Financials%20%26%20Covenant%20Analysis/_Facility%20Financials/2024/.12%20Dec"
+	    
+	#"Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/{}".format(operator,str(selected_year),month_folder_name)
         if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
             st.stop()	
