@@ -134,23 +134,15 @@ def ensure_folder_exists(site, folder_path):
 
 def Upload_To_Sharepoint(files, sharepoint_folder):
     file=files[0]
-    temp_file_path = os.path.join(".", file.name)
-    with open(temp_file_path, "wb") as f:
-        f.write(file.getbuffer())
-        # Authenticate with SharePoint
-    authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
-    site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
     try:
-        temp_file_path = os.path.join(".", file.name)
-        with open(temp_file_path, "wb") as f:
-            f.write(file.getbuffer())
         # Authenticate with SharePoint
         authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
+        st.write("0,authcookie success")
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
-        
+        st.write("1,site success")
         # Access the sharepoint_folder
         sharepoint_folder = site.Folder(sharepoint_folder)
-        
+        st.write("3,sharepoint_folder",sharepoint_folder)
         # Upload the file
         with open(temp_file_path, "rb") as file_content:
             sharepoint_folder.upload_file(file_content, file.name)
