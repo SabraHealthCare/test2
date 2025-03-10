@@ -132,7 +132,7 @@ def ensure_folder_exists(site, folder_path):
         st.error(f"Error ensuring folder exists: {str(e)}")
         raise
 
-def upload_to_sharepoint(file_path, folder):
+def Upload_To_Sharepoint(file_path, folder):
     try:
         # Authenticate with SharePoint
         authcookie = Office365(SHAREPOINT_URL, username="sli@sabrahealth.com", password="June2022SL!").GetCookies()
