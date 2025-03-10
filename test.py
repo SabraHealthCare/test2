@@ -72,8 +72,8 @@ master_template_path="Documents/Tenant Monthly Uploading/Master Template"
 # SharePoint credentials and site details
 SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with scheme
 SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full site URL
-
-SHAREPOINT_FOLDER = "Asset Management/01_Operators"  # Relative folder path
+SHAREPOINT_FOLDER = "/sites/S-Cloud/Asset Management/01_Operators" 
+#SHAREPOINT_FOLDER = "Asset Management/01_Operators"  # Relative folder path
 
 
 sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
@@ -173,6 +173,7 @@ def Upload_To_Sharepoint(file, sharepoint_folder):
     except Exception as e:
         st.error(f"Error uploading file: {e}")
         return False, f"Error uploading file: {e}"
+
 #Upload file to SharePoint
 #file:uploaded_file
 def Upload_To_Sharepoint1(files, folder_path,new_names=None):
