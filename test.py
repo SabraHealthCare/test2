@@ -133,24 +133,44 @@ def ensure_folder_exists(site, folder_path):
         raise
 
 def Upload_To_Sharepoint(files, sharepoint_folder):
-    file=files[0]
+    file = files[0]
     try:
         # Authenticate with SharePoint
         authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
-        st.write("0,authcookie success")
+        st.write("0, Authentication successful.")
+
+        # Connect to the SharePoint site
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
-        st.write("1,site success")
-        # Access the sharepoint_folder
+        st.write("1, Connected to SharePoint site.")
+
+        # Ensure the folder path is a valid server-relative URL
+        if not sharepoint_folder.startswith("/"):
+            sharepoint_folder = "/" + sharepoint_folder
+        st.write(f"2, Folder path: {sharepoint_folder}")
+
+        # Access the folder
         sharepoint_folder = site.Folder(sharepoint_folder)
-        st.write("3,sharepoint_folder",sharepoint_folder)
+        st.write("3, Folder accessed successfully.")
+
+        # Save the file temporarily
+        temp_file_path = os.path.join(os.getcwd(), file.name)
+        with open(temp_file_path, "wb") as f:
+            f.write(file.read())
+
         # Upload the file
         with open(temp_file_path, "rb") as file_content:
             sharepoint_folder.upload_file(file_content, file.name)
+        st.write("4, File uploaded successfully.")
+
         # Clean up
         os.remove(temp_file_path)
+        st.write("5, Temporary file removed.")
+
         return True, "File uploaded successfully!"
     except Exception as e:
+        st.error(f"Error uploading file: {e}")
         return False, f"Error uploading file: {e}"
+
 
 #Upload file to SharePoint
 #file:uploaded_file
