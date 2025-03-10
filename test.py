@@ -162,7 +162,7 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
             sharepoint_folder.upload_file(file_content, file.name)
         st.write("4, File uploaded successfully.")
 
-        # Clean up
+        # Clean up 
         os.remove(temp_file_path)
         st.write("5, Temporary file removed.")
 
