@@ -132,9 +132,10 @@ def ensure_folder_exists(site, folder_path):
         st.error(f"Error ensuring folder exists: {str(e)}")
         raise
 
-def Upload_To_Sharepoint(file, sharepoint_folder):
+def Upload_To_Sharepoint(files, sharepoint_folder):
+    file=files[0]
     try:
-        temp_file_path = os.path.join(".", file[0].name)
+        temp_file_path = os.path.join(".", file.name)
         with open(temp_file_path, "wb") as f:
             f.write(file.getbuffer())
         # Authenticate with SharePoint
