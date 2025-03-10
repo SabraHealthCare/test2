@@ -135,7 +135,7 @@ def ensure_folder_exists(site, folder_path):
         st.error(f"Error ensuring folder exists: {str(e)}")
         raise
 
-def Upload_To_Sharepoint(file):
+def Upload_To_Sharepoint(file,SHAREPOINT_FOLDER):
     try:
         # Save the uploaded file temporarily
         temp_file_path = os.path.join(".", file.name)
