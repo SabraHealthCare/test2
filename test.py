@@ -97,26 +97,19 @@ entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance",
 
 
 def ensure_folder_exists(site, folder_path):
+    """
+    Ensure the folder exists in SharePoint. If not, create it.
+    """
     try:
-        # Split the folder path into parts
-        folders = folder_path.split("/")
+        # Get the root folder of the site
+        root_folder = site.web.get_folder_by_server_relative_url("/")
         
-        # Start from the root folder 
-        current_folder = site.Folder(folders[0])
-      
-        # Traverse the remaining folder structure
-        for folder in folders[1:]:
-            try:
-                # Try to access the folder
-                current_folder = current_folder.Folder(folder)
-               
-            except Exception:
-                # If the folder doesn't exist, create it
-                current_folder.create_folder(folder)
-                current_folder = current_folder.Folder(folder)
-        
-        return current_folder
+        # Ensure the folder path exists
+        folder = root_folder.ensure_folder_path(folder_path).execute_query()
+        st.write(f"Folder '{folder_path}' ensured.")
+        return folder
     except Exception as e:
+        st.error(f"Error ensuring folder exists: {e}")
         raise
 
 #Upload file to SharePoint
