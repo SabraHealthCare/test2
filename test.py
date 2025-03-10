@@ -72,10 +72,7 @@ master_template_path="Documents/Tenant Monthly Uploading/Master Template"
 # SharePoint credentials and site details
 SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with scheme
 SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full site URL
-SHAREPOINT_FOLDER = "Shared Documents/Asset Management/01_Operators"
-#SHAREPOINT_FOLDER = "Asset Management/01_Operators"  # Relative folder path
-
-
+SHAREPOINT_FOLDER = "Asset Management/01_Operators"  # Relative folder path
 sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
 sharepoint_password = "June2022SL!"
 
@@ -98,116 +95,29 @@ headers = {'Authorization': 'Bearer ' + access_token,}
 account_mapping_str_col=["Tenant_Account","Tenant_Account"]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
 
-
-def ensure_folder_exists(site, folder_path):
-    """
-    Ensure the folder exists in SharePoint. If not, create it.
-    """
+#Upload file to SharePoint
+#sharepoint_folder:"Asset Management/01_Operators/..."
+#file:uploaded_file
+def Upload_To_Sharepoint(file, sharepoint_folder):
     try:
-        # Ensure the folder path starts with a slash
-        if not folder_path.startswith("/"):
-            folder_path = "/" + folder_path
-        
-        # Get the root folder of the site
-        root_folder = site.web.get_folder_by_server_relative_url("/")
-        st.write(f"Root folder retrieved: {root_folder}")
-
-        # Split the folder path into parts
-        folder_parts = folder_path.strip("/").split("/")
-        current_folder = root_folder
-
-        # Traverse or create the folder structure
-        for part in folder_parts:
-            try:
-                # Check if the subfolder exists
-                subfolder = current_folder.folders.get_by_url(part)
-                subfolder.get().execute_query()
-                st.write(f"Subfolder '{part}' already exists.")
-            except Exception:
-                # Create the subfolder if it doesn't exist
-                subfolder = current_folder.folders.add(part).execute_query()
-                st.write(f"Created subfolder '{part}'.")
-            current_folder = subfolder
-
-        st.write(f"Folder '{folder_path}' ensured.")
-        return current_folder
-    except Exception as e:
-        st.error(f"Error ensuring folder exists: {str(e)}")
-        raise
-
-def Upload_To_Sharepoint(file,SHAREPOINT_FOLDER):
-    try:
-        # Save the uploaded file temporarily
         temp_file_path = os.path.join(".", file.name)
         with open(temp_file_path, "wb") as f:
             f.write(file.getbuffer())
-
-        # Authenticate
-        authcookie = Office365(SHAREPOINT_URL,
-                               username=sharepoint_username,
-                               password=sharepoint_password).GetCookies()
+        # Authenticate with SharePoint
+        authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
-
-        # Get the SharePoint folder
-        folder = site.List("Shared Documents").Folder(SHAREPOINT_FOLDER)
-
-        # Upload file
+        
+        # Access the sharepoint_folder
+        sharepoint_folder = site.Folder(sharepoint_folder)
+        
+        # Upload the file
         with open(temp_file_path, "rb") as file_content:
-            folder.upload_file(file_content, file.name)
-
+            sharepoint_folder.upload_file(file_content, file.name)
         # Clean up
         os.remove(temp_file_path)
         return True, "File uploaded successfully!"
-
     except Exception as e:
         return False, f"Error uploading file: {e}"
-
-#Upload file to SharePoint
-#file:uploaded_file
-def Upload_To_Sharepoint1(files, folder_path,new_names=None):
-    st.write("files, folder_path",files, folder_path)
-    try:
-        # Authenticate with SharePoint
-        authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
-        st.write("Authentication successful.")
-	    
-        # Connect to the SharePoint site
-        site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
-        st.write("Connected to SharePoint site.")
-	    
-        # Ensure the folder exists
-        folder = ensure_folder_exists(site, folder_path)
-        st.write("Folder ensured:", folder)		
-        success_files = []
-        failed_files = []
-        for file in files:
-            try:
-                # Read the file content from the UploadedFile object
-                file_content = file.read()  # Read the file content as bytes
-                st.write(f"Read file content for '{file.name}'.")
-
-                if new_names and len(files)==1:
-                    file_name = new_names  # Use the new name
-                else:
-                    file_name = file.name  # Use the original name
-                st.write(f"Uploading file '{file_name}'.")
-                # Upload the file
-                folder.upload_file(file_content, file_name)
-                st.write(f"Successfully uploaded '{file_name}'.")
-                success_files.append(file.name)
-            except Exception as e:
-                st.error(f"Error uploading file '{file.name}': {e}")
-                failed_files.append((file.name, str(e)))
-        
-        if len(failed_files) == 0:
-            st.write("All files uploaded successfully.")
-            return True,success_files
-        else:
-            st.write(f"Failed to upload {len(failed_files)} files.")
-            return False, failed_files
-    except Exception as e:
-        st.error(f"Unexpected error: {e}")
-        return False,[]
 	    
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
@@ -1344,8 +1254,8 @@ def View_Summary():
     check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
     #check if available unit changed by previous month
-    reporting_month_data,Total_PL,email_body_Aunit=Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month,email_body)
-    email_body+=email_body_Aunit
+    reporting_month_data,Total_PL,email_body=Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month,email_body)
+	
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Balance Sheet"]
 
@@ -1420,6 +1330,12 @@ def View_Summary():
             show_column=["Sabra_Account", "Total"]
         else:
             show_column=["Sabra_Account"]
+        
+        #summary_for_email= reporting_month_data[(reporting_month_data["Sabra_Account"].\
+		               #isin(["Total - Patient Days","Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"]))\
+	                       #| (reporting_month_data["Sabra_Account"].str.startswith("Operating Beds-"))]\
+		                #[show_column + list(entity_columns)]
+	    
 
         summary_for_email = reporting_month_data[
                           (reporting_month_data["Sabra_Account"].isin([
@@ -1460,29 +1376,24 @@ def Submit_Upload(total_email_body):
     else: 
         st.write(" ")  #----------record into error report------------------------	
         # save original tenant P&L to OneDrive
-
-    finance_success,finance_upload_message = Upload_To_Sharepoint(uploaded_finance, SHAREPOINT_FOLDER,"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
-    if not finance_success:
-        st.error("Financial uploaded unsuccessfully ")  #----------record into error report------------------------	
-        email_body+=f"""<p><strong>Financial upload unsuccessful.</strong></p>"""  
+    if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
+        st.write("upload unsuccessfully ")  #----------record into error report------------------------	
 
     if BS_separate_excel=="Y":
         # save tenant BS to OneDrive
-        BS_success,BS_upload_message = Upload_To_Sharepoint(uploaded_BS, SHAREPOINT_FOLDER,"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
-        if not BS_success:
-            st.write("Balance Sheet uploaded unsuccessfully ")   #----------record into error report------------------------
-            email_body+=f"""<p><strong>Balance sheet upload unsuccessful.</strong></p>"""  	
+        if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
+            st.write(" unsuccess")  #----------record into error report------------------------	
     
     subject = "Confirmation of {} {} reporting".format(operator,reporting_month_display)
     # Get 'Asset_Manager' from entity_mapping
-    asset_managers_email = entity_mapping['Asset_Manager'].unique()
+    unique_asset_managers = entity_mapping['Asset_Manager'].unique()
  
     receiver_email_list = operator_email.split(",") + ["twarner@sabrahealth.com","sli@sabrahealth.com","jmanalastas@sabrahealth.com"]
     
     if '@*' in operator_email:
         st.error("Please update email address (in 'Menu' - 'Edit Account') to ensure you receive confirmation email.")
     # Append these unique values to receiver_list
-    receiver_email_list.extend(asset_managers_email)
+    receiver_email_list.extend(unique_asset_managers)
   
     # Send the confirmation email
     format_total_email_body= f"""
@@ -1494,8 +1405,8 @@ def Submit_Upload(total_email_body):
     </body>
     </html>"""
     if not st.session_state.email_sent:
-        Send_Confirmation_Email(["sli@sabrahealth.com"], subject, format_total_email_body)    
-        #Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
+        #Send_Confirmation_Email(["sli@sabrahealth.com"], subject, format_total_email_body)    
+        Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
         if email_body!="":
             Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body)    
         st.session_state.email_sent = True
@@ -2399,11 +2310,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
-	# sharepoint folder path
-        month_folder_name=".{} {}".format(month_map[selected_month],selected_month)
-        #SHAREPOINT_FOLDER = "/Asset%20Management/01_Operators/Nexus%20Systems/Financials%20%26%20Covenant%20Analysis/_Facility%20Financials/2024/.12%20Dec"
-        SHAREPOINT_FOLDER = "/Asset Management/01_Operators"
-	#"Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/{}".format(operator,str(selected_year),month_folder_name)
         if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
             st.stop()	
@@ -2412,21 +2318,26 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.error("The reporting month is not valid as it either exceeds the sold date or precedes the acquisition date for the properties.")
             st.stop()
         if uploaded_other_docs: 
-            #success,ancillary_upload_message = Upload_To_Sharepoint(uploaded_other_docs, SHAREPOINT_FOLDER)
-            success, ancillary_upload_message = Upload_To_Sharepoint(uploaded_other_docs[0], SHAREPOINT_FOLDER)
-            st.write("success,ancillary_upload_message",success,ancillary_upload_message)
-            if success:
-                st.success("Ancillary files for {} uploaded: {} files".format(reporting_month_display, len(uploaded_other_docs)))
-            elif not success and ancillary_upload_message!=[]:
-                email_body+=f"""
-	        <p><strong>{len(ancillary_upload_message)}</strong> files failed to upload:</p>  
-                <ul>  
-                    {''.join(f'<li>{file}</li>' for file in ancillary_upload_message)}  
-                </ul>
-	        """
-            elif ancillary_upload_message==[]:
-                email_body+=f"""<p><strong>Error during SharePoint upload process. Files are not uploaded</p> """
+            filename_list=[]
+            for file in uploaded_other_docs: 
+	        # create new file name by adding reporting_month at the end of original filename    
+                #original_file_name = file.name
+                #file_name, file_extension = original_file_name.rsplit('.', 1)
+                #new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
 
+                                
+                st.write("Uploading file to SharePoint...")
+                success, message = Upload_To_Sharepoint(file, SHAREPOINT_FOLDER)
+        
+                if success:
+                    st.success(message)
+                else:
+                    st.error(message)
+		    
+                #Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
+                #filename_list.append(original_file_name)
+            st.success("Ancillary files for {} uploaded: {} files".format(reporting_month_display, len(uploaded_other_docs)))
+            
         col1, col2 = st.columns([1,3])  
         if 'uploaded_finance' in locals() and uploaded_finance:
             with col1:
@@ -2434,11 +2345,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         else:   
             if uploaded_other_docs: 
                 st.error("You have only uploaded ancillary files without any monthly reporting data.")
-                asset_managers_email = entity_mapping['Asset_Manager'].unique()
+                unique_asset_managers = entity_mapping['Asset_Manager'].unique()
                 receiver = operator_email.split(",") + ["twarner@sabrahealth.com", "sli@sabrahealth.com"]  
-                receiver.extend(asset_managers_email)	 
+                receiver.extend(unique_asset_managers)	 
                 if not st.session_state.email_sent:
-                    #Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(ancillary_upload_message), ",  ".join(ancillary_upload_message)))
+                    #Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
                     st.session_state.email_sent = True
             else:
                 st.markdown(":red[P&L is not uploaded ]")
@@ -2453,12 +2364,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col2:
                     st.markdown("❌ :red[Balance sheet is not uploaded ]")
                 if uploaded_other_docs: 
-                    st.error("You have only uploaded ancillary files. Please upload Balance Sheet if you want to upload monthly reporting data.")
-                    asset_managers_email = entity_mapping['Asset_Manager'].unique()
+                    st.error("You have only uploaded ancillary files without any monthly reporting data. Please upload Balance Sheet if you want to upload monthly reporting data.")
+                    unique_asset_managers = entity_mapping['Asset_Manager'].unique()
                     receiver = operator_email.split(",") + ["twarner@sabrahealth.com", "sli@sabrahealth.com"] 
-                    receiver.extend(asset_managers_email)	
-                    if not st.session_state.email_sent: 
-                        #Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(ancillary_upload_message), ",  ".join(ancillary_upload_message)))
+                    receiver.extend(unique_asset_managers)	
+                    if not st.session_state.email_sent:
+                        Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))    
                         st.session_state.email_sent = True
                 st.stop()
         else:
@@ -2477,7 +2388,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             if BS_separate_excel=="N":  # Finance/BS are in one excel
                 entity_mapping,finance_wb=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
                 Total_PL=Upload_And_Process(uploaded_finance,finance_wb,"Finance")
-
+                #st.write("Total_PL1",Total_PL)
             elif BS_separate_excel=="Y": # Finance/BS are in different excel 
                 entity_mapping,finance_wb=Check_Sheet_Name_List(uploaded_finance,"Finance")
                 entity_mapping,bs_wb=Check_Sheet_Name_List(uploaded_BS,"BS")
