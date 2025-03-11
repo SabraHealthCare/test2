@@ -96,28 +96,37 @@ entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance",
 
 def Ensure_Folder_Exists(site, folder_path):
     try:
-        # Split the folder path into parts
-        folders = folder_path.split("/")
-        
-        # Start from the root folder of the site
-        current_folder = site.root_folder
-        
-        # Traverse the folder structure
-        for folder in folders:
-            if not folder:
-                continue  # Skip empty folder names (e.g., from leading/trailing slashes)
-            
-            # Check if the subfolder exists
-            subfolder = current_folder.folders.get_by_name(folder)
-            if not subfolder:
-                # If the folder doesn't exist, create it
-                current_folder = current_folder.folders.add(folder)
+        # Get the context and web object
+        ctx = site.context
+        web = site.root_web
+        ctx.load(web)
+        ctx.execute_query()
+
+        # Start from the root folder
+        current_folder = web.get_folder_by_server_relative_url(folder_path)
+
+        # Check if the folder exists by trying to load its properties
+        try:
+            ctx.load(current_folder)
+            ctx.execute_query()
+        except ClientRequestException as e:
+            if "File Not Found" in str(e):
+                # Folder does not exist, create it
+                parent_folder = web.root_folder
+                folders = folder_path.split("/")
+                for folder in folders:
+                    if folder:
+                        new_folder_url = f"{parent_folder.serverRelativeUrl}/{folder}"
+                        parent_folder = parent_folder.folders.add(new_folder_url)
+                        ctx.execute_query()
+                current_folder = parent_folder
             else:
-                current_folder = subfolder
-        
+                raise
+
         return current_folder
+
     except Exception as e:
-        print(f"Error ensuring folder exists: {e}")
+        st.error(f"Error ensuring folder exists: {e}")
         raise
 #Upload file to SharePoint
 #sharepoint_folder:"Asset Management/01_Operators/..."
