@@ -147,8 +147,14 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
                 success_files.append(file.name)
             except Exception as e:
                 st.error(f"Error uploading file '{file.name}': {e}")
-          
-	    
+        # Clean up
+        os.remove(temp_file_path)
+        if len(failed_files) == 0:
+            return True,success_files
+        else:
+            return False, failed_files
+    except Exception as e:
+        return False,[]
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
     password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password, not the API_key
