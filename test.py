@@ -93,20 +93,20 @@ headers = {'Authorization': 'Bearer ' + access_token,}
 
 account_mapping_str_col=["Tenant_Account","Tenant_Account"]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
+
 def Ensure_Folder_Exists(site, folder_path):
     try:
         # Split the folder path into parts
         folders = folder_path.split("/")
         
-        # Start from the root folder 
+        # Start from the root folder
         current_folder = site.Folder(folders[0])
-      
+        
         # Traverse the remaining folder structure
         for folder in folders[1:]:
             try:
                 # Try to access the folder
                 current_folder = current_folder.Folder(folder)
-               
             except Exception:
                 # If the folder doesn't exist, create it
                 current_folder.create_folder(folder)
@@ -115,44 +115,47 @@ def Ensure_Folder_Exists(site, folder_path):
         return current_folder
     except Exception as e:
         raise
-
-#Upload file to SharePoint
-#sharepoint_folder:"Asset Management/01_Operators/..."
-#file:uploaded_file
 def Upload_To_Sharepoint(files, sharepoint_folder):
     try:
         # Authenticate with SharePoint
-        authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
-        site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
+        ctx_auth = AuthenticationContext(SHAREPOINT_URL)
+        if ctx_auth.acquire_token_for_user(sharepoint_username, sharepoint_password):
+            ctx = ClientContext(SHAREPOINT_SITE, ctx_auth)
+        else:
+            raise Exception("Failed to authenticate with SharePoint.")
         
-	# Ensure the folder exists
-        sharepoint_folder = Ensure_Folder_Exists(site, sharepoint_folder)
+        # Ensure the folder exists
+        folder = Ensure_Folder_Exists(ctx.web, sharepoint_folder)
+        
         success_files = []
-        failed_files = []  
+        failed_files = []
+        
         for file in files:
-            try:   
-                temp_file_path = os.path.join(".", file.name)
+            temp_file_path = os.path.join(tempfile.gettempdir(), file.name)
+            try:
+                # Save the file temporarily
                 with open(temp_file_path, "wb") as f:
                     f.write(file.getbuffer())
-        
-                # Access the sharepoint_folder
-                #sharepoint_folder = site.Folder(sharepoint_folder)
-        
-                # Upload the file
+                
+                # Upload the file to SharePoint
                 with open(temp_file_path, "rb") as file_content:
-                    sharepoint_folder.upload_file(file_content, file.name)
+                    folder.upload_file(file_content, file.name)
                 success_files.append(file.name)
             except Exception as e:
-                st.error(f"Error uploading file '{file.name}': {e}")
+                print(f"Error uploading file '{file.name}': {e}")
                 failed_files.append((file.name, str(e)))
-        # Clean up
-        os.remove(temp_file_path)
+            finally:
+                # Clean up the temporary file
+                if os.path.exists(temp_file_path):
+                    os.remove(temp_file_path)
+        
         if len(failed_files) == 0:
-            return True,success_files
+            return True, success_files
         else:
             return False, failed_files
     except Exception as e:
-        return False,[]
+        print(f"An error occurred: {e}")
+        return False, []
 	    
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
