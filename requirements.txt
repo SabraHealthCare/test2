@@ -18,4 +18,5 @@ msal
 requests>=2.32.1  # Updated to a secure version
 chardet
 shareplum
+Office365-REST-Python-Client
 git+https://github.com/streamlit/files-connection
