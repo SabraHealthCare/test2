@@ -8,7 +8,7 @@ from openpyxl.utils import get_column_letter
 import streamlit as st             
 from io import BytesIO
 from io import StringIO
-from tempfile import NamedTemporaryFile
+from tempfile
 import time
 import  streamlit_tree_select
 import copy
@@ -97,21 +97,19 @@ entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance",
 
 
 from office365.sharepoint.client_context import ClientContext
-from office365.sharepoint.files.file import File
 from office365.runtime.client_request_exception import ClientRequestException
 
-def Ensure_Folder_Exists(site, folder_path):
+def Ensure_Folder_Exists(ctx, folder_path):
     try:
-        # Get the context and web object
-        ctx = site.context
-        web = site.root_web
+        # Get the web object
+        web = ctx.web
         ctx.load(web)
         ctx.execute_query()
 
         # Start from the root folder
         current_folder = web.get_folder_by_server_relative_url(folder_path)
 
-        # Check if the folder exists by trying to load its properties
+        # Try to load the folder to check existence
         try:
             ctx.load(current_folder)
             ctx.execute_query()
@@ -119,12 +117,21 @@ def Ensure_Folder_Exists(site, folder_path):
             if "File Not Found" in str(e):
                 # Folder does not exist, create it
                 parent_folder = web.root_folder
-                folders = folder_path.split("/")
+                folders = folder_path.strip("/").split("/")
+
                 for folder in folders:
-                    if folder:
-                        new_folder_url = f"{parent_folder.serverRelativeUrl}/{folder}"
-                        parent_folder = parent_folder.folders.add(new_folder_url)
+                    new_folder_url = f"{parent_folder.serverRelativeUrl}/{folder}"
+                    try:
+                        parent_folder = web.get_folder_by_server_relative_url(new_folder_url)
+                        ctx.load(parent_folder)
                         ctx.execute_query()
+                    except ClientRequestException as e:
+                        if "File Not Found" in str(e):
+                            # Create folder if not found
+                            parent_folder = parent_folder.folders.add(folder)
+                            ctx.execute_query()
+                        else:
+                            raise
                 current_folder = parent_folder
             else:
                 raise
@@ -132,8 +139,9 @@ def Ensure_Folder_Exists(site, folder_path):
         return current_folder
 
     except Exception as e:
-        st.error(f"Error ensuring folder exists: {e}")
+        print(f"Error ensuring folder exists: {e}")
         raise
+
 #Upload file to SharePoint
 #sharepoint_folder:"Asset Management/01_Operators/..."
 #file:uploaded_file
