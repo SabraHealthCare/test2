@@ -105,20 +105,27 @@ def Ensure_Folder_Exists(site, folder_path):
         
         # Start from the root folder of the site
         current_folder = site.root_folder
+        print(f"Starting from root folder: {current_folder.server_relative_url}")
         
         # Traverse the folder structure
         for folder in folders:
             if not folder:
                 continue  # Skip empty folder names (e.g., from leading/trailing slashes)
             
+            print(f"Checking for folder: {folder}")
+            
             # Check if the subfolder exists
             subfolder = current_folder.folders.get_by_name(folder)
             if not subfolder:
+                print(f"Folder '{folder}' does not exist. Creating...")
                 # If the folder doesn't exist, create it
                 current_folder = current_folder.folders.add(folder)
+                print(f"Created folder: {current_folder.server_relative_url}")
             else:
                 current_folder = subfolder
+                print(f"Folder '{folder}' exists. Using: {current_folder.server_relative_url}")
         
+        print(f"Final folder: {current_folder.server_relative_url}")
         return current_folder
     except Exception as e:
         print(f"Error ensuring folder exists: {e}")
@@ -146,10 +153,13 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
                 with open(temp_file_path, "wb") as f:
                     f.write(file.getbuffer())
                 
+                print(f"Uploading file: {file.name} to {folder.server_relative_url}")
+                
                 # Upload the file to SharePoint
                 with open(temp_file_path, "rb") as file_content:
                     folder.upload_file(file_content, file.name)
                 success_files.append(file.name)
+                print(f"Successfully uploaded: {file.name}")
             except Exception as e:
                 print(f"Error uploading file '{file.name}': {e}")
                 failed_files.append((file.name, str(e)))
@@ -165,9 +175,6 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
     except Exception as e:
         print(f"An error occurred: {e}")
         return False, []
-
-
-
 
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
