@@ -115,34 +115,34 @@ def Ensure_Folder_Exists(site, folder_path):
         # Load the root folder properties
         ctx.load(current_folder)
         ctx.execute_query()
-        print(f"Starting from root folder: {current_folder.properties['ServerRelativeUrl']}")
+        st.write(f"Starting from root folder: {current_folder.properties['ServerRelativeUrl']}")
         
         # Traverse the folder structure
         for folder in folders:
             if not folder:
                 continue  # Skip empty folder names (e.g., from leading/trailing slashes)
             
-            print(f"Checking for folder: {folder}")
+            st.write(f"Checking for folder: {folder}")
             
             # Check if the subfolder exists
             subfolder = current_folder.folders.get_by_name(folder)
             if not subfolder:
-                print(f"Folder '{folder}' does not exist. Creating...")
+                st.write(f"Folder '{folder}' does not exist. Creating...")
                 # If the folder doesn't exist, create it
                 current_folder = current_folder.folders.add(folder)
                 ctx.load(current_folder)  # Load the new folder properties
                 ctx.execute_query()  # Execute the query to create the folder
-                print(f"Created folder: {current_folder.properties['ServerRelativeUrl']}")
+                st.write(f"Created folder: {current_folder.properties['ServerRelativeUrl']}")
             else:
                 current_folder = subfolder
                 ctx.load(current_folder)  # Load the folder properties
                 ctx.execute_query()  # Execute the query to get the folder properties
-                print(f"Folder '{folder}' exists. Using: {current_folder.properties['ServerRelativeUrl']}")
+                st.write(f"Folder '{folder}' exists. Using: {current_folder.properties['ServerRelativeUrl']}")
         
-        print(f"Final folder: {current_folder.properties['ServerRelativeUrl']}")
+        st.write(f"Final folder: {current_folder.properties['ServerRelativeUrl']}")
         return current_folder
     except Exception as e:
-        print(f"Error ensuring folder exists: {e}")
+        st.write(f"Error ensuring folder exists: {e}")
         raise
 
 def Upload_To_Sharepoint(files, sharepoint_folder):
@@ -167,16 +167,16 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
                 with open(temp_file_path, "wb") as f:
                     f.write(file.getbuffer())
                 
-                print(f"Uploading file: {file.name} to {folder.properties['ServerRelativeUrl']}")
+                st.write(f"Uploading file: {file.name} to {folder.properties['ServerRelativeUrl']}")
                 
                 # Upload the file to SharePoint
                 with open(temp_file_path, "rb") as file_content:
                     folder.upload_file(file_content, file.name)
                 ctx.execute_query()  # Execute the query to upload the file
                 success_files.append(file.name)
-                print(f"Successfully uploaded: {file.name}")
+                st.write(f"Successfully uploaded: {file.name}")
             except Exception as e:
-                print(f"Error uploading file '{file.name}': {e}")
+                st.write(f"Error uploading file '{file.name}': {e}")
                 failed_files.append((file.name, str(e)))
             finally:
                 # Clean up the temporary file
@@ -188,7 +188,7 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
         else:
             return False, failed_files
     except Exception as e:
-        print(f"An error occurred: {e}")
+        st.write(f"An error occurred: {e}")
         return False, []
 
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
