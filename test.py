@@ -93,84 +93,80 @@ headers = {'Authorization': 'Bearer ' + access_token,}
 account_mapping_str_col=["Tenant_Account","Tenant_Account"]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
 
-
-
+import os
+import tempfile
+from office365.runtime.auth.authentication_context import AuthenticationContext
 from office365.sharepoint.client_context import ClientContext
-from office365.runtime.client_request_exception import ClientRequestException
 
-def Ensure_Folder_Exists(ctx, folder_path):
+def Ensure_Folder_Exists(site, folder_path):
     try:
-        web = ctx.web
-        ctx.load(web)
-        ctx.execute_query()
-
-        # Start from the root folder
-        parent_folder = web.root_folder
-        folders = folder_path.strip("/").split("/")
-
+        # Split the folder path into parts
+        folders = folder_path.split("/")
+        
+        # Start from the root folder of the site
+        current_folder = site.root_folder
+        
+        # Traverse the folder structure
         for folder in folders:
-            try:
-                # Try to get the folder
-                subfolder = parent_folder.folders.get_by_url(folder)
-                ctx.load(subfolder)
-                ctx.execute_query()
-                parent_folder = subfolder  # Move to next subfolder
-            except ClientRequestException as e:
-                if "File Not Found" in str(e):
-                    # Folder doesn't exist; create it
-                    parent_folder = parent_folder.folders.add(folder)
-                    ctx.execute_query()
-                else:
-                    raise
-
-        return parent_folder  # Return the last folder in the path
+            if not folder:
+                continue  # Skip empty folder names (e.g., from leading/trailing slashes)
+            
+            # Check if the subfolder exists
+            subfolder = current_folder.folders.get_by_name(folder)
+            if not subfolder:
+                # If the folder doesn't exist, create it
+                current_folder = current_folder.folders.add(folder)
+            else:
+                current_folder = subfolder
+        
+        return current_folder
     except Exception as e:
         print(f"Error ensuring folder exists: {e}")
         raise
 
-#Upload file to SharePoint
-#sharepoint_folder:"Asset Management/01_Operators/..."
-#file:uploaded_file
-import os
-from office365.sharepoint.client_context import ClientContext
-from office365.runtime.auth.client_credential import ClientCredential
-
 def Upload_To_Sharepoint(files, sharepoint_folder):
     try:
-        # Authenticate with SharePoint using ClientContext
-        ctx = ClientContext(SHAREPOINT_URL).with_credentials(ClientCredential(sharepoint_username, sharepoint_password))
-
+        # Authenticate with SharePoint
+        ctx_auth = AuthenticationContext(SHAREPOINT_URL)
+        if ctx_auth.acquire_token_for_user(sharepoint_username, sharepoint_password):
+            ctx = ClientContext(SHAREPOINT_SITE, ctx_auth)
+        else:
+            raise Exception("Failed to authenticate with SharePoint.")
+        
         # Ensure the folder exists
-        sharepoint_folder_obj = Ensure_Folder_Exists(ctx, sharepoint_folder)
-
+        folder = Ensure_Folder_Exists(ctx.web, sharepoint_folder)
+        
         success_files = []
-        failed_files = []  
-
+        failed_files = []
+        
         for file in files:
-            try:   
-                temp_file_path = os.path.join(".", file.name)
+            temp_file_path = os.path.join(tempfile.gettempdir(), file.name)
+            try:
+                # Save the file temporarily
                 with open(temp_file_path, "wb") as f:
                     f.write(file.getbuffer())
-
-                # Upload the file
+                
+                # Upload the file to SharePoint
                 with open(temp_file_path, "rb") as file_content:
-                    sharepoint_folder_obj.upload_file(file.name, file_content)
-                    ctx.execute_query()
-
+                    folder.upload_file(file_content, file.name)
                 success_files.append(file.name)
             except Exception as e:
-                failed_files.append(file.name)
                 print(f"Error uploading file '{file.name}': {e}")
-
-        # Clean up temporary file
-        if os.path.exists(temp_file_path):
-            os.remove(temp_file_path)
-
-        return (True, success_files) if not failed_files else (False, failed_files)
-
+                failed_files.append((file.name, str(e)))
+            finally:
+                # Clean up the temporary file
+                if os.path.exists(temp_file_path):
+                    os.remove(temp_file_path)
+        
+        if len(failed_files) == 0:
+            return True, success_files
+        else:
+            return False, failed_files
     except Exception as e:
-        print(f"Upload failed: {e}")
+        print(f"An error occurred: {e}")
         return False, []
+
+
 
 
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
