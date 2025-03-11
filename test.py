@@ -126,7 +126,7 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
         
 	# Ensure the folder exists
-        folder = Ensure_Folder_Exists(site, sharepoint_folder)
+        #folder = Ensure_Folder_Exists(site, sharepoint_folder)
         success_files = []
         failed_files = []  
         for file in files:
@@ -136,7 +136,7 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
                     f.write(file.getbuffer())
         
                 # Access the sharepoint_folder
-                #sharepoint_folder = site.Folder(sharepoint_folder)
+                sharepoint_folder = site.Folder(sharepoint_folder)
         
                 # Upload the file
                 with open(temp_file_path, "rb") as file_content:
