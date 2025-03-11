@@ -153,7 +153,6 @@ def Ensure_Folder_Exists(site, folder_path):
     except Exception as e:
         st.write(f"Error ensuring folder exists: {e}")
         raise
-
 def Upload_To_Sharepoint(files, sharepoint_folder):
     try:
         # Authenticate with SharePoint
