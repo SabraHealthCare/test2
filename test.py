@@ -98,14 +98,19 @@ import tempfile
 from office365.runtime.auth.authentication_context import AuthenticationContext
 from office365.sharepoint.client_context import ClientContext
 
+import os
+import tempfile
+from office365.runtime.auth.authentication_context import AuthenticationContext
+from office365.sharepoint.client_context import ClientContext
+
 def Ensure_Folder_Exists(site, folder_path):
     try:
         # Split the folder path into parts
         folders = folder_path.split("/")
-        st.write("folders",folders)
+        
         # Start from the root folder of the site
         current_folder = site.root_folder
-        st.write(f"Starting from root folder: {current_folder.server_relative_url}")
+        st.write(f"Starting from root folder: {current_folder.properties['ServerRelativeUrl']}")
         
         # Traverse the folder structure
         for folder in folders:
@@ -120,12 +125,16 @@ def Ensure_Folder_Exists(site, folder_path):
                 st.write(f"Folder '{folder}' does not exist. Creating...")
                 # If the folder doesn't exist, create it
                 current_folder = current_folder.folders.add(folder)
-                st.write(f"Created folder: {current_folder.server_relative_url}")
+                ctx.load(current_folder)  # Load the folder properties
+                ctx.execute_query()  # Execute the query to create the folder
+                st.write(f"Created folder: {current_folder.properties['ServerRelativeUrl']}")
             else:
                 current_folder = subfolder
-                st.write(f"Folder '{folder}' exists. Using: {current_folder.server_relative_url}")
+                ctx.load(current_folder)  # Load the folder properties
+                ctx.execute_query()  # Execute the query to get the folder properties
+                st.write(f"Folder '{folder}' exists. Using: {current_folder.properties['ServerRelativeUrl']}")
         
-        st.write(f"Final folder: {current_folder.server_relative_url}")
+        st.write(f"Final folder: {current_folder.properties['ServerRelativeUrl']}")
         return current_folder
     except Exception as e:
         st.write(f"Error ensuring folder exists: {e}")
@@ -139,10 +148,10 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
             ctx = ClientContext(SHAREPOINT_SITE, ctx_auth)
         else:
             raise Exception("Failed to authenticate with SharePoint.")
-        st.write("AuthenticationContext successfully")
+        
         # Ensure the folder exists
         folder = Ensure_Folder_Exists(ctx.web, sharepoint_folder)
-        st.write("folder folder",folder)
+        
         success_files = []
         failed_files = []
         
@@ -153,11 +162,12 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
                 with open(temp_file_path, "wb") as f:
                     f.write(file.getbuffer())
                 
-                st.write(f"Uploading file: {file.name} to {folder.server_relative_url}")
+                st.write(f"Uploading file: {file.name} to {folder.properties['ServerRelativeUrl']}")
                 
                 # Upload the file to SharePoint
                 with open(temp_file_path, "rb") as file_content:
                     folder.upload_file(file_content, file.name)
+                ctx.execute_query()  # Execute the query to upload the file
                 success_files.append(file.name)
                 st.write(f"Successfully uploaded: {file.name}")
             except Exception as e:
