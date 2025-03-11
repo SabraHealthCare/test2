@@ -120,7 +120,7 @@ def Ensure_Folder_Exists(site, folder_path):
         folders = folder_path.split("/")
         
         # Start from the document library (e.g., "Asset Management")
-        library_name = "Asset Management"  # Replace with your document library name
+        library_name = "Asset Management"  # Use the correct library name
         library = site.lists.get_by_title(library_name)
         ctx = library.context  # Get the context for query execution
         
