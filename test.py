@@ -99,63 +99,55 @@ def Ensure_Folder_Exists(site, folder_path):
         # Split the folder path into parts
         folders = folder_path.split("/")
         
-        # Start from the root folder
-        current_folder = site.Folder(folders[0])
+        # Start from the root folder of the site
+        current_folder = site.root_folder
         
-        # Traverse the remaining folder structure
-        for folder in folders[1:]:
-            try:
-                # Try to access the folder
-                current_folder = current_folder.Folder(folder)
-            except Exception:
+        # Traverse the folder structure
+        for folder in folders:
+            if not folder:
+                continue  # Skip empty folder names (e.g., from leading/trailing slashes)
+            
+            # Check if the subfolder exists
+            subfolder = current_folder.folders.get_by_name(folder)
+            if not subfolder:
                 # If the folder doesn't exist, create it
-                current_folder.create_folder(folder)
-                current_folder = current_folder.Folder(folder)
+                current_folder = current_folder.folders.add(folder)
+            else:
+                current_folder = subfolder
         
         return current_folder
     except Exception as e:
+        print(f"Error ensuring folder exists: {e}")
         raise
+#Upload file to SharePoint
+#sharepoint_folder:"Asset Management/01_Operators/..."
+#file:uploaded_file
 def Upload_To_Sharepoint(files, sharepoint_folder):
     try:
         # Authenticate with SharePoint
-        ctx_auth = AuthenticationContext(SHAREPOINT_URL)
-        if ctx_auth.acquire_token_for_user(sharepoint_username, sharepoint_password):
-            ctx = ClientContext(SHAREPOINT_SITE, ctx_auth)
-        else:
-            raise Exception("Failed to authenticate with SharePoint.")
+        authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
+        site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
         
-        # Ensure the folder exists
-        folder = Ensure_Folder_Exists(ctx.web, sharepoint_folder)
-        
+	# Ensure the folder exists
+        sharepoint_folder = Ensure_Folder_Exists(site, sharepoint_folder)
         success_files = []
-        failed_files = []
-        
+        failed_files = []  
         for file in files:
-            temp_file_path = os.path.join(tempfile.gettempdir(), file.name)
-            try:
-                # Save the file temporarily
+            try:   
+                temp_file_path = os.path.join(".", file.name)
                 with open(temp_file_path, "wb") as f:
                     f.write(file.getbuffer())
-                
-                # Upload the file to SharePoint
+        
+                # Access the sharepoint_folder
+                #sharepoint_folder = site.Folder(sharepoint_folder)
+        
+                # Upload the file
                 with open(temp_file_path, "rb") as file_content:
-                    folder.upload_file(file_content, file.name)
+                    sharepoint_folder.upload_file(file_content, file.name)
                 success_files.append(file.name)
             except Exception as e:
-                print(f"Error uploading file '{file.name}': {e}")
-                failed_files.append((file.name, str(e)))
-            finally:
-                # Clean up the temporary file
-                if os.path.exists(temp_file_path):
-                    os.remove(temp_file_path)
-        
-        if len(failed_files) == 0:
-            return True, success_files
-        else:
-            return False, failed_files
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return False, []
+                st.error(f"Error uploading file '{file.name}': {e}")
+          
 	    
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
