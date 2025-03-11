@@ -98,7 +98,22 @@ import tempfile
 import streamlit as st
 from office365.runtime.auth.authentication_context import AuthenticationContext
 from office365.sharepoint.client_context import ClientContext
+from office365.runtime.auth.authentication_context import AuthenticationContext
+from office365.sharepoint.client_context import ClientContext
 
+def authenticate_with_sharepoint():
+    try:
+        # Authenticate with SharePoint
+        ctx_auth = AuthenticationContext(SHAREPOINT_URL)
+        if ctx_auth.acquire_token_for_user(sharepoint_username, sharepoint_password):
+            ctx = ClientContext(SHAREPOINT_SITE, ctx_auth)
+            return ctx
+        else:
+            raise Exception("Failed to authenticate with SharePoint.")
+    except Exception as e:
+        st.write(f"Authentication error: {e}")
+        raise
+	    
 def Ensure_Folder_Exists(site, folder_path):
     try:
         # Split the folder path into parts
@@ -158,41 +173,45 @@ from office365.runtime.auth.client_credential import ClientCredential
 
 def Upload_To_Sharepoint(files, sharepoint_folder):
     try:
-        # Authenticate with SharePoint using ClientContext
-        ctx = ClientContext(SHAREPOINT_URL).with_credentials(ClientCredential(sharepoint_username, sharepoint_password))
-
+        # Authenticate with SharePoint
+        ctx = authenticate_with_sharepoint()
+        
         # Ensure the folder exists
-        sharepoint_folder_obj = Ensure_Folder_Exists(ctx, sharepoint_folder)
-
+        folder = Ensure_Folder_Exists(ctx.web, sharepoint_folder)
+        
         success_files = []
-        failed_files = []  
-
+        failed_files = []
+        
         for file in files:
-            try:   
-                temp_file_path = os.path.join(".", file.name)
+            temp_file_path = os.path.join(tempfile.gettempdir(), file.name)
+            try:
+                # Save the file temporarily
                 with open(temp_file_path, "wb") as f:
                     f.write(file.getbuffer())
-
-                # Upload the file
+                
+                st.write(f"Uploading file: {file.name} to {folder.properties['ServerRelativeUrl']}")
+                
+                # Upload the file to SharePoint
                 with open(temp_file_path, "rb") as file_content:
-                    sharepoint_folder_obj.upload_file(file.name, file_content)
-                    ctx.execute_query()
-
+                    folder.upload_file(file_content, file.name)
+                ctx.execute_query()  # Execute the query to upload the file
                 success_files.append(file.name)
+                st.write(f"Successfully uploaded: {file.name}")
             except Exception as e:
-                failed_files.append(file.name)
-                print(f"Error uploading file '{file.name}': {e}")
-
-        # Clean up temporary file
-        if os.path.exists(temp_file_path):
-            os.remove(temp_file_path)
-
-        return (True, success_files) if not failed_files else (False, failed_files)
-
+                st.write(f"Error uploading file '{file.name}': {e}")
+                failed_files.append((file.name, str(e)))
+            finally:
+                # Clean up the temporary file
+                if os.path.exists(temp_file_path):
+                    os.remove(temp_file_path)
+        
+        if len(failed_files) == 0:
+            return True, success_files
+        else:
+            return False, failed_files
     except Exception as e:
-        print(f"Upload failed: {e}")
+        st.write(f"An error occurred: {e}")
         return False, []
-
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
     password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password, not the API_key
