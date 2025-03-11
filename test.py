@@ -100,43 +100,30 @@ from office365.runtime.client_request_exception import ClientRequestException
 
 def Ensure_Folder_Exists(ctx, folder_path):
     try:
-        # Get the web object
         web = ctx.web
         ctx.load(web)
         ctx.execute_query()
 
         # Start from the root folder
-        current_folder = web.get_folder_by_server_relative_url(folder_path)
+        parent_folder = web.root_folder
+        folders = folder_path.strip("/").split("/")
 
-        # Try to load the folder to check existence
-        try:
-            ctx.load(current_folder)
-            ctx.execute_query()
-        except ClientRequestException as e:
-            if "File Not Found" in str(e):
-                # Folder does not exist, create it
-                parent_folder = web.root_folder
-                folders = folder_path.strip("/").split("/")
+        for folder in folders:
+            try:
+                # Try to get the folder
+                subfolder = parent_folder.folders.get_by_url(folder)
+                ctx.load(subfolder)
+                ctx.execute_query()
+                parent_folder = subfolder  # Move to next subfolder
+            except ClientRequestException as e:
+                if "File Not Found" in str(e):
+                    # Folder doesn't exist; create it
+                    parent_folder = parent_folder.folders.add(folder)
+                    ctx.execute_query()
+                else:
+                    raise
 
-                for folder in folders:
-                    new_folder_url = f"{parent_folder.serverRelativeUrl}/{folder}"
-                    try:
-                        parent_folder = web.get_folder_by_server_relative_url(new_folder_url)
-                        ctx.load(parent_folder)
-                        ctx.execute_query()
-                    except ClientRequestException as e:
-                        if "File Not Found" in str(e):
-                            # Create folder if not found
-                            parent_folder = parent_folder.folders.add(folder)
-                            ctx.execute_query()
-                        else:
-                            raise
-                current_folder = parent_folder
-            else:
-                raise
-
-        return current_folder
-
+        return parent_folder  # Return the last folder in the path
     except Exception as e:
         print(f"Error ensuring folder exists: {e}")
         raise
@@ -144,39 +131,48 @@ def Ensure_Folder_Exists(ctx, folder_path):
 #Upload file to SharePoint
 #sharepoint_folder:"Asset Management/01_Operators/..."
 #file:uploaded_file
+import os
+from office365.sharepoint.client_context import ClientContext
+from office365.runtime.auth.client_credential import ClientCredential
+
 def Upload_To_Sharepoint(files, sharepoint_folder):
     try:
-        # Authenticate with SharePoint
-        authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
-        site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
-        
-	# Ensure the folder exists
-        sharepoint_folder = Ensure_Folder_Exists(site, sharepoint_folder)
+        # Authenticate with SharePoint using ClientContext
+        ctx = ClientContext(SHAREPOINT_URL).with_credentials(ClientCredential(sharepoint_username, sharepoint_password))
+
+        # Ensure the folder exists
+        sharepoint_folder_obj = Ensure_Folder_Exists(ctx, sharepoint_folder)
+
         success_files = []
         failed_files = []  
+
         for file in files:
             try:   
                 temp_file_path = os.path.join(".", file.name)
                 with open(temp_file_path, "wb") as f:
                     f.write(file.getbuffer())
-        
-                # Access the sharepoint_folder
-                #sharepoint_folder = site.Folder(sharepoint_folder)
-        
+
                 # Upload the file
                 with open(temp_file_path, "rb") as file_content:
-                    sharepoint_folder.upload_file(file_content, file.name)
+                    sharepoint_folder_obj.upload_file(file.name, file_content)
+                    ctx.execute_query()
+
                 success_files.append(file.name)
             except Exception as e:
-                st.error(f"Error uploading file '{file.name}': {e}")
-        # Clean up
-        os.remove(temp_file_path)
-        if len(failed_files) == 0:
-            return True,success_files
-        else:
-            return False, failed_files
+                failed_files.append(file.name)
+                print(f"Error uploading file '{file.name}': {e}")
+
+        # Clean up temporary file
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
+
+        return (True, success_files) if not failed_files else (False, failed_files)
+
     except Exception as e:
-        return False,[]
+        print(f"Upload failed: {e}")
+        return False, []
+
+
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
     password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password, not the API_key
