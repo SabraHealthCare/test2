@@ -133,16 +133,8 @@ def Ensure_Folder_Exists(site, folder_path):
                     break
             
             if not subfolder:
-                st.write(f"Folder '{folder}' does not exist. Creating...")
-                # If the folder doesn't exist, create it
-                try:
-                    subfolder = current_folder.folders.add(folder)
-                    ctx.load(subfolder)  # Load the new folder properties
-                    ctx.execute_query()  # Execute the query to create the folder
-                    st.write(f"Created folder: {subfolder.properties['ServerRelativeUrl']}")
-                except Exception as e:
-                    st.write(f"Failed to create folder '{folder}': {e}")
-                    raise
+                # If the folder doesn't exist, raise an error (since it should already exist)
+                raise Exception(f"Folder '{folder}' does not exist. Please create it manually.")
             else:
                 st.write(f"Folder '{folder}' exists. Using: {subfolder.properties['ServerRelativeUrl']}")
             
