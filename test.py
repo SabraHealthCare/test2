@@ -93,30 +93,66 @@ headers = {'Authorization': 'Bearer ' + access_token,}
 
 account_mapping_str_col=["Tenant_Account","Tenant_Account"]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
+def Ensure_Folder_Exists(site, folder_path):
+    try:
+        # Split the folder path into parts
+        folders = folder_path.split("/")
+        
+        # Start from the root folder 
+        current_folder = site.Folder(folders[0])
+      
+        # Traverse the remaining folder structure
+        for folder in folders[1:]:
+            try:
+                # Try to access the folder
+                current_folder = current_folder.Folder(folder)
+               
+            except Exception:
+                # If the folder doesn't exist, create it
+                current_folder.create_folder(folder)
+                current_folder = current_folder.Folder(folder)
+        
+        return current_folder
+    except Exception as e:
+        raise
 
 #Upload file to SharePoint
 #sharepoint_folder:"Asset Management/01_Operators/..."
 #file:uploaded_file
-def Upload_To_Sharepoint(file, sharepoint_folder):
+def Upload_To_Sharepoint(files, sharepoint_folder):
     try:
-        temp_file_path = os.path.join(".", file.name)
-        with open(temp_file_path, "wb") as f:
-            f.write(file.getbuffer())
         # Authenticate with SharePoint
         authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
         
-        # Access the sharepoint_folder
-        sharepoint_folder = site.Folder(sharepoint_folder)
+	# Ensure the folder exists
+        folder = Ensure_Folder_Exists(site, sharepoint_folder)
+        success_files = []
+        failed_files = []  
+        for file in files:
+            try:   
+                temp_file_path = os.path.join(".", file.name)
+                with open(temp_file_path, "wb") as f:
+                    f.write(file.getbuffer())
         
-        # Upload the file
-        with open(temp_file_path, "rb") as file_content:
-            sharepoint_folder.upload_file(file_content, file.name)
+                # Access the sharepoint_folder
+                #sharepoint_folder = site.Folder(sharepoint_folder)
+        
+                # Upload the file
+                with open(temp_file_path, "rb") as file_content:
+                    sharepoint_folder.upload_file(file_content, file.name)
+                success_files.append(file.name)
+            except Exception as e:
+                st.error(f"Error uploading file '{file.name}': {e}")
+                failed_files.append((file.name, str(e)))
         # Clean up
         os.remove(temp_file_path)
-        return True, "File uploaded successfully!"
+        if len(failed_files) == 0:
+            return True,success_files
+        else:
+            return False, failed_files
     except Exception as e:
-        return False, f"Error uploading file: {e}"
+        return False,[]
 	    
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
@@ -2310,10 +2346,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
         SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator,str(selected_year),month_map[selected_month],selected_month)
-	#Asset Management\01_Operators\Nexus Systems\Financials & Covenant Analysis\_Facility Financials\2024\.11 Nov
-        #Asset Management/01_Operators/Nexus Systems/Financials & Covenant Analysis/_Facility Financials/ 2024/.11 Nov
-	    
-        st.write("SHAREPOINT_FOLDER",SHAREPOINT_FOLDER)
+	  
         if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
             st.stop()	
@@ -2322,25 +2355,20 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             st.error("The reporting month is not valid as it either exceeds the sold date or precedes the acquisition date for the properties.")
             st.stop()
         if uploaded_other_docs: 
-            filename_list=[]
-            for file in uploaded_other_docs: 
-	        # create new file name by adding reporting_month at the end of original filename    
-                #original_file_name = file.name
-                #file_name, file_extension = original_file_name.rsplit('.', 1)
-                #new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
-  
-                st.write("Uploading file to SharePoint...")
-                success, message = Upload_To_Sharepoint(file, SHAREPOINT_FOLDER)
-        
-                if success:
-                    st.success(message)
-                else:
-                    st.error(message)
-		    
-                #Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
-                #filename_list.append(original_file_name)
-            st.success("Ancillary files for {} uploaded: {} files".format(reporting_month_display, len(uploaded_other_docs)))
-            
+            success,ancillary_upload_message  = Upload_To_Sharepoint(uploaded_other_docs, SHAREPOINT_FOLDER)
+            if success:
+                st.success("{} ancillary files for {} uploaded successfully.".format(reporting_month_display, len(uploaded_other_docs)))
+            elif not success and ancillary_upload_message!=[]:
+                email_body+=f"""
+	        <p><strong>{len(ancillary_upload_message)}</strong> files failed to upload:</p>  
+                <ul>  
+                    {''.join(f'<li>{file}</li>' for file in ancillary_upload_message)}  
+                </ul>
+	        """
+            elif ancillary_upload_message==[]:
+                email_body+=f"""<p><strong>Error during SharePoint upload process. Files are not uploaded</p> """
+
+
         col1, col2 = st.columns([1,3])  
         if 'uploaded_finance' in locals() and uploaded_finance:
             with col1:
