@@ -101,117 +101,39 @@ from office365.sharepoint.client_context import ClientContext
 from office365.runtime.auth.authentication_context import AuthenticationContext
 from office365.sharepoint.client_context import ClientContext
 
-def authenticate_with_sharepoint():
-    try:
-        # Authenticate with SharePoint
-        ctx_auth = AuthenticationContext(SHAREPOINT_URL)
-        if ctx_auth.acquire_token_for_user(sharepoint_username, sharepoint_password):
-            ctx = ClientContext(SHAREPOINT_SITE, ctx_auth)
-            return ctx
-        else:
-            raise Exception("Failed to authenticate with SharePoint.")
-    except Exception as e:
-        st.write(f"Authentication error: {e}")
-        raise
-	    
-def Ensure_Folder_Exists(site, folder_path):
-    try:
-        # Split the folder path into parts
-        folders = folder_path.split("/")
-        
-        # Start from the document library (e.g., "Asset Management")
-        library_name = "Asset Management"  # Use the correct library name
-        library = site.lists.get_by_title(library_name)
-        ctx = library.context  # Get the context for query execution
-        
-        # Load the library properties
-        ctx.load(library)
-        ctx.execute_query()
-        st.write(f"Starting from library: {library.title}")
-        
-        # Start from the root folder of the library
-        current_folder = library.root_folder
-        ctx.load(current_folder)
-        ctx.execute_query()
-        st.write(f"Starting from root folder: {current_folder.properties['ServerRelativeUrl']}")
-        
-        # Traverse the folder structure
-        for folder in folders:
-            if not folder:
-                continue  # Skip empty folder names (e.g., from leading/trailing slashes)
-            
-            st.write(f"Checking for folder: {folder}")
-            
-            # Check if the subfolder exists
-            subfolder = None
-            folders_collection = current_folder.folders
-            ctx.load(folders_collection)
-            ctx.execute_query()
-            
-            # Iterate through folders to find the desired folder
-            for f in folders_collection:
-                if f.properties['Name'] == folder:
-                    subfolder = f
-                    break
-            
-            if not subfolder:
-                # If the folder doesn't exist, raise an error (since it should already exist)
-                raise Exception(f"Folder '{folder}' does not exist. Please create it manually.")
-            else:
-                st.write(f"Folder '{folder}' exists. Using: {subfolder.properties['ServerRelativeUrl']}")
-            
-            current_folder = subfolder
-        
-        st.write(f"Final folder: {current_folder.properties['ServerRelativeUrl']}")
-        return current_folder
-    except Exception as e:
-        st.write(f"Error ensuring folder exists: {e}")
-        raise
-import os
-from office365.sharepoint.client_context import ClientContext
-from office365.runtime.auth.client_credential import ClientCredential
-
 def Upload_To_Sharepoint(files, sharepoint_folder):
     try:
         # Authenticate with SharePoint
-        ctx = authenticate_with_sharepoint()
+        authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
+        site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
         
-        # Ensure the folder exists
-        folder = Ensure_Folder_Exists(ctx.web, sharepoint_folder)
-        
+	# Ensure the folder exists
+        sharepoint_folder = folder(site, sharepoint_folder)
         success_files = []
-        failed_files = []
-        
+        failed_files = []  
         for file in files:
-            temp_file_path = os.path.join(tempfile.gettempdir(), file.name)
-            try:
-                # Save the file temporarily
+            try:   
+                temp_file_path = os.path.join(".", file.name)
                 with open(temp_file_path, "wb") as f:
                     f.write(file.getbuffer())
-                
-                st.write(f"Uploading file: {file.name} to {folder.properties['ServerRelativeUrl']}")
-                
-                # Upload the file to SharePoint
-                with open(temp_file_path, "rb") as file_content:
-                    folder.upload_file(file_content, file.name)
-                ctx.execute_query()  # Execute the query to upload the file
-                success_files.append(file.name)
-                st.write(f"Successfully uploaded: {file.name}")
-            except Exception as e:
-                st.write(f"Error uploading file '{file.name}': {e}")
-                failed_files.append((file.name, str(e)))
-            finally:
-                # Clean up the temporary file
-                if os.path.exists(temp_file_path):
-                    os.remove(temp_file_path)
         
+                # Access the sharepoint_folder
+                #sharepoint_folder = site.Folder(sharepoint_folder)
+        
+                # Upload the file
+                with open(temp_file_path, "rb") as file_content:
+                    sharepoint_folder.upload_file(file_content, file.name)
+                success_files.append(file.name)
+            except Exception as e:
+                st.error(f"Error uploading file '{file.name}': {e}")
+        # Clean up
+        os.remove(temp_file_path)
         if len(failed_files) == 0:
-            return True, success_files
+            return True,success_files
         else:
             return False, failed_files
     except Exception as e:
-        st.write(f"An error occurred: {e}")
-        return False, []
+        return False,[]
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
     password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password, not the API_key
@@ -2404,7 +2326,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
         #SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator,str(selected_year),month_map[selected_month],selected_month)
-        SHAREPOINT_FOLDER = "01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator, str(selected_year), month_map[selected_month], selected_month)  
+        SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator, str(selected_year), month_map[selected_month], selected_month)  
         if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
             st.stop()	
