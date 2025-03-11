@@ -72,7 +72,7 @@ master_template_path="Documents/Tenant Monthly Uploading/Master Template"
 # SharePoint credentials and site details
 SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with scheme
 SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full site URL
-SHAREPOINT_FOLDER = "Asset Management/01_Operators"  # Relative folder path
+SHAREPOINT_FOLDER = "Asset Management/01_Operators/Nexus Systems/Financials & Covenant Analysis/_Facility Financials/2024/.11 Nov"  # Relative folder path
 sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
 sharepoint_password = "June2022SL!"
 
