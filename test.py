@@ -72,7 +72,6 @@ master_template_path="Documents/Tenant Monthly Uploading/Master Template"
 # SharePoint credentials and site details
 SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with scheme
 SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full site URL
-SHAREPOINT_FOLDER = "Asset Management/01_Operators/Nexus Systems/Financials & Covenant Analysis/_Facility Financials/2024/.11 Nov"  # Relative folder path
 sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
 sharepoint_password = "June2022SL!"
 
@@ -2310,6 +2309,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
+        SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/Facility Financials/\
+	              {}/.{} {}".format(operator,str(selected_year),month_map[selected_month],selected_month)
         if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
             st.stop()	
@@ -2324,8 +2325,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 #original_file_name = file.name
                 #file_name, file_extension = original_file_name.rsplit('.', 1)
                 #new_file_name = f"{file_name}_{reporting_month}.{file_extension}"
-
-                                
+  
                 st.write("Uploading file to SharePoint...")
                 success, message = Upload_To_Sharepoint(file, SHAREPOINT_FOLDER)
         
