@@ -104,11 +104,18 @@ def Ensure_Folder_Exists(site, folder_path):
         # Split the folder path into parts
         folders = folder_path.split("/")
         
-        # Start from the root folder of the site
-        current_folder = site.root_folder
-        ctx = current_folder.context  # Get the context for query execution
+        # Start from the document library (e.g., "Shared Documents")
+        library_name = "Shared Documents"  # Replace with your document library name
+        library = site.lists.get_by_title(library_name)
+        ctx = library.context  # Get the context for query execution
         
-        # Load the root folder properties
+        # Load the library properties
+        ctx.load(library)
+        ctx.execute_query()
+        st.write(f"Starting from library: {library.title}")
+        
+        # Start from the root folder of the library
+        current_folder = library.root_folder
         ctx.load(current_folder)
         ctx.execute_query()
         st.write(f"Starting from root folder: {current_folder.properties['ServerRelativeUrl']}")
@@ -145,51 +152,47 @@ def Ensure_Folder_Exists(site, folder_path):
     except Exception as e:
         st.write(f"Error ensuring folder exists: {e}")
         raise
+import os
+from office365.sharepoint.client_context import ClientContext
+from office365.runtime.auth.client_credential import ClientCredential
+
 def Upload_To_Sharepoint(files, sharepoint_folder):
     try:
-        # Authenticate with SharePoint
-        ctx_auth = AuthenticationContext(SHAREPOINT_URL)
-        if ctx_auth.acquire_token_for_user(sharepoint_username, sharepoint_password):
-            ctx = ClientContext(SHAREPOINT_SITE, ctx_auth)
-        else:
-            raise Exception("Failed to authenticate with SharePoint.")
-        
+        # Authenticate with SharePoint using ClientContext
+        ctx = ClientContext(SHAREPOINT_URL).with_credentials(ClientCredential(sharepoint_username, sharepoint_password))
+
         # Ensure the folder exists
-        folder = Ensure_Folder_Exists(ctx.web, sharepoint_folder)
-        
+        sharepoint_folder_obj = Ensure_Folder_Exists(ctx, sharepoint_folder)
+
         success_files = []
-        failed_files = []
-        
+        failed_files = []  
+
         for file in files:
-            temp_file_path = os.path.join(tempfile.gettempdir(), file.name)
-            try:
-                # Save the file temporarily
+            try:   
+                temp_file_path = os.path.join(".", file.name)
                 with open(temp_file_path, "wb") as f:
                     f.write(file.getbuffer())
-                
-                st.write(f"Uploading file: {file.name} to {folder.properties['ServerRelativeUrl']}")
-                
-                # Upload the file to SharePoint
+
+                # Upload the file
                 with open(temp_file_path, "rb") as file_content:
-                    folder.upload_file(file_content, file.name)
-                ctx.execute_query()  # Execute the query to upload the file
+                    sharepoint_folder_obj.upload_file(file.name, file_content)
+                    ctx.execute_query()
+
                 success_files.append(file.name)
-                st.write(f"Successfully uploaded: {file.name}")
             except Exception as e:
-                st.write(f"Error uploading file '{file.name}': {e}")
-                failed_files.append((file.name, str(e)))
-            finally:
-                # Clean up the temporary file
-                if os.path.exists(temp_file_path):
-                    os.remove(temp_file_path)
-        
-        if len(failed_files) == 0:
-            return True, success_files
-        else:
-            return False, failed_files
+                failed_files.append(file.name)
+                print(f"Error uploading file '{file.name}': {e}")
+
+        # Clean up temporary file
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
+
+        return (True, success_files) if not failed_files else (False, failed_files)
+
     except Exception as e:
-        st.write(f"An error occurred: {e}")
+        print(f"Upload failed: {e}")
         return False, []
+
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
     password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password, not the API_key
