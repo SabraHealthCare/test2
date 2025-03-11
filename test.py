@@ -2309,8 +2309,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
-        SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/Facility Financials/\
-	              {}/.{} {}".format(operator,str(selected_year),month_map[selected_month],selected_month)
+        SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator,str(selected_year),month_map[selected_month],selected_month)
+	#Asset Management\01_Operators\Nexus Systems\Financials & Covenant Analysis\_Facility Financials\2024\.11 Nov
+        #Asset Management/01_Operators/Nexus Systems/Financials & Covenant Analysis/_Facility Financials/ 2024/.11 Nov
+	    
         st.write("SHAREPOINT_FOLDER",SHAREPOINT_FOLDER)
         if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
