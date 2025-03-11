@@ -139,10 +139,10 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
             ctx = ClientContext(SHAREPOINT_SITE, ctx_auth)
         else:
             raise Exception("Failed to authenticate with SharePoint.")
-        
+        st.write("AuthenticationContext successfully")
         # Ensure the folder exists
         folder = Ensure_Folder_Exists(ctx.web, sharepoint_folder)
-        
+        st.write("folder folder",folder)
         success_files = []
         failed_files = []
         
