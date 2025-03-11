@@ -136,7 +136,7 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
                     f.write(file.getbuffer())
         
                 # Access the sharepoint_folder
-                #sharepoint_folder = site.Folder(sharepoint_folder)
+                sharepoint_folder = site.Folder(sharepoint_folder)
         
                 # Upload the file
                 with open(temp_file_path, "rb") as file_content:
