@@ -95,11 +95,7 @@ entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance",
 
 import os
 import tempfile
-from office365.runtime.auth.authentication_context import AuthenticationContext
-from office365.sharepoint.client_context import ClientContext
-
-import os
-import tempfile
+import streamlit as st
 from office365.runtime.auth.authentication_context import AuthenticationContext
 from office365.sharepoint.client_context import ClientContext
 
@@ -125,19 +121,28 @@ def Ensure_Folder_Exists(site, folder_path):
             st.write(f"Checking for folder: {folder}")
             
             # Check if the subfolder exists
-            subfolder = current_folder.folders.get_by_name(folder)
+            subfolder = None
+            folders_collection = current_folder.folders
+            ctx.load(folders_collection)
+            ctx.execute_query()
+            
+            # Iterate through folders to find the desired folder
+            for f in folders_collection:
+                if f.properties['Name'] == folder:
+                    subfolder = f
+                    break
+            
             if not subfolder:
                 st.write(f"Folder '{folder}' does not exist. Creating...")
                 # If the folder doesn't exist, create it
-                current_folder = current_folder.folders.add(folder)
-                ctx.load(current_folder)  # Load the new folder properties
+                subfolder = current_folder.folders.add(folder)
+                ctx.load(subfolder)  # Load the new folder properties
                 ctx.execute_query()  # Execute the query to create the folder
-                st.write(f"Created folder: {current_folder.properties['ServerRelativeUrl']}")
+                st.write(f"Created folder: {subfolder.properties['ServerRelativeUrl']}")
             else:
-                current_folder = subfolder
-                ctx.load(current_folder)  # Load the folder properties
-                ctx.execute_query()  # Execute the query to get the folder properties
-                st.write(f"Folder '{folder}' exists. Using: {current_folder.properties['ServerRelativeUrl']}")
+                st.write(f"Folder '{folder}' exists. Using: {subfolder.properties['ServerRelativeUrl']}")
+            
+            current_folder = subfolder
         
         st.write(f"Final folder: {current_folder.properties['ServerRelativeUrl']}")
         return current_folder
@@ -190,7 +195,6 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
     except Exception as e:
         st.write(f"An error occurred: {e}")
         return False, []
-
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
     password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password, not the API_key
