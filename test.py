@@ -104,7 +104,6 @@ sharepoint_password = "June2022SL!"
 from office365.sharepoint.folders.folder import Folder
 
 
-
 def Ensure_Folder_Exists(site_url, folder_path, username, password):
     try:
         # Authenticate with SharePoint
