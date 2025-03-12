@@ -100,7 +100,7 @@ sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint user
 sharepoint_password = "June2022SL!"
 
 
-def ensure_folder_structure(site_url, folder_path, username, password):
+def Ensure_Folder_Exists(site_url, folder_path, username, password):
     try:
         # Authenticate with SharePoint
         ctx_auth = AuthenticationContext(site_url)
