@@ -145,7 +145,7 @@ def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
                 with open(temp_file_path, "rb") as file_content:
                     if new_file_name==None:
                         sharepoint_folder.upload_file(file_content, file.name)
-		    else:
+                    else:
                         sharepoint_folder.upload_file(file_content, new_file_name)  
                 success_files.append(file.name)
             except Exception as e:
