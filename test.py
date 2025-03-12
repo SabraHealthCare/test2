@@ -104,8 +104,6 @@ sharepoint_password = "June2022SL!"
 from office365.sharepoint.folders.folder import Folder
 
 
-from office365.runtime.auth.authentication_context import AuthenticationContext
-from office365.sharepoint.client_context import ClientContext
 
 def Ensure_Folder_Exists(site_url, folder_path, username, password):
     try:
@@ -148,7 +146,7 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
 
         return True
     except Exception as e:
-        print(f"Error ensuring folder structure exists: {e}")
+        st.write(f"Error ensuring folder structure exists: {e}")
         return False
 
 def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
