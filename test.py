@@ -105,6 +105,8 @@ from office365.sharepoint.folders.folder import Folder
 
 
 
+
+
 def Ensure_Folder_Exists(site_url, folder_path, username, password):
     try:
         # Authenticate with SharePoint
@@ -138,9 +140,15 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
                     ctx.execute_query()
 
                     # Create the new folder
-                    new_folder = parent_folder.folders.add(part)
-                    ctx.execute_query()
-                    current_folder = new_folder
+                    try:
+                        new_folder = parent_folder.folders.add(part)
+                        ctx.execute_query()
+                        current_folder = new_folder
+                    except Exception as create_error:
+                        if "403" in str(create_error):
+                            raise Exception(f"Permission denied: Unable to create folder '{part}'. Please check user permissions.")
+                        else:
+                            raise  # Re-raise any other exceptions
                 else:
                     raise  # Re-raise any other exceptions
 
@@ -148,6 +156,7 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
     except Exception as e:
         st.write(f"Error ensuring folder structure exists: {e}")
         return False
+	    
 
 def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
     try:
