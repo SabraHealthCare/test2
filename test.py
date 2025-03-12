@@ -105,7 +105,6 @@ from office365.sharepoint.folders.folder import Folder
 
 
 
-
 from office365.runtime.auth.authentication_context import AuthenticationContext
 from office365.sharepoint.client_context import ClientContext
 
@@ -114,7 +113,7 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
         # Authenticate with SharePoint
         ctx_auth = AuthenticationContext(site_url)
         if not ctx_auth.acquire_token_for_user(username, password):
-            raise Exception("Authentication failed")
+            raise Exception("Authentication failed: Invalid credentials")
 
         ctx = ClientContext(site_url, ctx_auth)
         web = ctx.web
@@ -123,27 +122,31 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
 
         # Split the folder path into parts
         folder_parts = folder_path.strip("/").split("/")
-        current_folder = web.get_folder_by_server_relative_url("/")  # Start from the root folder
 
-        # Iterate through each part of the folder path
-        for i, part in enumerate(folder_parts):
+        # Start from the "01_Operators" folder (assume it already exists)
+        start_folder = "01_Operators"
+        if folder_parts[0] != start_folder:
+            raise Exception(f"Folder path must start with '{start_folder}'.")
+
+        # Construct the base folder path (up to "01_Operators")
+        base_folder_path = "/" + start_folder
+        current_folder = web.get_folder_by_server_relative_url(base_folder_path)
+        ctx.load(current_folder)
+        ctx.execute_query()
+
+        # Iterate through the remaining parts of the folder path
+        for part in folder_parts[1:]:
             try:
                 # Construct the server-relative URL for the current folder
-                relative_url = "/" + "/".join(folder_parts[:i + 1])
+                relative_url = base_folder_path + "/" + "/".join(folder_parts[:folder_parts.index(part) + 1])
                 current_folder = web.get_folder_by_server_relative_url(relative_url)
                 ctx.load(current_folder)
                 ctx.execute_query()
             except Exception as e:
                 if "404" in str(e) or "does not exist" in str(e):  # Folder does not exist, so create it
-                    # Construct the parent folder URL
-                    parent_relative_url = "/" + "/".join(folder_parts[:i])
-                    parent_folder = web.get_folder_by_server_relative_url(parent_relative_url)
-                    ctx.load(parent_folder)
-                    ctx.execute_query()
-
-                    # Create the new folder
+                    # Create the new folder under the current folder
                     try:
-                        new_folder = parent_folder.folders.add(part)
+                        new_folder = current_folder.folders.add(part)
                         ctx.execute_query()
                         current_folder = new_folder
                     except Exception as create_error:
@@ -158,6 +161,7 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
     except Exception as e:
         st.write(f"Error ensuring folder structure exists: {e}")
         return False
+
 	    
 
 def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
