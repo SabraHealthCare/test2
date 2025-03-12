@@ -2386,7 +2386,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             elif ancillary_upload_message==[]:
                 email_body_for_Sabra+=f"""<p><strong>Error during SharePoint upload process. Files are not uploaded</p> """
             for file in uploaded_other_docs:
-                Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
+                Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),file.name)
 
         col1, col2 = st.columns([1,3])  
         if 'uploaded_finance' in locals() and uploaded_finance:
