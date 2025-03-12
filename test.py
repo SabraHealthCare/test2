@@ -127,13 +127,12 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
     except Exception as e:
         return False
        
-def Upload_To_Sharepoint(files, sharepoint_folder):
+def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
     try:
         # Authenticate with SharePoint
         authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
-        Ensure_Folder_Exists(SHAREPOINT_URL, sharepoint_folder, sharepoint_username, sharepoint_password)
-	# Ensure the folder exists
+
         sharepoint_folder = site.Folder(sharepoint_folder)
         success_files = []
         failed_files = []  
@@ -144,7 +143,10 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
                     f.write(file.getbuffer())
                 # Upload the file
                 with open(temp_file_path, "rb") as file_content:
-                    sharepoint_folder.upload_file(file_content, file.name)
+                    if new_file_name==None:
+                        sharepoint_folder.upload_file(file_content, file.name)
+		    else:
+                        sharepoint_folder.upload_file(file_content, new_file_name)  
                 success_files.append(file.name)
             except Exception as e:
                 st.error(f"Error uploading file '{file.name}': {e}")
@@ -1417,18 +1419,14 @@ def Submit_Upload(total_email_body):
 
     # save tenant P&L to OneDrive
     PL_success,PL_upload_message  = Upload_To_Sharepoint(uploaded_finance, SHAREPOINT_FOLDER,"{}/{}".format(PL_path,operator),"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
-        if not PL_success and PL_upload_message!=[]:
+    if not PL_success and PL_upload_message!=[]:
         email_body+=f"""<p><strong>P&L failed to upload:</p>"""
  	
-    if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
-        BS_success,BS_upload_message  = Upload_To_Sharepoint(uploaded_BS, SHAREPOINT_FOLDER,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
-            if not BS_success and BS_upload_message!=[]:
-                email_body+=f"""<p><strong>Balance sheet failed to upload:</p>"""
 
     if BS_separate_excel=="Y":
         # save tenant BS to OneDrive
-        success,BS_upload_message  = Upload_To_Sharepoint(uploaded_BS, SHAREPOINT_FOLDER,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
-            if not success and BS_upload_message!=[]:
+        BS_success,BS_upload_message  = Upload_To_Sharepoint(uploaded_BS, SHAREPOINT_FOLDER,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
+            if not BS_success and BS_upload_message!=[]:
                 email_body+=f"""<p><strong>Balance sheet failed to upload:</p>"""
  
     subject = "Confirmation of {} {} reporting".format(operator,reporting_month_display)
@@ -2357,8 +2355,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
-        #SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator,str(selected_year),month_map[selected_month],selected_month)
         SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator, str(selected_year), month_map[selected_month], selected_month)  
+        Ensure_Folder_Exists(SHAREPOINT_URL, SHAREPOINT_FOLDER, sharepoint_username, sharepoint_password)
         if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
             st.stop()	
