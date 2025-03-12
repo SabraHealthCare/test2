@@ -104,7 +104,6 @@ sharepoint_password = "June2022SL!"
 from office365.sharepoint.folders.folder import Folder
 
 
-
 from office365.runtime.auth.authentication_context import AuthenticationContext
 from office365.sharepoint.client_context import ClientContext
 
@@ -123,22 +122,23 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
         # Split the folder path into parts
         folder_parts = folder_path.strip("/").split("/")
 
-        # Start from the "01_Operators" folder (assume it already exists)
-        start_folder = "01_Operators"
-        if folder_parts[0] != start_folder:
-            raise Exception(f"Folder path must start with '{start_folder}'.")
+        # Find the index of "01_Operators" in the folder path
+        try:
+            start_index = folder_parts.index("01_Operators")
+        except ValueError:
+            raise Exception("Folder path must contain '01_Operators'.")
 
         # Construct the base folder path (up to "01_Operators")
-        base_folder_path = "/" + start_folder
+        base_folder_path = "/" + "/".join(folder_parts[:start_index + 1])
         current_folder = web.get_folder_by_server_relative_url(base_folder_path)
         ctx.load(current_folder)
         ctx.execute_query()
 
-        # Iterate through the remaining parts of the folder path
-        for part in folder_parts[1:]:
+        # Iterate through the remaining parts of the folder path (after "01_Operators")
+        for part in folder_parts[start_index + 1:]:
             try:
                 # Construct the server-relative URL for the current folder
-                relative_url = base_folder_path + "/" + "/".join(folder_parts[:folder_parts.index(part) + 1])
+                relative_url = base_folder_path + "/" + "/".join(folder_parts[start_index + 1:folder_parts.index(part) + 1])
                 current_folder = web.get_folder_by_server_relative_url(relative_url)
                 ctx.load(current_folder)
                 ctx.execute_query()
@@ -161,9 +161,6 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
     except Exception as e:
         st.write(f"Error ensuring folder structure exists: {e}")
         return False
-
-	    
-
 def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
     try:
         # Authenticate with SharePoint
