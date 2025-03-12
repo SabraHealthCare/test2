@@ -1426,8 +1426,8 @@ def Submit_Upload(total_email_body):
     if BS_separate_excel=="Y":
         # save tenant BS to OneDrive
         BS_success,BS_upload_message  = Upload_To_Sharepoint(uploaded_BS, SHAREPOINT_FOLDER,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
-            if not BS_success and BS_upload_message!=[]:
-                email_body+=f"""<p><strong>Balance sheet failed to upload:</p>"""
+        if not BS_success and BS_upload_message!=[]:
+            email_body+=f"""<p><strong>Balance sheet failed to upload:</p>"""
  
     subject = "Confirmation of {} {} reporting".format(operator,reporting_month_display)
     # Get 'Asset_Manager' from entity_mapping
