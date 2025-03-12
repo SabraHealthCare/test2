@@ -156,7 +156,7 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
 
         return True
     except Exception as e:
-        print(f"Error ensuring folder structure exists: {e}")
+        st.write(f"Error ensuring folder structure exists: {e}")
         return False
 	    
 
