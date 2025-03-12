@@ -101,12 +101,50 @@ from office365.sharepoint.client_context import ClientContext
 from office365.runtime.auth.authentication_context import AuthenticationContext
 from office365.sharepoint.client_context import ClientContext
 
+
+SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with scheme
+SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full site URL
+sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
+sharepoint_password = "June2022SL!"
+#SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator, str(selected_year), month_map[selected_month], selected_month)  
+from office365.sharepoint.client_context import ClientContext
+from office365.runtime.auth.authentication_context import AuthenticationContext
+
+def ensure_folder_exists(site_url, relative_folder_path, username, password):
+    try:
+        # Authenticate with SharePoint
+        ctx_auth = AuthenticationContext(site_url)
+        if ctx_auth.acquire_token_for_user(username, password):
+            ctx = ClientContext(site_url, ctx_auth)
+            web = ctx.web
+            ctx.load(web)
+            ctx.execute_query()
+        else:
+            raise Exception("Authentication failed")
+        
+        folder = ctx.web.get_folder_by_server_relative_url(relative_folder_path)
+        ctx.load(folder)
+        try:
+            ctx.execute_query()
+        except:
+            # Folder does not exist, create it
+            parent_folder_url = "/".join(relative_folder_path.split("/")[:-1])
+            parent_folder = ctx.web.get_folder_by_server_relative_url(parent_folder_url)
+            ctx.load(parent_folder)
+            ctx.execute_query()
+            parent_folder.folders.add(relative_folder_path)
+            ctx.execute_query()
+        return True
+    except Exception as e:
+        print(f"Error ensuring folder exists: {e}")
+        return False
+       
 def Upload_To_Sharepoint(files, sharepoint_folder):
     try:
         # Authenticate with SharePoint
         authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
-        
+        ensure_folder_exists(SHAREPOINT_URL, sharepoint_folder, sharepoint_username, sharepoint_password)
 	# Ensure the folder exists
         sharepoint_folder = site.Folder(sharepoint_folder)
         success_files = []
