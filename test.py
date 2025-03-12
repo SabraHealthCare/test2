@@ -101,11 +101,11 @@ sharepoint_password = "June2022SL!"
 
 def Ensure_Folder_Exists(site_url, relative_folder_path, username, password):
     """
-    Ensures that the folder structure exists in SharePoint.
+    Ensures that the last two folders (Year and Month) exist in SharePoint.
     
     Parameters:
         site_url (str): SharePoint site URL.
-        relative_folder_path (str): The folder path to check and create if missing.
+        relative_folder_path (str): The full folder path (including Year/Month).
         username (str): SharePoint username.
         password (str): SharePoint password.
     """
@@ -116,60 +116,54 @@ def Ensure_Folder_Exists(site_url, relative_folder_path, username, password):
             raise Exception("Authentication failed")
 
         ctx = ClientContext(site_url, ctx_auth)
-        
-        # Split the path into folders
+
+        # Extract base path and last two folders (Year and Month)
         folders = relative_folder_path.strip("/").split("/")
         
-        # Check if the base folder exists
-        base_folder_path = "/".join(folders[:-2])  # Exclude the last two folders (year and month)
+        if len(folders) < 3:
+            raise Exception("Error: The path must contain at least three levels (Base/Year/Month).")
+
+        base_folder_path = "/".join(folders[:-2])  # Everything except Year and Month
+        year_folder = folders[-2]  # Second last folder (Year)
+        month_folder = folders[-1]  # Last folder (Month)
+
+        # Step 1: Check if the base folder exists
         base_folder = ctx.web.get_folder_by_server_relative_url(base_folder_path)
         ctx.load(base_folder)
-
         try:
-            ctx.execute_query()  # Try loading the base folder (if it exists)
-        except Exception as e:
-            if "404" in str(e) or "does not exist" in str(e):
-                raise Exception(f"Base folder '{base_folder_path}' does not exist. Please verify the folder path.")
-            else:
-                raise  # Re-raise any other exceptions
+            ctx.execute_query()
+        except Exception:
+            raise Exception(f"Error: Base folder does not exist - {base_folder_path}")
 
-        # Check and create the last two folders (year and month)
-        year_folder_path = f"{base_folder_path}/{folders[-2]}"  # Path for the year folder
-        month_folder_path = f"{year_folder_path}/{folders[-1]}"  # Path for the month folder
-
-        # Check if the year folder exists
-        year_folder = ctx.web.get_folder_by_server_relative_url(year_folder_path)
-        ctx.load(year_folder)
-
+        # Step 2: Check and create the Year folder
+        year_folder_path = f"{base_folder_path}/{year_folder}"
+        year_folder_obj = ctx.web.get_folder_by_server_relative_url(year_folder_path)
+        ctx.load(year_folder_obj)
         try:
-            ctx.execute_query()  # Try loading the year folder (if it exists)
-        except Exception as e:
-            if "404" in str(e) or "does not exist" in str(e):
-                # Year folder does not exist, create it
-                base_folder.folders.add(folders[-2])
-                ctx.execute_query()
-            else:
-                raise  # Re-raise any other exceptions
+            ctx.execute_query()
+        except Exception:
+            # Year folder doesn't exist, create it
+            base_folder.folders.add(year_folder)
+            ctx.execute_query()
 
-        # Check if the month folder exists
-        month_folder = ctx.web.get_folder_by_server_relative_url(month_folder_path)
-        ctx.load(month_folder)
-
+        # Step 3: Check and create the Month folder inside the Year folder
+        month_folder_path = f"{year_folder_path}/{month_folder}"
+        month_folder_obj = ctx.web.get_folder_by_server_relative_url(month_folder_path)
+        ctx.load(month_folder_obj)
         try:
-            ctx.execute_query()  # Try loading the month folder (if it exists)
-        except Exception as e:
-            if "404" in str(e) or "does not exist" in str(e):
-                # Month folder does not exist, create it
-                year_folder.folders.add(folders[-1])
-                ctx.execute_query()
-            else:
-                raise  # Re-raise any other exceptions
+            ctx.execute_query()
+        except Exception:
+            # Month folder doesn't exist, create it
+            year_folder_obj = ctx.web.get_folder_by_server_relative_url(year_folder_path)  # Reload year folder
+            ctx.load(year_folder_obj)
+            ctx.execute_query()
+            year_folder_obj.folders.add(month_folder)
+            ctx.execute_query()
 
         return True
     except Exception as e:
-        st.write(f"Error ensuring folder exists: {e}")
+        print(f"Error ensuring folder exists: {e}")
         return False
-
 def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
     try:
         # Authenticate with SharePoint
