@@ -103,7 +103,6 @@ sharepoint_password = "June2022SL!"
 
 from office365.sharepoint.folders.folder import Folder
 
-
 from office365.runtime.auth.authentication_context import AuthenticationContext
 from office365.sharepoint.client_context import ClientContext
 
@@ -130,9 +129,16 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
 
         # Construct the base folder path (up to "01_Operators")
         base_folder_path = "/" + "/".join(folder_parts[:start_index + 1])
-        current_folder = web.get_folder_by_server_relative_url(base_folder_path)
-        ctx.load(current_folder)
-        ctx.execute_query()
+        try:
+            # Try to access the base folder
+            current_folder = web.get_folder_by_server_relative_url(base_folder_path)
+            ctx.load(current_folder)
+            ctx.execute_query()
+        except Exception as e:
+            if "404" in str(e) or "does not exist" in str(e):
+                raise Exception(f"Base folder '{base_folder_path}' does not exist. Please verify the folder path.")
+            else:
+                raise  # Re-raise any other exceptions
 
         # Iterate through the remaining parts of the folder path (after "01_Operators")
         for part in folder_parts[start_index + 1:]:
@@ -159,8 +165,9 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
 
         return True
     except Exception as e:
-        st.write(f"Error ensuring folder structure exists: {e}")
+        print(f"Error ensuring folder structure exists: {e}")
         return False
+
 def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
     try:
         # Authenticate with SharePoint
