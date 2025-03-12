@@ -77,6 +77,7 @@ sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint user
 sharepoint_password = "June2022SL!"
 
 email_body=""
+email_body_for_Sabra=""
 today= datetime.now(pytz.timezone('America/Los_Angeles')).date()
 current_year= today.year
 current_month= today.month
@@ -102,15 +103,6 @@ sharepoint_password = "June2022SL!"
 
 
 def Ensure_Folder_Exists(site_url, relative_folder_path, username, password):
-    """
-    Ensures that the folder structure exists in SharePoint.
-    
-    Parameters:
-        site_url (str): SharePoint site URL.
-        relative_folder_path (str): The folder path to check and create if missing.
-        username (str): SharePoint username.
-        password (str): SharePoint password.
-    """
     try:
         # Authenticate with SharePoint
         ctx_auth = AuthenticationContext(site_url)
@@ -121,51 +113,22 @@ def Ensure_Folder_Exists(site_url, relative_folder_path, username, password):
         
         # Split the path into folders
         folders = relative_folder_path.strip("/").split("/")
-        
-        # Construct the base folder path (up to "_Facility Financials")
-        base_folder_path = "/" + "/".join(folders[:-2])  # Exclude the last two folders (year and month)
-        base_folder = ctx.web.get_folder_by_server_relative_url(base_folder_path)
-        ctx.load(base_folder)
+        base_path = folders[0]  # Start with the first folder
 
-        try:
-            ctx.execute_query()  # Try loading the base folder (if it exists)
-        except Exception as e:
-            if "404" in str(e) or "does not exist" in str(e):
-                raise Exception(f"Base folder '{base_folder_path}' does not exist. Please verify the folder path.")
-            else:
-                raise  # Re-raise any other exceptions
+        for folder in folders[1:]:
+            base_path = f"{base_path}/{folder}"
+            folder_obj = ctx.web.get_folder_by_server_relative_url(base_path)
+            ctx.load(folder_obj)
 
-        # Check and create the last two folders (year and month)
-        year_folder_path = f"{base_folder_path}/{folders[-2]}"  # Path for the year folder
-        month_folder_path = f"{year_folder_path}/{folders[-1]}"  # Path for the month folder
-
-        # Check if the year folder exists
-        year_folder = ctx.web.get_folder_by_server_relative_url(year_folder_path)
-        ctx.load(year_folder)
-
-        try:
-            ctx.execute_query()  # Try loading the year folder (if it exists)
-        except Exception as e:
-            if "404" in str(e) or "does not exist" in str(e):
-                # Year folder does not exist, create it
-                base_folder.folders.add(folders[-2])
+            try:
+                ctx.execute_query()  # Try loading the folder (if it exists)
+            except Exception:
+                # Folder doesn't exist, create it
+                parent_folder = ctx.web.get_folder_by_server_relative_url("/".join(base_path.split("/")[:-1]))
+                ctx.load(parent_folder)
                 ctx.execute_query()
-            else:
-                raise  # Re-raise any other exceptions
-
-        # Check if the month folder exists
-        month_folder = ctx.web.get_folder_by_server_relative_url(month_folder_path)
-        ctx.load(month_folder)
-
-        try:
-            ctx.execute_query()  # Try loading the month folder (if it exists)
-        except Exception as e:
-            if "404" in str(e) or "does not exist" in str(e):
-                # Month folder does not exist, create it
-                year_folder.folders.add(folders[-1])
+                parent_folder.folders.add(folder)
                 ctx.execute_query()
-            else:
-                raise  # Re-raise any other exceptions
 
         return True
     except Exception as e:
@@ -194,6 +157,7 @@ def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
                 success_files.append(file.name)
             except Exception as e:
                 st.error(f"Error uploading file '{file.name}': {e}")
+                
         # Clean up
         os.remove(temp_file_path)
         if len(failed_files) == 0:
@@ -1464,15 +1428,15 @@ def Submit_Upload(total_email_body):
     # save tenant P&L to OneDrive
     PL_success,PL_upload_message  = Upload_To_Sharepoint(uploaded_finance, SHAREPOINT_FOLDER,"{}/{}".format(PL_path,operator),"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
     if not PL_success and PL_upload_message!=[]:
-        email_body+=f"""<p><strong>P&L failed to upload:</p>"""
+        email_body_for_Sabra+=f"""<p><strong>P&L failed to upload:</p>"""
  	
+    Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
 
     if BS_separate_excel=="Y":
-        # save tenant BS to OneDrive
         BS_success,BS_upload_message  = Upload_To_Sharepoint(uploaded_BS, SHAREPOINT_FOLDER,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
         if not BS_success and BS_upload_message!=[]:
-            email_body+=f"""<p><strong>Balance sheet failed to upload:</p>"""
- 
+            email_body_for_Sabra+=f"""<p><strong>Balance sheet failed to upload:</p>"""
+        Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
     subject = "Confirmation of {} {} reporting".format(operator,reporting_month_display)
     # Get 'Asset_Manager' from entity_mapping
     unique_asset_managers = entity_mapping['Asset_Manager'].unique()
@@ -1496,8 +1460,8 @@ def Submit_Upload(total_email_body):
     if not st.session_state.email_sent:
         #Send_Confirmation_Email(["sli@sabrahealth.com"], subject, format_total_email_body)    
         Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
-        if email_body!="":
-            Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body)    
+        if email_body!="" or email_body_for_Sabra!="":
+            Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body+email_body_for_Sabra)    
         st.session_state.email_sent = True
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
@@ -2400,7 +2364,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
         SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator, str(selected_year), month_map[selected_month], selected_month)  
-        Ensure_Folder_Exists(SHAREPOINT_URL, SHAREPOINT_FOLDER, sharepoint_username, sharepoint_password)
+        #Ensure_Folder_Exists(SHAREPOINT_URL, SHAREPOINT_FOLDER, sharepoint_username, sharepoint_password)
         if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
             st.stop()	
@@ -2413,15 +2377,16 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             if success:
                 st.success("{} ancillary files for {} uploaded successfully.".format(reporting_month_display, len(uploaded_other_docs)))
             elif not success and ancillary_upload_message!=[]:
-                email_body+=f"""
+                email_body_for_Sabra+=f"""
 	        <p><strong>{len(ancillary_upload_message)}</strong> files failed to upload:</p>  
                 <ul>  
                     {''.join(f'<li>{file}</li>' for file in ancillary_upload_message)}  
                 </ul>
 	        """
             elif ancillary_upload_message==[]:
-                email_body+=f"""<p><strong>Error during SharePoint upload process. Files are not uploaded</p> """
-
+                email_body_for_Sabra+=f"""<p><strong>Error during SharePoint upload process. Files are not uploaded</p> """
+            for file in uploaded_other_docs:
+                Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),new_file_name)
 
         col1, col2 = st.columns([1,3])  
         if 'uploaded_finance' in locals() and uploaded_finance:
