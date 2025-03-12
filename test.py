@@ -102,8 +102,7 @@ sharepoint_password = "June2022SL!"
 
 from office365.sharepoint.client_context import ClientContext
 from office365.runtime.auth.authentication_context import AuthenticationContext
-
-from office365.runtime.exceptions.service_exception import ServiceException
+#from office365.runtime.exceptions.service_exception import ServiceException
 from office365.sharepoint.folders.folder import Folder
 def Ensure_Folder_Exists(site_url, folder_path, username, password):
     try:
@@ -126,7 +125,7 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
                 current_folder = current_folder.folders.get_by_url(part)
                 ctx.load(current_folder)
                 ctx.execute_query()
-            except ServiceException as e:
+            except:
                 if "does not exist" in str(e):  # Folder does not exist, so create it
                     parent_folder = web.get_folder_by_server_relative_url("/".join(folder_parts[:-1]))
                     ctx.load(parent_folder)
