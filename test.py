@@ -103,69 +103,41 @@ sharepoint_password = "June2022SL!"
 
 from office365.sharepoint.folders.folder import Folder
 
-from office365.runtime.auth.authentication_context import AuthenticationContext
-from office365.sharepoint.client_context import ClientContext
+
+If the folder structure already exists, the function will return True.
+
+If the folder structure does not exist, the function will create it and return True.
+
+If an error occurs (e.g., insufficient permissions), the function will return False and print the error message.
+
+Let me know if you encounter further issues!
 
 def Ensure_Folder_Exists(site_url, folder_path, username, password):
     try:
         # Authenticate with SharePoint
         ctx_auth = AuthenticationContext(site_url)
-        if not ctx_auth.acquire_token_for_user(username, password):
-            raise Exception("Authentication failed: Invalid credentials")
-
-        ctx = ClientContext(site_url, ctx_auth)
-        web = ctx.web
-        ctx.load(web)
-        ctx.execute_query()
-
-        # Split the folder path into parts
-        folder_parts = folder_path.strip("/").split("/")
-
-        # Find the index of "01_Operators" in the folder path
-        try:
-            start_index = folder_parts.index("01_Operators")
-        except ValueError:
-            raise Exception("Folder path must contain '01_Operators'.")
-
-        # Construct the base folder path (up to "01_Operators")
-        base_folder_path = "/" + "/".join(folder_parts[:start_index + 1])
-        try:
-            # Try to access the base folder
-            current_folder = web.get_folder_by_server_relative_url(base_folder_path)
-            ctx.load(current_folder)
+        if ctx_auth.acquire_token_for_user(username, password):
+            ctx = ClientContext(site_url, ctx_auth)
+            web = ctx.web
+            ctx.load(web)
             ctx.execute_query()
-        except Exception as e:
-            if "404" in str(e) or "does not exist" in str(e):
-                raise Exception(f"Base folder '{base_folder_path}' does not exist. Please verify the folder path.")
-            else:
-                raise  # Re-raise any other exceptions
-
-        # Iterate through the remaining parts of the folder path (after "01_Operators")
-        for part in folder_parts[start_index + 1:]:
-            try:
-                # Construct the server-relative URL for the current folder
-                relative_url = base_folder_path + "/" + "/".join(folder_parts[start_index + 1:folder_parts.index(part) + 1])
-                current_folder = web.get_folder_by_server_relative_url(relative_url)
-                ctx.load(current_folder)
-                ctx.execute_query()
-            except Exception as e:
-                if "404" in str(e) or "does not exist" in str(e):  # Folder does not exist, so create it
-                    # Create the new folder under the current folder
-                    try:
-                        new_folder = current_folder.folders.add(part)
-                        ctx.execute_query()
-                        current_folder = new_folder
-                    except Exception as create_error:
-                        if "403" in str(create_error):
-                            raise Exception(f"Permission denied: Unable to create folder '{part}'. Please check user permissions.")
-                        else:
-                            raise  # Re-raise any other exceptions
-                else:
-                    raise  # Re-raise any other exceptions
-
+        else:
+            raise Exception("Authentication failed")
+        
+        folder = ctx.web.get_folder_by_server_relative_url(folder_path)
+        ctx.load(folder)
+        try:
+            ctx.execute_query()
+        except:
+            # Folder does not exist, create it
+            parent_folder_url = "/".join(folder_path.split("/")[:-1])
+            parent_folder = ctx.web.get_folder_by_server_relative_url(parent_folder_url)
+            ctx.load(parent_folder)
+            ctx.execute_query()
+            parent_folder.folders.add(folder_path)
+            ctx.execute_query()
         return True
     except Exception as e:
-        print(f"Error ensuring folder structure exists: {e}")
         return False
 
 def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
