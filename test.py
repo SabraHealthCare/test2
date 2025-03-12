@@ -100,12 +100,17 @@ sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint user
 sharepoint_password = "June2022SL!"
 
 
+from office365.sharepoint.client_context import ClientContext
+from office365.runtime.auth.authentication_context import AuthenticationContext
+from office365.sharepoint.files.folder import Folder
+from office365.runtime.exceptions.service_exception import ServiceException
+
 def Ensure_Folder_Exists(site_url, folder_path, username, password):
     try:
         # Authenticate with SharePoint
         ctx_auth = AuthenticationContext(site_url)
         if not ctx_auth.acquire_token_for_user(username, password):
-            raise Exception("Authentication failed")
+            raise Exception("Authentication failed: Invalid credentials")
 
         ctx = ClientContext(site_url, ctx_auth)
         web = ctx.web
@@ -114,26 +119,29 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
 
         # Split the folder path into parts
         folder_parts = folder_path.strip("/").split("/")
-        base_path = ""
-        
+        current_folder = web.get_folder_by_server_relative_url("")  # Start from the root
+
         for part in folder_parts:
-            base_path = f"{base_path}/{part}" if base_path else part
-            folder = ctx.web.get_folder_by_server_relative_url(base_path)
-            ctx.load(folder)
             try:
-                ctx.execute_query()  # Check if folder exists
-            except:
-                # Folder does not exist, so create it
-                parent_folder = ctx.web.get_folder_by_server_relative_url("/".join(base_path.split("/")[:-1]))
-                ctx.load(parent_folder)
+                current_folder = current_folder.folders.get_by_url(part)
+                ctx.load(current_folder)
                 ctx.execute_query()
-                parent_folder.folders.add(part)
-                ctx.execute_query()
-        
+            except ServiceException as e:
+                if "does not exist" in str(e):  # Folder does not exist, so create it
+                    parent_folder = web.get_folder_by_server_relative_url("/".join(folder_parts[:-1]))
+                    ctx.load(parent_folder)
+                    ctx.execute_query()
+                    parent_folder.folders.add(part)
+                    ctx.execute_query()
+                    current_folder = parent_folder.folders.get_by_url(part)
+                else:
+                    raise  # Re-raise any other exceptions
+
         return True
     except Exception as e:
-        st.write(f"Error ensuring folder structure exists: {e}")
+        print(f"Error ensuring folder structure exists: {e}")
         return False
+
 	    
        
 def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
