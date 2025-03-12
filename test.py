@@ -106,13 +106,15 @@ from office365.sharepoint.folders.folder import Folder
 
 
 
+from office365.runtime.auth.authentication_context import AuthenticationContext
+from office365.sharepoint.client_context import ClientContext
 
 def Ensure_Folder_Exists(site_url, folder_path, username, password):
     try:
         # Authenticate with SharePoint
         ctx_auth = AuthenticationContext(site_url)
         if not ctx_auth.acquire_token_for_user(username, password):
-            raise Exception("Authentication failed: Invalid credentials")
+            raise Exception("Authentication failed")
 
         ctx = ClientContext(site_url, ctx_auth)
         web = ctx.web
@@ -154,7 +156,7 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
 
         return True
     except Exception as e:
-        st.write(f"Error ensuring folder structure exists: {e}")
+        print(f"Error ensuring folder structure exists: {e}")
         return False
 	    
 
