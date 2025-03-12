@@ -99,33 +99,42 @@ SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full
 sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
 sharepoint_password = "June2022SL!"
 
-def Ensure_Folder_Exists(site_url, folder_path, username, password):
+
+def ensure_folder_structure(site_url, folder_path, username, password):
     try:
         # Authenticate with SharePoint
         ctx_auth = AuthenticationContext(site_url)
-        if ctx_auth.acquire_token_for_user(username, password):
-            ctx = ClientContext(site_url, ctx_auth)
-            web = ctx.web
-            ctx.load(web)
-            ctx.execute_query()
-        else:
+        if not ctx_auth.acquire_token_for_user(username, password):
             raise Exception("Authentication failed")
+
+        ctx = ClientContext(site_url, ctx_auth)
+        web = ctx.web
+        ctx.load(web)
+        ctx.execute_query()
+
+        # Split the folder path into parts
+        folder_parts = folder_path.strip("/").split("/")
+        base_path = ""
         
-        folder = ctx.web.get_folder_by_server_relative_url(folder_path)
-        ctx.load(folder)
-        try:
-            ctx.execute_query()
-        except:
-            # Folder does not exist, create it
-            parent_folder_url = "/".join(folder_path.split("/")[:-1])
-            parent_folder = ctx.web.get_folder_by_server_relative_url(parent_folder_url)
-            ctx.load(parent_folder)
-            ctx.execute_query()
-            parent_folder.folders.add(folder_path)
-            ctx.execute_query()
+        for part in folder_parts:
+            base_path = f"{base_path}/{part}" if base_path else part
+            folder = ctx.web.get_folder_by_server_relative_url(base_path)
+            ctx.load(folder)
+            try:
+                ctx.execute_query()  # Check if folder exists
+            except:
+                # Folder does not exist, so create it
+                parent_folder = ctx.web.get_folder_by_server_relative_url("/".join(base_path.split("/")[:-1]))
+                ctx.load(parent_folder)
+                ctx.execute_query()
+                parent_folder.folders.add(part)
+                ctx.execute_query()
+        
         return True
     except Exception as e:
+        print(f"Error ensuring folder structure exists: {e}")
         return False
+	    
        
 def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
     try:
