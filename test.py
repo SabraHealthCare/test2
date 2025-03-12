@@ -104,13 +104,6 @@ sharepoint_password = "June2022SL!"
 from office365.sharepoint.folders.folder import Folder
 
 
-If the folder structure already exists, the function will return True.
-
-If the folder structure does not exist, the function will create it and return True.
-
-If an error occurs (e.g., insufficient permissions), the function will return False and print the error message.
-
-Let me know if you encounter further issues!
 
 def Ensure_Folder_Exists(site_url, folder_path, username, password):
     try:
