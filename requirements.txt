@@ -19,4 +19,5 @@ requests>=2.32.1  # Updated to a secure version
 chardet
 shareplum
 Office365-REST-Python-Client
+office365-rest-python-client
 git+https://github.com/streamlit/files-connection
