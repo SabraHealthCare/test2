@@ -99,7 +99,10 @@ SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full
 sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
 sharepoint_password = "June2022SL!"
 
-def Ensure_Folder_Exists(site_url, folder_path, username, password):
+from office365.sharepoint.client_context import ClientContext
+from office365.runtime.auth.authentication_context import AuthenticationContext
+
+def Ensure_Folder_Exists(site_url, relative_folder_path, username, password):
     try:
         # Authenticate with SharePoint
         ctx_auth = AuthenticationContext(site_url)
@@ -111,22 +114,23 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
         else:
             raise Exception("Authentication failed")
         
-        folder = ctx.web.get_folder_by_server_relative_url(folder_path)
+        folder = ctx.web.get_folder_by_server_relative_url(relative_folder_path)
         ctx.load(folder)
         try:
             ctx.execute_query()
         except:
             # Folder does not exist, create it
-            parent_folder_url = "/".join(folder_path.split("/")[:-1])
+            parent_folder_url = "/".join(relative_folder_path.split("/")[:-1])
             parent_folder = ctx.web.get_folder_by_server_relative_url(parent_folder_url)
             ctx.load(parent_folder)
             ctx.execute_query()
-            parent_folder.folders.add(folder_path)
+            parent_folder.folders.add(relative_folder_path)
             ctx.execute_query()
         return True
     except Exception as e:
+        st.write(f"Error ensuring folder exists: {e}")
         return False
-       
+
 def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
     try:
         # Authenticate with SharePoint
