@@ -8,7 +8,6 @@ from openpyxl.utils import get_column_letter
 import streamlit as st             
 from io import BytesIO
 from io import StringIO
-from tempfile import NamedTemporaryFile
 import time
 import  streamlit_tree_select
 import copy
@@ -34,6 +33,8 @@ from shareplum import Site
 from shareplum import Office365
 from shareplum.site import Version
 import os
+from office365.runtime.auth.authentication_context import AuthenticationContext
+from office365.sharepoint.client_context import ClientContext
 
 #---------------------------define parameters--------------------------
 st.set_page_config(
@@ -93,40 +94,55 @@ headers = {'Authorization': 'Bearer ' + access_token,}
 
 account_mapping_str_col=["Tenant_Account","Tenant_Account"]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
-def Ensure_Folder_Exists(site, folder_path):
-    try:
-        # Split the folder path into parts
-        folders = folder_path.split("/")
-        
-        # Start from the root folder 
-        current_folder = site.Folder(folders[0])
-      
-        # Traverse the remaining folder structure
-        for folder in folders[1:]:
-            try:
-                # Try to access the folder
-                current_folder = current_folder.Folder(folder)
-               
-            except Exception:
-                # If the folder doesn't exist, create it
-                current_folder.create_folder(folder)
-                current_folder = current_folder.Folder(folder)
-        
-        return current_folder
-    except Exception as e:
-        raise
+SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with scheme
+SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full site URL
+sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
+sharepoint_password = "June2022SL!"
 
-#Upload file to SharePoint
-#sharepoint_folder:"Asset Management/01_Operators/..."
-#file:uploaded_file
-def Upload_To_Sharepoint(files, sharepoint_folder):
+
+def ensure_folder_structure(site_url, folder_path, username, password):
+    try:
+        # Authenticate with SharePoint
+        ctx_auth = AuthenticationContext(site_url)
+        if not ctx_auth.acquire_token_for_user(username, password):
+            raise Exception("Authentication failed")
+
+        ctx = ClientContext(site_url, ctx_auth)
+        web = ctx.web
+        ctx.load(web)
+        ctx.execute_query()
+
+        # Split the folder path into parts
+        folder_parts = folder_path.strip("/").split("/")
+        base_path = ""
+        
+        for part in folder_parts:
+            base_path = f"{base_path}/{part}" if base_path else part
+            folder = ctx.web.get_folder_by_server_relative_url(base_path)
+            ctx.load(folder)
+            try:
+                ctx.execute_query()  # Check if folder exists
+            except:
+                # Folder does not exist, so create it
+                parent_folder = ctx.web.get_folder_by_server_relative_url("/".join(base_path.split("/")[:-1]))
+                ctx.load(parent_folder)
+                ctx.execute_query()
+                parent_folder.folders.add(part)
+                ctx.execute_query()
+        
+        return True
+    except Exception as e:
+        print(f"Error ensuring folder structure exists: {e}")
+        return False
+	    
+       
+def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
     try:
         # Authenticate with SharePoint
         authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
-        
-	# Ensure the folder exists
-        #folder = Ensure_Folder_Exists(site, sharepoint_folder)
+
+        sharepoint_folder = site.Folder(sharepoint_folder)
         success_files = []
         failed_files = []  
         for file in files:
@@ -134,17 +150,15 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
                 temp_file_path = os.path.join(".", file.name)
                 with open(temp_file_path, "wb") as f:
                     f.write(file.getbuffer())
-        
-                # Access the sharepoint_folder
-                #sharepoint_folder = site.Folder(sharepoint_folder)
-        
                 # Upload the file
                 with open(temp_file_path, "rb") as file_content:
-                    sharepoint_folder.upload_file(file_content, file.name)
+                    if new_file_name==None:
+                        sharepoint_folder.upload_file(file_content, file.name)
+                    else:
+                        sharepoint_folder.upload_file(file_content, new_file_name)  
                 success_files.append(file.name)
             except Exception as e:
                 st.error(f"Error uploading file '{file.name}': {e}")
-                failed_files.append((file.name, str(e)))
         # Clean up
         os.remove(temp_file_path)
         if len(failed_files) == 0:
@@ -153,7 +167,6 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
             return False, failed_files
     except Exception as e:
         return False,[]
-	    
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
     password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password, not the API_key
@@ -1411,14 +1424,20 @@ def Submit_Upload(total_email_body):
     else: 
         st.write(" ")  #----------record into error report------------------------	
         # save original tenant P&L to OneDrive
-    if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
-        st.write("upload unsuccessfully ")  #----------record into error report------------------------	
+
+
+    # save tenant P&L to OneDrive
+    PL_success,PL_upload_message  = Upload_To_Sharepoint(uploaded_finance, SHAREPOINT_FOLDER,"{}/{}".format(PL_path,operator),"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
+    if not PL_success and PL_upload_message!=[]:
+        email_body+=f"""<p><strong>P&L failed to upload:</p>"""
+ 	
 
     if BS_separate_excel=="Y":
         # save tenant BS to OneDrive
-        if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
-            st.write(" unsuccess")  #----------record into error report------------------------	
-    
+        BS_success,BS_upload_message  = Upload_To_Sharepoint(uploaded_BS, SHAREPOINT_FOLDER,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
+        if not BS_success and BS_upload_message!=[]:
+            email_body+=f"""<p><strong>Balance sheet failed to upload:</p>"""
+ 
     subject = "Confirmation of {} {} reporting".format(operator,reporting_month_display)
     # Get 'Asset_Manager' from entity_mapping
     unique_asset_managers = entity_mapping['Asset_Manager'].unique()
@@ -2345,8 +2364,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
-        SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator,str(selected_year),month_map[selected_month],selected_month)
-	  
+        SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator, str(selected_year), month_map[selected_month], selected_month)  
+        Ensure_Folder_Exists(SHAREPOINT_URL, SHAREPOINT_FOLDER, sharepoint_username, sharepoint_password)
         if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
             st.stop()	
