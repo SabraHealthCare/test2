@@ -99,42 +99,33 @@ SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full
 sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
 sharepoint_password = "June2022SL!"
 
-
 def Ensure_Folder_Exists(site_url, folder_path, username, password):
     try:
         # Authenticate with SharePoint
         ctx_auth = AuthenticationContext(site_url)
-        if not ctx_auth.acquire_token_for_user(username, password):
+        if ctx_auth.acquire_token_for_user(username, password):
+            ctx = ClientContext(site_url, ctx_auth)
+            web = ctx.web
+            ctx.load(web)
+            ctx.execute_query()
+        else:
             raise Exception("Authentication failed")
-
-        ctx = ClientContext(site_url, ctx_auth)
-        web = ctx.web
-        ctx.load(web)
-        ctx.execute_query()
-
-        # Split the folder path into parts
-        folder_parts = folder_path.strip("/").split("/")
-        base_path = ""
         
-        for part in folder_parts:
-            base_path = f"{base_path}/{part}" if base_path else part
-            folder = ctx.web.get_folder_by_server_relative_url(base_path)
-            ctx.load(folder)
-            try:
-                ctx.execute_query()  # Check if folder exists
-            except:
-                # Folder does not exist, so create it
-                parent_folder = ctx.web.get_folder_by_server_relative_url("/".join(base_path.split("/")[:-1]))
-                ctx.load(parent_folder)
-                ctx.execute_query()
-                parent_folder.folders.add(part)
-                ctx.execute_query()
-        
+        folder = ctx.web.get_folder_by_server_relative_url(folder_path)
+        ctx.load(folder)
+        try:
+            ctx.execute_query()
+        except:
+            # Folder does not exist, create it
+            parent_folder_url = "/".join(folder_path.split("/")[:-1])
+            parent_folder = ctx.web.get_folder_by_server_relative_url(parent_folder_url)
+            ctx.load(parent_folder)
+            ctx.execute_query()
+            parent_folder.folders.add(folder_path)
+            ctx.execute_query()
         return True
     except Exception as e:
-        st.write(f"Error ensuring folder structure exists: {e}")
         return False
-	    
        
 def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
     try:
@@ -1435,8 +1426,8 @@ def Submit_Upload(total_email_body):
     if BS_separate_excel=="Y":
         # save tenant BS to OneDrive
         BS_success,BS_upload_message  = Upload_To_Sharepoint(uploaded_BS, SHAREPOINT_FOLDER,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
-        if not BS_success and BS_upload_message!=[]:
-            email_body+=f"""<p><strong>Balance sheet failed to upload:</p>"""
+            if not BS_success and BS_upload_message!=[]:
+                email_body+=f"""<p><strong>Balance sheet failed to upload:</p>"""
  
     subject = "Confirmation of {} {} reporting".format(operator,reporting_month_display)
     # Get 'Asset_Manager' from entity_mapping
