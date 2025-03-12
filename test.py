@@ -33,6 +33,8 @@ from shareplum import Site
 from shareplum import Office365
 from shareplum.site import Version
 import os
+from office365.runtime.auth.authentication_context import AuthenticationContext
+from office365.sharepoint.client_context import ClientContext
 
 #---------------------------define parameters--------------------------
 st.set_page_config(
@@ -92,25 +94,12 @@ headers = {'Authorization': 'Bearer ' + access_token,}
 
 account_mapping_str_col=["Tenant_Account","Tenant_Account"]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
-
-import os
-import tempfile
-import streamlit as st
-from office365.runtime.auth.authentication_context import AuthenticationContext
-from office365.sharepoint.client_context import ClientContext
-from office365.runtime.auth.authentication_context import AuthenticationContext
-from office365.sharepoint.client_context import ClientContext
-
-
 SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with scheme
 SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full site URL
 sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
 sharepoint_password = "June2022SL!"
-#SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator, str(selected_year), month_map[selected_month], selected_month)  
-from office365.sharepoint.client_context import ClientContext
-from office365.runtime.auth.authentication_context import AuthenticationContext
 
-def ensure_folder_exists(site_url, relative_folder_path, username, password):
+def Ensure_Folder_Exists(site_url, folder_path, username, password):
     try:
         # Authenticate with SharePoint
         ctx_auth = AuthenticationContext(site_url)
@@ -122,21 +111,20 @@ def ensure_folder_exists(site_url, relative_folder_path, username, password):
         else:
             raise Exception("Authentication failed")
         
-        folder = ctx.web.get_folder_by_server_relative_url(relative_folder_path)
+        folder = ctx.web.get_folder_by_server_relative_url(folder_path)
         ctx.load(folder)
         try:
             ctx.execute_query()
         except:
             # Folder does not exist, create it
-            parent_folder_url = "/".join(relative_folder_path.split("/")[:-1])
+            parent_folder_url = "/".join(folder_path.split("/")[:-1])
             parent_folder = ctx.web.get_folder_by_server_relative_url(parent_folder_url)
             ctx.load(parent_folder)
             ctx.execute_query()
-            parent_folder.folders.add(relative_folder_path)
+            parent_folder.folders.add(folder_path)
             ctx.execute_query()
         return True
     except Exception as e:
-        print(f"Error ensuring folder exists: {e}")
         return False
        
 def Upload_To_Sharepoint(files, sharepoint_folder):
@@ -144,7 +132,7 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
         # Authenticate with SharePoint
         authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
-        ensure_folder_exists(SHAREPOINT_URL, sharepoint_folder, sharepoint_username, sharepoint_password)
+        Ensure_Folder_Exists(SHAREPOINT_URL, sharepoint_folder, sharepoint_username, sharepoint_password)
 	# Ensure the folder exists
         sharepoint_folder = site.Folder(sharepoint_folder)
         success_files = []
@@ -154,10 +142,6 @@ def Upload_To_Sharepoint(files, sharepoint_folder):
                 temp_file_path = os.path.join(".", file.name)
                 with open(temp_file_path, "wb") as f:
                     f.write(file.getbuffer())
-        
-                # Access the sharepoint_folder
-                #sharepoint_folder = site.Folder(sharepoint_folder)
-        
                 # Upload the file
                 with open(temp_file_path, "rb") as file_content:
                     sharepoint_folder.upload_file(file_content, file.name)
@@ -1429,14 +1413,24 @@ def Submit_Upload(total_email_body):
     else: 
         st.write(" ")  #----------record into error report------------------------	
         # save original tenant P&L to OneDrive
+
+
+    # save tenant P&L to OneDrive
+    PL_success,PL_upload_message  = Upload_To_Sharepoint(uploaded_finance, SHAREPOINT_FOLDER,"{}/{}".format(PL_path,operator),"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
+        if not PL_success and PL_upload_message!=[]:
+        email_body+=f"""<p><strong>P&L failed to upload:</p>"""
+ 	
     if not Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
-        st.write("upload unsuccessfully ")  #----------record into error report------------------------	
+        BS_success,BS_upload_message  = Upload_To_Sharepoint(uploaded_BS, SHAREPOINT_FOLDER,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
+            if not BS_success and BS_upload_message!=[]:
+                email_body+=f"""<p><strong>Balance sheet failed to upload:</p>"""
 
     if BS_separate_excel=="Y":
         # save tenant BS to OneDrive
-        if not Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4])):
-            st.write(" unsuccess")  #----------record into error report------------------------	
-    
+        success,BS_upload_message  = Upload_To_Sharepoint(uploaded_BS, SHAREPOINT_FOLDER,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
+            if not success and BS_upload_message!=[]:
+                email_body+=f"""<p><strong>Balance sheet failed to upload:</p>"""
+ 
     subject = "Confirmation of {} {} reporting".format(operator,reporting_month_display)
     # Get 'Asset_Manager' from entity_mapping
     unique_asset_managers = entity_mapping['Asset_Manager'].unique()
