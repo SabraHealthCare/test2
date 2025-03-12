@@ -104,6 +104,9 @@ sharepoint_password = "June2022SL!"
 from office365.sharepoint.folders.folder import Folder
 
 
+from office365.runtime.auth.authentication_context import AuthenticationContext
+from office365.sharepoint.client_context import ClientContext
+
 def Ensure_Folder_Exists(site_url, folder_path, username, password):
     try:
         # Authenticate with SharePoint
@@ -118,22 +121,24 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
 
         # Split the folder path into parts
         folder_parts = folder_path.strip("/").split("/")
-        current_folder = web.get_folder_by_server_relative_url("")  # Start from the root
+        current_folder = web.get_folder_by_server_relative_url("/")  # Start from the root folder
 
+        # Iterate through each part of the folder path
         for i, part in enumerate(folder_parts):
             try:
-                # Try to get the folder
-                current_folder = current_folder.folders.get_by_url(part)
+                # Construct the server-relative URL for the current folder
+                relative_url = "/" + "/".join(folder_parts[:i + 1])
+                current_folder = web.get_folder_by_server_relative_url(relative_url)
                 ctx.load(current_folder)
                 ctx.execute_query()
             except Exception as e:
-                if "does not exist" in str(e):  # Folder does not exist, so create it
-                    # Get the parent folder
-                    parent_folder_url = "/".join(folder_parts[:i])
-                    parent_folder = web.get_folder_by_server_relative_url(parent_folder_url)
+                if "404" in str(e) or "does not exist" in str(e):  # Folder does not exist, so create it
+                    # Construct the parent folder URL
+                    parent_relative_url = "/" + "/".join(folder_parts[:i])
+                    parent_folder = web.get_folder_by_server_relative_url(parent_relative_url)
                     ctx.load(parent_folder)
                     ctx.execute_query()
-                    
+
                     # Create the new folder
                     new_folder = parent_folder.folders.add(part)
                     ctx.execute_query()
@@ -143,8 +148,40 @@ def Ensure_Folder_Exists(site_url, folder_path, username, password):
 
         return True
     except Exception as e:
-        st.write(f"Error ensuring folder structure exists: {e}")
+        print(f"Error ensuring folder structure exists: {e}")
         return False
+
+def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
+    try:
+        # Authenticate with SharePoint
+        authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
+        site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
+
+        sharepoint_folder = site.Folder(sharepoint_folder)
+        success_files = []
+        failed_files = []  
+        for file in files:
+            try:   
+                temp_file_path = os.path.join(".", file.name)
+                with open(temp_file_path, "wb") as f:
+                    f.write(file.getbuffer())
+                # Upload the file
+                with open(temp_file_path, "rb") as file_content:
+                    if new_file_name==None:
+                        sharepoint_folder.upload_file(file_content, file.name)
+                    else:
+                        sharepoint_folder.upload_file(file_content, new_file_name)  
+                success_files.append(file.name)
+            except Exception as e:
+                st.error(f"Error uploading file '{file.name}': {e}")
+        # Clean up
+        os.remove(temp_file_path)
+        if len(failed_files) == 0:
+            return True,success_files
+        else:
+            return False, failed_files
+    except Exception as e:
+        return False,[]
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
     password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password, not the API_key
