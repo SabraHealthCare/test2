@@ -102,9 +102,9 @@ sharepoint_password = "June2022SL!"
 
 from office365.sharepoint.client_context import ClientContext
 from office365.runtime.auth.authentication_context import AuthenticationContext
-from office365.sharepoint.files.folder import Folder
-from office365.runtime.exceptions.service_exception import ServiceException
 
+from office365.runtime.exceptions.service_exception import ServiceException
+from office365.sharepoint.folders.folder import Folder
 def Ensure_Folder_Exists(site_url, folder_path, username, password):
     try:
         # Authenticate with SharePoint
