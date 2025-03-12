@@ -101,7 +101,7 @@ sharepoint_password = "June2022SL!"
 
 
 
-def ensure_folder_exists(site_url, relative_folder_path, username, password):
+def Ensure_Folder_Exists(site_url, relative_folder_path, username, password):
     """
     Ensures that the folder structure exists in SharePoint.
     
