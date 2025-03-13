@@ -1322,7 +1322,7 @@ def View_Summary():
         st.write("No data detected for below properties and accounts: ")
         missing_category=missing_category[["ENTITY",reporting_month,"Category"]].merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")[["Property_Name","Category",reporting_month]]
         missing_category=missing_category.rename(columns={'Property_Name':'Property',"Category":"Account category",reporting_month:reporting_month_display})
-        st.dataframe(missing_category.style.applymap(color_missing, subset=[reporting_month_display]).hide(axis="index"))
+        st.dataframe(missing_category.style.map(color_missing, subset=[reporting_month_display]).hide(axis="index"))
 
         email_body+= f"<p> No data detected for below properties and accounts:</p>{missing_category.to_html(index=False)}"
     #st.write("reporting_month_data",reporting_month_data)
@@ -1426,14 +1426,14 @@ def Submit_Upload(total_email_body):
 
 
     # save tenant P&L to OneDrive
-    PL_success,PL_upload_message  = Upload_To_Sharepoint(uploaded_finance, SHAREPOINT_FOLDER,"{}/{}".format(PL_path,operator),"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
+    PL_success,PL_upload_message  = Upload_To_Sharepoint(uploaded_finance, SHAREPOINT_FOLDER,"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
     if not PL_success and PL_upload_message!=[]:
         email_body_for_Sabra+=f"""<p><strong>P&L failed to upload:</p>"""
  	
     Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
 
     if BS_separate_excel=="Y":
-        BS_success,BS_upload_message  = Upload_To_Sharepoint(uploaded_BS, SHAREPOINT_FOLDER,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
+        BS_success,BS_upload_message  = Upload_To_Sharepoint(uploaded_BS, SHAREPOINT_FOLDER,"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
         if not BS_success and BS_upload_message!=[]:
             email_body_for_Sabra+=f"""<p><strong>Balance sheet failed to upload:</p>"""
         Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
@@ -2375,7 +2375,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if uploaded_other_docs: 
             success,ancillary_upload_message  = Upload_To_Sharepoint(uploaded_other_docs, SHAREPOINT_FOLDER)
             if success:
-                st.success("{} ancillary files for {} uploaded successfully.".format(reporting_month_display, len(uploaded_other_docs)))
+                st.success("{} ancillary files for {} uploaded successfully.".format(len(uploaded_other_docs),reporting_month_display))
             elif not success and ancillary_upload_message!=[]:
                 email_body_for_Sabra+=f"""
 	        <p><strong>{len(ancillary_upload_message)}</strong> files failed to upload:</p>  
