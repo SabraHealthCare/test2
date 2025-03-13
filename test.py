@@ -1458,7 +1458,7 @@ def Submit_Upload(total_email_body):
     </body>
     </html>"""
     if not st.session_state.email_sent:
-        #Send_Confirmation_Email(["sli@sabrahealth.com"], subject, format_total_email_body)    
+        receiver_email_list= ["sli@sabrahealth.com"]   
         Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
         if email_body!="" or email_body_for_Sabra!="":
             Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body+email_body_for_Sabra)    
@@ -2399,7 +2399,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 receiver = operator_email.split(",") + ["twarner@sabrahealth.com", "sli@sabrahealth.com"]  
                 receiver.extend(unique_asset_managers)	 
                 if not st.session_state.email_sent:
-                    #Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
+                    receiver=["sli@sabrahealth.com"]  
+                    Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
                     st.session_state.email_sent = True
             else:
                 st.markdown(":red[P&L is not uploaded ]")
@@ -2419,6 +2420,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     receiver = operator_email.split(",") + ["twarner@sabrahealth.com", "sli@sabrahealth.com"] 
                     receiver.extend(unique_asset_managers)	
                     if not st.session_state.email_sent:
+                        receiver= ["sli@sabrahealth.com"] 
                         Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))    
                         st.session_state.email_sent = True
                 st.stop()
