@@ -1406,7 +1406,7 @@ def View_Summary():
         total_email_body=f"<p>Here is the summary for your reference:</p>{summary_for_email.to_html(index=False)}"+email_body
         return total_email_body
 # no cache
-def Submit_Upload(total_email_body,email_body_for_Sabra):
+def Submit_Upload(total_email_body,email_body_for_Sabra,SHAREPOINT_FOLDER):
     global Total_PL,reporting_month,placeholder
     upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
     upload_reporting_month["TIME"]=reporting_month
@@ -2468,7 +2468,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
         # Perform the upload action here and check for discrepancies
         if st.session_state.clicked['submit_report']:
-            Submit_Upload(total_email_body,email_body_for_Sabra)
+            Submit_Upload(total_email_body,email_body_for_Sabra,SHAREPOINT_FOLDER)
             # Discrepancy of Historic Data
             if len(Total_PL.columns) > 1 and BPC_pull.shape[0] > 0:
                 with st.expander("Discrepancy for Historic Data", expanded=True):
