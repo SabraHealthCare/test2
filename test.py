@@ -2342,7 +2342,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if uploaded_finance:
             upload_list.append(uploaded_finance)
             upload_filename_list.append()
-        if uploaded_BS:
+        if BS_separate_excel=="Y" and uploaded_BS:
             upload_list.append(uploaded_BS)
             upload_filename_list.append()
         if uploaded_other_docs:
