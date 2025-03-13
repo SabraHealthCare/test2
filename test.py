@@ -33,8 +33,6 @@ from shareplum import Site
 from shareplum import Office365
 from shareplum.site import Version
 import os
-from office365.runtime.auth.authentication_context import AuthenticationContext
-from office365.sharepoint.client_context import ClientContext
 
 #---------------------------define parameters--------------------------
 st.set_page_config(
@@ -93,7 +91,7 @@ token_response = app.acquire_token_for_client(scopes=["https://graph.microsoft.c
 access_token = token_response['access_token']
 headers = {'Authorization': 'Bearer ' + access_token,}    
 
-account_mapping_str_col=["Tenant_Account","Tenant_Account"]
+account_mapping_str_col=["Tenant_Account",]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
 SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with scheme
 SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full site URL
@@ -1422,7 +1420,7 @@ def Submit_Upload(total_email_body,email_body_for_Sabra,SHAREPOINT_FOLDER):
     </body>
     </html>"""
     if not st.session_state.email_sent:
-        receiver_email_list= ["sli@sabrahealth.com"]   
+        #receiver_email_list= ["sli@sabrahealth.com"]   
         Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
         if email_body!="" or email_body_for_Sabra!="":
             Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body+email_body_for_Sabra)    
@@ -2383,7 +2381,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 receiver = operator_email.split(",") + ["twarner@sabrahealth.com", "sli@sabrahealth.com"]  
                 receiver.extend(unique_asset_managers)	 
                 if not st.session_state.email_sent:
-                    receiver=["sli@sabrahealth.com"]  
+                    #receiver=["sli@sabrahealth.com"]  
                     Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
                     st.session_state.email_sent = True
             else:
