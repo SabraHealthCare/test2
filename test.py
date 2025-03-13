@@ -278,20 +278,11 @@ def Save_File_To_Onedrive(df, path, file_name, file_type):
         else:
             return False
     except Exception as e:
-        st.write(f"Error: {e}")
+        st.error(f"Error: {e}")
         return False
 
                 
-        # Clean up
-        os.remove(temp_file_path)
-        if len(success_files) == len(files):
-            return True,success_files
-        else:
-            return False, failed_files
-    except Exception as e:
-        return False,[]
-success_files = []
-        failed_files = [] 
+
 
 
 # For updating account_mapping, entity_mapping, reporting_month_data, only for operator use
