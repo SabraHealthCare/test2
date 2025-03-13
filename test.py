@@ -2341,10 +2341,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         upload_filename_list=[]
         if uploaded_finance:
             upload_list.append(uploaded_finance)
-            upload_filename_list.append()
+            upload_filename_list.append("{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
         if BS_separate_excel=="Y" and uploaded_BS:
             upload_list.append(uploaded_BS)
-            upload_filename_list.append()
+            upload_filename_list.append("{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
         if uploaded_other_docs:
             for file in uploaded_other_docs:
                 upload_list.append(file)
