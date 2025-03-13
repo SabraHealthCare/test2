@@ -100,41 +100,7 @@ SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full
 sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
 sharepoint_password = "June2022SL!"
 
-
-
-def Ensure_Folder_Exists(site_url, relative_folder_path, username, password):
-    try:
-        # Authenticate with SharePoint
-        ctx_auth = AuthenticationContext(site_url)
-        if not ctx_auth.acquire_token_for_user(username, password):
-            raise Exception("Authentication failed")
-
-        ctx = ClientContext(site_url, ctx_auth)
-        
-        # Split the path into folders
-        folders = relative_folder_path.strip("/").split("/")
-        base_path = folders[0]  # Start with the first folder
-
-        for folder in folders[1:]:
-            base_path = f"{base_path}/{folder}"
-            folder_obj = ctx.web.get_folder_by_server_relative_url(base_path)
-            ctx.load(folder_obj)
-
-            try:
-                ctx.execute_query()  # Try loading the folder (if it exists)
-            except Exception:
-                # Folder doesn't exist, create it
-                parent_folder = ctx.web.get_folder_by_server_relative_url("/".join(base_path.split("/")[:-1]))
-                ctx.load(parent_folder)
-                ctx.execute_query()
-                parent_folder.folders.add(folder)
-                ctx.execute_query()
-
-        return True
-    except Exception as e:
-        st.write(f"Error ensuring folder exists: {e}")
-        return False
-def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
+def Upload_To_Sharepoint(files, sharepoint_folder,new_file_names):
     try:
         # Authenticate with SharePoint
         authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
@@ -143,29 +109,30 @@ def Upload_To_Sharepoint(files, sharepoint_folder,new_file_name=None):
         sharepoint_folder = site.Folder(sharepoint_folder)
         success_files = []
         failed_files = []  
+        i=0
         for file in files:
+            new_file_name=new_file_names[i]
+            i+=1
             try:   
                 temp_file_path = os.path.join(".", file.name)
                 with open(temp_file_path, "wb") as f:
                     f.write(file.getbuffer())
                 # Upload the file
                 with open(temp_file_path, "rb") as file_content:
-                    if new_file_name==None:
-                        sharepoint_folder.upload_file(file_content, file.name)
-                    else:
-                        sharepoint_folder.upload_file(file_content, new_file_name)  
+                    sharepoint_folder.upload_file(file_content, new_file_name) 
                 success_files.append(file.name)
-            except Exception as e:
-                st.error(f"Error uploading file '{file.name}': {e}")
+            except:
+                failed_files.append(file.name)
                 
         # Clean up
         os.remove(temp_file_path)
-        if len(failed_files) == 0:
+        if len(success_files) == len(files):
             return True,success_files
         else:
             return False, failed_files
     except Exception as e:
         return False,[]
+ 
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
     password = 'b1bpwmzxs9hnbpkM'  #SMTP2GO password, not the API_key
@@ -193,28 +160,41 @@ def Send_Confirmation_Email(receiver_email_list, subject, email_body):
         st.write( f"Failed to send confirmation email.")
 	    
 #directly save the uploaded (.xlsx) file to onedrive
-def Upload_to_Onedrive(uploaded_file,path,file_name):
-    # Set the API endpoint and headers
-    api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
+def Upload_to_Onedrive(uploaded_files,path,file_names):
+    i=0
+    success_files = []
+    failed_files = [] 
+    try:
+        for uploaded_file in uploaded_files:
+            file_name=reporting_month+"_"+file_names[i]
+            i+=1
+            # Set the API endpoint and headers
+            api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
 
-    # Ensure the file pointer is at the start
-    uploaded_file.seek(0)
+            # Ensure the file pointer is at the start
+            uploaded_file.seek(0)
     
-    # Read the file content as binary data
-    file_content = uploaded_file.read()
+            # Read the file content as binary data
+            file_content = uploaded_file.read()
     
-    # Set the Content-Type header for Excel files
-    headers.update({'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})
+            # Set the Content-Type header for Excel files
+            headers.update({'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})
     
-    # Make the request to upload the file
-    response = requests.put(api_url, headers=headers, data=file_content)
+            # Make the request to upload the file
+            response = requests.put(api_url, headers=headers, data=file_content)
 	
-    #response = requests.put(api_url, headers=headers, data=BytesIO(uploaded_file.read()))
-    if response.status_code in [200,201]:# or response.status_code==201:
-        return True
-    else:
-        return False
-
+            if response.status_code in [200,201]:# or response.status_code==201:
+                success_files.append(file_name)
+                continue
+            else:
+                failed_files.append(file_name)
+                continue
+        if len(success_files) == len(uploaded_files):
+            return True,success_files
+        else:
+            return False, failed_files
+    except:
+        return False,[]
 # no cache read csv/excel from onedrive , return dataframe
 def detect_encoding(file_content):
     result = chardet.detect(file_content)
@@ -300,7 +280,19 @@ def Save_File_To_Onedrive(df, path, file_name, file_type):
     except Exception as e:
         st.write(f"Error: {e}")
         return False
-	    
+
+                
+        # Clean up
+        os.remove(temp_file_path)
+        if len(success_files) == len(files):
+            return True,success_files
+        else:
+            return False, failed_files
+    except Exception as e:
+        return False,[]
+success_files = []
+        failed_files = [] 
+
 
 # For updating account_mapping, entity_mapping, reporting_month_data, only for operator use
 # if entity_list is provided,
@@ -1378,11 +1370,6 @@ def View_Summary():
         else:
             show_column=["Sabra_Account"]
         
-        #summary_for_email= reporting_month_data[(reporting_month_data["Sabra_Account"].\
-		               #isin(["Total - Patient Days","Total - Revenue", "Total - Operating Expenses", "Total - Non-Operating Expenses"]))\
-	                       #| (reporting_month_data["Sabra_Account"].str.startswith("Operating Beds-"))]\
-		                #[show_column + list(entity_columns)]
-	    
 
         summary_for_email = reporting_month_data[
                           (reporting_month_data["Sabra_Account"].isin([
@@ -1416,7 +1403,6 @@ def Submit_Upload(total_email_body,email_body_for_Sabra,SHAREPOINT_FOLDER):
     upload_reporting_month["Operator"]=operator
     upload_reporting_month=upload_reporting_month.apply(Format_Value)
 
-
     if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,"CSV",None,None):
         st.success("{} {} reporting data was uploaded successfully!".format(operator,reporting_month[4:6]+"/"+reporting_month[0:4]))
         placeholder.empty()
@@ -1424,19 +1410,6 @@ def Submit_Upload(total_email_body,email_body_for_Sabra,SHAREPOINT_FOLDER):
         st.write(" ")  #----------record into error report------------------------	
         # save original tenant P&L to OneDrive
 
-
-    # save tenant P&L to OneDrive
-    PL_success,PL_upload_message  = Upload_To_Sharepoint(uploaded_finance, SHAREPOINT_FOLDER,"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
-    if not PL_success and PL_upload_message!=[]:
-        email_body_for_Sabra+=f"""<p><strong>P&L failed to upload:</p>"""
- 	
-    Upload_to_Onedrive(uploaded_finance,"{}/{}".format(PL_path,operator),"{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
-
-    if BS_separate_excel=="Y":
-        BS_success,BS_upload_message  = Upload_To_Sharepoint(uploaded_BS, SHAREPOINT_FOLDER,"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
-        if not BS_success and BS_upload_message!=[]:
-            email_body_for_Sabra+=f"""<p><strong>Balance sheet failed to upload:</p>"""
-        Upload_to_Onedrive(uploaded_BS,"{}/{}".format(PL_path,operator),"{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
     subject = "Confirmation of {} {} reporting".format(operator,reporting_month_display)
     # Get 'Asset_Manager' from entity_mapping
     unique_asset_managers = entity_mapping['Asset_Manager'].unique()
@@ -2364,7 +2337,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
         SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator, str(selected_year), month_map[selected_month], selected_month)  
-        #Ensure_Folder_Exists(SHAREPOINT_URL, SHAREPOINT_FOLDER, sharepoint_username, sharepoint_password)
+      
         if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
             st.stop()	
@@ -2372,22 +2345,42 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if entity_mapping.empty:
             st.error("The reporting month is not valid as it either exceeds the sold date or precedes the acquisition date for the properties.")
             st.stop()
-        if uploaded_other_docs: 
-            success,ancillary_upload_message  = Upload_To_Sharepoint(uploaded_other_docs, SHAREPOINT_FOLDER)
+        #uploading all the files to sharepoint
+        upload_list=[]
+        upload_filename_list=[]
+        if uploaded_finance:
+            upload_list.append(uploaded_finance)
+            upload_filename_list.append()
+        if uploaded_BS:
+            upload_list.append(uploaded_BS)
+            upload_filename_list.append()
+        if uploaded_other_docs:
+            for file in uploaded_other_docs:
+                upload_list.append(file)
+                upload_filename_list.append(file.name)	    
+        if uploaded_finance or uploaded_BS or uploaded_other_docs:
+            success,upload_message  = Upload_To_Sharepoint(upload_list, SHAREPOINT_FOLDER,upload_filename_list)
             if success:
-                st.success("{} ancillary files for {} uploaded successfully.".format(len(uploaded_other_docs),reporting_month_display))
-            elif not success and ancillary_upload_message!=[]:
+                st.success("{} files for {} uploaded successfully.".format(len(upload_list),reporting_month_display))
+            elif not success and upload_message!=[]:
                 email_body_for_Sabra+=f"""
-	        <p><strong>{len(ancillary_upload_message)}</strong> files failed to upload:</p>  
+	        <p><strong>{len(upload_message)}</strong> files failed to upload:</p>  
                 <ul>  
-                    {''.join(f'<li>{file}</li>' for file in ancillary_upload_message)}  
+                    {''.join(f'<li>{file}</li>' for file in upload_message)}  
                 </ul>
 	        """
-            elif ancillary_upload_message==[]:
+            elif upload_message==[]:
                 email_body_for_Sabra+=f"""<p><strong>Error during SharePoint upload process. Files are not uploaded</p> """
-            for file in uploaded_other_docs:
-                Upload_to_Onedrive(file,"{}/{}".format(PL_path,operator),file.name)
 
+            success_onedrive,upload_message_onedrive=Upload_to_Onedrive(upload_list,"{}/{}".format(PL_path,operator),upload_filename_list)
+            if not success_onedrive and upload_message!=[]:
+                 email_body_for_Sabra+=f"""
+	        <p><strong>{len(upload_message_onedrive)}</strong> files failed to upload to onedrive:</p>  
+                <ul>  
+                    {''.join(f'<li>{file}</li>' for file in upload_message_onedrive)}  
+                </ul>
+	        """
+ 
         col1, col2 = st.columns([1,3])  
         if 'uploaded_finance' in locals() and uploaded_finance:
             with col1:
@@ -2415,14 +2408,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col2:
                     st.markdown("❌ :red[Balance sheet is not uploaded ]")
                 if uploaded_other_docs: 
-                    st.error("You have only uploaded ancillary files without any monthly reporting data. Please upload Balance Sheet if you want to upload monthly reporting data.")
-                    unique_asset_managers = entity_mapping['Asset_Manager'].unique()
-                    receiver = operator_email.split(",") + ["twarner@sabrahealth.com", "sli@sabrahealth.com"] 
-                    receiver.extend(unique_asset_managers)	
-                    if not st.session_state.email_sent:
-                        receiver= ["sli@sabrahealth.com"] 
-                        Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))    
-                        st.session_state.email_sent = True
+                    st.warning("You have only uploaded ancillary files without any monthly reporting data. Please upload Balance Sheet if you want to upload monthly reporting data.")
                 st.stop()
         else:
             BS_separate_excel="N"
