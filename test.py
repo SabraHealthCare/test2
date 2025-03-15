@@ -1067,7 +1067,7 @@ def Manage_Entity_Mapping(operator):
 
 # no cache 
 def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type_name="False"):
-    global account_mapping，email_body_for_Sabra
+    global account_mapping,email_body_for_Sabra
     st.warning("Please complete mapping for below new accounts:")
     count=len(new_tenant_account_list)
     Sabra_main_account_list=[np.nan] * count
