@@ -1127,7 +1127,8 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
     new_accounts_df=new_accounts_df.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")  
 
     # if there are new revenue accounts,  check if revenue need multiply -1. 
-    new_rev_accounts=new_accounts_df[new_accounts_df["Sabra_Account"].startswith("REV_")]
+    new_rev_accounts = new_accounts_df[new_accounts_df["Sabra_Account"].str.startswith("REV_")]
+
     if new_rev_accounts:
         original_revenue = account_mapping[account_mapping["Sabra_Account"].str.startswith("REV_")]
 
