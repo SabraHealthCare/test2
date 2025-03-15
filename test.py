@@ -1128,7 +1128,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
 
         # if there are new revenue accounts,  check if revenue need multiply -1. 
         new_rev_accounts = new_accounts_df[new_accounts_df["Sabra_Account"].str.startswith("REV_")]
-        st.write("new_rev_accounts",",".join(new_rev_accounts))
+        st.write("new_rev_accounts",",".join(new_rev_accounts["Tenant_Account"]))
         if not new_rev_accounts.empty:
             original_revenue = account_mapping[account_mapping["Sabra_Account"].str.startswith("REV_")]
 
@@ -1136,7 +1136,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
             conversion_percentage=(conversion_count / len(original_revenue)) * 100 if len(original_revenue) > 0 else 0
             if conversion_percentage>=0.7:
                 st.warning(f"Based on your previous revenue, below new revenue accounts will be adjusted by multiplying by -1. Please let us know at sli@sabrahealth.com if this process is incorrect.")
-                st.warning(",".join(new_rev_accounts))
+                st.warning(",".join(new_rev_accounts["Tenant_Account"]))
                 new_accounts_df["Conversion"] = new_accounts_df["Sabra_Account"].apply(lambda x: "*-1" if x.startswith("REV_") else "")		
                 email_body_for_Sabra=f"""<p>New revenue accounts were added and adjusted by multiplying -1</p> """
 	        
