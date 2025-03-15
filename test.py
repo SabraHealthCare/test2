@@ -1140,7 +1140,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
                 new_accounts_df["Conversion"] = new_accounts_df["Sabra_Account"].apply(lambda x: "*-1" if x.startswith("REV_") else "")		
                 email_body_for_Sabra=f"""<p>New revenue accounts were added and adjusted by multiplying -1</p> """
 	        
-	    if conversion_percentage>0 and conversion_percentage<1:
+            if conversion_percentage>0 and conversion_percentage<1:
                 email_body_for_Sabra=f"""<p>Not all the revenue accounts were adjusted by multiplying -1, please check.</p> """    
     
     # Create a dropdown for the last column
