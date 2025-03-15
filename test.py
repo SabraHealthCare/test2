@@ -1067,7 +1067,7 @@ def Manage_Entity_Mapping(operator):
 
 # no cache 
 def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type_name="False"):
-    global account_mapping
+    global account_mapping，email_body_for_Sabra
     st.warning("Please complete mapping for below new accounts:")
     count=len(new_tenant_account_list)
     Sabra_main_account_list=[np.nan] * count
@@ -1127,20 +1127,23 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
         new_accounts_df["Operator"]=operator     
         new_accounts_df=new_accounts_df.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")  
 
-        #non_nan_conversion = account_mapping[account_mapping['Conversion'].notna()]
-        # check if there is any conversion for same Sabra_Accounts. 
-        #if non_nan_conversion.shape[0]>0:
-            #accounts_with_conversions = new_accounts_df[new_accounts_df['Sabra_Account'].isin(non_nan_conversion['Sabra_Account'])]
-            #if accounts_with_conversions.shape[0]>0:
-                #st.write("Please confirm if below account need to be applied conversion")
-                #for tenant_account in accounts_with_conversions["Tenant_Account"]:
-#or index, row in df.iterrows():
-    # Display the row data
-    #st.write(f"Row {index}: {row['Column 1']}, {row['Column 2']}")
+        # if there are new revenue accounts,  check if revenue need multiply -1. 
+        new_rev_accounts=new_accounts_df[new_accounts_df["Sabra_Account"].startswith("REV_")]
+        if new_rev_accounts:
+            original_revenue = account_mapping[account_mapping["Sabra_Account"].str.startswith("REV_")]
+
+            conversion_count = len(original_revenue[original_revenue["Conversion"] == "*-1"])
+            conversion_percentage=(conversion_count / len(original_revenue)) * 100 if len(original_revenue) > 0 else 0
+            if conversion_percentage>=0.7:
+                st.warning(f"Based on your previous revenue, below new revenue accounts will be adjusted by multiplying by -1. Please let us know at sli@sabrahealth.com if this process is incorrect.")
+                st.warning(",".join(new_rev_accounts))
+                new_accounts_df["Conversion"] = new_accounts_df["Sabra_Account"].apply(lambda x: "*-1" if x.startswith("REV_") else "")		
+                email_body_for_Sabra=f"""<p>New revenue accounts were added and adjusted by multiplying -1</p> """
+	        
+	    if conversion_percentage>0 and conversion_percentage<1:
+                email_body_for_Sabra=f"""<p>Not all the revenue accounts were adjusted by multiplying -1, please check.</p> """    
     
     # Create a dropdown for the last column
-    #decision = st.selectbox(f"Select for Row {index}", options=["Yes", "No"], index=0, key=index)
-                
         account_mapping=pd.concat([account_mapping, new_accounts_df],ignore_index=True)
         Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion"]],operator,"XLSX",None,account_mapping_str_col)
         st.success("New accounts mapping were successfully saved.")   
@@ -1420,7 +1423,7 @@ def Submit_Upload(total_email_body,email_body_for_Sabra,SHAREPOINT_FOLDER):
     </body>
     </html>"""
     if not st.session_state.email_sent:
-        #receiver_email_list= ["sli@sabrahealth.com"]   
+        receiver_email_list= ["sli@sabrahealth.com"]   
         Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
         if email_body!="" or email_body_for_Sabra!="":
             Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body+email_body_for_Sabra)    
@@ -2381,7 +2384,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 receiver = operator_email.split(",") + ["twarner@sabrahealth.com", "sli@sabrahealth.com"]  
                 receiver.extend(unique_asset_managers)	 
                 if not st.session_state.email_sent:
-                    #receiver=["sli@sabrahealth.com"]  
+                    receiver=["sli@sabrahealth.com"]  
                     Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
                     st.session_state.email_sent = True
             else:
