@@ -1075,10 +1075,8 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
     Sabra_main_account_value=[np.nan] * count
     Sabra_second_account_value=[np.nan] * count
 
-    st.write("count",count)
     with st.form(key=new_tenant_account_list[0]):  
         for i in range(count):
-            st.write("i",i)
             if sheet_name=="False":
                 st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
             elif sheet_type_name != "Occupancy":
