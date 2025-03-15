@@ -1129,7 +1129,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
     # if there are new revenue accounts,  check if revenue need multiply -1. 
     new_rev_accounts = new_accounts_df[new_accounts_df["Sabra_Account"].str.startswith("REV_")]
 
-    if new_rev_accounts:
+    if new_rev_accounts.empty:
         original_revenue = account_mapping[account_mapping["Sabra_Account"].str.startswith("REV_")]
 
         conversion_count = len(original_revenue[original_revenue["Conversion"] == "*-1"])
