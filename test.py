@@ -1122,26 +1122,26 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
         else:
             st.stop()
                 
-        #insert new record to the bottom line of account_mapping
-        new_accounts_df = pd.DataFrame({'Sabra_Account': Sabra_main_account_value, 'Sabra_Second_Account': Sabra_second_account_value, 'Tenant_Account':list(map(lambda x:x.upper().strip(), new_tenant_account_list))})
-        new_accounts_df["Operator"]=operator     
-        new_accounts_df=new_accounts_df.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")  
+    #insert new record to the bottom line of account_mapping
+    new_accounts_df = pd.DataFrame({'Sabra_Account': Sabra_main_account_value, 'Sabra_Second_Account': Sabra_second_account_value, 'Tenant_Account':list(map(lambda x:x.upper().strip(), new_tenant_account_list))})
+    new_accounts_df["Operator"]=operator     
+    new_accounts_df=new_accounts_df.merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account",right_on="BPC_Account_Name",how="left").drop(columns="BPC_Account_Name")  
 
-        # if there are new revenue accounts,  check if revenue need multiply -1. 
-        new_rev_accounts=new_accounts_df[new_accounts_df["Sabra_Account"].startswith("REV_")]
-        if new_rev_accounts:
-            original_revenue = account_mapping[account_mapping["Sabra_Account"].str.startswith("REV_")]
+    # if there are new revenue accounts,  check if revenue need multiply -1. 
+    new_rev_accounts=new_accounts_df[new_accounts_df["Sabra_Account"].startswith("REV_")]
+    if new_rev_accounts:
+        original_revenue = account_mapping[account_mapping["Sabra_Account"].str.startswith("REV_")]
 
-            conversion_count = len(original_revenue[original_revenue["Conversion"] == "*-1"])
-            conversion_percentage=(conversion_count / len(original_revenue)) * 100 if len(original_revenue) > 0 else 0
-            if conversion_percentage>=0.7:
-                st.warning(f"Based on your previous revenue, below new revenue accounts will be adjusted by multiplying by -1. Please let us know at sli@sabrahealth.com if this process is incorrect.")
-                st.warning(",".join(new_rev_accounts))
-                new_accounts_df["Conversion"] = new_accounts_df["Sabra_Account"].apply(lambda x: "*-1" if x.startswith("REV_") else "")		
-                email_body_for_Sabra=f"""<p>New revenue accounts were added and adjusted by multiplying -1</p> """
+        conversion_count = len(original_revenue[original_revenue["Conversion"] == "*-1"])
+        conversion_percentage=(conversion_count / len(original_revenue)) * 100 if len(original_revenue) > 0 else 0
+        if conversion_percentage>=0.7:
+            st.warning(f"Based on your previous revenue, below new revenue accounts will be adjusted by multiplying by -1. Please let us know at sli@sabrahealth.com if this process is incorrect.")
+            st.warning(",".join(new_rev_accounts))
+            new_accounts_df["Conversion"] = new_accounts_df["Sabra_Account"].apply(lambda x: "*-1" if x.startswith("REV_") else "")		
+            email_body_for_Sabra=f"""<p>New revenue accounts were added and adjusted by multiplying -1</p> """
 	        
-            if conversion_percentage>0 and conversion_percentage<1:
-                email_body_for_Sabra=f"""<p>Not all the revenue accounts were adjusted by multiplying -1, please check.</p> """    
+        if conversion_percentage>0 and conversion_percentage<1:
+            email_body_for_Sabra=f"""<p>Not all the revenue accounts were adjusted by multiplying -1, please check.</p> """    
     
     # Create a dropdown for the last column
         account_mapping=pd.concat([account_mapping, new_accounts_df],ignore_index=True)
