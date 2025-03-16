@@ -1128,7 +1128,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
 
         # if there are new revenue accounts,  check if revenue need multiply -1. 
         new_rev_accounts = new_accounts_df[new_accounts_df["Sabra_Account"].str.startswith("REV_")]
-        st.write("new_rev_accounts",",".join(new_rev_accounts["Tenant_Account"]))
+        
         if not new_rev_accounts.empty:
             original_revenue = account_mapping[account_mapping["Sabra_Account"].str.startswith("REV_")]
 
@@ -1385,8 +1385,8 @@ def View_Summary():
         total_email_body=f"<p>Here is the summary for your reference:</p>{summary_for_email.to_html(index=False)}"+email_body
         return total_email_body
 # no cache
-def Submit_Upload(total_email_body,email_body_for_Sabra,SHAREPOINT_FOLDER):
-    global Total_PL,reporting_month,placeholder
+def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
+    global Total_PL,reporting_month,placeholder,email_body_for_Sabra
     upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
     upload_reporting_month["TIME"]=reporting_month
     upload_reporting_month=upload_reporting_month.rename(columns={reporting_month:"Amount"})
@@ -1422,10 +1422,13 @@ def Submit_Upload(total_email_body,email_body_for_Sabra,SHAREPOINT_FOLDER):
         <p>Sabra Healthcare REIT.</p>
     </body>
     </html>"""
+    st.write("email_body_for_Sabra",email_body_for_Sabra)
     if not st.session_state.email_sent:
         receiver_email_list= ["sli@sabrahealth.com"]   
-        Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body)    
+        Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body) 
+        
         if email_body!="" or email_body_for_Sabra!="":
+        
             Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body+email_body_for_Sabra)    
         st.session_state.email_sent = True
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
@@ -2446,7 +2449,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
         # Perform the upload action here and check for discrepancies
         if st.session_state.clicked['submit_report']:
-            Submit_Upload(total_email_body,email_body_for_Sabra,SHAREPOINT_FOLDER)
+            Submit_Upload(total_email_body,SHAREPOINT_FOLDER)
             # Discrepancy of Historic Data
             if len(Total_PL.columns) > 1 and BPC_pull.shape[0] > 0:
                 with st.expander("Discrepancy for Historic Data", expanded=True):
