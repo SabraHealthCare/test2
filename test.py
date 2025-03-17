@@ -1142,7 +1142,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
 	        
             if conversion_percentage>0 and conversion_percentage<1:
                 email_body_for_Sabra=f"""<p>Not all the revenue accounts were adjusted by multiplying -1, please check.</p> """    
-    
+        st.write("email_body_for_Sabra inside manage mapping",email_body_for_Sabra)
         # Create a dropdown for the last column
         account_mapping=pd.concat([account_mapping, new_accounts_df],ignore_index=True)
         Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion"]],operator,"XLSX",None,account_mapping_str_col)
@@ -1875,7 +1875,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         if len(new_tenant_account_list)>0:
             #st.write("new_tenant_account_list",new_tenant_account_list)	
             account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)
-            
+            st.write("email_body_for_Sabra after manage account_mapping",email_body_for_Sabra)
 	    # Update account pool
             if sheet_type=="Sheet_Name_Finance":
                 account_pool=account_mapping.copy()
