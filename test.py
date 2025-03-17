@@ -1789,7 +1789,7 @@ def Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_n
         st.stop()    
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,sheet_name):  
-    global account_mapping,reporting_month,tenant_account_col
+    global account_mapping,reporting_month,tenant_account_col,email_body_for_Sabra
     #st.write("account_mapping",account_mapping)
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
     #st.write("sheet_type",sheet_type,"account_pool","account_pool",sheet_name)
@@ -1932,7 +1932,7 @@ def Get_Previous_Months(reporting_month,full_date_header):
 
 #no cache    
 def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):  
-    global account_mapping,reporting_month,tenant_account_col,date_header,select_months_list
+    global account_mapping,reporting_month,tenant_account_col,date_header,select_months_list,email_body_for_Sabra
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
 
