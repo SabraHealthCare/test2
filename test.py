@@ -1067,8 +1067,8 @@ def Manage_Entity_Mapping(operator):
     return entity_mapping
 
 # no cache 
-def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type_name="False"):
-    global account_mapping,email_body_for_Sabra
+def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type_name="False",email_body_for_Sabra):
+    global account_mapping
     st.warning("Please complete mapping for below new accounts:")
     count=len(new_tenant_account_list)
     Sabra_main_account_list=[np.nan] * count
@@ -1140,16 +1140,15 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
                 st.warning(",".join(new_rev_accounts["Tenant_Account"]))
                 new_accounts_df["Conversion"] = new_accounts_df["Sabra_Account"].apply(lambda x: "*-1" if x.startswith("REV_") else "")		
                 email_body_for_Sabra=f"""<p>New revenue accounts were added and adjusted by multiplying -1</p> """
-                st.write("email_body_for_Sabra in Manage_Account_Mapping", email_body_for_Sabra)
+               
             if conversion_percentage>0 and conversion_percentage<1:
                 email_body_for_Sabra=f"""<p>Not all the revenue accounts were adjusted by multiplying -1, please check.</p> """    
-        st.write("email_body_for_Sabra inside manage mapping",email_body_for_Sabra)
 
         # Create a dropdown for the last column
         account_mapping=pd.concat([account_mapping, new_accounts_df],ignore_index=True)
         Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion"]],operator,"XLSX",None,account_mapping_str_col)
         st.success("New accounts mapping were successfully saved.")   
-    return account_mapping
+    return account_mapping,email_body_for_Sabra
 	
 #@st.cache_data 
 def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
@@ -1387,9 +1386,8 @@ def View_Summary():
         total_email_body=f"<p>Here is the summary for your reference:</p>{summary_for_email.to_html(index=False)}"+email_body
         return total_email_body
 # no cache
-def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
-    global Total_PL,reporting_month,placeholder,email_body_for_Sabra
-    st.write("email_body_for_Sabra in Submit_Upload", email_body_for_Sabra)
+def Submit_Upload(total_email_body,SHAREPOINT_FOLDER,email_body_for_Sabra):
+    global Total_PL,reporting_month,placeholder
     upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
     upload_reporting_month["TIME"]=reporting_month
     upload_reporting_month=upload_reporting_month.rename(columns={reporting_month:"Amount"})
@@ -1877,7 +1875,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
             #st.write("new_tenant_account_list",new_tenant_account_list)	
-            account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)
+            account_mapping,email_body_for_Sabra=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name,email_body_for_Sabra)
+
             st.write("email_body_for_Sabra after manage account_mapping",email_body_for_Sabra)
 	    # Update account pool
             if sheet_type=="Sheet_Name_Finance":
@@ -2030,7 +2029,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
         new_tenant_account_list=list(filter(lambda x: x not in list(account_mapping["Tenant_Account"]),PL.index))
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
-            account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)   
+            account_mapping,email_body_for_Sabra=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name,email_body_for_Sabra)   
             # Update account pool
             if sheet_type=="Sheet_Name_Finance":
                 account_pool=account_mapping.copy()
@@ -2455,7 +2454,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
         # Perform the upload action here and check for discrepancies
         if st.session_state.clicked['submit_report']:
-            Submit_Upload(total_email_body,SHAREPOINT_FOLDER)
+            Submit_Upload(total_email_body,SHAREPOINT_FOLDER,email_body_for_Sabra)
             # Discrepancy of Historic Data
             if len(Total_PL.columns) > 1 and BPC_pull.shape[0] > 0:
                 with st.expander("Discrepancy for Historic Data", expanded=True):
