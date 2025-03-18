@@ -111,6 +111,7 @@ def Upload_To_Sharepoint(files, sharepoint_folder,new_file_names):
         i=0
         for file in files:
             new_file_name=new_file_names[i]
+            st.write("new_file_name",new_file_name)
             i+=1
             try:   
                 temp_file_path = os.path.join(".", file.name)
