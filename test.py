@@ -166,7 +166,7 @@ def Upload_to_Onedrive(uploaded_files,path,file_names):
     failed_files = [] 
     try:
         for uploaded_file in uploaded_files:
-            file_name=reporting_month+"_"+file_names[i]
+            file_name=file_names[i]
             i+=1
             # Set the API endpoint and headers
             api_url = f'https://graph.microsoft.com/v1.0/users/{user_id}/drive/items/root:/{path}/{file_name}:/content'
