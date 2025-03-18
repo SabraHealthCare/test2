@@ -2070,7 +2070,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
 
 # no cache
 def Upload_And_Process(uploaded_file,wb,file_type):
-    global  tenant_account_col
+    global  tenant_account_col,email_body_for_Sabra
     Total_PL=pd.DataFrame()
     #Total_PL_detail=pd.DataFrame()
     total_entity_list=list(entity_mapping.index)
