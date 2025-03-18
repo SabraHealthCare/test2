@@ -79,6 +79,7 @@ email_body_for_Sabra=""
 today= datetime.now(pytz.timezone('America/Los_Angeles')).date()
 current_year= today.year
 current_month= today.month
+current_day=today.day  
 operators_remove_hidden_rowcol=["Ignite"]
 
 # Acquire a token using client credentials flow
@@ -2345,14 +2346,14 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         upload_filename_list=[]
         if uploaded_finance:
             upload_list.append(uploaded_finance)
-            upload_filename_list.append("{}_P&L_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
+            upload_filename_list.append("{}-{}_{}_P&L_uploaded_{}-{}.xlsx".format(reporting_month[4:6],reporting_month[0:4],operator,current_month,current_day))
         if BS_separate_excel=="Y" and uploaded_BS:
             upload_list.append(uploaded_BS)
-            upload_filename_list.append("{}_BS_{}-{}.xlsx".format(operator,reporting_month[4:6],reporting_month[0:4]))
+            upload_filename_list.append("{}-{}_{}_BS_uploaded_{}-{}.xlsx".format(reporting_month[4:6],reporting_month[0:4],operator,current_month,current_day))
         if uploaded_other_docs:
             for file in uploaded_other_docs:
                 upload_list.append(file)
-                upload_filename_list.append(file.name)	    
+                upload_filename_list.append("{}-{}_{}".format(reporting_month[4:6],reporting_month[0:4],file.name)	    
         if upload_filename_list:
             success,upload_message  = Upload_To_Sharepoint(upload_list, SHAREPOINT_FOLDER,upload_filename_list)
             if success:
