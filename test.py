@@ -2238,7 +2238,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     operator=st.session_state["operator"]
     st.title(operator)
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
-    choice=st.sidebar.selectbox("Menu", menu)
+    if "operator_choice" not in st.session_state:
+        st.session_state["operator_choice"] = menu[0]  # Set default value
+    choice=st.sidebar.selectbox("Menu", menu,key="operator_choice",index=menu.index(st.session_state["operator_choice"]))
+    st.session_state["operator_choice"] = choice
     if choice=="Upload P&L":
         if current_month<10:
             current_date=str(current_year)+"0"+str(current_month)
@@ -2504,7 +2507,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     operator_list=Read_File_From_Onedrive(mapping_path,operator_list_filename,"CSV")
 
     menu=["Review Monthly reporting","Review New Mapping","Edit Account","Register","Logout"]
-    choice=st.sidebar.selectbox("Menu", menu)
+    if "Sabra_choice" not in st.session_state:
+        st.session_state["Sabra_choice"] = menu[0]  # Set default value
+    choice=st.sidebar.selectbox("Menu", menu,key="operator_choice",index=menu.index(st.session_state["Sabra_choice"]))
+    st.session_state["Sabra_choice"] = choice
+
 
     if choice=="Edit Account":
 	# update user details widget
