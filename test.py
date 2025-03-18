@@ -1131,9 +1131,9 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
         new_rev_accounts = new_accounts_df[new_accounts_df["Sabra_Account"].str.startswith("REV_")]
         
         if not new_rev_accounts.empty:
-            original_revenue = account_mapping[account_mapping["Sabra_Account"].str.startswith("REV_")]
+            original_revenue = account_mapping[account_mapping["Sabra_Account"].fillna("").str.startswith("REV_")]
+            conversion_count = len(original_revenue[original_revenue["Conversion"].fillna("") == "*-1"])
 
-            conversion_count = len(original_revenue[original_revenue["Conversion"] == "*-1"])
             conversion_percentage=(conversion_count / len(original_revenue)) * 100 if len(original_revenue) > 0 else 0
             if conversion_percentage>=0.7:
                 st.warning(f"Based on your previous revenue, below new revenue accounts will be adjusted by multiplying by -1. Please let us know at sli@sabrahealth.com if this process is incorrect.")
