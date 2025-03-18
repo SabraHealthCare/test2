@@ -111,7 +111,6 @@ def Upload_To_Sharepoint(files, sharepoint_folder,new_file_names):
         i=0
         for file in files:
             new_file_name=new_file_names[i]
-            st.write("new_file_name",new_file_name)
             i+=1
             try:   
                 temp_file_path = os.path.join(".", file.name)
@@ -1141,10 +1140,11 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
                 st.warning(",".join(new_rev_accounts["Tenant_Account"]))
                 new_accounts_df["Conversion"] = new_accounts_df["Sabra_Account"].apply(lambda x: "*-1" if x.startswith("REV_") else "")		
                 email_body_for_Sabra=f"""<p>New revenue accounts were added and adjusted by multiplying -1</p> """
-	        
+                st.write("email_body_for_Sabra in Manage_Account_Mapping", email_body_for_Sabra)
             if conversion_percentage>0 and conversion_percentage<1:
                 email_body_for_Sabra=f"""<p>Not all the revenue accounts were adjusted by multiplying -1, please check.</p> """    
         st.write("email_body_for_Sabra inside manage mapping",email_body_for_Sabra)
+
         # Create a dropdown for the last column
         account_mapping=pd.concat([account_mapping, new_accounts_df],ignore_index=True)
         Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion"]],operator,"XLSX",None,account_mapping_str_col)
@@ -1389,6 +1389,7 @@ def View_Summary():
 # no cache
 def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
     global Total_PL,reporting_month,placeholder,email_body_for_Sabra
+    st.write("email_body_for_Sabra in Submit_Upload", email_body_for_Sabra)
     upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
     upload_reporting_month["TIME"]=reporting_month
     upload_reporting_month=upload_reporting_month.rename(columns={reporting_month:"Amount"})
