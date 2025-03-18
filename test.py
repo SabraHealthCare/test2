@@ -2353,7 +2353,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if uploaded_other_docs:
             for file in uploaded_other_docs:
                 upload_list.append(file)
-                upload_filename_list.append("{}-{}_{}".format(reporting_month[4:6],reporting_month[0:4],file.name)	    
+                upload_filename_list.append("{}-{}_{}".format(reporting_month[4:6],reporting_month[0:4],file.name))	    
         if upload_filename_list:
             success,upload_message  = Upload_To_Sharepoint(upload_list, SHAREPOINT_FOLDER,upload_filename_list)
             if success:
