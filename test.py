@@ -2071,6 +2071,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
 # no cache
 def Upload_And_Process(uploaded_file,wb,file_type):
     global  tenant_account_col,email_body_for_Sabra
+    st.write("email_body_for_Sabra in Upload_And_Process",email_body_for_Sabra)
     Total_PL=pd.DataFrame()
     #Total_PL_detail=pd.DataFrame()
     total_entity_list=list(entity_mapping.index)
@@ -2091,6 +2092,7 @@ def Upload_And_Process(uploaded_file,wb,file_type):
 	    # properties are in seperate sheet 
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,wb,account_pool_full)
+                st.write("email_body_for_Sabra after Read_Clean_PL_Single",email_body_for_Sabra)
                 if operator!="Ignite":
                     Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
                 else:
@@ -2141,6 +2143,7 @@ def Upload_And_Process(uploaded_file,wb,file_type):
                 tenant_account_col=[10000]
                 entity_list_finance_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_in_onesheet].tolist()
                 PL=Read_Clean_PL_Multiple(entity_list_finance_in_onesheet,"Sheet_Name_Finance",uploaded_file,account_pool_full,sheet_name_finance_in_onesheet)
+                st.write("email_body_for_Sabra after Read_Clean_PL_Multiple",email_body_for_Sabra)
                 if operator!="Ignite":               
                     Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
                 else:
@@ -2486,7 +2489,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                         st.stop()
                     account_mapping,email_body_for_Sabra=Manage_Account_Mapping(new_tenant_account_list,email_body_for_Sabra)
                     Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator,"XLSX",None,account_mapping_str_col)
-			
+
     elif choice=='Instructions':
         # insert Video
         video=Read_File_From_Onedrive(mapping_path,"Sabra App video.mp4","VIDEO")
