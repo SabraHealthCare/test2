@@ -75,7 +75,9 @@ sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint user
 sharepoint_password = "June2022SL!"
 
 email_body=""
-email_body_for_Sabra=""
+if "email_body_for_Sabra" not in st.session_state:
+    st.session_state.email_body_for_Sabra = ""  # only email these info to sabra
+
 today= datetime.now(pytz.timezone('America/Los_Angeles')).date()
 current_year= today.year
 current_month= today.month
@@ -1067,7 +1069,7 @@ def Manage_Entity_Mapping(operator):
     return entity_mapping
 
 # no cache 
-def Manage_Account_Mapping(new_tenant_account_list,email_body_for_Sabra,sheet_name="False",sheet_type_name="False"):
+def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type_name="False"):
     global account_mapping
     st.warning("Please complete mapping for below new accounts:")
     count=len(new_tenant_account_list)
@@ -1139,16 +1141,16 @@ def Manage_Account_Mapping(new_tenant_account_list,email_body_for_Sabra,sheet_na
                 st.warning(f"Based on your previous revenue, below new revenue accounts will be adjusted by multiplying by -1. Please let us know at sli@sabrahealth.com if this process is incorrect.")
                 st.warning(",".join(new_rev_accounts["Tenant_Account"]))
                 new_accounts_df["Conversion"] = new_accounts_df["Sabra_Account"].apply(lambda x: "*-1" if x.startswith("REV_") else "")		
-                email_body_for_Sabra=f"""<p>New revenue accounts were added and adjusted by multiplying -1</p> """
+                st.session_state.email_body_for_Sabra+=f"""<p>New revenue accounts were added and adjusted by multiplying -1</p> """
                
             if conversion_percentage>0 and conversion_percentage<1:
-                email_body_for_Sabra=f"""<p>Not all the revenue accounts were adjusted by multiplying -1, please check.</p> """    
+                st.session_state.email_body_for_Sabra+=f"""<p>Not all the revenue accounts were adjusted by multiplying -1, please check.</p> """    
 
         # Create a dropdown for the last column
         account_mapping=pd.concat([account_mapping, new_accounts_df],ignore_index=True)
         Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion"]],operator,"XLSX",None,account_mapping_str_col)
         st.success("New accounts mapping were successfully saved.")   
-    return account_mapping,email_body_for_Sabra
+    return account_mapping
 	
 #@st.cache_data 
 def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
@@ -1386,7 +1388,7 @@ def View_Summary():
         total_email_body=f"<p>Here is the summary for your reference:</p>{summary_for_email.to_html(index=False)}"+email_body
         return total_email_body
 # no cache
-def Submit_Upload(total_email_body,SHAREPOINT_FOLDER,email_body_for_Sabra):
+def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
     global Total_PL,reporting_month,placeholder
     upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
     upload_reporting_month["TIME"]=reporting_month
@@ -1423,14 +1425,14 @@ def Submit_Upload(total_email_body,SHAREPOINT_FOLDER,email_body_for_Sabra):
         <p>Sabra Healthcare REIT.</p>
     </body>
     </html>"""
-    st.write("email_body_for_Sabra",email_body_for_Sabra)
+
     if not st.session_state.email_sent:
         receiver_email_list= ["sli@sabrahealth.com"]   
         Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body) 
         
-        if email_body!="" or email_body_for_Sabra!="":
+        if email_body!="" or st.session_state.email_body_for_Sabra!="":
         
-            Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body+email_body_for_Sabra)    
+            Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body+st.session_state.email_body_for_Sabra)    
         st.session_state.email_sent = True
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
     global entity_mapping,PL_sheet_list
@@ -1790,7 +1792,7 @@ def Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_n
         st.stop()    
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,sheet_name):  
-    global account_mapping,reporting_month,tenant_account_col,email_body_for_Sabra
+    global account_mapping,reporting_month,tenant_account_col
     #st.write("account_mapping",account_mapping)
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
     #st.write("sheet_type",sheet_type,"account_pool","account_pool",sheet_name)
@@ -1875,9 +1877,8 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
             #st.write("new_tenant_account_list",new_tenant_account_list)	
-            account_mapping,email_body_for_Sabra=Manage_Account_Mapping(new_tenant_account_list,email_body_for_Sabra,sheet_name,sheet_type_name)
+            account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)
 
-            st.write("email_body_for_Sabra after manage account_mapping",email_body_for_Sabra)
 	    # Update account pool
             if sheet_type=="Sheet_Name_Finance":
                 account_pool=account_mapping.copy()
@@ -1914,8 +1915,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         #st.write("sheet_type",sheet_type,"PL",PL,"account_pool",account_pool)
         PL=Map_PL_Sabra(PL,entity_list,sheet_type,account_pool) # index are ('ENTITY',"Sabra_Account")
         PL.rename(columns={"value":reporting_month},inplace=True)
-        #PL_with_detail.rename(columns={"values":reporting_month},inplace=True)
-       
+        #PL_with_detail.rename(columns={"values":reporting_month},inplace=True) 
     return PL
 	
 @st.cache_data
@@ -1934,7 +1934,7 @@ def Get_Previous_Months(reporting_month,full_date_header):
 
 #no cache    
 def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):  
-    global account_mapping,reporting_month,tenant_account_col,date_header,select_months_list,email_body_for_Sabra
+    global account_mapping,reporting_month,tenant_account_col,date_header,select_months_list
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
 
@@ -2029,7 +2029,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
         new_tenant_account_list=list(filter(lambda x: x not in list(account_mapping["Tenant_Account"]),PL.index))
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
-            account_mapping,email_body_for_Sabra=Manage_Account_Mapping(new_tenant_account_list,email_body_for_Sabra,sheet_name,sheet_type_name)   
+            account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)   
             # Update account pool
             if sheet_type=="Sheet_Name_Finance":
                 account_pool=account_mapping.copy()
@@ -2070,8 +2070,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
 
 # no cache
 def Upload_And_Process(uploaded_file,wb,file_type):
-    global  tenant_account_col,email_body_for_Sabra
-    st.write("email_body_for_Sabra in Upload_And_Process",email_body_for_Sabra)
+    global  tenant_account_col
     Total_PL=pd.DataFrame()
     #Total_PL_detail=pd.DataFrame()
     total_entity_list=list(entity_mapping.index)
@@ -2092,7 +2091,6 @@ def Upload_And_Process(uploaded_file,wb,file_type):
 	    # properties are in seperate sheet 
             if entity_mapping.loc[entity_i,"Finance_in_separate_sheets"]=="Y":
                 PL=Read_Clean_PL_Single(entity_i,"Sheet_Name_Finance",uploaded_file,wb,account_pool_full)
-                st.write("email_body_for_Sabra after Read_Clean_PL_Single",email_body_for_Sabra)
                 if operator!="Ignite":
                     Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
                 else:
@@ -2143,7 +2141,6 @@ def Upload_And_Process(uploaded_file,wb,file_type):
                 tenant_account_col=[10000]
                 entity_list_finance_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_in_onesheet].tolist()
                 PL=Read_Clean_PL_Multiple(entity_list_finance_in_onesheet,"Sheet_Name_Finance",uploaded_file,account_pool_full,sheet_name_finance_in_onesheet)
-                st.write("email_body_for_Sabra after Read_Clean_PL_Multiple",email_body_for_Sabra)
                 if operator!="Ignite":               
                     Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
                 else:
@@ -2366,18 +2363,18 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             if success:
                 st.success("{} files for {} uploaded successfully.".format(len(upload_list),reporting_month_display))
             elif not success and upload_message!=[]:
-                email_body_for_Sabra+=f"""
+                st.session_state.email_body_for_Sabra+=f"""
 	        <p><strong>{len(upload_message)}</strong> files failed to upload:</p>  
                 <ul>  
                     {''.join(f'<li>{file}</li>' for file in upload_message)}  
                 </ul>
 	        """
             elif upload_message==[]:
-                email_body_for_Sabra+=f"""<p><strong>Error during SharePoint upload process. Files are not uploaded</p> """
+                st.session_state.email_body_for_Sabra+=f"""<p><strong>Error during SharePoint upload process. Files are not uploaded</p> """
 
             success_onedrive,upload_message_onedrive=Upload_to_Onedrive(upload_list,"{}/{}".format(PL_path,operator),upload_filename_list)
             if not success_onedrive and upload_message!=[]:
-                 email_body_for_Sabra+=f"""
+                 st.session_state.email_body_for_Sabra+=f"""
 	        <p><strong>{len(upload_message_onedrive)}</strong> files failed to upload to onedrive:</p>  
                 <ul>  
                     {''.join(f'<li>{file}</li>' for file in upload_message_onedrive)}  
@@ -2457,7 +2454,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
         # Perform the upload action here and check for discrepancies
         if st.session_state.clicked['submit_report']:
-            Submit_Upload(total_email_body,SHAREPOINT_FOLDER,email_body_for_Sabra)
+            Submit_Upload(total_email_body,SHAREPOINT_FOLDER)
             # Discrepancy of Historic Data
             if len(Total_PL.columns) > 1 and BPC_pull.shape[0] > 0:
                 with st.expander("Discrepancy for Historic Data", expanded=True):
@@ -2487,7 +2484,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     new_tenant_account_list=list(set(new_tenant_account_list) - set(duplicate_accounts))
                     if len(new_tenant_account_list)==0:
                         st.stop()
-                    account_mapping,email_body_for_Sabra=Manage_Account_Mapping(new_tenant_account_list,email_body_for_Sabra)
+                    account_mapping=Manage_Account_Mapping(new_tenant_account_list)
                     Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator,"XLSX",None,account_mapping_str_col)
 
     elif choice=='Instructions':
