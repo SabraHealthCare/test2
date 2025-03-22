@@ -951,7 +951,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                 return PL_date_header,current_month_rows,PL.iloc[current_month_rows,:]
             else:
                 #st.write("valid_col_index",valid_col_index,"valid_col_mask",valid_col_mask)
-                st.error("Failed to identify any month/year header in sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
+                st.error("Failed to identify any month/year header in {} sheet: '{}', please add the month/year header and re-upload.".format(sheet_type,sheet_name))
                 st.stop()
         elif len(valid_col_index) == 1:  #  only one column contain numeric data
             only_numeric_column_value=PL_temp.iloc[:,valid_col_index[0]]
