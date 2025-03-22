@@ -936,7 +936,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
 
             for col_i in valid_col_index:
                 column = PL.iloc[0:first_tenant_account_row, col_i].reset_index(drop=True)
-                if column.astype(str).str.contains('current month|current period|mtd', case=False, na=False).any():
+                if column.astype(str).str.contains('current month|current period|mtd|current', case=False, na=False).any():
                     current_month_cols.append(col_i)
                     #current_month_rows = column.index[column.astype(str).str.contains('current month', case=False, na=False)][0]
                     current_month_rows = column.index[column.astype(str).str.contains(r'(current month|current period|mtd)', case=False, na=False)][0]
