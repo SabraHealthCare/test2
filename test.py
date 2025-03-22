@@ -939,7 +939,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                 if column.astype(str).str.contains('current month|current period|mtd|current', case=False, na=False).any():
                     current_month_cols.append(col_i)
                     #current_month_rows = column.index[column.astype(str).str.contains(current_month_keyword, case=False, na=False)][0]
-                    current_month_rows = column.index[column.astype(str).str.contains(r'(current month|current period|mtd|current')', case=False, na=False)][0]
+                    current_month_rows = column.index[column.astype(str).str.contains(r'(current month|current period|mtd|current)', case=False, na=False)][0]
                 elif sheet_type=="Sheet_Name_Occupancy" and column.astype(str).str.contains('#\\s*of\\s*days|total', case=False, na=False).any():
                     current_month_cols.append(col_i)
                     current_month_rows = column.index[column.astype(str).str.contains('#\\s*of\\s*days|total', case=False, na=False)][0]
