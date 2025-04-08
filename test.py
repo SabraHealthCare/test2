@@ -2014,7 +2014,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
         PL.drop(nan_index, inplace=True)
         #set index as str ,strip,upper
         PL.index=map(lambda x:str(x).strip().upper(),PL.index)
-        #st.write("process PL",PL)    
+        st.write("process PL",PL)    
         # filter columns with month_select
         selected_month_columns = [val in select_months_list for val in date_header[0]]
         #st.write("selected_month_columns",selected_month_columns)
@@ -2027,7 +2027,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
         PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
 	# mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x: x not in list(account_mapping["Tenant_Account"]),PL.index))
-        new_tenant_account_list=list(set(new_tenant_account_list))    
+        new_tenant_account_list=list(set(new_tenant_account_list))
+        st.write("new_tenant_account_list",new_tenant_account_list)
         if len(new_tenant_account_list)>0:
             account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)   
             # Update account pool
