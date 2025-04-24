@@ -1393,8 +1393,9 @@ def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
     global Total_PL,reporting_month,placeholder
     st.write("Total_PL",Total_PL,"reporting_month",reporting_month)
     upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
-    upload_reporting_month["Year"] = reporting_month.split(".")[0]
-    upload_reporting_month["Month"] = reporting_month.split(".")[1]
+    upload_reporting_month["Year"] = int(reporting_month[:4])  # 2025 (integer)
+    upload_reporting_month["Month"] = pd.to_datetime(month_num, format="%m").strftime("%b")
+
     upload_reporting_month=upload_reporting_month.rename(columns={reporting_month:"Amount"})
    
     current_time = datetime.now(pytz.timezone('America/Los_Angeles')).strftime("%H:%M")
