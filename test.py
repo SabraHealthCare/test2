@@ -82,7 +82,7 @@ today= datetime.now(pytz.timezone('America/Los_Angeles')).date()
 current_year= today.year
 current_month= today.month
 current_day=today.day  
-operators_remove_hidden_rowcol=["Ignite"]
+operators_remove_hidden_rowcol=["Ignite"]#"Creative Solutions"
 
 # Acquire a token using client credentials flow
 app = ConfidentialClientApplication(
@@ -936,10 +936,10 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
 
             for col_i in valid_col_index:
                 column = PL.iloc[0:first_tenant_account_row, col_i].reset_index(drop=True)
-                if column.astype(str).str.contains('current month|current period|mtd|current', case=False, na=False).any():
+                if column.astype(str).str.contains('current month|current period|mtd', case=False, na=False).any():
                     current_month_cols.append(col_i)
-                    #current_month_rows = column.index[column.astype(str).str.contains(current_month_keyword, case=False, na=False)][0]
-                    current_month_rows = column.index[column.astype(str).str.contains(r'(current month|current period|mtd|current)', case=False, na=False)][0]
+                    #current_month_rows = column.index[column.astype(str).str.contains('current month', case=False, na=False)][0]
+                    current_month_rows = column.index[column.astype(str).str.contains(r'(current month|current period|mtd)', case=False, na=False)][0]
                 elif sheet_type=="Sheet_Name_Occupancy" and column.astype(str).str.contains('#\\s*of\\s*days|total', case=False, na=False).any():
                     current_month_cols.append(col_i)
                     current_month_rows = column.index[column.astype(str).str.contains('#\\s*of\\s*days|total', case=False, na=False)][0]
@@ -951,7 +951,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                 return PL_date_header,current_month_rows,PL.iloc[current_month_rows,:]
             else:
                 #st.write("valid_col_index",valid_col_index,"valid_col_mask",valid_col_mask)
-                st.error("Failed to identify any month/year header in 111111111111111111 {} sheet: '{}', please add the month/year header and re-upload.".format(sheet_type,sheet_name))
+                st.error("Failed to identify any month/year header in sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
                 st.stop()
         elif len(valid_col_index) == 1:  #  only one column contain numeric data
             only_numeric_column_value=PL_temp.iloc[:,valid_col_index[0]]
@@ -1170,13 +1170,13 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     # Ensure index name consistency
     PL.index.name = "Tenant_Account"
     PL = PL.reset_index(drop=False)
-    st.write("PL_Before mapping",PL)
+    
     # Filter main_account_mapping before the merge
     main_account_mapping_filtered = main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]] 
 	
     PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
                     PL.merge(main_account_mapping_filtered,   on="Tenant_Account", how="right")])
-    st.write("PL after mapping",PL)
+    #st.write("PL mapping",PL)
     #Remove blank or missing "Sabra_Account" values
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
     PL.dropna(subset=["Sabra_Account"], inplace=True)
@@ -1947,7 +1947,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
 
     # read data from uploaded file
     PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)	
-    st.write("read PL",PL)
+    #st.write("read PL",PL)
     if PL.shape[0]<=1:  # sheet is empty or only has one column
         return pd.DataFrame()
     if operator in operators_remove_hidden_rowcol:
@@ -1966,7 +1966,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenant_account_col=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
-        st.write("tenant_account_col0",tenant_account_col)
+        #st.write("tenant_account_col0",tenant_account_col)
         if len(tenant_account_col) > 1:
             # Start with the first column
             tenant_account_col_values = PL.iloc[:, tenant_account_col[0]].fillna('')
@@ -1979,7 +1979,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
         elif len(tenant_account_col) == 1:
             tenant_account_col_values=PL.iloc[:, tenant_account_col[0]]
         tenant_account_col_values = tenant_account_col_values.apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
-        st.write("tenant_account_col_values",tenant_account_col_values)
+        #st.write("tenant_account_col_values",tenant_account_col_values)
         date_header=Identify_Month_Row(PL,tenant_account_col_values,tenant_account_col[0],sheet_name,sheet_type,date_header)
         #st.write("date_header",date_header)
         if len(date_header[0])==0:
@@ -2014,7 +2014,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
         PL.drop(nan_index, inplace=True)
         #set index as str ,strip,upper
         PL.index=map(lambda x:str(x).strip().upper(),PL.index)
-        st.write("process PL",PL)    
+        #st.write("process PL",PL)    
         # filter columns with month_select
         selected_month_columns = [val in select_months_list for val in date_header[0]]
         #st.write("selected_month_columns",selected_month_columns)
@@ -2027,8 +2027,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
         PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
 	# mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x: x not in list(account_mapping["Tenant_Account"]),PL.index))
-        new_tenant_account_list=list(set(new_tenant_account_list))
-        st.write("new_tenant_account_list",new_tenant_account_list)
+        new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
             account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)   
             # Update account pool
