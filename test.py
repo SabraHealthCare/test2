@@ -1391,10 +1391,8 @@ def View_Summary():
 # no cache
 def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
     global Total_PL,reporting_month,placeholder
-    st.write("Total_PL",Total_PL)
+    st.write("Total_PL",Total_PL,"reporting_month",reporting_month)
     upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
-    upload_reporting_month["TIME"]=reporting_month
-	
     upload_reporting_month["Year"] = reporting_month.split(".")[0]
     upload_reporting_month["Month"] = reporting_month.split(".")[1]
     upload_reporting_month=upload_reporting_month.rename(columns={reporting_month:"Amount"})
