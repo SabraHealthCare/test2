@@ -1400,7 +1400,7 @@ def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
     current_time = datetime.now(pytz.timezone('America/Los_Angeles')).strftime("%H:%M")
     upload_reporting_month["Update_Time"]=str(today)+" "+current_time
     
-    upload_reporting_month=upload_reporting_month.merge(entity_mapping[["GEOGRAPHY", "LEASE_NAME", "FACILITY_TYPE", "INV_TYPE"]].reset_index(), on="ENTITY",how="left")
+    upload_reporting_month=upload_reporting_month.merge(entity_mapping[["GEOGRAPHY", "LEASE_NAME", "FACILITY_TYPE", "INV_TYPE","Operator"]].reset_index(), on="ENTITY",how="left")
     upload_reporting_month = upload_reporting_month[["ENTITY","Year","Month","Sabra_Account","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE","Amount","Update_Time","Operator"]]
     upload_reporting_month.columns = ["ENTITY", "YEAR", "PERIOD", "ACCOUNT", "GEOGRAPHY", "LEASE_NAME", "FACILITY_TYPE", "INV_TYPE", "Amount", "Update_Time", "Operator"]
 
