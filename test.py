@@ -162,7 +162,7 @@ def Send_Confirmation_Email(receiver_email_list, subject, email_body):
         st.write( f"Failed to send confirmation email.")
 	    
 #directly save the uploaded (.xlsx) file to onedrive
-def Upload_to_Onedrive(uploaded_files,path,file_names):
+def Upload_To_Onedrive(uploaded_files,path,file_names):
     i=0
     success_files = []
     failed_files = [] 
@@ -2343,7 +2343,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
-        SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator, str(selected_year), month_map[selected_month], selected_month)  
+        if operator=="Ensign_Aspen":
+            SHAREPOINT_FOLDER = "Asset Management/01_Operators/Ensign/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(str(selected_year), month_map[selected_month], selected_month)  
+	else:
+            SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator, str(selected_year), month_map[selected_month], selected_month)  
       
         if reporting_month>=current_date:
             st.error("The reporting month should precede the current month.")
@@ -2379,7 +2382,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             elif upload_message==[]:
                 st.session_state.email_body_for_Sabra+=f"""<p><strong>Error during SharePoint upload process. Files are not uploaded</p> """
 
-            success_onedrive,upload_message_onedrive=Upload_to_Onedrive(upload_list,"{}/{}".format(PL_path,operator),upload_filename_list)
+            success_onedrive,upload_message_onedrive=Upload_To_Onedrive(upload_list,"{}/{}".format(PL_path,operator),upload_filename_list)
             if not success_onedrive and upload_message!=[]:
                  st.session_state.email_body_for_Sabra+=f"""
 	        <p><strong>{len(upload_message_onedrive)}</strong> files failed to upload to onedrive:</p>  
