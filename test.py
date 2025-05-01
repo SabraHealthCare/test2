@@ -2596,6 +2596,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
 	    
         st.subheader("Uploading Summary")
+        monthly_reporting_filename="Total monthly reporting.csv"
         data=Read_File_From_Onedrive(master_template_path,monthly_reporting_filename,"CSV")
 
         if data is False or data.empty:
