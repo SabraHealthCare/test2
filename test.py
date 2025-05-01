@@ -1402,7 +1402,7 @@ def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
     
     upload_reporting_month=upload_reporting_month.merge(entity_mapping[["GEOGRAPHY", "LEASE_NAME", "FACILITY_TYPE", "INV_TYPE","Operator"]].reset_index(), on="ENTITY",how="left")
     upload_reporting_month = upload_reporting_month[["ENTITY","Year","Month","Sabra_Account","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE","Amount","Update_Time","Operator"]]
-    upload_reporting_month.columns = ["ENTITY", "YEAR", "PERIOD", "ACCOUNT", "GEOGRAPHY", "LEASE_NAME", "FACILITY_TYPE", "INV_TYPE", "Amount", "Update_Time", "Operator"]
+    upload_reporting_month.columns = ["ENTITY", "YEARS", "PERIOD", "ACCOUNT", "GEOGRAPHY", "LEASE_NAME", "FACILITY_TYPE", "INV_TYPE", "Amount", "Update_Time", "Operator"]
 
     st.write("upload_reporting_month",upload_reporting_month)
     if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,"csv",None,None):
