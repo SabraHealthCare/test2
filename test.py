@@ -45,7 +45,7 @@ BPC_pull_filename="BPC_Pull.csv"
 entity_mapping_filename ="Entity_Mapping.csv"
 discrepancy_filename="Total_Diecrepancy_Review.csv"
 #monthly_reporting_filename="Total monthly reporting.csv"
-monthly_reporting_filename="Upload_template.xlsx"
+monthly_reporting_filename="Sabra_Tenant_Mod.csv"
 operator_list_filename="Operator_list.csv"
 BPC_account_filename="Sabra_account_list.csv"
 previous_monthes_comparison=0
@@ -304,7 +304,6 @@ def Update_File_Onedrive(path,file_name,new_data,operator,file_type="CSV",entity
                 new_data = new_data[new_data["ENTITY"].isin(entity_list)]
             # remove original data by operator and month
             original_data = original_data[~condition]
-
 
         else:
             condition = (original_data['Operator'] == operator)
@@ -1402,10 +1401,11 @@ def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
     upload_reporting_month["Update_Time"]=str(today)+" "+current_time
     
     upload_reporting_month=upload_reporting_month.merge(entity_mapping[["GEOGRAPHY", "LEASE_NAME", "FACILITY_TYPE", "INV_TYPE"]].reset_index(), on="ENTITY",how="left")
-    upload_reporting_month = upload_reporting_month[["ENTITY","Year","Month","Sabra_Account","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE","Amount","Update_Time"]]
-    #upload_reporting_month=upload_reporting_month.apply(Format_Value)
+    upload_reporting_month = upload_reporting_month[["ENTITY","Year","Month","Sabra_Account","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE","Amount","Update_Time","Operator"]]
+    upload_reporting_month.columns = ["ENTITY", "YEAR", "PERIOD", "ACCOUNT", "GEOGRAPHY", "LEASE_NAME", "FACILITY_TYPE", "INV_TYPE", "Amount", "Update_Time", "Operator"]
+
     st.write("upload_reporting_month",upload_reporting_month)
-    if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,"XLSX",None,None):
+    if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,"csv",None,None):
         st.success("{} {} reporting data was uploaded successfully!".format(operator,reporting_month[4:6]+"/"+reporting_month[0:4]))
         placeholder.empty()
     else: 
