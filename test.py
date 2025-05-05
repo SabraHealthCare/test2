@@ -1269,7 +1269,7 @@ def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
 
 def View_Summary(): 
-    global Total_PL,reporting_month_data,reporting_month,email_body,placeholder
+    global Total_PL,reporting_month_data,email_body,placeholder
     
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
@@ -1388,8 +1388,7 @@ def View_Summary():
         return total_email_body
 # no cache
 def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
-    global Total_PL,reporting_month,placeholder
-    st.write("Total_PL",Total_PL,"reporting_month",reporting_month)
+    #st.write("Total_PL",Total_PL,"reporting_month",reporting_month)
     upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
     upload_reporting_month["Year"] = int(reporting_month[:4])  # 2025 (integer)
     upload_reporting_month["Month"] = pd.to_datetime(reporting_month[4:], format="%m").strftime("%b")
