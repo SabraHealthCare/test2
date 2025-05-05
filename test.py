@@ -977,7 +977,6 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
 
 # manage entity mapping in "Manage Mapping" 
 def Manage_Entity_Mapping(operator):
-    global entity_mapping
     entity_mapping_updation=pd.DataFrame(\
 	    columns=["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"],\
             index=entity_mapping.index)
