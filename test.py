@@ -1939,7 +1939,7 @@ def Get_Previous_Months(reporting_month,full_date_header):
 
 #no cache    
 def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):  
-    global account_mapping,reporting_month,tenant_account_col,date_header,select_months_list
+    global account_mapping,tenant_account_col,date_header,select_months_list
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
     property_name= str(entity_mapping.loc[entity_i,"Property_Name"] ) 
 
