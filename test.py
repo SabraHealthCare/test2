@@ -1440,7 +1440,7 @@ def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
             Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body+st.session_state.email_body_for_Sabra)    
         st.session_state.email_sent = True
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
-    global entity_mapping,PL_sheet_list
+    global PL_sheet_list
     try:
         wb = load_workbook(uploaded_file, data_only=True)
         PL_sheet_list = wb.sheetnames        
