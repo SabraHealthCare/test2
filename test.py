@@ -1147,9 +1147,11 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
 
         # Create a dropdown for the last column
         account_mapping=pd.concat([account_mapping, new_accounts_df],ignore_index=True)
-        Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion"]],operator,"XLSX",None,account_mapping_str_col)
-        st.success("New accounts mapping were successfully saved.")   
-    return account_mapping
+        if Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion"]],operator,"XLSX",None,account_mapping_str_col)
+            st.success("New accounts mapping were successfully saved.")   
+        else:
+            st.error("New accounts were not successfully saved.")
+    #return account_mapping
 	
 #@st.cache_data 
 def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
@@ -1891,7 +1893,7 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
             #st.write("new_tenant_account_list",new_tenant_account_list)	
-            account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)
+            Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)
 
 	    # Update account pool
             if sheet_type=="Sheet_Name_Finance":
@@ -2043,7 +2045,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
         new_tenant_account_list=list(filter(lambda x: x not in list(account_mapping["Tenant_Account"]),PL.index))
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
-            account_mapping=Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)   
+            Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)   
             # Update account pool
             if sheet_type=="Sheet_Name_Finance":
                 account_pool=account_mapping.copy()
@@ -2508,8 +2510,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     new_tenant_account_list=list(set(new_tenant_account_list) - set(duplicate_accounts))
                     if len(new_tenant_account_list)==0:
                         st.stop()
-                    account_mapping=Manage_Account_Mapping(new_tenant_account_list)
-                    Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator,"XLSX",None,account_mapping_str_col)
+                    Manage_Account_Mapping(new_tenant_account_list)
+                    #Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping,operator,"XLSX",None,account_mapping_str_col)
 
     elif choice=='Instructions':
         # insert Video
