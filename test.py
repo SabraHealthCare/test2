@@ -1159,21 +1159,19 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     #st.write(account_pool)
     
     main_account_mapping = account_pool.loc[account_pool["Sabra_Account"].apply(lambda x: pd.notna(x) and x.upper() != "NO NEED TO MAP")]
-        # Concatenate main accounts with second accounts
+    main_account_mapping_filtered = main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]] 
+	
+    # second_account_mapping has removed None
     second_account_mapping = account_pool.loc[(pd.notna(account_pool["Sabra_Second_Account"])) & (account_pool["Sabra_Second_Account"] != "NO NEED TO MAP")]\
 	[["Sabra_Second_Account","Tenant_Account", "Conversion"]]\
         .rename(columns={"Sabra_Second_Account": "Sabra_Account"})
-    
     if second_account_mapping.shape[0]>0:
         second_account_mapping = second_account_mapping[second_account_mapping["Sabra_Account"].str.strip() != ""]
     
-    # Ensure index name consistency
     PL.index.name = "Tenant_Account"
     PL = PL.reset_index(drop=False)
     
-    # Filter main_account_mapping before the merge
-    main_account_mapping_filtered = main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]] 
-	
+    #Concatenate main accounts with second accounts
     PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
                     PL.merge(main_account_mapping_filtered,   on="Tenant_Account", how="right")])
     #st.write("PL mapping",PL)
@@ -1282,6 +1280,12 @@ def View_Summary():
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
+
+    total_REV_EXP = reporting_month_data[reporting_month_data["Sabra_Account"].isin(["TOTAL_REV", "TOTAL_EXP"])]
+    reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(["TOTAL_REV", "TOTAL_EXP"])]
+    st.write("total_REV_EXP", total_REV_EXP)
+
+
     # check patient days ( available days > patient days)	
     check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].str.startswith("A_"))|(reporting_month_data["Category"]=='Patient Days') ]
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
@@ -2138,7 +2142,7 @@ def Upload_And_Process(uploaded_file,wb,file_type):
             for sheet_name_finance_in_onesheet in sheet_list_finance_in_onesheet:
                 tenant_account_col=[10000]
                 entity_list_finance_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_in_onesheet].tolist()
-                PL=Read_Clean_PL_Multiple(entity_list_finance_in_onesheet,"Sheet_Name_Finance",uploaded_file,account_pool_full,sheet_name_finance_in_onesheet)
+                PL=(entity_list_finance_in_onesheet,"Sheet_Name_Finance",uploaded_file,account_pool_full,sheet_name_finance_in_onesheet)
                 if operator!="Ignite":               
                     Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
                 else:
