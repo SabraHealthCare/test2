@@ -1268,10 +1268,8 @@ def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
 
 def View_Summary(): 
-    total_account_list=["TOTAL_REV","TOTAL_OPEX","TOTAL_PD"]
     global Total_PL,reporting_month_data,email_body,placeholder
-    
-    def highlight_total(df):
+    total_account_list=["TOTAL_REV","TOTAL_OPEX","TOTAL_PD"]    def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
     #st.write("Total_PL",Total_PL,Total_PL.index)
@@ -1280,7 +1278,7 @@ def View_Summary():
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-    #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
+    st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
 
 
     # check patient days ( available days > patient days)	
@@ -1319,11 +1317,18 @@ def View_Summary():
 
     reporting_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
     reporting_month_data=reporting_month_data.dropna(subset=["Sabra_Account"])
-    sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet","Additional Statistical Information","Government Funds","Total"]
+    st.write("reporting_month_data2",reporting_month_data)
+    sorter=["Facility Information","Patient Days","Revenue","Operating Expenses",\
+	    "Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet",\
+	    "Additional Statistical Information","Government Funds","Total"]
     sorter=list(filter(lambda x:x in reporting_month_data["Category"].unique(),sorter))
+	
     reporting_month_data.Category = reporting_month_data.Category.astype("category")
+    st.write("reporting_month_data3",reporting_month_data)
     reporting_month_data.Category = reporting_month_data.Category.cat.set_categories(sorter)
+    st.write("reporting_month_data4",reporting_month_data)
     reporting_month_data=reporting_month_data.sort_values(["Category"]) 
+    st.write("reporting_month_data5",reporting_month_data)
     reporting_month_data = pd.concat([reporting_month_data.\
              groupby(by='Category', as_index=False,observed=False).\
 	     sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).\
