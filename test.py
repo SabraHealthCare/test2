@@ -1282,10 +1282,6 @@ def View_Summary():
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
 
-    total_REV_EXP = reporting_month_data[reporting_month_data["Sabra_Account"].isin(total_account_list)]
-    reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(total_account_list)]
-    st.write("total_REV_EXP", total_REV_EXP)
-
 
     # check patient days ( available days > patient days)	
     check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].str.startswith("A_"))|(reporting_month_data["Category"]=='Patient Days') ]
@@ -1328,7 +1324,11 @@ def View_Summary():
     reporting_month_data.Category = reporting_month_data.Category.astype("category")
     reporting_month_data.Category = reporting_month_data.Category.cat.set_categories(sorter)
     reporting_month_data=reporting_month_data.sort_values(["Category"]) 
-    reporting_month_data = pd.concat([reporting_month_data.groupby(by='Category', as_index=False,observed=False).sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
+    reporting_month_data = pd.concat([reporting_month_data.\
+             groupby(by='Category', as_index=False,observed=False).\
+	     sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).\
+	     sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
+    st.write("reporting_month_data1",reporting_month_data)
     set_empty=list(reporting_month_data.columns)
     set_empty.remove("Category")
     set_empty.remove("Sabra_Account")
@@ -1338,6 +1338,8 @@ def View_Summary():
             if reporting_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 reporting_month_data.loc[i,set_empty]=np.nan
 
+    
+    st.write("reporting_month_data2",reporting_month_data)	
     entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
    
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
