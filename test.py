@@ -1268,6 +1268,7 @@ def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
 
 def View_Summary(): 
+    total_account_list=["TOTAL_REV","TOTAL_OPEX","TOTAL_PD"]
     global Total_PL,reporting_month_data,email_body,placeholder
     
     def highlight_total(df):
@@ -1281,8 +1282,8 @@ def View_Summary():
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
 
-    total_REV_EXP = reporting_month_data[reporting_month_data["Sabra_Account"].isin(["TOTAL_REV", "TOTAL_EXP"])]
-    reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(["TOTAL_REV", "TOTAL_EXP"])]
+    total_REV_EXP = reporting_month_data[reporting_month_data["Sabra_Account"].isin(total_account_list)]
+    reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(total_account_list)]
     st.write("total_REV_EXP", total_REV_EXP)
 
 
