@@ -33,7 +33,7 @@ from shareplum import Site
 from shareplum import Office365
 from shareplum.site import Version
 import os
-
+import random
 #---------------------------define parameters--------------------------
 st.set_page_config(
    initial_sidebar_state="expanded",  layout="wide")
