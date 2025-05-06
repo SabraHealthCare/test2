@@ -1319,7 +1319,7 @@ def View_Summary():
 
     reporting_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
     reporting_month_data=reporting_month_data.dropna(subset=["Sabra_Account"])
-    sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet","Additional Statistical Information","Government Funds"]
+    sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet","Additional Statistical Information","Government Funds","Total"]
     sorter=list(filter(lambda x:x in reporting_month_data["Category"].unique(),sorter))
     reporting_month_data.Category = reporting_month_data.Category.astype("category")
     reporting_month_data.Category = reporting_month_data.Category.cat.set_categories(sorter)
