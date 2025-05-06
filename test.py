@@ -34,6 +34,7 @@ from shareplum import Office365
 from shareplum.site import Version
 import os
 import random
+
 #---------------------------define parameters--------------------------
 st.set_page_config(
    initial_sidebar_state="expanded",  layout="wide")
@@ -44,8 +45,7 @@ account_mapping_filename="Account_Mapping.xlsx"
 BPC_pull_filename="BPC_Pull.csv"
 entity_mapping_filename ="Entity_Mapping.csv"
 discrepancy_filename="Total_Diecrepancy_Review.csv"
-#monthly_reporting_filename="Total monthly reporting.csv"
-monthly_reporting_filename="Sabra_Tenant_Mod.csv"
+monthly_reporting_filename="Total monthly reporting.csv"
 operator_list_filename="Operator_list.csv"
 BPC_account_filename="Sabra_account_list.csv"
 previous_monthes_comparison=0
@@ -83,7 +83,7 @@ today= datetime.now(pytz.timezone('America/Los_Angeles')).date()
 current_year= today.year
 current_month= today.month
 current_day=today.day  
-operators_remove_hidden_rowcol=["Ignite"]#"Creative Solutions"
+operators_remove_hidden_rowcol=["Ignite","Recovery Centers of America"]#"Creative Solutions"
 
 # Acquire a token using client credentials flow
 app = ConfidentialClientApplication(
@@ -304,6 +304,7 @@ def Update_File_Onedrive(path,file_name,new_data,operator,file_type="CSV",entity
                 new_data = new_data[new_data["ENTITY"].isin(entity_list)]
             # remove original data by operator and month
             original_data = original_data[~condition]
+
 
         else:
             condition = (original_data['Operator'] == operator)
@@ -938,7 +939,6 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                 column = PL.iloc[0:first_tenant_account_row, col_i].reset_index(drop=True)
                 if column.astype(str).str.contains('current month|current period|mtd|current', case=False, na=False).any():
                     current_month_cols.append(col_i)
-                    #current_month_rows = column.index[column.astype(str).str.contains('current month', case=False, na=False)][0]
                     current_month_rows = column.index[column.astype(str).str.contains(r'(current month|current period|mtd|current)', case=False, na=False)][0]
                 elif sheet_type=="Sheet_Name_Occupancy" and column.astype(str).str.contains('#\\s*of\\s*days|total', case=False, na=False).any():
                     current_month_cols.append(col_i)
@@ -984,7 +984,7 @@ def Manage_Entity_Mapping(operator):
     entity_mapping_different_sheet_index= entity_mapping.index[(entity_mapping["DATE_SOLD_PAYOFF"]=="N") & ( entity_mapping["Finance_in_separate_sheets"]=="Y")]
    
     if len(entity_mapping_different_sheet_index)>0:
-        with st.form(key="Mapping Property mapping"):
+        with st.form(key="Property mapping"):
             col1,col2,col3,col4=st.columns([4,3,3,3])
             with col1:
                 st.write("Property")
@@ -1077,7 +1077,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
     Sabra_main_account_value=[np.nan] * count
     Sabra_second_account_value=[np.nan] * count
     form_key = f"form_{sheet_name}_{sheet_type_name}_{random.randint(100, 200)}"
-    with st.form(key=form_key):    
+    with st.form(key=form_key):  
         for i in range(count):
             if sheet_name=="False":
                 st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
@@ -1389,22 +1389,15 @@ def View_Summary():
         return total_email_body
 # no cache
 def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
-    #st.write("Total_PL",Total_PL,"reporting_month",reporting_month)
     upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
-    upload_reporting_month["Year"] = int(reporting_month[:4])  # 2025 (integer)
-    upload_reporting_month["Month"] = pd.to_datetime(reporting_month[4:], format="%m").strftime("%b")
-
+    upload_reporting_month["TIME"]=reporting_month
     upload_reporting_month=upload_reporting_month.rename(columns={reporting_month:"Amount"})
-   
     current_time = datetime.now(pytz.timezone('America/Los_Angeles')).strftime("%H:%M")
-    upload_reporting_month["Update_Time"]=str(today)+" "+current_time
-    
-    upload_reporting_month=upload_reporting_month.merge(entity_mapping[["GEOGRAPHY", "LEASE_NAME", "FACILITY_TYPE", "INV_TYPE","Operator"]].reset_index(), on="ENTITY",how="left")
-    upload_reporting_month = upload_reporting_month[["ENTITY","Year","Month","Sabra_Account","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE","Amount","Update_Time","Operator"]]
-    upload_reporting_month.columns = ["ENTITY", "YEARS", "PERIOD", "ACCOUNT", "GEOGRAPHY", "LEASE_NAME", "FACILITY_TYPE", "INV_TYPE", "Amount", "Update_Time", "Operator"]
+    upload_reporting_month["Latest_Upload_Time"]=str(today)+" "+current_time
+    upload_reporting_month["Operator"]=operator
+    upload_reporting_month=upload_reporting_month.apply(Format_Value)
 
-    st.write("upload_reporting_month",upload_reporting_month)
-    if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,"csv",None,None):
+    if Update_File_Onedrive(master_template_path,monthly_reporting_filename,upload_reporting_month,operator,"CSV",None,None):
         st.success("{} {} reporting data was uploaded successfully!".format(operator,reporting_month[4:6]+"/"+reporting_month[0:4]))
         placeholder.empty()
     else: 
@@ -1433,11 +1426,10 @@ def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
     </html>"""
 
     if not st.session_state.email_sent:
-        receiver_email_list= ["sli@sabrahealth.com"]   
+        #receiver_email_list= ["sli@sabrahealth.com"]   
         Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body) 
         
         if email_body!="" or st.session_state.email_body_for_Sabra!="":
-        
             Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body+st.session_state.email_body_for_Sabra)    
         st.session_state.email_sent = True
 def Check_Sheet_Name_List(uploaded_file,sheet_type):
@@ -2400,8 +2392,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 receiver = operator_email.split(",") + ["twarner@sabrahealth.com", "sli@sabrahealth.com"]  
                 receiver.extend(unique_asset_managers)	 
                 if not st.session_state.email_sent:
-                    receiver=["sli@sabrahealth.com"]  
-                    Send_Confirmation_Email(receiver, "{} uploaded {} ancillary files".format(operator,reporting_month_display),"{} files uploaded: {}".format(len(uploaded_other_docs), ",  ".join(filename_list)))
                     st.session_state.email_sent = True
             else:
                 st.markdown(":red[P&L is not uploaded ]")
@@ -2430,45 +2420,55 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 select_months_list=select_months_list[:previous_monthes_comparison]+[reporting_month]  
             else:
                 select_months_list.append(reporting_month) 
-        with st.spinner("Processing... Please wait!"):
-            if BS_separate_excel=="N":  # Finance/BS are in one excel
-                entity_mapping,finance_wb=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
-                Total_PL=Upload_And_Process(uploaded_finance,finance_wb,"Finance")
-                #st.write("Total_PL1",Total_PL)
-            elif BS_separate_excel=="Y": # Finance/BS are in different excel 
-                entity_mapping,finance_wb=Check_Sheet_Name_List(uploaded_finance,"Finance")
-                entity_mapping,bs_wb=Check_Sheet_Name_List(uploaded_BS,"BS")
+        #with st.spinner("Processing report... Please wait and click 'Confirm' when it's ready. Do not leave this page until you complete the process."):
+        with st.container():
+            spinner_placeholder = st.empty()
+            with spinner_placeholder:
+                st.markdown("""
+    <div style="font-size:28px; background-color: yellow; color: #000; padding: 10px; border-radius: 8px;">
+        ⏳ Processing report... Please wait and click 'Confirm' when it's ready.<br>
+        Do not leave this page until you complete the process!
+    </div>
+""", unsafe_allow_html=True)
+		    
+                if BS_separate_excel=="N":  # Finance/BS are in one excel
+                    entity_mapping,finance_wb=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
+                    Total_PL=Upload_And_Process(uploaded_finance,finance_wb,"Finance")
+                    #st.write("Total_PL1",Total_PL)
+                elif BS_separate_excel=="Y": # Finance/BS are in different excel 
+                    entity_mapping,finance_wb=Check_Sheet_Name_List(uploaded_finance,"Finance")
+                    entity_mapping,bs_wb=Check_Sheet_Name_List(uploaded_BS,"BS")
 
-                # process Finance 
-                Total_PL=Upload_And_Process(uploaded_finance,finance_wb,"Finance")
-                #st.write("Total_PL",Total_PL)
-	        # process BS 
-                Total_BS=Upload_And_Process(uploaded_BS,bs_wb,"BS")
-	        # combine Finance and BS
-                Total_PL=Total_BS.combine_first(Total_PL)
-                #Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
-            if len(Total_PL.columns)==1:
-                Total_PL.columns=[reporting_month]
+                    # process Finance 
+                    Total_PL=Upload_And_Process(uploaded_finance,finance_wb,"Finance")
+                    #st.write("Total_PL",Total_PL)
+	            # process BS 
+                    Total_BS=Upload_And_Process(uploaded_BS,bs_wb,"BS")
+	            # combine Finance and BS
+                    Total_PL=Total_BS.combine_first(Total_PL)
+                    #Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
+                if len(Total_PL.columns)==1:
+                    Total_PL.columns=[reporting_month]
 
-            elif len(Total_PL.columns)>1 and BPC_pull.shape[0]>0:  # there are previous months in P&L
-                #diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail,reporting_month)
-                diff_BPC_PL=Compare_PL_Sabra(Total_PL,reporting_month)
-   
-	# 1 Summary
-        total_email_body=View_Summary()
-        # Define the button and handle the click event
-        if st.button(f'Confirm and upload {reporting_month_display} reporting', key='reporting_month', help="Click and wait a few seconds for the confirmation message."):
-            st.session_state.clicked['submit_report'] = True
+                elif len(Total_PL.columns)>1 and BPC_pull.shape[0]>0:  # there are previous months in P&L
+                    #diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail,reporting_month)
+                    diff_BPC_PL=Compare_PL_Sabra(Total_PL,reporting_month)
 
-        # Perform the upload action here and check for discrepancies
-        if st.session_state.clicked['submit_report']:
-            Submit_Upload(total_email_body,SHAREPOINT_FOLDER)
-            # Discrepancy of Historic Data
-            if len(Total_PL.columns) > 1 and BPC_pull.shape[0] > 0:
-                with st.expander("Discrepancy for Historic Data", expanded=True):
-                    ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-                    View_Discrepancy()
+	    # 1 Summary
+            total_email_body=View_Summary()
+            # Define the button and handle the click event
+            if st.button(f'Confirm and upload {reporting_month_display} reporting', key='reporting_month', help="Click and wait a few seconds for the confirmation message."):
+                st.session_state.clicked['submit_report'] = True
 
+            # Perform the upload action here and check for discrepancies
+            if st.session_state.clicked['submit_report']:
+                Submit_Upload(total_email_body,SHAREPOINT_FOLDER)
+                # Discrepancy of Historic Data
+                if len(Total_PL.columns) > 1 and BPC_pull.shape[0] > 0:
+                    with st.expander("Discrepancy for Historic Data", expanded=True):
+                        ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
+                        View_Discrepancy()
+            spinner_placeholder.empty()
     elif choice=="Manage Mapping":
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
         with st.expander("Manage Property Mapping" ,expanded=True):
@@ -2594,7 +2594,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
 	    
         st.subheader("Uploading Summary")
-        monthly_reporting_filename="Total monthly reporting.csv"
         data=Read_File_From_Onedrive(master_template_path,monthly_reporting_filename,"CSV")
 
         if data is False or data.empty:
