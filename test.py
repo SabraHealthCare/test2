@@ -1313,6 +1313,7 @@ def View_Summary():
 
         email_body+= f"<p> No data detected for below properties and accounts:</p>{missing_category.to_html(index=False)}"
     #st.write("reporting_month_data",reporting_month_data)
+    st.write("reporting_month_data10",reporting_month_data)
     reporting_month_data =reporting_month_data.pivot_table(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=reporting_month,aggfunc='last')
     st.write("reporting_month_data1",reporting_month_data)
     reporting_month_data.reset_index(drop=False,inplace=True)
