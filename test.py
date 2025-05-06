@@ -1273,13 +1273,13 @@ def View_Summary():
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
-    st.write("Total_PL",Total_PL,Total_PL.index)
+    #st.write("Total_PL",Total_PL,Total_PL.index)
 
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-    st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
+    #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
 
 
     # check patient days ( available days > patient days)	
@@ -1314,9 +1314,11 @@ def View_Summary():
         email_body+= f"<p> No data detected for below properties and accounts:</p>{missing_category.to_html(index=False)}"
     #st.write("reporting_month_data",reporting_month_data)
     reporting_month_data =reporting_month_data.pivot_table(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=reporting_month,aggfunc='last')
+    st.write("reporting_month_data1",reporting_month_data)
     reporting_month_data.reset_index(drop=False,inplace=True)
-
+    st.write("reporting_month_data11",reporting_month_data)
     reporting_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
+    st.write("reporting_month_data111",reporting_month_data)
     reporting_month_data=reporting_month_data.dropna(subset=["Sabra_Account"])
     st.write("reporting_month_data2",reporting_month_data)
     sorter=["Facility Information","Patient Days","Revenue","Operating Expenses",\
@@ -1325,16 +1327,16 @@ def View_Summary():
     sorter=list(filter(lambda x:x in reporting_month_data["Category"].unique(),sorter))
 	
     reporting_month_data.Category = reporting_month_data.Category.astype("category")
-    st.write("reporting_month_data3",reporting_month_data)
+    #st.write("reporting_month_data3",reporting_month_data)
     reporting_month_data.Category = reporting_month_data.Category.cat.set_categories(sorter)
-    st.write("reporting_month_data4",reporting_month_data)
+    #st.write("reporting_month_data4",reporting_month_data)
     reporting_month_data=reporting_month_data.sort_values(["Category"]) 
-    st.write("reporting_month_data5",reporting_month_data)
+    #st.write("reporting_month_data5",reporting_month_data)
     reporting_month_data = pd.concat([reporting_month_data.\
              groupby(by='Category', as_index=False,observed=False).\
 	     sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).\
 	     sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
-    st.write("reporting_month_data1",reporting_month_data)
+    #st.write("reporting_month_data1",reporting_month_data)
     set_empty=list(reporting_month_data.columns)
     set_empty.remove("Category")
     set_empty.remove("Sabra_Account")
