@@ -930,7 +930,6 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     elif len(candidate_date)==0: 
 	#  more than one column contain numeric data without any month date header
         if len(valid_col_index) > 1: 
-            st.write("valid_col_index",valid_col_index)
             # search "current month" as reporting month
             current_month_cols=[]
 
@@ -947,17 +946,14 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                 PL_date_header[current_month_cols[0]] = reporting_month
                 return PL_date_header,current_month_rows,PL.iloc[current_month_rows,:]
               
-            # didn't find key word "current month", remove the key word "ytd"...
+            # Didn't find key word "current month", remove the key word "ytd"...
             keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period","period ending","consolidated"]
-            st.write("valid_col_index1",valid_col_index)
 
             for col_idx in valid_col_index[:]:
-                st.write("col_idx,PL",col_idx,PL.iloc[:, col_idx])
     		# Search for "YTD", "Year to date", or "year-to_date"
                 if any(str(PL.iloc[row, col_idx]).strip().lower() in keywords for row in range(first_tenant_account_row)):
                     # Change the corresponding value in `PL_date_header` to 0
                     valid_col_mask[col_idx] = False
-                    st.write("valid_col_mask1",valid_col_mask)
             if np.sum(valid_col_mask) == 1:
                 PL_date_header=[reporting_month if x else 0 for x in valid_col_mask]
                 return PL_date_header,first_tenant_account_row-1,[]
