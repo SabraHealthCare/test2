@@ -1285,20 +1285,24 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
     # Create a new row for the difference
     diff_row = pd.DataFrame(data=[["Difference"] + diff.flatten().tolist()],columns=["Sabra_Account"] + value_column)
 
-    if np.any(np.abs(diff) > 10):
-        # Only keep values where abs(diff) > 10, else put np.nan
-        diff_filtered = [d if abs(d) > 10 else np.nan for d in diff.flatten().tolist()]
-    
-        # Create the diff row
-        diff_row = pd.DataFrame(
-        data=[["Difference"] + diff_filtered],
-        columns=["Sabra_Account"] + value_column )
+    # Only keep values where abs(diff) > 10, else put np.nan
+    diff_flat = diff.flatten()
 
-        # Concatenate result rows
-        result_df = pd.concat([
-        row1_PL[["Sabra_Account"] + value_column],
-        row2_Sabra[["Sabra_Account"] + value_column],
-        diff_row ], ignore_index=True)
+    # Identify indices where abs difference > 10
+    significant_diff_indices = np.where(np.abs(diff_flat) > 10)[0]
+    if len(significant_diff_indices) > 0:
+        selected_columns = [value_column[i] for i in significant_diff_indices]
+	    
+        # Create filtered diff row
+        diff_row = pd.DataFrame( data=[["Diff"] + [diff_flat[i] for i in significant_diff_indices]],
+        columns=["Sabra_Account"] + selected_columns)
+
+        # Filter original rows to keep only selected columns
+        row1_filtered = row1_PL[columns_to_keep]
+        row2_filtered = row2_Sabra[columns_to_keep]
+
+        # Concatenate results
+        result_df = pd.concat([row1_filtered, row2_filtered, diff_row],ignore_index=True)
         st.write("result_df",result_df)
 	    
 def View_Summary(): 
