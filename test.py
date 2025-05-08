@@ -1357,7 +1357,7 @@ def View_Summary():
 
     
     row1 = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total Patient days"]
-    row2 = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total-Patient Days"]
+    row2 = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Patient Days"]
 
     # Compute the difference (row1 - row2) for entity columns
     diff = row1[entity_columns].values - row2[entity_columns].values
