@@ -870,7 +870,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                     if count_reporting_month==0: # there is no reporting_month
                        continue
                     elif count_reporting_month>1:  # there are duplicated months (more than one same months in header)
-                        keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period","period ending"]
+                        keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period","period ending","consolidated"]
                         duplicate_rm_columns = PL.columns[PL_date_header == reporting_month].tolist()  # the column index for duplicated reporting months
                         #st.write("PL",PL)
                         for col_idx in duplicate_rm_columns:
@@ -929,7 +929,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
     # there is no month/year in PL
     elif len(candidate_date)==0: 
 	# if there is only one column contains numeric data, identify this column as reporting month     
-	# search "current month" as reporting month
+	# search key word "current month" as reporting month
 
         if len(valid_col_index) > 1:
 	    # search "current month" as reporting month
@@ -1076,7 +1076,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
     Sabra_second_account_list=[np.nan] * count
     Sabra_main_account_value=[np.nan] * count
     Sabra_second_account_value=[np.nan] * count
-    form_key = f"form_{sheet_name}_{sheet_type_name}_{random.randint(100, 200)}"
+    form_key = f"form_{new_tenant_account_list[0]}_{sheet_name}_{sheet_type_name}"
     with st.form(key=form_key):  
         for i in range(count):
             if sheet_name=="False":
@@ -1130,7 +1130,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
 
         # if there are new revenue accounts,  check if revenue need multiply -1. 
         new_rev_accounts = new_accounts_df[new_accounts_df["Sabra_Account"].str.startswith("REV_")]
-        
+
         if not new_rev_accounts.empty:
             original_revenue = account_mapping[account_mapping["Sabra_Account"].fillna("").str.startswith("REV_")]
             conversion_count = len(original_revenue[original_revenue["Conversion"].fillna("") == "*-1"])
@@ -1147,11 +1147,13 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
 
         # Create a dropdown for the last column
         account_mapping=pd.concat([account_mapping, new_accounts_df],ignore_index=True)
-        if Update_File_Onedrive(mapping_path,account_mapping_filename,account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion"]],operator,"XLSX",None,account_mapping_str_col)
+
+        if Update_File_Onedrive(mapping_path,account_mapping_filename,\
+	             account_mapping[["Operator", "Sabra_Account", "Sabra_Second_Account", "Tenant_Account", "Conversion"]],\
+		     operator,"XLSX",None,account_mapping_str_col):
             st.success("New accounts mapping were successfully saved.")   
         else:
-            st.error("New accounts were not successfully saved.")
-    #return account_mapping
+            st.error("New accounts mapping were not successfully saved.") 
 	
 #@st.cache_data 
 def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
@@ -1161,19 +1163,21 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     #st.write(account_pool)
     
     main_account_mapping = account_pool.loc[account_pool["Sabra_Account"].apply(lambda x: pd.notna(x) and x.upper() != "NO NEED TO MAP")]
-    main_account_mapping_filtered = main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]] 
-	
-    # second_account_mapping has removed None
+        # Concatenate main accounts with second accounts
     second_account_mapping = account_pool.loc[(pd.notna(account_pool["Sabra_Second_Account"])) & (account_pool["Sabra_Second_Account"] != "NO NEED TO MAP")]\
 	[["Sabra_Second_Account","Tenant_Account", "Conversion"]]\
         .rename(columns={"Sabra_Second_Account": "Sabra_Account"})
+    
     if second_account_mapping.shape[0]>0:
         second_account_mapping = second_account_mapping[second_account_mapping["Sabra_Account"].str.strip() != ""]
     
+    # Ensure index name consistency
     PL.index.name = "Tenant_Account"
     PL = PL.reset_index(drop=False)
     
-    #Concatenate main accounts with second accounts
+    # Filter main_account_mapping before the merge
+    main_account_mapping_filtered = main_account_mapping[pd.notna(main_account_mapping["Sabra_Account"])][["Sabra_Account", "Tenant_Account", "Conversion"]] 
+	
     PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
                     PL.merge(main_account_mapping_filtered,   on="Tenant_Account", how="right")])
     #st.write("PL mapping",PL)
@@ -1271,7 +1275,7 @@ def color_missing(data):
 
 def View_Summary(): 
     global Total_PL,reporting_month_data,email_body,placeholder
-    total_account_list=["TOTAL_REV","TOTAL_OPEX","TOTAL_PD"]    
+    
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
@@ -1282,8 +1286,6 @@ def View_Summary():
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
-
-
     # check patient days ( available days > patient days)	
     check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].str.startswith("A_"))|(reporting_month_data["Category"]=='Patient Days') ]
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
@@ -1291,7 +1293,7 @@ def View_Summary():
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
     #check if available unit changed by previous month
     reporting_month_data,Total_PL,email_body=Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month,email_body)
-    st.write("reporting_month_data0",reporting_month_data,reporting_month_data.index)
+	
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Balance Sheet"]
 
@@ -1315,31 +1317,17 @@ def View_Summary():
 
         email_body+= f"<p> No data detected for below properties and accounts:</p>{missing_category.to_html(index=False)}"
     #st.write("reporting_month_data",reporting_month_data)
-    st.write("reporting_month_data10",reporting_month_data)
     reporting_month_data =reporting_month_data.pivot_table(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=reporting_month,aggfunc='last')
-    st.write("reporting_month_data1",reporting_month_data)
     reporting_month_data.reset_index(drop=False,inplace=True)
-    st.write("reporting_month_data11",reporting_month_data)
+
     reporting_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
-    st.write("reporting_month_data111",reporting_month_data)
     reporting_month_data=reporting_month_data.dropna(subset=["Sabra_Account"])
-    st.write("reporting_month_data2",reporting_month_data)
-    sorter=["Facility Information","Patient Days","Revenue","Operating Expenses",\
-	    "Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet",\
-	    "Additional Statistical Information","Government Funds","Total"]
+    sorter=["Facility Information","Patient Days","Revenue","Operating Expenses","Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet","Additional Statistical Information","Government Funds"]
     sorter=list(filter(lambda x:x in reporting_month_data["Category"].unique(),sorter))
-	
     reporting_month_data.Category = reporting_month_data.Category.astype("category")
-    #st.write("reporting_month_data3",reporting_month_data)
     reporting_month_data.Category = reporting_month_data.Category.cat.set_categories(sorter)
-    #st.write("reporting_month_data4",reporting_month_data)
     reporting_month_data=reporting_month_data.sort_values(["Category"]) 
-    #st.write("reporting_month_data5",reporting_month_data)
-    reporting_month_data = pd.concat([reporting_month_data.\
-             groupby(by='Category', as_index=False,observed=False).\
-	     sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).\
-	     sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
-    #st.write("reporting_month_data1",reporting_month_data)
+    reporting_month_data = pd.concat([reporting_month_data.groupby(by='Category', as_index=False,observed=False).sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
     set_empty=list(reporting_month_data.columns)
     set_empty.remove("Category")
     set_empty.remove("Sabra_Account")
@@ -1349,8 +1337,6 @@ def View_Summary():
             if reporting_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 reporting_month_data.loc[i,set_empty]=np.nan
 
-    
-    st.write("reporting_month_data2",reporting_month_data)	
     entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
    
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
@@ -2156,7 +2142,7 @@ def Upload_And_Process(uploaded_file,wb,file_type):
             for sheet_name_finance_in_onesheet in sheet_list_finance_in_onesheet:
                 tenant_account_col=[10000]
                 entity_list_finance_in_onesheet=entity_mapping.index[entity_mapping["Sheet_Name_Finance"]==sheet_name_finance_in_onesheet].tolist()
-                PL=(entity_list_finance_in_onesheet,"Sheet_Name_Finance",uploaded_file,account_pool_full,sheet_name_finance_in_onesheet)
+                PL=Read_Clean_PL_Multiple(entity_list_finance_in_onesheet,"Sheet_Name_Finance",uploaded_file,account_pool_full,sheet_name_finance_in_onesheet)
                 if operator!="Ignite":               
                     Total_PL = Total_PL.combine_first(PL) if not Total_PL.empty else PL
                 else:
@@ -2313,8 +2299,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                                          accept_multiple_files=True, 
                                          key="Other docs")
 
-                submitted = st.form_submit_button("Upload")
-
+                submitted = st.form_submit_button("Calculate & Review (Not Yet Submitted)")
+                
                 if submitted:
 	            # clear cache for every upload
                     st.cache_data.clear()
@@ -2341,7 +2327,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 with col3:
                     st.write("Other Documents:")
                     uploaded_other_docs=st.file_uploader("Optional",type=["csv","pdf","xlsm","xlsx","xls"],accept_multiple_files=True,key="Other docs")
-                submitted = st.form_submit_button("Upload")
+                submitted = st.form_submit_button("Calculate & Review (Not Yet Submitted)")
                 if submitted:
 	            # clear cache for every upload
                     st.cache_data.clear()
@@ -2438,17 +2424,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 select_months_list=select_months_list[:previous_monthes_comparison]+[reporting_month]  
             else:
                 select_months_list.append(reporting_month) 
-        #with st.spinner("Processing report... Please wait and click 'Confirm' when it's ready. Do not leave this page until you complete the process."):
-        with st.container():
-            spinner_placeholder = st.empty()
-            with spinner_placeholder:
-                st.markdown("""
-    <div style="font-size:28px; background-color: yellow; color: #000; padding: 10px; border-radius: 8px;">
-        ⏳ Processing report... Please wait and click 'Confirm' when it's ready.<br>
-        Do not leave this page until you complete the process!
-    </div>
-""", unsafe_allow_html=True)
-		    
+        with st.spinner("Processing report... Please wait and click 'Confirm' when it's ready. Do not leave this page until you complete the process."):
+            if True:
                 if BS_separate_excel=="N":  # Finance/BS are in one excel
                     entity_mapping,finance_wb=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
                     Total_PL=Upload_And_Process(uploaded_finance,finance_wb,"Finance")
@@ -2486,7 +2463,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     with st.expander("Discrepancy for Historic Data", expanded=True):
                         ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
                         View_Discrepancy()
-            spinner_placeholder.empty()
+
     elif choice=="Manage Mapping":
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
         with st.expander("Manage Property Mapping" ,expanded=True):
