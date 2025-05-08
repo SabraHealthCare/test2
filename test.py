@@ -1325,31 +1325,24 @@ def View_Summary():
 
         email_body+= f"<p> No data detected for below properties and accounts:</p>{missing_category.to_html(index=False)}"
     #st.write("reporting_month_data",reporting_month_data)
-    st.write("reporting_month_data10",reporting_month_data)
     reporting_month_data =reporting_month_data.pivot_table(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=reporting_month,aggfunc='last')
-    st.write("reporting_month_data1",reporting_month_data)
     reporting_month_data.reset_index(drop=False,inplace=True)
-    st.write("reporting_month_data11",reporting_month_data)
     reporting_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
-    st.write("reporting_month_data111",reporting_month_data)
     reporting_month_data=reporting_month_data.dropna(subset=["Sabra_Account"])
-    st.write("reporting_month_data2",reporting_month_data)
     sorter=["Facility Information","Patient Days","Revenue","Operating Expenses",\
 	    "Non-Operating Expenses","Labor Expenses","Management Fee","Balance Sheet",\
 	    "Additional Statistical Information","Government Funds","Total"]
     sorter=list(filter(lambda x:x in reporting_month_data["Category"].unique(),sorter))
 	
     reporting_month_data.Category = reporting_month_data.Category.astype("category")
-    #st.write("reporting_month_data3",reporting_month_data)
     reporting_month_data.Category = reporting_month_data.Category.cat.set_categories(sorter)
-    #st.write("reporting_month_data4",reporting_month_data)
     reporting_month_data=reporting_month_data.sort_values(["Category"]) 
-    #st.write("reporting_month_data5",reporting_month_data)
+    st.write("reporting_month_data5",reporting_month_data)
     reporting_month_data = pd.concat([reporting_month_data.\
              groupby(by='Category', as_index=False,observed=False).\
 	     sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).\
 	     sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
-    #st.write("reporting_month_data1",reporting_month_data)
+    st.write("reporting_month_data6",reporting_month_data)
     set_empty=list(reporting_month_data.columns)
     set_empty.remove("Category")
     set_empty.remove("Sabra_Account")
@@ -1360,12 +1353,12 @@ def View_Summary():
                 reporting_month_data.loc[i,set_empty]=np.nan
 
     
-    st.write("reporting_month_data2",reporting_month_data)	
+    st.write("reporting_month_data7",reporting_month_data)	
     entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
    
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
     reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
-	
+    st.write("reporting_month_data8",reporting_month_data)
     placeholder = st.empty()
     placeholder.markdown("""
             <div style="background-color: #fff1ad; padding: 10px; border-radius: 5px;">
