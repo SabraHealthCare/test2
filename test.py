@@ -1354,14 +1354,14 @@ def View_Summary():
     entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
     reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
-
-    
+	
+    st.write("reporting_month_data",reporting_month_data)
     row1 = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total Patient days"]
     row2 = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Patient Days"]
-
+    st.write("row12",row1,row2)
     # Compute the difference (row1 - row2) for entity columns
     diff = row1[["Total"]+entity_columns].values - row2[["Total"]+entity_columns].values
-    st.write("diff",diff,row1,row2)
+    st.write("diff",diff)
     # Create a new row for the difference
     diff_row = pd.DataFrame(data=[[ "Difference: Total Patient days - Total-Patient Days"] + diff.flatten().tolist()],columns=["Sabra_Account","Total"] + entity_columns)
 
