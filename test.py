@@ -1359,15 +1359,17 @@ def View_Summary():
     row1 = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total Patient days"]
     row2 = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Patient Days"]
     st.write("row12",row1,row2)
+    st.write("row12",row1.columns,row2.columns)
+    value_column=["Total"]+entity_columns
     # Compute the difference (row1 - row2) for entity columns
-    diff = row1[["Total"]+entity_columns].values - row2[["Total"]+entity_columns].values
+    diff = row1[value_column].values - row2[value_column].values
     st.write("diff",diff)
     # Create a new row for the difference
     diff_row = pd.DataFrame(data=[[ "Difference: Total Patient days - Total-Patient Days"] + diff.flatten().tolist()],columns=["Sabra_Account","Total"] + entity_columns)
 
     # Concatenate the rows into the final result
-    result_df = pd.concat([row1[["Sabra_Account"] + entity_columns],
-                       row2[["Sabra_Account"] + entity_columns],
+    result_df = pd.concat([row1[["Sabra_Account","Total"] + entity_columns],
+                       row2[["Sabra_Account","Total"] + entity_columns],
                        diff_row],
                       ignore_index=True)
     st.write("result_df",result_df)
