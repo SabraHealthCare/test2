@@ -1392,7 +1392,7 @@ def View_Summary():
 
 
 
-    reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(Total_list)]	
+    reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(total_list)]	
     placeholder = st.empty()
     placeholder.markdown("""
             <div style="background-color: #fff1ad; padding: 10px; border-radius: 5px;">
