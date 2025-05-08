@@ -1301,7 +1301,7 @@ def View_Summary():
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
     #check if available unit changed by previous month
     reporting_month_data,Total_PL,email_body=Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month,email_body)
-    st.write("reporting_month_data0",reporting_month_data,reporting_month_data.index)
+   
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Balance Sheet"]
 
@@ -1355,16 +1355,15 @@ def View_Summary():
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
     reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
 
+    if 
     row1 = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total Patient days"]
     row2 = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total-Patient Days"]
 
     # Compute the difference (row1 - row2) for entity columns
     diff = row1[entity_columns].values - row2[entity_columns].values
-
+    st.write("diff",diff)
     # Create a new row for the difference
-    diff_row = pd.DataFrame(
-        data=[[ "Difference: Total Patient days - Total-Patient Days"] + diff.flatten().tolist()],
-        columns=["Sabra_Account"] + entity_columns)
+    diff_row = pd.DataFrame(data=[[ "Difference: Total Patient days - Total-Patient Days"] + diff.flatten().tolist()],columns=["Sabra_Account"] + entity_columns)
 
     # Concatenate the rows into the final result
     result_df = pd.concat([row1[["Sabra_Account"] + entity_columns],
