@@ -1360,7 +1360,7 @@ def View_Summary():
     row2 = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Patient Days"]
     st.write("row12",row1,row2)
     st.write("row12",row1.columns,row2.columns)
-    value_column=["Total"]+entity_columns
+    value_column=["Total"]+list(entity_columns)
     st.write("value_column",value_column)
     # Compute the difference (row1 - row2) for entity columns
     diff = row1[value_column].values - row2[value_column].values
