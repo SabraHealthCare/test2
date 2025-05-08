@@ -953,24 +953,35 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                 #st.write("valid_col_index",valid_col_index,"valid_col_mask",valid_col_mask)
                 st.error("Failed to identify any month/year header in sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
                 st.stop()
-        elif len(valid_col_index) == 1:  #  only one column contain numeric data
-            only_numeric_column_value=PL_temp.iloc[:,valid_col_index[0]]
-            # count the value in numeric column
-            count_non = only_numeric_column_value.isna().sum()
-            # Count string values
-            count_str = only_numeric_column_value.apply(lambda x: isinstance(x, str)).sum()
-            # Count numeric values
-            count_num = only_numeric_column_value.apply(lambda x: pd.to_numeric(x, errors='coerce')).notna().sum()
+        elif len(valid_col_index) >= 1:  #  only one column contain numeric data
+            st.write("valid_col_index",valid_col_index)
+            if len(valid_col_index) >1:
+                keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period","period ending","consolidated"]
+                for col_idx in valid_col_index[:]:
+    		    # Search for "YTD", "Year to date", or "year-to_date"
+                    if any(str(PL_temp.iloc[row, col_idx]).strip().lower() in keywords for row in range(first_tenant_account_row)):
+    			# Change the corresponding value in `PL_date_header` to 0
+                        valid_col_index.remove(col_idx)
+                       
+            if len(valid_col_index)==1:  
+		
+                only_numeric_column_value=PL_temp.iloc[:,valid_col_index[0]]
+                # count the value in numeric column
+                count_non = only_numeric_column_value.isna().sum()
+                # Count string values
+                count_str = only_numeric_column_value.apply(lambda x: isinstance(x, str)).sum()
+                # Count numeric values
+                count_num = only_numeric_column_value.apply(lambda x: pd.to_numeric(x, errors='coerce')).notna().sum()
 
-            # numeric data is supposed to be more than character data
-            if (count_str>0 and (count_num/count_str)<0.7):
-                st.error("Failed to identify Year/Month header for sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
-                st.stop()
-            else:
-		# first_tenant_account_row -1 is the header row No. (used to remove the above rows, and prevent map new accounts)
-                #st.write("first_tenant_account_row",first_tenant_account_row,PL.iloc[first_tenant_account_row,:])
-                PL_date_header=[reporting_month if x else 0 for x in valid_col_mask]
-                return PL_date_header,first_tenant_account_row-1,[]
+                # numeric data is supposed to be more than character data
+                if (count_str>0 and (count_num/count_str)<0.7):
+                    st.error("Failed to identify Year/Month header for sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
+                    st.stop()
+                else:
+		    # first_tenant_account_row -1 is the header row No. (used to remove the above rows, and prevent map new accounts)
+                    #st.write("first_tenant_account_row",first_tenant_account_row,PL.iloc[first_tenant_account_row,:])
+                    PL_date_header=[reporting_month if x else 0 for x in valid_col_mask]
+                    return PL_date_header,first_tenant_account_row-1,[]
         else:
             st.error("Failed to identify {}/{} header for sheet: '{}', please add the month/year header and re-upload.".format(int(reporting_month[4:6]),reporting_month[0:4],sheet_name))
             st.stop()
