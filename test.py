@@ -953,17 +953,38 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                 #st.write("valid_col_index",valid_col_index,"valid_col_mask",valid_col_mask)
                 st.error("Failed to identify any month/year header in sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
                 st.stop()
-        elif len(valid_col_index) >= 1:  #  only one column contain numeric data
+        elif len(valid_col_index) > 1:  #  more than one column contain numeric data without any month date header
             st.write("valid_col_index",valid_col_index)
             if len(valid_col_index) >1:
+                # search "current month" as reporting month
+                current_month_cols=[]
+
+                for col_i in valid_col_index:
+                    column = PL.iloc[0:first_tenant_account_row, col_i].reset_index(drop=True)
+                    if column.astype(str).str.contains('current month|current period|mtd|current', case=False, na=False).any():
+                        current_month_cols.append(col_i)
+                        current_month_rows = column.index[column.astype(str).str.contains(r'(current month|current period|mtd|current)', case=False, na=False)][0]
+                    elif sheet_type=="Sheet_Name_Occupancy" and column.astype(str).str.contains('#\\s*of\\s*days|total', case=False, na=False).any():
+                        current_month_cols.append(col_i)
+                        current_month_rows = column.index[column.astype(str).str.contains('#\\s*of\\s*days|total', case=False, na=False)][0]  
+                if len(current_month_cols)==1:
+                    PL_date_header = [0] * PL_col_size
+                    PL_date_header[current_month_cols[0]] = reporting_month
+                    return PL_date_header,current_month_rows,PL.iloc[current_month_rows,:]
+              
+                # didn't find key word "current month", remove the key word "ytd"...
                 keywords = ["ytd", "year to date", "year-to-date","year_to_date","prior period","period ending","consolidated"]
                 for col_idx in valid_col_index[:]:
     		    # Search for "YTD", "Year to date", or "year-to_date"
                     if any(str(PL_temp.iloc[row, col_idx]).strip().lower() in keywords for row in range(first_tenant_account_row)):
     			# Change the corresponding value in `PL_date_header` to 0
-                        valid_col_index.remove(col_idx)
-                       
-            if len(valid_col_index)==1:  
+    			valid_col_mask[col_idx] = False
+                        st.write("valid_col_mask",valid_col_mask)
+                if valid_col_mask.count(True) == 1:
+                    PL_date_header=[reporting_month if x else 0 for x in valid_col_mask]
+                    return PL_date_header,first_tenant_account_row-1,[]
+              
+        elif len(valid_col_index)==1:  #only one column contain numeric data
 		
                 only_numeric_column_value=PL_temp.iloc[:,valid_col_index[0]]
                 # count the value in numeric column
@@ -982,6 +1003,12 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                     #st.write("first_tenant_account_row",first_tenant_account_row,PL.iloc[first_tenant_account_row,:])
                     PL_date_header=[reporting_month if x else 0 for x in valid_col_mask]
                     return PL_date_header,first_tenant_account_row-1,[]
+            else:
+                #st.write("valid_col_index",valid_col_index,"valid_col_mask",valid_col_mask)
+                st.error("Failed to identify any month/year header in sheet: '{}', please add the month/year header and re-upload.".format(sheet_name))
+                st.stop()
+
+
         else:
             st.error("Failed to identify {}/{} header for sheet: '{}', please add the month/year header and re-upload.".format(int(reporting_month[4:6]),reporting_month[0:4],sheet_name))
             st.stop()
