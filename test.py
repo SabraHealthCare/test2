@@ -1355,7 +1355,7 @@ def View_Summary():
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
     reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
 
-    if 
+    
     row1 = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total Patient days"]
     row2 = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total-Patient Days"]
 
