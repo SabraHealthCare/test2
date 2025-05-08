@@ -956,7 +956,7 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
                 if any(str(PL_temp.iloc[row, col_idx]).strip().lower() in keywords for row in range(first_tenant_account_row)):
                     # Change the corresponding value in `PL_date_header` to 0
                     valid_col_mask[col_idx] = False
-	            st.write("valid_col_mask1",valid_col_mask)
+                    st.write("valid_col_mask1",valid_col_mask)
             if np.sum(valid_col_mask) == 1:
                 PL_date_header=[reporting_month if x else 0 for x in valid_col_mask]
                 return PL_date_header,first_tenant_account_row-1,[]
