@@ -1292,10 +1292,9 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
     significant_diff_indices = np.where(np.abs(diff_flat) > 10)[0]
     if len(significant_diff_indices) > 0:
         selected_columns = [value_column[i] for i in significant_diff_indices]
-	    
+        columns_to_keep=["Sabra_Account"] + selected_columns 
         # Create filtered diff row
-        diff_row = pd.DataFrame( data=[["Diff"] + [diff_flat[i] for i in significant_diff_indices]],
-        columns=["Sabra_Account"] + selected_columns)
+        diff_row = pd.DataFrame( data=[["Diff"] + [diff_flat[i] for i in significant_diff_indices]],columns=columns_to_keep)
 
         # Filter original rows to keep only selected columns
         row1_filtered = row1_PL[columns_to_keep]
