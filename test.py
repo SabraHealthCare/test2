@@ -1278,7 +1278,29 @@ def Compare_PL_Sabra(Total_PL,reporting_month):
 	
 def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
+def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
+    # Compute the difference (row1 - row2) for value_column
+    diff = row1_PL[value_column].values - row2_Sabra[value_column].values
+    st.write("diff",diff)
+    # Create a new row for the difference
+    diff_row = pd.DataFrame(data=[["Difference"] + diff.flatten().tolist()],columns=["Sabra_Account"] + value_column)
 
+    if np.any(np.abs(diff) > 10):
+        # Only keep values where abs(diff) > 10, else put np.nan
+        diff_filtered = [d if abs(d) > 10 else np.nan for d in diff.flatten().tolist()]
+    
+        # Create the diff row
+        diff_row = pd.DataFrame(
+        data=[["Difference"] + diff_filtered],
+        columns=["Sabra_Account"] + value_column )
+
+        # Concatenate result rows
+        result_df = pd.concat([
+        row1_PL[["Sabra_Account"] + value_column],
+        row2_Sabra[["Sabra_Account"] + value_column],
+        diff_row ], ignore_index=True)
+        st.write("result_df",result_df)
+	    
 def View_Summary(): 
     global Total_PL,reporting_month_data,email_body,placeholder
     total_account_list=["TOTAL_REV","TOTAL_OPEX","TOTAL_PD"]    
@@ -1354,26 +1376,23 @@ def View_Summary():
     entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
     reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
-
-    row1 = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total Patient days"]
-    row2 = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Patient Days"]
-
-    value_column=["Total"]+list(entity_columns)
-
-    # Compute the difference (row1 - row2) for entity columns
-    diff = row1[value_column].values - row2[value_column].values
-    st.write("diff",diff)
-    # Create a new row for the difference
-    diff_row = pd.DataFrame(data=[[ "Difference: Total Patient days - Total-Patient Days"] + diff.flatten().tolist()],columns=["Sabra_Account"] +value_column)
-
-    # Concatenate the rows into the final result
-    result_df = pd.concat([row1[["Sabra_Account"] + value_column],
-                       row2[["Sabra_Account"] + value_column],
-                       diff_row],
-                      ignore_index=True)
-    st.write("result_df",result_df)
-
 	
+    total_list=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
+    total_data = reporting_month_data[reporting_month_data["Sabra_Account"].isin(total_list)]
+    # DataFrame with all other rows
+    #reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(total_list)]	    
+    value_column=["Total"]+list(entity_columns)
+    if total_data.shape[0]>0:
+        compare_metric=total_data["Sabra_Account"].tolist()
+        if "Total Patient Days in P&L" in compare_metric:
+            row1_PL = total_data[total_data["Sabra_Account"] == "Total Patient Days in P&L"]
+            row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Patient Days"]
+            Compare_Total_with_Total(row1_PL,row2_Sabra,value_column)
+
+
+
+
+    reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(Total_list)]	
     placeholder = st.empty()
     placeholder.markdown("""
             <div style="background-color: #fff1ad; padding: 10px; border-radius: 5px;">
