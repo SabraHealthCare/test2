@@ -1361,7 +1361,7 @@ def View_Summary():
 
     # Compute the difference (row1 - row2) for entity columns
     diff = row1[entity_columns].values - row2[entity_columns].values
-    st.write("diff",diff)
+    st.write("diff",diff,row1,row2)
     # Create a new row for the difference
     diff_row = pd.DataFrame(data=[[ "Difference: Total Patient days - Total-Patient Days"] + diff.flatten().tolist()],columns=["Sabra_Account"] + entity_columns)
 
