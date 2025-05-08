@@ -1324,7 +1324,7 @@ def View_Summary():
         st.dataframe(missing_category.style.map(color_missing, subset=[reporting_month_display]).hide(axis="index"))
 
         email_body+= f"<p> No data detected for below properties and accounts:</p>{missing_category.to_html(index=False)}"
-    #st.write("reporting_month_data",reporting_month_data)
+
     reporting_month_data =reporting_month_data.pivot_table(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=reporting_month,aggfunc='last')
     reporting_month_data.reset_index(drop=False,inplace=True)
     reporting_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
@@ -1337,12 +1337,11 @@ def View_Summary():
     reporting_month_data.Category = reporting_month_data.Category.astype("category")
     reporting_month_data.Category = reporting_month_data.Category.cat.set_categories(sorter)
     reporting_month_data=reporting_month_data.sort_values(["Category"]) 
-    st.write("reporting_month_data5",reporting_month_data)
     reporting_month_data = pd.concat([reporting_month_data.\
              groupby(by='Category', as_index=False,observed=False).\
 	     sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).\
 	     sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
-    st.write("reporting_month_data6",reporting_month_data)
+
     set_empty=list(reporting_month_data.columns)
     set_empty.remove("Category")
     set_empty.remove("Sabra_Account")
@@ -1351,14 +1350,30 @@ def View_Summary():
             reporting_month_data.loc[i,"Sabra_Account"]="Total - "+reporting_month_data.loc[i,'Category']
             if reporting_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 reporting_month_data.loc[i,set_empty]=np.nan
-
-    
-    st.write("reporting_month_data7",reporting_month_data)	
+	
     entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
-   
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
     reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
-    st.write("reporting_month_data8",reporting_month_data)
+
+    row1 = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total Patient days"]
+    row2 = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total-Patient Days"]
+
+    # Compute the difference (row1 - row2) for entity columns
+    diff = row1[entity_columns].values - row2[entity_columns].values
+
+    # Create a new row for the difference
+    diff_row = pd.DataFrame(
+        data=[[ "Difference: Total Patient days - Total-Patient Days"] + diff.flatten().tolist()],
+        columns=["Sabra_Account"] + entity_columns)
+
+    # Concatenate the rows into the final result
+    result_df = pd.concat([row1[["Sabra_Account"] + entity_columns],
+                       row2[["Sabra_Account"] + entity_columns],
+                       diff_row],
+                      ignore_index=True)
+    st.write("result_df",result_df)
+
+	
     placeholder = st.empty()
     placeholder.markdown("""
             <div style="background-color: #fff1ad; padding: 10px; border-radius: 5px;">
