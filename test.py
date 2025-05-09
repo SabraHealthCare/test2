@@ -74,7 +74,6 @@ SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with schem
 SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full site URL
 sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
 sharepoint_password = "June2022SL!"
-
 email_body=""
 if "email_body_for_Sabra" not in st.session_state:
     st.session_state.email_body_for_Sabra = ""  # only email these info to sabra
@@ -703,7 +702,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
 			      & (Total_PL.index.get_level_values("Sabra_Account").str.startswith("A_")))]
 	    
         if previous_A_unit.shape[0]>1:
-            st.error("The following properties are missing operating beds. Historical data has been used to fill in the gaps. If this information is incorrect, please update the operating beds in the P&L and re-upload.")
+            st.warning("The following properties are missing operating beds. Historical data has been used to fill in the gaps. If this information is incorrect, please update the operating beds in the P&L and re-upload.")
         elif previous_A_unit.shape[0]==1:
             st.error("{} is missing operating beds. Historical data has been used to fill in the missing info as shown below. If this data is incorrect, please add the operating beds and re-upload P&L.".format(properties_fill_Aunit[0]))
         previous_A_unit_display = previous_A_unit.pivot(index=["Sabra_Account"], columns="Property_Name", values=reporting_month)
@@ -1279,6 +1278,7 @@ def Compare_PL_Sabra(Total_PL,reporting_month):
 def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
 def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category):
+    global email_body
     # Compute the difference (row1 - row2) for value_column
     diff = row1_PL[value_column].values - row2_Sabra[value_column].values
     # Create a new row for the difference
@@ -1301,14 +1301,19 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category):
 
         # Concatenate row1,row2, diff to create the final dataframe
         result_df = pd.concat([row1_PL, row2_Sabra, diff_row],ignore_index=True)
-        st.error(f"The calculated {category} are inconsistent with those in the P&L. Please download the mapping file and review it.")
-        st.write(result_df)
+        st.error(f"The calculated {category} are inconsistent with those in the P&L. Please download the mapping and check it.")
+        result_df=result_df.apply(Format_Value)
+        result_df.rename(columns={"Sabra_Account": "P&L vs. Calculated"},inplace=True))
+        st.markdown(result_df, unsafe_allow_html=True)
+
+        email_body+=f"<p>The calculated {category} are inconsistent with those in the P&L:</p>{result_df.to_html(index=False)}"
+        
         return True
     return False
 
 
 def View_Summary(): 
-    global Total_PL,reporting_month_data,email_body,placeholder
+    global Total_PL,reporting_month_data,placeholder
     total_account_list=["TOTAL_REV","TOTAL_OPEX","TOTAL_PD"]    
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
@@ -1328,7 +1333,7 @@ def View_Summary():
     check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
     #check if available unit changed by previous month
-    reporting_month_data,Total_PL,email_body=Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month,email_body)
+    reporting_month_data,Total_PL,=Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month,)
    
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Balance Sheet"]
@@ -1394,12 +1399,12 @@ def View_Summary():
         if "Total Patient Days in P&L" in compare_metric:
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Patient Days in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Patient Days"]
-            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"patient days"):
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total patient days"):
                 download_mapping=True
         if "Total Revenue in P&L" in compare_metric:
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Revenue in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Revenue"]
-            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total revenue"):
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total revenue(excluding bad debt)"):
                 download_mapping=True
         if "Total OPEX in P&L" in compare_metric:
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
@@ -1508,7 +1513,7 @@ def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
     </html>"""
 
     if not st.session_state.email_sent:
-        #receiver_email_list= ["sli@sabrahealth.com"]   
+        receiver_email_list= ["sli@sabrahealth.com"]   
         Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body) 
         
         if email_body!="" or st.session_state.email_body_for_Sabra!="":
