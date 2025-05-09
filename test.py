@@ -1399,7 +1399,7 @@ def View_Summary():
         if "Total Revenue in P&L" in compare_metric:
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Revenue in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Revenue"]
-            if weather_download_mappingCompare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total revenue"):
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total revenue"):
                 download_mapping=True
         if "Total OPEX in P&L" in compare_metric:
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
