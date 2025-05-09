@@ -1417,7 +1417,7 @@ def View_Summary():
                 download_mapping=True
             
         if download_mapping:
-            download_report(account_mapping,"accounts mapping",key=1)
+            download_report(account_mapping,"mapping to check inconsistence")
 
     reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names)]	
     placeholder = st.empty()
@@ -1434,7 +1434,7 @@ def View_Summary():
         with col1:
             download_report(reporting_month_data,"Report")
         with col2:
-            download_report(account_mapping,"accounts mapping",key=2)
+            download_report(account_mapping,"accounts mapping")
         reporting_month_data=reporting_month_data.apply(Format_Value)
         reporting_month_data=reporting_month_data.fillna(0).infer_objects(copy=False)
         reporting_month_data=reporting_month_data.replace(0,'')
