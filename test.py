@@ -640,10 +640,11 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
     return PL_date_header
 	
 @st.cache_data 
-def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month,email_body):
+def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month):
     #check patient days,fill missing operating beds to reporting_month_data
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
     #st.write("check_patient_days",check_patient_days,check_patient_days.index)
+    global email_body
     month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
     problem_properties=[]
     properties_fill_Aunit=[]
@@ -746,8 +747,8 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         check_patient_days_display.columns.name=None
         check_patient_days_display=check_patient_days_display.rename(columns={"Property_Name": "Property"})
         st.dataframe(check_patient_days_display.style.map(color_missing, subset=["Patient Days","Operating Beds"]).format(precision=0, thousands=","),hide_index=True)
-        email_body= f" <p>Please pay attention to the improper entries in the patient days:</p>{check_patient_days_display.to_html(index=False)}"+"<ul>"+error_for_email+"</ul>"	
-    return reporting_month_data,Total_PL,email_body
+        email_body+= f" <p>Please pay attention to the improper entries in the patient days:</p>{check_patient_days_display.to_html(index=False)}"+"<ul>"+error_for_email+"</ul>"	
+    return reporting_month_data,Total_PL
 
 @st.cache_data  
 def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_name,sheet_type,pre_date_header): 
@@ -1313,7 +1314,7 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category):
 
 
 def View_Summary(): 
-    global Total_PL,reporting_month_data,placeholder
+    global Total_PL,reporting_month_data,placeholder,email_body
     total_account_list=["TOTAL_REV","TOTAL_OPEX","TOTAL_PD"]    
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
@@ -1333,7 +1334,7 @@ def View_Summary():
     check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
     #check if available unit changed by previous month
-    reporting_month_data,Total_PL,=Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month,)
+    reporting_month_data,Total_PL=Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month)
    
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Balance Sheet"]
