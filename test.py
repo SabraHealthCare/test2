@@ -1278,12 +1278,11 @@ def Compare_PL_Sabra(Total_PL,reporting_month):
 	
 def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
-def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
+def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category):
     # Compute the difference (row1 - row2) for value_column
     diff = row1_PL[value_column].values - row2_Sabra[value_column].values
-    st.write("diff",diff)
     # Create a new row for the difference
-    diff_row = pd.DataFrame(data=[["Difference"] + diff.flatten().tolist()],columns=["Sabra_Account"] + value_column)
+    diff_row = pd.DataFrame(data=[["Delta"] + diff.flatten().tolist()],columns=["Sabra_Account"] + value_column)
 
     # Only keep values where abs(diff) > 10, else put np.nan
     diff_flat = diff.flatten()
@@ -1291,19 +1290,23 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
     # Identify indices where abs difference > 10
     significant_diff_indices = np.where(np.abs(diff_flat) > 10)[0]
     if len(significant_diff_indices) > 0:
-        selected_columns = [value_column[i] for i in significant_diff_indices]
-        columns_to_keep=["Sabra_Account"] + selected_columns 
+        delta_properties_columns = [value_column[i] for i in significant_diff_indices]
+        columns_to_keep=["Sabra_Account"] + delta_properties_columns 
         # Create filtered diff row
         diff_row = pd.DataFrame( data=[["Diff"] + [diff_flat[i] for i in significant_diff_indices]],columns=columns_to_keep)
 
         # Filter original rows to keep only selected columns
-        row1_filtered = row1_PL[columns_to_keep]
-        row2_filtered = row2_Sabra[columns_to_keep]
+        row1_PL = row1_PL[columns_to_keep]
+        row2_Sabra = row2_Sabra[columns_to_keep]
 
-        # Concatenate results
-        result_df = pd.concat([row1_filtered, row2_filtered, diff_row],ignore_index=True)
-        st.write("result_df",result_df)
-	    
+        # Concatenate row1,row2, diff to create the final dataframe
+        result_df = pd.concat([row1_PL, row2_Sabra, diff_row],ignore_index=True)
+        st.error(f"The calculated {category} values are inconsistent with those in the P&L. Please download the mapping file and review it.")
+	st.write("result_df",result_df)
+        retrun True
+    return False
+
+
 def View_Summary(): 
     global Total_PL,reporting_month_data,email_body,placeholder
     total_account_list=["TOTAL_REV","TOTAL_OPEX","TOTAL_PD"]    
@@ -1385,33 +1388,36 @@ def View_Summary():
     # DataFrame with all other rows
     #reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(total_list)]	    
     value_column=["Total"]+list(entity_columns)
-    if total_data.shape[0]>0:
-        compare_metric=total_data["Sabra_Account"].tolist()
+    if PL_total.shape[0]>0:
+        download_mapping=False
+        compare_metric=PL_total["Sabra_Account"].tolist()
         if "Total Patient Days in P&L" in compare_metric:
-            row1_PL = total_data[total_data["Sabra_Account"] == "Total Patient Days in P&L"]
+            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Patient Days in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Patient Days"]
-            Compare_Total_with_Total(row1_PL,row2_Sabra,value_column)
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
+		download_mapping=True
         if "Total Revenue in P&L" in compare_metric:
-            row1_PL = total_data[total_data["Sabra_Account"] == "Total Revenue in P&L"]
+            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Revenue in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Revenue"]
-            Compare_Total_with_Total(row1_PL,row2_Sabra,value_column)
+            if weather_download_mappingCompare_Total_with_Total(row1_PL,row2_Sabra,value_column):
+		download_mapping=True
         if "Total OPEX in P&L" in compare_metric:
-            row1_PL = total_data[total_data["Sabra_Account"] == "Total OPEX in P&L"]
+            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Operating Expenses"]
-            Compare_Total_with_Total(row1_PL,row2_Sabra,value_column)
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
+		download_mapping=True
         if "Total Expense in P&L" in compare_metric:
-            row1_PL = total_data[total_data["Sabra_Account"] == "Total OPEX in P&L"]
-            target_accounts = ["Total - Operating Expenses", "Total - Non-Operating Expenses", "Total - Management Fee"]
-            row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"].isin(target_accounts)]
-
+            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
+            sabra_total_accounts = ["Total - Operating Expenses", "Total - Non-Operating Expenses", "Total - Management Fee"]
+            row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"].isin(sabra_total_accounts)]
             # Sum the numeric columns across the filtered rows
             row2_Sabra = row2_Sabra.drop(columns=["Sabra_Account"]).sum().to_frame().T
-
-            # Add back the Sabra_Account label for identification
             row2_Sabra.insert(0, "Sabra_Account", "Total - Expense")
-            Compare_Total_with_Total(row1_PL,row2_Sabra,value_column)
-
-
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
+		download_mapping=True
+            
+	if download_mapping:
+            download_report(account_mapping,"accounts mapping")
 
     reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(total_list)]	
     placeholder = st.empty()
@@ -2531,10 +2537,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             if st.session_state.clicked['submit_report']:
                 Submit_Upload(total_email_body,SHAREPOINT_FOLDER)
                 # Discrepancy of Historic Data
-                if len(Total_PL.columns) > 1 and BPC_pull.shape[0] > 0:
-                    with st.expander("Discrepancy for Historic Data", expanded=True):
-                        ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-                        View_Discrepancy()
+                #if len(Total_PL.columns) > 1 and BPC_pull.shape[0] > 0:
+                    #with st.expander("Discrepancy for Historic Data", expanded=True):
+                        #ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
+                        #View_Discrepancy()
 
     elif choice=="Manage Mapping":
         BPC_pull,entity_mapping,account_mapping=Initial_Mapping(operator)
