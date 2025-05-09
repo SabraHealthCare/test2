@@ -1302,8 +1302,8 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category):
         # Concatenate row1,row2, diff to create the final dataframe
         result_df = pd.concat([row1_PL, row2_Sabra, diff_row],ignore_index=True)
         st.error(f"The calculated {category} values are inconsistent with those in the P&L. Please download the mapping file and review it.")
-	st.write("result_df",result_df)
-        retrun True
+        st.write("result_df",result_df)
+        return True
     return False
 
 
