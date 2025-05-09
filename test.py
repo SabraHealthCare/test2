@@ -1395,17 +1395,17 @@ def View_Summary():
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Patient Days in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Patient Days"]
             if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
-		download_mapping=True
+                download_mapping=True
         if "Total Revenue in P&L" in compare_metric:
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Revenue in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Revenue"]
             if weather_download_mappingCompare_Total_with_Total(row1_PL,row2_Sabra,value_column):
-		download_mapping=True
+                download_mapping=True
         if "Total OPEX in P&L" in compare_metric:
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Operating Expenses"]
             if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
-		download_mapping=True
+                download_mapping=True
         if "Total Expense in P&L" in compare_metric:
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
             sabra_total_accounts = ["Total - Operating Expenses", "Total - Non-Operating Expenses", "Total - Management Fee"]
@@ -1414,7 +1414,7 @@ def View_Summary():
             row2_Sabra = row2_Sabra.drop(columns=["Sabra_Account"]).sum().to_frame().T
             row2_Sabra.insert(0, "Sabra_Account", "Total - Expense")
             if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
-		download_mapping=True
+                download_mapping=True
             
 	if download_mapping:
             download_report(account_mapping,"accounts mapping")
