@@ -640,11 +640,8 @@ def Fill_Year_To_Header(PL,month_row_index,full_month_header,sheet_name,reportin
     return PL_date_header
 	
 @st.cache_data 
-def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month):
+def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month,email_body):
     #check patient days,fill missing operating beds to reporting_month_data
-    #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
-    #st.write("check_patient_days",check_patient_days,check_patient_days.index)
-    global email_body
     month_days=monthrange(int(reporting_month[:4]), int(reporting_month[4:]))[1]
     problem_properties=[]
     properties_fill_Aunit=[]
@@ -748,7 +745,7 @@ def Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,repor
         check_patient_days_display=check_patient_days_display.rename(columns={"Property_Name": "Property"})
         st.dataframe(check_patient_days_display.style.map(color_missing, subset=["Patient Days","Operating Beds"]).format(precision=0, thousands=","),hide_index=True)
         email_body+= f" <p>Please pay attention to the improper entries in the patient days:</p>{check_patient_days_display.to_html(index=False)}"+"<ul>"+error_for_email+"</ul>"	
-    return reporting_month_data,Total_PL
+    return reporting_month_data,Total_PL,email_body
 
 @st.cache_data  
 def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_name,sheet_type,pre_date_header): 
@@ -1334,7 +1331,7 @@ def View_Summary():
     check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
     #check if available unit changed by previous month
-    reporting_month_data,Total_PL=Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month)
+    reporting_month_data,Total_PL,email_body=Check_Available_Units(reporting_month_data,Total_PL,check_patient_days,reporting_month,email_body)
    
     #check missing category ( example: total revenue= 0, total Opex=0...)	
     category_list=['Revenue','Patient Days','Operating Expenses',"Balance Sheet"]
@@ -2509,29 +2506,27 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             else:
                 select_months_list.append(reporting_month) 
         with st.spinner("Processing report... Please wait and click 'Confirm' when it's ready. Do not leave this page until you complete the process."):
-            if True:
-                if BS_separate_excel=="N":  # Finance/BS are in one excel
-                    entity_mapping,finance_wb=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
-                    Total_PL=Upload_And_Process(uploaded_finance,finance_wb,"Finance")
-                    #st.write("Total_PL1",Total_PL)
-                elif BS_separate_excel=="Y": # Finance/BS are in different excel 
-                    entity_mapping,finance_wb=Check_Sheet_Name_List(uploaded_finance,"Finance")
-                    entity_mapping,bs_wb=Check_Sheet_Name_List(uploaded_BS,"BS")
+            if BS_separate_excel=="N":  # Finance/BS are in one excel
+                entity_mapping,finance_wb=Check_Sheet_Name_List(uploaded_finance,"Finance")	 
+                Total_PL=Upload_And_Process(uploaded_finance,finance_wb,"Finance")
 
-                    # process Finance 
-                    Total_PL=Upload_And_Process(uploaded_finance,finance_wb,"Finance")
-                    #st.write("Total_PL",Total_PL)
-	            # process BS 
-                    Total_BS=Upload_And_Process(uploaded_BS,bs_wb,"BS")
-	            # combine Finance and BS
-                    Total_PL=Total_BS.combine_first(Total_PL)
-                    #Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
-                if len(Total_PL.columns)==1:
-                    Total_PL.columns=[reporting_month]
+            elif BS_separate_excel=="Y": # Finance/BS are in different excel 
+                entity_mapping,finance_wb=Check_Sheet_Name_List(uploaded_finance,"Finance")
+                entity_mapping,bs_wb=Check_Sheet_Name_List(uploaded_BS,"BS")
 
-                elif len(Total_PL.columns)>1 and BPC_pull.shape[0]>0:  # there are previous months in P&L
-                    #diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail,reporting_month)
-                    diff_BPC_PL=Compare_PL_Sabra(Total_PL,reporting_month)
+                # process Finance 
+                Total_PL=Upload_And_Process(uploaded_finance,finance_wb,"Finance")
+
+	        # process BS 
+                Total_BS=Upload_And_Process(uploaded_BS,bs_wb,"BS")
+	        # combine Finance and BS
+                Total_PL=Total_BS.combine_first(Total_PL)
+
+            if len(Total_PL.columns)==1:
+                Total_PL.columns=[reporting_month]
+
+            elif len(Total_PL.columns)>1 and BPC_pull.shape[0]>0:  # there are previous months in P&L
+                diff_BPC_PL=Compare_PL_Sabra(Total_PL,reporting_month)
 
 	    # 1 Summary
             total_email_body=View_Summary()
