@@ -1302,7 +1302,7 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category):
         # Concatenate row1,row2, diff to create the final dataframe
         result_df = pd.concat([row1_PL, row2_Sabra, diff_row],ignore_index=True)
         st.error(f"The calculated {category} are inconsistent with those in the P&L. Please download the mapping file and review it.")
-        st.write("result_df",result_df)
+        st.write(result_df)
         return True
     return False
 
@@ -1417,7 +1417,7 @@ def View_Summary():
                 download_mapping=True
             
         if download_mapping:
-            download_report(account_mapping,"accounts mapping")
+            download_report(account_mapping,"accounts mapping",key=1)
 
     reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names)]	
     placeholder = st.empty()
@@ -1434,7 +1434,7 @@ def View_Summary():
         with col1:
             download_report(reporting_month_data,"Report")
         with col2:
-            download_report(account_mapping,"accounts mapping")
+            download_report(account_mapping,"accounts mapping",key=2)
         reporting_month_data=reporting_month_data.apply(Format_Value)
         reporting_month_data=reporting_month_data.fillna(0).infer_objects(copy=False)
         reporting_month_data=reporting_month_data.replace(0,'')
