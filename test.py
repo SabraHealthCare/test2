@@ -1305,7 +1305,7 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category):
         st.error(f"The calculated {category} are inconsistent with those in the P&L. Please download the mapping and check it.")
         result_df=result_df.apply(Format_Value)
         result_df.rename(columns={"Sabra_Account": "P&L vs. Calculated"},inplace=True)
-        st.markdown(result_df)
+        st.write(result_df)
 
         email_body+=f"<p>The calculated {category} are inconsistent with those in the P&L:</p>{result_df.to_html(index=False)}"
         
