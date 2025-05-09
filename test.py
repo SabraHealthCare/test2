@@ -1301,7 +1301,7 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category):
 
         # Concatenate row1,row2, diff to create the final dataframe
         result_df = pd.concat([row1_PL, row2_Sabra, diff_row],ignore_index=True)
-        st.error(f"The calculated {category} values are inconsistent with those in the P&L. Please download the mapping file and review it.")
+        st.error(f"The calculated {category} are inconsistent with those in the P&L. Please download the mapping file and review it.")
         st.write("result_df",result_df)
         return True
     return False
@@ -1383,10 +1383,10 @@ def View_Summary():
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
     reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
 	
-    total_list=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
-    total_data = reporting_month_data[reporting_month_data["Sabra_Account"].isin(total_list)]
+    PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
+    PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
     # DataFrame with all other rows
-    #reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(total_list)]	    
+    #reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names)]	    
     value_column=["Total"]+list(entity_columns)
     if PL_total.shape[0]>0:
         download_mapping=False
@@ -1394,17 +1394,17 @@ def View_Summary():
         if "Total Patient Days in P&L" in compare_metric:
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Patient Days in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Patient Days"]
-            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"patient days"):
                 download_mapping=True
         if "Total Revenue in P&L" in compare_metric:
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Revenue in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Revenue"]
-            if weather_download_mappingCompare_Total_with_Total(row1_PL,row2_Sabra,value_column):
+            if weather_download_mappingCompare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total revenue"):
                 download_mapping=True
         if "Total OPEX in P&L" in compare_metric:
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Operating Expenses"]
-            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total operating expense"):
                 download_mapping=True
         if "Total Expense in P&L" in compare_metric:
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
@@ -1413,13 +1413,13 @@ def View_Summary():
             # Sum the numeric columns across the filtered rows
             row2_Sabra = row2_Sabra.drop(columns=["Sabra_Account"]).sum().to_frame().T
             row2_Sabra.insert(0, "Sabra_Account", "Total - Expense")
-            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total expense(includes: OPEX,non-OPEX,Management fee)"):
                 download_mapping=True
             
-	if download_mapping:
+        if download_mapping:
             download_report(account_mapping,"accounts mapping")
 
-    reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(total_list)]	
+    reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names)]	
     placeholder = st.empty()
     placeholder.markdown("""
             <div style="background-color: #fff1ad; padding: 10px; border-radius: 5px;">
