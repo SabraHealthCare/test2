@@ -1278,11 +1278,12 @@ def Compare_PL_Sabra(Total_PL,reporting_month):
 	
 def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
-def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category):
+def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
     # Compute the difference (row1 - row2) for value_column
     diff = row1_PL[value_column].values - row2_Sabra[value_column].values
+    st.write("diff",diff)
     # Create a new row for the difference
-    diff_row = pd.DataFrame(data=[["Delta"] + diff.flatten().tolist()],columns=["Sabra_Account"] + value_column)
+    diff_row = pd.DataFrame(data=[["Difference"] + diff.flatten().tolist()],columns=["Sabra_Account"] + value_column)
 
     # Only keep values where abs(diff) > 10, else put np.nan
     diff_flat = diff.flatten()
@@ -1290,21 +1291,19 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category):
     # Identify indices where abs difference > 10
     significant_diff_indices = np.where(np.abs(diff_flat) > 10)[0]
     if len(significant_diff_indices) > 0:
-        delta_properties_columns = [value_column[i] for i in significant_diff_indices]
-        columns_to_keep=["Sabra_Account"] + delta_properties_columns 
+        selected_columns = [value_column[i] for i in significant_diff_indices]
+        columns_to_keep=["Sabra_Account"] + selected_columns 
         # Create filtered diff row
         diff_row = pd.DataFrame( data=[["Diff"] + [diff_flat[i] for i in significant_diff_indices]],columns=columns_to_keep)
 
         # Filter original rows to keep only selected columns
-        row1_PL = row1_PL[columns_to_keep]
-        row2_Sabra = row2_Sabra[columns_to_keep]
+        row1_filtered = row1_PL[columns_to_keep]
+        row2_filtered = row2_Sabra[columns_to_keep]
 
         # Concatenate results
-        result_df = pd.concat([row1_PL, row2_Sabra, diff_row],ignore_index=True)
-        st.error(f"The calculated {category} values are inconsistent with those in the P&L. Please download the mapping file and review it.")
-	st.write("result_df",result_df)
-        retrun True
-    return False
+        result_df = pd.concat([row1_filtered, row2_filtered, diff_row],ignore_index=True)
+        st.write("result_df",result_df)
+	    
 def View_Summary(): 
     global Total_PL,reporting_month_data,email_body,placeholder
     total_account_list=["TOTAL_REV","TOTAL_OPEX","TOTAL_PD"]    
@@ -1381,45 +1380,40 @@ def View_Summary():
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
     reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
 	
-    PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
-    PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
+    total_list=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
+    total_data = reporting_month_data[reporting_month_data["Sabra_Account"].isin(total_list)]
     # DataFrame with all other rows
-    #reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names)]	    
+    #reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(total_list)]	    
     value_column=["Total"]+list(entity_columns)
-
-    if PL_total.shape[0]>0:
-        download_mapping=False
-        compare_metric=PL_total["Sabra_Account"].tolist()
+    if total_data.shape[0]>0:
+        compare_metric=total_data["Sabra_Account"].tolist()
         if "Total Patient Days in P&L" in compare_metric:
-            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Patient Days in P&L"]
+            row1_PL = total_data[total_data["Sabra_Account"] == "Total Patient Days in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Patient Days"]
-            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
-		download_mapping=True
+            Compare_Total_with_Total(row1_PL,row2_Sabra,value_column)
         if "Total Revenue in P&L" in compare_metric:
-            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Revenue in P&L"]
+            row1_PL = total_data[total_data["Sabra_Account"] == "Total Revenue in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Revenue"]
-            if weather_download_mappingCompare_Total_with_Total(row1_PL,row2_Sabra,value_column):
-		download_mapping=True
+            Compare_Total_with_Total(row1_PL,row2_Sabra,value_column)
         if "Total OPEX in P&L" in compare_metric:
-            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
+            row1_PL = total_data[total_data["Sabra_Account"] == "Total OPEX in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Operating Expenses"]
-            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
-		download_mapping=True
+            Compare_Total_with_Total(row1_PL,row2_Sabra,value_column)
         if "Total Expense in P&L" in compare_metric:
-            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
-            sabra_total_accounts = ["Total - Operating Expenses", "Total - Non-Operating Expenses", "Total - Management Fee"]
-            row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"].isin(sabra_total_accounts)]
+            row1_PL = total_data[total_data["Sabra_Account"] == "Total OPEX in P&L"]
+            target_accounts = ["Total - Operating Expenses", "Total - Non-Operating Expenses", "Total - Management Fee"]
+            row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"].isin(target_accounts)]
+
             # Sum the numeric columns across the filtered rows
             row2_Sabra = row2_Sabra.drop(columns=["Sabra_Account"]).sum().to_frame().T
-            row2_Sabra.insert(0, "Sabra_Account", "Total - Expense")
-            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column):
-		download_mapping=True
-            
-	if download_mapping:
-            
-		
 
-    reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names)]	
+            # Add back the Sabra_Account label for identification
+            row2_Sabra.insert(0, "Sabra_Account", "Total - Expense")
+            Compare_Total_with_Total(row1_PL,row2_Sabra,value_column)
+
+
+
+    reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(total_list)]	
     placeholder = st.empty()
     placeholder.markdown("""
             <div style="background-color: #fff1ad; padding: 10px; border-radius: 5px;">
@@ -1587,55 +1581,55 @@ def Check_Sheet_Name_List(uploaded_file,sheet_type):
         submitted = st.form_submit_button("Submit")
            
     if submitted:
-        if sheet_type=="Finance":
-            if (missing_PL_sheet_property_Y.shape[0]>0 and missing_PL_sheet_property_Y["Sheet_Name_Finance"].isna().any()) or (missing_occ_sheet_property_Y.shape[0]>0 and missing_occ_sheet_property_Y["Sheet_Name_Occupancy"].isna().any()) or (missing_BS_sheet_property_Y.shape[0]>0 and missing_BS_sheet_property_Y["Sheet_Name_Balance_Sheet"].isna().any()):
-                st.error("Please complete above mapping.")
-                st.stop()
-            else:
-                if missing_PL_sheet_property_Y.shape[0]>0:
-	            # each property in seperate sheet, so the sheet names should be unique
-                    duplicates = missing_PL_sheet_property_Y[missing_PL_sheet_property_Y.duplicated('Sheet_Name_Finance', keep=False)]
-                    # Group by 'Sheet_Name_Finance' and get corresponding 'Property Name'
-                    if not duplicates.empty:
-                        grouped = duplicates.groupby("Sheet_Name_Finance")["Property_Name"].apply(lambda x: ', '.join(x)).reset_index()
-                        for _, row in grouped.iterrows():
-                            st.error(f"The sheet names are supposed to be different for {row['Property_Name']} .")
-                            st.stop()
-                    for entity_i in missing_PL_sheet_property_Y.index: 
-                        new_finance_sheet_name=missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"]
-                        if new_finance_sheet_name in entity_mapping["Sheet_Name_Finance"].values:
-                            property = entity_mapping.loc[entity_mapping["Sheet_Name_Finance"] == new_finance_sheet_name, "Property_Name"].iloc[0]
-                            st.error(f"The '{new_finance_sheet_name}' sheet is for {property}, please choose another sheet for {missing_PL_sheet_property_Y.loc[entity_i, 'Property_Name']}")
-                            st.stop()
+            if sheet_type=="Finance":
+                if (missing_PL_sheet_property_Y.shape[0]>0 and missing_PL_sheet_property_Y["Sheet_Name_Finance"].isna().any()) or (missing_occ_sheet_property_Y.shape[0]>0 and missing_occ_sheet_property_Y["Sheet_Name_Occupancy"].isna().any()) or (missing_BS_sheet_property_Y.shape[0]>0 and missing_BS_sheet_property_Y["Sheet_Name_Balance_Sheet"].isna().any()):
+                    st.error("Please complete above mapping.")
+                    st.stop()
+                else:
+                    if missing_PL_sheet_property_Y.shape[0]>0:
+	                # each property in seperate sheet, so the sheet names should be unique
+                        duplicates = missing_PL_sheet_property_Y[missing_PL_sheet_property_Y.duplicated('Sheet_Name_Finance', keep=False)]
+                        # Group by 'Sheet_Name_Finance' and get corresponding 'Property Name'
+                        if not duplicates.empty:
+                            grouped = duplicates.groupby("Sheet_Name_Finance")["Property_Name"].apply(lambda x: ', '.join(x)).reset_index()
+                            for _, row in grouped.iterrows():
+                                st.error(f"The sheet names are supposed to be different for {row['Property_Name']} .")
+                                st.stop()
+                        for entity_i in missing_PL_sheet_property_Y.index: 
+                            new_finance_sheet_name=missing_PL_sheet_property_Y.loc[entity_i,"Sheet_Name_Finance"]
+                            if new_finance_sheet_name in entity_mapping["Sheet_Name_Finance"].values:
+                                property = entity_mapping.loc[entity_mapping["Sheet_Name_Finance"] == new_finance_sheet_name, "Property_Name"].iloc[0]
+                                st.error(f"The '{new_finance_sheet_name}' sheet is for {property}, please choose another sheet for {missing_PL_sheet_property_Y.loc[entity_i, 'Property_Name']}")
+                                st.stop()
                             entity_mapping.loc[entity_i,"Sheet_Name_Finance"]=new_finance_sheet_name
 	
-                if missing_occ_sheet_property_Y.shape[0]>0:
-                    for entity_i in missing_occ_sheet_property_Y.index:
-                        entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"]=missing_occ_sheet_property_Y.loc[entity_i,"Sheet_Name_Occupancy"]
-                if missing_BS_sheet_property_Y.shape[0]>0:
-                    for entity_i in missing_BS_sheet_property_Y.index:
-                        entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]=missing_BS_sheet_property_Y.loc[entity_i,"Sheet_Name_Balance_Sheet"]
+                    if missing_occ_sheet_property_Y.shape[0]>0:
+                        for entity_i in missing_occ_sheet_property_Y.index:
+                            entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"]=missing_occ_sheet_property_Y.loc[entity_i,"Sheet_Name_Occupancy"]
+                    if missing_BS_sheet_property_Y.shape[0]>0:
+                        for entity_i in missing_BS_sheet_property_Y.index:
+                            entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]=missing_BS_sheet_property_Y.loc[entity_i,"Sheet_Name_Balance_Sheet"]
 
-            if (missing_PL_sheet_property_N.shape[0]>0 and PL_sheet== "")\
+                if (missing_PL_sheet_property_N.shape[0]>0 and PL_sheet== "")\
 			or (missing_occ_sheet_property_N.shape[0]>0 and occ_sheet== "") \
 			or (missing_BS_sheet_property_N.shape[0]>0 and BS_sheet== ""):
-                st.error("Please complete above mapping.")
-                st.stop()
-            else:
-                if missing_PL_sheet_property_N.shape[0]>0:
-                    entity_mapping.loc[missing_PL_sheet_property_N.index,"Sheet_Name_Finance"]=PL_sheet
-                if missing_occ_sheet_property_N.shape[0]>0:
-                    entity_mapping.loc[missing_occ_sheet_property_N.index,"Sheet_Name_Occupancy"]=occ_sheet
-                if missing_BS_sheet_property_N.shape[0]>0:
-                    entity_mapping.loc[missing_BS_sheet_property_N.index,"Sheet_Name_Balance_Sheet"]=BS_sheet
+                        st.error("Please complete above mapping.")
+                        st.stop()
+                else:
+                    if missing_PL_sheet_property_N.shape[0]>0:
+                        entity_mapping.loc[missing_PL_sheet_property_N.index,"Sheet_Name_Finance"]=PL_sheet
+                    if missing_occ_sheet_property_N.shape[0]>0:
+                        entity_mapping.loc[missing_occ_sheet_property_N.index,"Sheet_Name_Occupancy"]=occ_sheet
+                    if missing_BS_sheet_property_N.shape[0]>0:
+                        entity_mapping.loc[missing_BS_sheet_property_N.index,"Sheet_Name_Balance_Sheet"]=BS_sheet
 
-        elif sheet_type=="BS":
-            if (missing_BS_sheet_property_Y.shape[0]>0 and missing_BS_sheet_property_Y["Sheet_Name_Balance_Sheet"].isna().any()):
-                st.error("Please complete Balance Sheet mapping.")
-                st.stop()
-            else:
-                if missing_BS_sheet_property_Y.shape[0]>0:
-                    for entity_i in missing_BS_sheet_property_Y.index:
+            elif sheet_type=="BS":
+                if (missing_BS_sheet_property_Y.shape[0]>0 and missing_BS_sheet_property_Y["Sheet_Name_Balance_Sheet"].isna().any()):
+                    st.error("Please complete Balance Sheet mapping.")
+                    st.stop()
+                else:
+                    if missing_BS_sheet_property_Y.shape[0]>0:
+                        for entity_i in missing_BS_sheet_property_Y.index:
                             entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]=missing_BS_sheet_property_Y.loc[entity_i,"Sheet_Name_Balance_Sheet"]
 
                 if missing_BS_sheet_property_N.shape[0]>0:
