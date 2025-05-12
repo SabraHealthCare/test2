@@ -1323,6 +1323,7 @@ def View_Summary():
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
+    st.write("PL_total",PL_total,reporting_month_data.index,reporting_month_data)
     reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names)]
 
     # check patient days ( available days > patient days)	
