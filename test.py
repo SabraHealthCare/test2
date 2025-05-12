@@ -59,6 +59,7 @@ month_dic_num={10:["10/","-10","/10","10","_10"],11:["11/","-11","/11","11","_11
                    7:["07/","7/","-7","-07","/7","/07"],8:["08/","8/","-8","-08","/8","/08"],9:["09/","9/","-09","-9","/9","/09"]}
 year_dic={2024:["2024","24"],2025:["2025","25"],2026:["2026","26"]} 	
 month_map = {"Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "Jun": "06", "Jul": "07", "Aug": "08","Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"}
+PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
 #One drive authority. Set application details
 client_id = 'bc5f9d8d-eb35-48c3-be6d-98812daab3e3'
 client_secret='PgR8Q~HZE2q-dmOb2w_9_0VuxfT9VMLt_Lp3Jbce'
@@ -1386,7 +1387,6 @@ def View_Summary():
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
     reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
 	
-    PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
     # DataFrame with all other rows
     #reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names)]	    
@@ -1474,6 +1474,7 @@ def View_Summary():
         return total_email_body
 # no cache
 def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
+    Total_PL = Total_PL[~Total_PL.index.isin(PL_total_names)]
     upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
     upload_reporting_month["TIME"]=reporting_month
     upload_reporting_month=upload_reporting_month.rename(columns={reporting_month:"Amount"})
