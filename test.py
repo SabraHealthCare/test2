@@ -1322,43 +1322,9 @@ def View_Summary():
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-    entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns
-
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
-    value_column=["Total"]+list(entity_columns)
-    if PL_total.shape[0]>0:
-        download_mapping=False
-        compare_metric=PL_total["Sabra_Account"].tolist()
-        if "Total Patient Days in P&L" in compare_metric:
-            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Patient Days in P&L"]
-            row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Patient Days"]
-            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total patient days"):
-                download_mapping=True
-        if "Total Revenue in P&L" in compare_metric:
-            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Revenue in P&L"]
-            row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Revenue"]
-            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total revenue(excluding bad debt)"):
-                download_mapping=True
-        if "Total OPEX in P&L" in compare_metric:
-            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
-            row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Operating Expenses"]
-            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total operating expense"):
-                download_mapping=True
-        if "Total Expense in P&L" in compare_metric:
-            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
-            sabra_total_accounts = ["Total - Operating Expenses", "Total - Non-Operating Expenses", "Total - Management Fee"]
-            row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"].isin(sabra_total_accounts)]
-            # Sum the numeric columns across the filtered rows
-            row2_Sabra = row2_Sabra.drop(columns=["Sabra_Account"]).sum().to_frame().T
-            row2_Sabra.insert(0, "Sabra_Account", "Total - Expense")
-            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total expense(includes: OPEX,non-OPEX,Management fee)"):
-                download_mapping=True
-            
-        if download_mapping:
-            download_report(account_mapping,"mapping to check inconsistence")
-
     reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names)]
-	
+
     # check patient days ( available days > patient days)	
     check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].str.startswith("A_"))|(reporting_month_data["Category"]=='Patient Days') ]
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
@@ -1415,8 +1381,41 @@ def View_Summary():
             reporting_month_data.loc[i,"Sabra_Account"]="Total - "+reporting_month_data.loc[i,'Category']
             if reporting_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 reporting_month_data.loc[i,set_empty]=np.nan
-	
-    st.write("reporting_month_data",reporting_month_data,entity_columns,entity_columns,reporting_month_data.index)
+    entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns
+    
+    value_column=["Total"]+list(entity_columns)
+    if PL_total.shape[0]>0:
+        download_mapping=False
+        compare_metric=PL_total["Sabra_Account"].tolist()
+        if "Total Patient Days in P&L" in compare_metric:
+            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Patient Days in P&L"]
+            row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Patient Days"]
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total patient days"):
+                download_mapping=True
+        if "Total Revenue in P&L" in compare_metric:
+            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Revenue in P&L"]
+            row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Revenue"]
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total revenue(excluding bad debt)"):
+                download_mapping=True
+        if "Total OPEX in P&L" in compare_metric:
+            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
+            row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Operating Expenses"]
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total operating expense"):
+                download_mapping=True
+        if "Total Expense in P&L" in compare_metric:
+            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
+            sabra_total_accounts = ["Total - Operating Expenses", "Total - Non-Operating Expenses", "Total - Management Fee"]
+            row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"].isin(sabra_total_accounts)]
+            # Sum the numeric columns across the filtered rows
+            row2_Sabra = row2_Sabra.drop(columns=["Sabra_Account"]).sum().to_frame().T
+            row2_Sabra.insert(0, "Sabra_Account", "Total - Expense")
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total expense(includes: OPEX,non-OPEX,Management fee)"):
+                download_mapping=True
+            
+        if download_mapping:
+            download_report(account_mapping,"mapping to check inconsistence")
+
+   	
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
     reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
 	
