@@ -1321,9 +1321,9 @@ def View_Summary():
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-    PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
+    PL_total = reporting_month_data[reporting_month_data["Category"]=="Total"]
     st.write("PL_total",PL_total,reporting_month_data.index,reporting_month_data)
-    reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names)]
+    reporting_month_data = reporting_month_data[reporting_month_data["Category"]!="Total"]
     st.write("reporting_month_data",reporting_month_data)
     # check patient days ( available days > patient days)	
     check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].str.startswith("A_"))|(reporting_month_data["Category"]=='Patient Days') ]
