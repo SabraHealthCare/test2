@@ -1475,7 +1475,7 @@ def View_Summary():
 # no cache
 def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
     upload_reporting_month = Total_PL[~Total_PL.index.isin(PL_total_names)]
-    upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
+    upload_reporting_month=upload_reporting_month[reporting_month].reset_index(drop=False)
     upload_reporting_month["TIME"]=reporting_month
     upload_reporting_month=upload_reporting_month.rename(columns={reporting_month:"Amount"})
     current_time = datetime.now(pytz.timezone('America/Los_Angeles')).strftime("%H:%M")
