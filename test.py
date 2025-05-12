@@ -1510,7 +1510,7 @@ def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
 
     if not st.session_state.email_sent:
         receiver_email_list= ["sli@sabrahealth.com"]   
-        Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body) 
+        #Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body) 
         
         if email_body!="" or st.session_state.email_body_for_Sabra!="":
             Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body+st.session_state.email_body_for_Sabra)    
