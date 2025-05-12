@@ -1322,7 +1322,7 @@ def View_Summary():
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-
+    entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns
 
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
     value_column=["Total"]+list(entity_columns)
@@ -1416,7 +1416,7 @@ def View_Summary():
             if reporting_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 reporting_month_data.loc[i,set_empty]=np.nan
 	
-    entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
+	
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
     reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
 	
