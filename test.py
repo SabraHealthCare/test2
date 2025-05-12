@@ -1416,7 +1416,7 @@ def View_Summary():
             if reporting_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 reporting_month_data.loc[i,set_empty]=np.nan
 	
-	
+    st.write("reporting_month_data",reporting_month_data,entity_columns,entity_columns.index)
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
     reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
 	
