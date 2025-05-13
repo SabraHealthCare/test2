@@ -1317,12 +1317,15 @@ def View_Summary():
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
+    #st.write("Total_PL",Total_PL,Total_PL.index)
 
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
+    #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
+    #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
 
-   
+
     # check patient days ( available days > patient days)	
     check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].str.startswith("A_"))|(reporting_month_data["Category"]=='Patient Days') ]
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
@@ -1379,11 +1382,15 @@ def View_Summary():
             reporting_month_data.loc[i,"Sabra_Account"]="Total - "+reporting_month_data.loc[i,'Category']
             if reporting_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 reporting_month_data.loc[i,set_empty]=np.nan
-    entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns
-
-    PL_total = reporting_month_data[reporting_month_data["Category"]=="Total"]
-    reporting_month_data = reporting_month_data[reporting_month_data["Category"]!="Total"]
 	
+    entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
+    reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
+    reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
+	
+    PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
+    PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
+    # DataFrame with all other rows
+    #reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names)]	    
     value_column=["Total"]+list(entity_columns)
     if PL_total.shape[0]>0:
         download_mapping=False
@@ -1416,11 +1423,7 @@ def View_Summary():
         if download_mapping:
             download_report(account_mapping,"mapping to check inconsistence")
 
-   	
-    reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
-    reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
-	
-	
+    reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names)]	
     placeholder = st.empty()
     placeholder.markdown("""
             <div style="background-color: #fff1ad; padding: 10px; border-radius: 5px;">
