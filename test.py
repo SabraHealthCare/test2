@@ -1311,7 +1311,7 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category,account_fo
         return True
     return False
 
-def Create_Account_Foluma(total_account)
+def Create_Account_Foluma(total_account):
     parts = []
     for _, row in total_account.iterrows():
         tenant = row["Tenant_Account"]
