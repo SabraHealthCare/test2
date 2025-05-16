@@ -1292,7 +1292,7 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category):
         delta_properties_columns = [value_column[i] for i in significant_diff_indices]
         columns_to_keep=["Sabra_Account"] + delta_properties_columns 
         # Create filtered diff row
-        diff_row = pd.DataFrame( data=[["Diff"] + [diff_flat[i] for i in significant_diff_indices]],columns=columns_to_keep)
+        diff_row = pd.DataFrame( data=["Delta"] + [diff_flat[i] for i in significant_diff_indices]],columns=columns_to_keep)
 
         # Filter original rows to keep only selected columns
         row1_PL = row1_PL[columns_to_keep]
@@ -1317,14 +1317,12 @@ def View_Summary():
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
-    #st.write("Total_PL",Total_PL,Total_PL.index)
 
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
     reporting_month_data=reporting_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	
     reporting_month_data=reporting_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
-
 
     # check patient days ( available days > patient days)	
     check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].str.startswith("A_"))|(reporting_month_data["Category"]=='Patient Days') ]
@@ -1423,7 +1421,7 @@ def View_Summary():
         if download_mapping:
             download_report(account_mapping,"mapping to check inconsistence")
 
-    reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names)]	
+    reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names+["Total - Total"])]	
     placeholder = st.empty()
     placeholder.markdown("""
             <div style="background-color: #fff1ad; padding: 10px; border-radius: 5px;">
