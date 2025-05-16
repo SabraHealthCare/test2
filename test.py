@@ -1304,7 +1304,8 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category,account_fo
         st.error(f"The calculated {category} are inconsistent with those in the P&L. Please download the mapping and check it.")
         result_df=result_df.apply(Format_Value)
         result_df.rename(columns={"Sabra_Account": "P&L vs. Calculated"},inplace=True)
-        st.write(result_df)
+        #st.write(result_df)
+        st.dataframe(result_df.reset_index(drop=True), use_container_width=True)
 
         email_body+=f"<p>The calculated {category} are inconsistent with those in the P&L:</p>{result_df.to_html(index=False)}"
         
@@ -1403,7 +1404,7 @@ def View_Summary():
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
     # DataFrame with all other rows
     PL_total = PL_total.drop(columns="Total")	    
-    value_column=["Total"]+list(entity_columns)
+    value_column=list(entity_columns)
     
     if PL_total.shape[0]>0:
         download_mapping=False
