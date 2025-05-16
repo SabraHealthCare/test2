@@ -1402,14 +1402,13 @@ def View_Summary():
     PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
     # DataFrame with all other rows
-    #reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names)]	    
+    PL_total = PL_total.drop(columns="Total")	    
     value_column=["Total"]+list(entity_columns)
     
     if PL_total.shape[0]>0:
         download_mapping=False
         compare_metric=PL_total["Sabra_Account"].tolist()
         if "Total Patient Days in P&L" in compare_metric:
-
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Patient Days in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Patient Days"]
             total_account = account_mapping[account_mapping["Sabra_Account"] == "TOTAL_PD"]
