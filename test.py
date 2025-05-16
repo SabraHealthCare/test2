@@ -1298,12 +1298,13 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category,account_fo
         row1_PL = row1_PL[columns_to_keep]
         row1_PL["Sabra_Account"] = row1_PL["Sabra_Account"] + f" ({account_forluma})"
         row2_Sabra = row2_Sabra[columns_to_keep]
+        row2_Sabra["Sabra_Account"] = "Calculated by mapping"
 
         # Concatenate row1,row2, diff to create the final dataframe
         result_df = pd.concat([row2_Sabra,row1_PL,diff_row],ignore_index=True)
         st.error(f"The calculated {category} are inconsistent with those in the P&L. Please download the mapping and check it.")
         result_df=result_df.apply(Format_Value)
-        result_df.rename(columns={"Sabra_Account": "P&L vs. Calculated"},inplace=True)
+        result_df.rename(columns={"Sabra_Account": category.title()+" calculated by Sabra vs. P&L"},inplace=True)
         #st.write(result_df)
         result_df_display = result_df.to_html(index=False)
         st.markdown(result_df_display, unsafe_allow_html=True)
