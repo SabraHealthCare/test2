@@ -1276,7 +1276,7 @@ def Compare_PL_Sabra(Total_PL,reporting_month):
 	
 def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
-def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category):
+def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category,account_forluma):
     global email_body
     # Compute the difference (row1 - row2) for value_column
     diff = row1_PL[value_column].values - row2_Sabra[value_column].values
@@ -1296,10 +1296,11 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category):
 
         # Filter original rows to keep only selected columns
         row1_PL = row1_PL[columns_to_keep]
+        row1_PL["Sabra_Account"] = row1_PL["Sabra_Account"] + f" ({account_forluma})"
         row2_Sabra = row2_Sabra[columns_to_keep]
 
         # Concatenate row1,row2, diff to create the final dataframe
-        result_df = pd.concat([row1_PL, row2_Sabra, diff_row],ignore_index=True)
+        result_df = pd.concat([row2_Sabra,row1_PL,diff_row],ignore_index=True)
         st.error(f"The calculated {category} are inconsistent with those in the P&L. Please download the mapping and check it.")
         result_df=result_df.apply(Format_Value)
         result_df.rename(columns={"Sabra_Account": "P&L vs. Calculated"},inplace=True)
@@ -1310,10 +1311,23 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category):
         return True
     return False
 
+def Create_Account_Foluma(total_account)
+    parts = []
+    for _, row in total_account.iterrows():
+        tenant = row["Tenant_Account"]
+        sign = '-' if row["Conversion"] == "*-1" else '+'
+        parts.append((sign, tenant))
+
+    # Assemble the string, skip the sign on the first item if it's '+'
+    expression = parts[0][1]  # First item without '+' sign
+    for sign, tenant in parts[1:]:
+        expression += f"{sign}{tenant}"
+
+    return expression
 
 def View_Summary(): 
     global Total_PL,reporting_month_data,placeholder,email_body
-    total_account_list=["TOTAL_REV","TOTAL_OPEX","TOTAL_PD"]    
+    
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
@@ -1390,23 +1404,31 @@ def View_Summary():
     # DataFrame with all other rows
     #reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names)]	    
     value_column=["Total"]+list(entity_columns)
+    
     if PL_total.shape[0]>0:
         download_mapping=False
         compare_metric=PL_total["Sabra_Account"].tolist()
         if "Total Patient Days in P&L" in compare_metric:
+
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Patient Days in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Patient Days"]
-            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total patient days"):
+            total_account = account_mapping[account_mapping["Sabra_Account"] == "TOTAL_PD"]
+            account_string=Create_Account_Foluma(total_account)
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total patient days",account_string):
                 download_mapping=True
         if "Total Revenue in P&L" in compare_metric:
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Revenue in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Revenue"]
-            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total revenue(excluding bad debt)"):
+            total_account = account_mapping[account_mapping["Sabra_Account"] == "TOTAL_REV"]
+            account_string=Create_Account_Foluma(total_account)
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total revenue",account_string):
                 download_mapping=True
         if "Total OPEX in P&L" in compare_metric:
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Operating Expenses"]
-            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total operating expense"):
+            total_account = account_mapping[account_mapping["Sabra_Account"] == "TOTAL_OPEX"]
+            account_string=Create_Account_Foluma(total_account)
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total operating expense",account_string):
                 download_mapping=True
         if "Total Expense in P&L" in compare_metric:
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
@@ -1415,7 +1437,9 @@ def View_Summary():
             # Sum the numeric columns across the filtered rows
             row2_Sabra = row2_Sabra.drop(columns=["Sabra_Account"]).sum().to_frame().T
             row2_Sabra.insert(0, "Sabra_Account", "Total - Expense")
-            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total expense(includes: OPEX,non-OPEX,Management fee)"):
+            total_account = account_mapping[account_mapping["Sabra_Account"] == "TOTAL_EXP"]
+            account_string=Create_Account_Foluma(total_account)
+            if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total expense",account_string):
                 download_mapping=True
             
         if download_mapping:
