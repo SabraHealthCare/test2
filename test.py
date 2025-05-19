@@ -1389,10 +1389,7 @@ def View_Summary():
     reporting_month_data.Category = reporting_month_data.Category.cat.set_categories(sorter)
     reporting_month_data=reporting_month_data.sort_values(["Category"]) 
     reporting_month_data_temp = reporting_month_data[~reporting_month_data["Sabra_Account"].str.contains("in P&L", na=False)]
-    reporting_month_data = pd.concat([reporting_month_data_temp.\
-             groupby(by='Category', as_index=False,observed=False).\
-	     sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).\
-	     sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
+   
     st.write("reporting_month_data",reporting_month_data)
     set_empty=list(reporting_month_data.columns)
     set_empty.remove("Category")
@@ -1405,9 +1402,8 @@ def View_Summary():
 
 
 	
-    entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
-    reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
-    reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
+    entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns
+
 	
     PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
@@ -1457,7 +1453,12 @@ def View_Summary():
 
     reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names+["Total - Total"])]
 
-
+    reporting_month_data = pd.concat([reporting_month_data_temp.\
+             groupby(by='Category', as_index=False,observed=False).\
+	     sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).\
+	     sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
+    reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
+    reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
 	
 	
     placeholder = st.empty()
