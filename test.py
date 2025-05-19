@@ -1304,7 +1304,7 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category,account_fo
         result_df = pd.concat([row2_Sabra,row1_PL,diff_row],ignore_index=True)
         st.error(f"The calculated {category} are inconsistent with those in the P&L. Please download the mapping and check it.")
         result_df=result_df.apply(Format_Value)
-        result_df.rename(columns={"Sabra_Account": category.title()+" calculated by Sabra vs. P&L"},inplace=True)
+        result_df.rename(columns={"Sabra_Account": category.title()},inplace=True)
         #st.write(result_df)
         result_df_display = result_df.to_html(index=False)
         st.markdown(result_df_display, unsafe_allow_html=True)
