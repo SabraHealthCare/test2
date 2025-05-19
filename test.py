@@ -2168,7 +2168,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
 
         # Step 4: Show error if any duplicated accounts remain after handling duplicates
         if len(dup_tenant_account) > 0:
-            st.error(f"Duplicated accounts detected in {sheet_type_name} sheet '{sheet_name}'. "
+            st.warning(f"Duplicated accounts detected in {sheet_type_name} sheet '{sheet_name}'. "
              f"Please rectify them to avoid repeated calculations: **{', '.join(dup_tenant_account)}**.")
 
         
