@@ -1161,6 +1161,7 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
 	
 #@st.cache_data 
 def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
+    st.write("PL",PL)
     # remove no need to map from account_mapping
     account_pool = account_pool[(account_pool["Sabra_Account"] != "NO NEED TO MAP") |
     (account_pool["Sabra_Second_Account"].notna())]
@@ -1235,6 +1236,7 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first 
+    st.write("PL",PL)
     return PL   
 	
 @st.cache_data
