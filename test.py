@@ -1298,7 +1298,7 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category,account_fo
         row1_PL = row1_PL[columns_to_keep]
         row1_PL["Sabra_Account"] = row1_PL["Sabra_Account"] + f" ({account_forluma})"
         row2_Sabra = row2_Sabra[columns_to_keep]
-        row2_Sabra["Sabra_Account"] = "Calculated by mapping"
+        row2_Sabra["Sabra_Account"] = "Sabra report(calculated by mapping)"
 
         # Concatenate row1,row2, diff to create the final dataframe
         result_df = pd.concat([row2_Sabra,row1_PL,diff_row],ignore_index=True)
