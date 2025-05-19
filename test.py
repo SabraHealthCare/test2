@@ -1184,7 +1184,7 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
 	
     PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
                     PL.merge(main_account_mapping_filtered,   on="Tenant_Account", how="right")])
-    #st.write("PL mapping",PL)
+    st.write("PL mapping",PL)
     #Remove blank or missing "Sabra_Account" values
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
     PL.dropna(subset=["Sabra_Account"], inplace=True)
@@ -1343,7 +1343,7 @@ def View_Summary():
     #st.write("reporting_month_data",reporting_month_data,reporting_month_data.index)
 
     # check patient days ( available days > patient days)	
-    check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].str.startswith("A_"))|(reporting_month_data["Category"]=='Patient Days') ]
+    
     check_patient_days = reporting_month_data[
     ((reporting_month_data["Sabra_Account"].str.startswith("A_")) | 
      (reporting_month_data["Category"] == "Patient Days")) &
