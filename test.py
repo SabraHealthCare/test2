@@ -1344,6 +1344,10 @@ def View_Summary():
 
     # check patient days ( available days > patient days)	
     check_patient_days=reporting_month_data[(reporting_month_data["Sabra_Account"].str.startswith("A_"))|(reporting_month_data["Category"]=='Patient Days') ]
+    check_patient_days = reporting_month_data[
+    ((reporting_month_data["Sabra_Account"].str.startswith("A_")) | 
+     (reporting_month_data["Category"] == "Patient Days")) &
+    (~reporting_month_data["Sabra_Account"].str.startswith("Total_", na=False))]
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
     check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
