@@ -1277,6 +1277,7 @@ def Compare_PL_Sabra(Total_PL,reporting_month):
 def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
 def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category,account_forluma):
+    st.write("row1_PL,row2_Sabra",row1_PL,row2_Sabra)
     global email_body
     # Compute the difference (row1 - row2) for value_column
     diff = row1_PL[value_column].values - row2_Sabra[value_column].values
@@ -1388,7 +1389,7 @@ def View_Summary():
     reporting_month_data.Category = reporting_month_data.Category.astype("category")
     reporting_month_data.Category = reporting_month_data.Category.cat.set_categories(sorter)
     reporting_month_data=reporting_month_data.sort_values(["Category"]) 
-    reporting_month_data_temp = reporting_month_data[~reporting_month_data["Sabra_Account"].str.contains("in P&L", na=False)]
+    #reporting_month_data_temp = reporting_month_data[~reporting_month_data["Sabra_Account"].str.contains("in P&L", na=False)]
    
     st.write("reporting_month_data",reporting_month_data)
     set_empty=list(reporting_month_data.columns)
