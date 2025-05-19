@@ -1161,7 +1161,6 @@ def Manage_Account_Mapping(new_tenant_account_list,sheet_name="False",sheet_type
 	
 #@st.cache_data 
 def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
-    st.write("PL",PL)
     # remove no need to map from account_mapping
     account_pool = account_pool[(account_pool["Sabra_Account"] != "NO NEED TO MAP") |
     (account_pool["Sabra_Second_Account"].notna())]
@@ -1236,7 +1235,6 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first 
-    st.write("PL",PL)
     return PL   
 	
 @st.cache_data
@@ -1279,7 +1277,6 @@ def Compare_PL_Sabra(Total_PL,reporting_month):
 def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
 def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category,account_forluma):
-    st.write("row1_PL,row2_Sabra",row1_PL,row2_Sabra)
     global email_body
     # Compute the difference (row1 - row2) for value_column
     diff = row1_PL[value_column].values - row2_Sabra[value_column].values
@@ -1334,6 +1331,7 @@ def Create_Account_Foluma(total_account):
 
 def View_Summary(): 
     global Total_PL,reporting_month_data,placeholder,email_body
+    
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
@@ -1349,7 +1347,7 @@ def View_Summary():
     check_patient_days = reporting_month_data[
     ((reporting_month_data["Sabra_Account"].str.startswith("A_")) | 
      (reporting_month_data["Category"] == "Patient Days")) &
-    (~reporting_month_data["Sabra_Account"].str.startswith("TOTAL_", na=False))]
+    (~reporting_month_data["Sabra_Account"].str.startswith("Total_", na=False))]
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
     check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
@@ -1391,21 +1389,12 @@ def View_Summary():
     reporting_month_data.Category = reporting_month_data.Category.astype("category")
     reporting_month_data.Category = reporting_month_data.Category.cat.set_categories(sorter)
     reporting_month_data=reporting_month_data.sort_values(["Category"]) 
-    #reporting_month_data_temp = reporting_month_data[~reporting_month_data["Sabra_Account"].str.contains("in P&L", na=False)]
-
-
-
-
-	
-    entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns
-    reporting_month_data = pd.concat([reporting_month_data.\
+    reporting_month_data_temp = reporting_month_data[~reporting_month_data["Sabra_Account"].str.contains("in P&L", na=False)]
+    reporting_month_data = pd.concat([reporting_month_data_temp.\
              groupby(by='Category', as_index=False,observed=False).\
 	     sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).\
 	     sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
-    reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
-    reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
-	
-    st.write("reporting_month_data",reporting_month_data)
+
     set_empty=list(reporting_month_data.columns)
     set_empty.remove("Category")
     set_empty.remove("Sabra_Account")
@@ -1414,12 +1403,17 @@ def View_Summary():
             reporting_month_data.loc[i,"Sabra_Account"]="Total - "+reporting_month_data.loc[i,'Category']
             if reporting_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 reporting_month_data.loc[i,set_empty]=np.nan
+
+
+	
+    entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
+    reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
+    reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
 	
     PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
     # DataFrame with all other rows
-    #PL_total = PL_total.drop(columns="Total")	 
-    st.write("PL_total",PL_total)
+    PL_total = PL_total.drop(columns="Total")	    
     value_column=list(entity_columns)
     
     if PL_total.shape[0]>0:
