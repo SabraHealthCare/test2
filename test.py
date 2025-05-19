@@ -1382,7 +1382,25 @@ def View_Summary():
 	    "Additional Statistical Information","Government Funds","Total"]
     sorter=list(filter(lambda x:x in reporting_month_data["Category"].unique(),sorter))
 	
-    ################################
+    reporting_month_data.Category = reporting_month_data.Category.astype("category")
+    reporting_month_data.Category = reporting_month_data.Category.cat.set_categories(sorter)
+    reporting_month_data=reporting_month_data.sort_values(["Category"]) 
+    reporting_month_data_temp = reporting_month_data[~reporting_month_data["Sabra_Account"].str.contains("in P&L", na=False)]
+    reporting_month_data = pd.concat([reporting_month_data_temp.\
+             groupby(by='Category', as_index=False,observed=False).\
+	     sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).\
+	     sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
+
+    set_empty=list(reporting_month_data.columns)
+    set_empty.remove("Category")
+    set_empty.remove("Sabra_Account")
+    for i in range(reporting_month_data.shape[0]):
+        if reporting_month_data.loc[i,"Sabra_Account"]=="Total_Sabra":
+            reporting_month_data.loc[i,"Sabra_Account"]="Total - "+reporting_month_data.loc[i,'Category']
+            if reporting_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
+                reporting_month_data.loc[i,set_empty]=np.nan
+
+
 	
     entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
@@ -1434,25 +1452,6 @@ def View_Summary():
             download_report(account_mapping,"mapping to check inconsistence")
 
     reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names+["Total - Total"])]
-
-######################################
-    reporting_month_data.Category = reporting_month_data.Category.astype("category")
-    reporting_month_data.Category = reporting_month_data.Category.cat.set_categories(sorter)
-    reporting_month_data=reporting_month_data.sort_values(["Category"]) 
-    reporting_month_data = pd.concat([reporting_month_data.\
-             groupby(by='Category', as_index=False,observed=False).\
-	     sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).\
-	     sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
-
-    set_empty=list(reporting_month_data.columns)
-    set_empty.remove("Category")
-    set_empty.remove("Sabra_Account")
-    for i in range(reporting_month_data.shape[0]):
-        if reporting_month_data.loc[i,"Sabra_Account"]=="Total_Sabra":
-            reporting_month_data.loc[i,"Sabra_Account"]="Total - "+reporting_month_data.loc[i,'Category']
-            if reporting_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
-                reporting_month_data.loc[i,set_empty]=np.nan
-
 
 
 	
