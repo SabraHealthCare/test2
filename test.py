@@ -1391,6 +1391,11 @@ def View_Summary():
     reporting_month_data=reporting_month_data.sort_values(["Category"]) 
     #reporting_month_data_temp = reporting_month_data[~reporting_month_data["Sabra_Account"].str.contains("in P&L", na=False)]
 
+
+
+
+	
+    entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns
     reporting_month_data = pd.concat([reporting_month_data.\
              groupby(by='Category', as_index=False,observed=False).\
 	     sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).\
@@ -1407,11 +1412,6 @@ def View_Summary():
             reporting_month_data.loc[i,"Sabra_Account"]="Total - "+reporting_month_data.loc[i,'Category']
             if reporting_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 reporting_month_data.loc[i,set_empty]=np.nan
-
-
-	
-    entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns
-
 	
     PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
