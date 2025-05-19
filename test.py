@@ -1393,7 +1393,7 @@ def View_Summary():
              groupby(by='Category', as_index=False,observed=False).\
 	     sum().assign(Sabra_Account="Total_Sabra"), reporting_month_data]).\
 	     sort_values(by='Category', kind='stable', ignore_index=True)[reporting_month_data.columns]
-
+    st.write("reporting_month_data",reporting_month_data)
     set_empty=list(reporting_month_data.columns)
     set_empty.remove("Category")
     set_empty.remove("Sabra_Account")
@@ -1413,7 +1413,7 @@ def View_Summary():
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
     # DataFrame with all other rows
     PL_total = PL_total.drop(columns="Total")	 
-    stw.write("PL_total",PL_total)
+    st.write("PL_total",PL_total)
     value_column=list(entity_columns)
     
     if PL_total.shape[0]>0:
