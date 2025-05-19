@@ -1184,7 +1184,8 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
 	
     PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
                     PL.merge(main_account_mapping_filtered,   on="Tenant_Account", how="right")])
-    st.write("entity",entity,sheet_type,"PL mapping",PL)
+    if entity=="S02861":
+        st.write("entity",entity,sheet_type,"PL mapping",PL)
     #Remove blank or missing "Sabra_Account" values
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
     PL.dropna(subset=["Sabra_Account"], inplace=True)
@@ -1205,8 +1206,11 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
                 elif conv == "*monthdays":
                     PL.loc[idx, month] *= monthrange(int(str(month)[0:4]), int(str(month)[4:6]))[1]
                 elif conv.startswith("*"):
+
+
                     multiplier = float(conv.split("*")[1])
                     PL.loc[idx, month] *= multiplier
+                    st.write("PL.loc[idx, month]",PL.loc[idx, month])
                 else:
                     continue
         PL=PL.drop(["Conversion","Tenant_Account"], axis=1)
@@ -1231,10 +1235,13 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
         PL=PL.drop(["Conversion"], axis=1)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='ENTITY')     
         PL=PL.drop(["Tenant_Account"], axis=1)
-
+    if entity=="S02861":
+        st.write("entity",entity,sheet_type,"PL mapping",PL)
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first 
+    if entity=="S02861":
+        st.write("entity",entity,sheet_type,"PL mapping",PL)
     return PL   
 	
 @st.cache_data
@@ -1347,7 +1354,7 @@ def View_Summary():
     check_patient_days = reporting_month_data[
     ((reporting_month_data["Sabra_Account"].str.startswith("A_")) | 
      (reporting_month_data["Category"] == "Patient Days")) &
-    (~reporting_month_data["Sabra_Account"].str.startswith("Total_", na=False))]
+    (~reporting_month_data["Sabra_Account"].str.startswith("TOTAL_", na=False))]
     check_patient_days.loc[check_patient_days['Category'] == 'Facility Information', 'Category'] = 'Operating Beds'
     check_patient_days=check_patient_days[["Property_Name","Category",reporting_month]].groupby(["Property_Name","Category"]).sum()
     check_patient_days = check_patient_days.fillna(0).infer_objects(copy=False)
