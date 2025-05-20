@@ -1290,7 +1290,7 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category,account_fo
     # Create a new row for the difference
     st.write("diff_row",diff_row)
     st.write(["Delta"] + diff.flatten().tolist())
-    st.write("Sabra_Account" + value_column",["Sabra_Account"] + value_column)
+    st.write("Sabra_Account + value_column",["Sabra_Account"] + value_column)
     diff_row = pd.DataFrame(data=[["Delta"] + diff.flatten().tolist()],columns=["Sabra_Account"] + value_column)
 
     # Only keep values where abs(diff) > 10, else put np.nan
