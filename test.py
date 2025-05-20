@@ -1282,7 +1282,7 @@ def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
 def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category,account_forluma):
     global email_body
-    st.write("row1_PL,row2_Sabra",row1_PL,row2_Sabra)
+
     # Compute the difference (row1 - row2) for value_column
     diff = row1_PL[value_column].values - row2_Sabra[value_column].values
     # Create a new row for the difference
