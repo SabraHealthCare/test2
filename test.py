@@ -1337,7 +1337,6 @@ def Create_Account_Foluma(total_account):
 
 def View_Summary(): 
     global Total_PL,reporting_month_data,placeholder,email_body
-    
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
@@ -1418,6 +1417,8 @@ def View_Summary():
 	
     PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
+    
+    st.write("PL_total",PL_total,"reporting_month_data",reporting_month_data)
     # DataFrame with all other rows
     PL_total = PL_total.drop(columns="Total")	    
     value_column=list(entity_columns)
