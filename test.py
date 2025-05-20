@@ -1417,7 +1417,7 @@ def View_Summary():
 	
     PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
-    
+    PL_total = PL_total[PL_total["Total"] != 0]
     st.write("PL_total",PL_total,"reporting_month_data",reporting_month_data)
     # DataFrame with all other rows
     PL_total = PL_total.drop(columns="Total")	    
