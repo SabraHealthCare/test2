@@ -1285,6 +1285,7 @@ def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
 def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category,account_forluma):
     global email_body
+    st.write("row1_PL,row2_Sabra",row1_PL,row2_Sabra)
     # Compute the difference (row1 - row2) for value_column
     diff = row1_PL[value_column].values - row2_Sabra[value_column].values
     # Create a new row for the difference
@@ -1454,6 +1455,7 @@ def View_Summary():
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
             sabra_total_accounts = ["Total - Operating Expenses", "Total - Non-Operating Expenses", "Total - Management Fee"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"].isin(sabra_total_accounts)]
+
             # Sum the numeric columns across the filtered rows
             row2_Sabra = row2_Sabra.drop(columns=["Sabra_Account"]).sum().to_frame().T
             row2_Sabra.insert(0, "Sabra_Account", "Total - Expense")
