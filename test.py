@@ -1209,7 +1209,6 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
 
                     multiplier = float(conv.split("*")[1])
                     PL.loc[idx, month] *= multiplier
-                    st.write("PL.loc[idx, month]",PL.loc[idx, month])
                 else:
                     continue
         PL=PL.drop(["Conversion","Tenant_Account"], axis=1)
@@ -1230,7 +1229,7 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
                 PL.loc[idx, entity] *= multiplier
             else:
                 continue
-        st.write("PL",PL)  
+        #st.write("PL",PL)  
         PL=PL.drop(["Conversion"], axis=1)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='ENTITY')     
         PL=PL.drop(["Tenant_Account"], axis=1)
@@ -1238,7 +1237,7 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first 
-    st.write("PL",PL)  
+    #st.write("PL",PL)  
     return PL   
 	
 @st.cache_data
