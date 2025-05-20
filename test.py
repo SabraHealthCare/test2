@@ -1184,8 +1184,7 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
 	
     PL = pd.concat([PL.merge(second_account_mapping, on="Tenant_Account", how="right"),\
                     PL.merge(main_account_mapping_filtered,   on="Tenant_Account", how="right")])
-    if entity=="S02861":
-        st.write("entity",entity,sheet_type,"PL mapping",PL)
+
     #Remove blank or missing "Sabra_Account" values
     PL = PL[PL["Sabra_Account"].str.strip() != ""]
     PL.dropna(subset=["Sabra_Account"], inplace=True)
@@ -1235,13 +1234,11 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
         PL=PL.drop(["Conversion"], axis=1)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='ENTITY')     
         PL=PL.drop(["Tenant_Account"], axis=1)
-    if entity=="S02861":
-        st.write("entity",entity,sheet_type,"PL mapping",PL)
+  
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first 
-    if entity=="S02861":
-        st.write("entity",entity,sheet_type,"PL mapping",PL)
+
     return PL   
 	
 @st.cache_data
@@ -1289,9 +1286,7 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category,account_fo
     # Compute the difference (row1 - row2) for value_column
     diff = row1_PL[value_column].values - row2_Sabra[value_column].values
     # Create a new row for the difference
-    st.write("diff",diff)
-    st.write(["Delta"] + diff.flatten().tolist())
-    st.write("Sabra_Account + value_column",["Sabra_Account"] + value_column)
+   
     diff_row = pd.DataFrame(data=[["Delta"] + diff.flatten().tolist()],columns=["Sabra_Account"] + value_column)
 
     # Only keep values where abs(diff) > 10, else put np.nan
@@ -1452,7 +1447,7 @@ def View_Summary():
             if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total operating expense",account_string):
                 download_mapping=True
         if "Total Expense in P&L" in compare_metric:
-            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total OPEX in P&L"]
+            row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Expense in P&L"]
             sabra_total_accounts = ["Total - Operating Expenses", "Total - Non-Operating Expenses", "Total - Management Fee"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"].isin(sabra_total_accounts)]
 
