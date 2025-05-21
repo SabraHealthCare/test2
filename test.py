@@ -83,7 +83,7 @@ today= datetime.now(pytz.timezone('America/Los_Angeles')).date()
 current_year= today.year
 current_month= today.month
 current_day=today.day  
-operators_remove_hidden_rowcol=["Ignite","Recovery Centers of America"]#"Creative Solutions"
+operators_remove_hidden_rowcol=["Ignite","Recovery Centers of America","Nexus Systems"]#"Creative Solutions"
 
 # Acquire a token using client credentials flow
 app = ConfidentialClientApplication(
