@@ -1281,18 +1281,17 @@ def color_missing(data):
     return f'background-color: rgb(255, 204, 204);'
 def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category,account_forluma):
     global email_body
-
     # Compute the difference (row1 - row2) for value_column
     diff = row1_PL[value_column].values - row2_Sabra[value_column].values
     # Create a new row for the difference
    
-    diff_row = pd.DataFrame(data=[["Delta"] + diff.flatten().tolist()],columns=["Sabra_Account"] + value_column)
-
     # Only keep values where abs(diff) > 10, else put np.nan
     diff_flat = diff.flatten()
+    non_zero_indices = np.where(row1_PL[value_column].values.flatten() != 0)[0]
 
-    # Identify indices where abs difference > 10
+    # Identify indices where abs difference > 10 and total_xx is not 0(0 means there is no total account in P&L)
     significant_diff_indices = np.where(np.abs(diff_flat) > 10)[0]
+    significant_diff_indices = np.intersect1d(significant_diff_indices, non_zero_indices)
     if len(significant_diff_indices) > 0:
         delta_properties_columns = [value_column[i] for i in significant_diff_indices]
         columns_to_keep=["Sabra_Account"] + delta_properties_columns 
@@ -1417,7 +1416,7 @@ def View_Summary():
     PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
     PL_total = PL_total[PL_total["Total"] != 0]
-    st.write("PL_total",PL_total,"reporting_month_data",reporting_month_data)
+    
     # DataFrame with all other rows
     PL_total = PL_total.drop(columns="Total")	    
     value_column=list(entity_columns)
