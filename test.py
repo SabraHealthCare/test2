@@ -1191,7 +1191,7 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     # Conversion column
     PL = PL.reset_index(drop=True)
     conversion = PL["Conversion"].fillna(np.nan)
-    st.write("PL0",PL)  
+    
     if isinstance(entity, str):# one entity,  properties are in separate sheet
         month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
         #Convert all values in the PL to numeric, coercing non-numeric values to NaN. Fill NaN values with 0.
@@ -1238,7 +1238,7 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first 
-    st.write("PL",PL)  
+    #st.write("PL",PL)  
     return PL   
 	
 @st.cache_data
@@ -2090,12 +2090,12 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
             PL = PL.iloc[visible_rows, visible_cols]
             # Reset the column indices to be continuous (0, 1, 2, ...)
             PL.columns = range(len(PL.columns))  # Reindex columns
-    st.write("PL",PL)          
+    #st.write("PL",PL)          
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenant_account_col=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
         
-        st.write("tenant_account_col0",len(tenant_account_col),tenant_account_col)
+        #st.write("tenant_account_col0",len(tenant_account_col),tenant_account_col)
         if len(tenant_account_col) > 1:
             # Start with the first column
             tenant_account_col_values = PL.iloc[:, tenant_account_col[0]].fillna('')
@@ -2108,9 +2108,9 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
         elif len(tenant_account_col) == 1:
             tenant_account_col_values=PL.iloc[:, tenant_account_col[0]]
         tenant_account_col_values = tenant_account_col_values.apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
-        st.write("tenant_account_col_values",tenant_account_col_values)
+        #st.write("tenant_account_col_values",tenant_account_col_values)
         date_header=Identify_Month_Row(PL,tenant_account_col_values,tenant_account_col[0],sheet_name,sheet_type,date_header)
-        st.write("date_header",date_header)
+        #st.write("date_header",date_header)
         if len(date_header[0])==0:
             return pd.DataFrame()
         if all(x=="0" or x==0 for x in date_header[0]):
@@ -2193,7 +2193,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
         
         # Map PL accounts and Sabra account
         PL=Map_PL_Sabra(PL,entity_i,sheet_type,account_pool) 
-        st.write("after Map_PL_Sabr",PL)
+        #st.write("after Map_PL_Sabr",PL)
     return PL
        
 
