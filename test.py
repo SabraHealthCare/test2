@@ -1191,6 +1191,7 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     # Conversion column
     PL = PL.reset_index(drop=True)
     conversion = PL["Conversion"].fillna(np.nan)
+    st.write("PL0",PL)  
     if isinstance(entity, str):# one entity,  properties are in separate sheet
         month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
         #Convert all values in the PL to numeric, coercing non-numeric values to NaN. Fill NaN values with 0.
@@ -1233,11 +1234,11 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
         PL=PL.drop(["Conversion"], axis=1)
         PL = pd.melt(PL, id_vars=['Sabra_Account','Tenant_Account'], value_vars=entity, var_name='ENTITY')     
         PL=PL.drop(["Tenant_Account"], axis=1)
-  
+
     # group by Sabra_Account
     PL = PL.groupby(by=['ENTITY',"Sabra_Account"], as_index=True).sum()
     PL= PL.apply(Format_Value)    # do these two step, so Total_PL can use combine.first 
-    #st.write("PL",PL)  
+    st.write("PL",PL)  
     return PL   
 	
 @st.cache_data
