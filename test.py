@@ -2094,7 +2094,8 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
     # Start checking process
     with st.spinner("********Start to check facility—'"+property_name+"' in sheet '"+sheet_name+"'********"):
         tenant_account_col=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type_name,account_pool["Tenant_Account"],tenant_account_col)
-        #st.write("tenant_account_col0",tenant_account_col)
+        
+        st.write("tenant_account_col0",tenant_account_col)
         if len(tenant_account_col) > 1:
             # Start with the first column
             tenant_account_col_values = PL.iloc[:, tenant_account_col[0]].fillna('')
@@ -2107,9 +2108,9 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
         elif len(tenant_account_col) == 1:
             tenant_account_col_values=PL.iloc[:, tenant_account_col[0]]
         tenant_account_col_values = tenant_account_col_values.apply(lambda x: str(int(x)).strip().upper() if pd.notna(x) and isinstance(x, float) else (str(x).strip().upper() if pd.notna(x) else x))
-        #st.write("tenant_account_col_values",tenant_account_col_values)
+        st.write("tenant_account_col_values",tenant_account_col_values)
         date_header=Identify_Month_Row(PL,tenant_account_col_values,tenant_account_col[0],sheet_name,sheet_type,date_header)
-        #st.write("date_header",date_header)
+        st.write("date_header",date_header)
         if len(date_header[0])==0:
             return pd.DataFrame()
         if all(x=="0" or x==0 for x in date_header[0]):
@@ -2192,7 +2193,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
         
         # Map PL accounts and Sabra account
         PL=Map_PL_Sabra(PL,entity_i,sheet_type,account_pool) 
-        #st.write("after Map_PL_Sabr",PL)
+        st.write("after Map_PL_Sabr",PL)
     return PL
        
 
