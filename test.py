@@ -1416,10 +1416,9 @@ def View_Summary():
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
     missing_total_accounts_PL = PL_total[PL_total.drop(columns='Sabra_Account').eq(0).any(axis=1)]
     if not missing_total_accounts_PL.empty:
-    st.session_state.email_body_for_Sabra += f"""
+        st.session_state.email_body_for_Sabra += f"""
         "<p>Below properties are missing total accounts:</p>" +
-        missing_total_accounts_PL.to_html(index=False, escape=False)
-    """
+        missing_total_accounts_PL.to_html(index=False, escape=False)"""
     PL_total = PL_total[PL_total["Total"] != 0]
 
     # DataFrame with all other rows
@@ -1523,7 +1522,7 @@ def View_Summary():
 # no cache
 def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
     upload_reporting_month=Total_PL[reporting_month].reset_index(drop=False)
-    upload_reporting_month = upload_reporting_month[~upload_reporting_month['Sabra_Account'].isin(PL_total_names)]
+    upload_reporting_month = upload_reporting_month[~upload_reporting_month['Sabra_Account'].str.startswith("TOTAL_")]
     upload_reporting_month["TIME"]=reporting_month
     upload_reporting_month=upload_reporting_month.rename(columns={reporting_month:"Amount"})
     current_time = datetime.now(pytz.timezone('America/Los_Angeles')).strftime("%H:%M")
