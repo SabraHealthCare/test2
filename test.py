@@ -2439,7 +2439,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.session_state.clicked = button_initial_state
                     st.session_state.selected_year = selected_year
                     st.session_state.email_sent = False
-
+                    st.session_state.email_body_for_Sabra = ""
         elif BS_separate_excel=="Y":	 
             with st.form("upload_form", clear_on_submit=True):
                 st.subheader("Select reporting month:") 
@@ -2465,7 +2465,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     st.cache_resource.clear()
                     st.session_state.clicked = button_initial_state
                     st.session_state.selected_year = selected_year
-
+                    st.session_state.email_body_for_Sabra = ""
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
         if operator=="Ensign_Aspen":
