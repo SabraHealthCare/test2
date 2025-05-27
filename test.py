@@ -1285,7 +1285,7 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category,account_fo
     # Compute the difference (row1 - row2) for value_column
     diff = row1_PL[value_column].values - row2_Sabra[value_column].values
     # Create a new row for the difference
-   
+    st.write("row1_PL",row1_PL,"row2_Sabra",row2_Sabra,"diff",diff)
     # Only keep values where abs(diff) > 10, else put np.nan
     diff_flat = diff.flatten()
     non_zero_indices = np.where(row1_PL[value_column].values.flatten() != 0)[0]
