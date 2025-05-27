@@ -1414,9 +1414,10 @@ def View_Summary():
 	
     PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
-    st.write("PL_total1",PL_total)
+    filtered_df = PL_total[PL_total.drop(columns='Sabra_Account').eq(0).any(axis=1)]
+    st.write("PL_total1",PL_total,"filtered_df",filtered_df)
     PL_total = PL_total[PL_total["Total"] != 0]
-    st.write("PL_total2",PL_total)
+
     
     # DataFrame with all other rows
     PL_total = PL_total.drop(columns="Total")	    
