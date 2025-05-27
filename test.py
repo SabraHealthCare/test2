@@ -1191,7 +1191,7 @@ def Map_PL_Sabra(PL,entity,sheet_type,account_pool):
     # Conversion column
     PL = PL.reset_index(drop=True)
     conversion = PL["Conversion"].fillna(np.nan)
-    st.write("PL",PL) 
+    #st.write("PL",PL) 
     if isinstance(entity, str):# one entity,  properties are in separate sheet
         month_cols=list(filter(lambda x:str(x[0:2])=="20",PL.columns))
         #Convert all values in the PL to numeric, coercing non-numeric values to NaN. Fill NaN values with 0.
@@ -1285,7 +1285,7 @@ def Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,category,account_fo
     # Compute the difference (row1 - row2) for value_column
     diff = row1_PL[value_column].values - row2_Sabra[value_column].values
     # Create a new row for the difference
-    st.write("row1_PL",row1_PL,"row2_Sabra",row2_Sabra,"diff",diff)
+    #st.write("row1_PL",row1_PL,"row2_Sabra",row2_Sabra,"diff",diff)
     # Only keep values where abs(diff) > 10, else put np.nan
     diff_flat = diff.flatten()
     non_zero_indices = np.where(row1_PL[value_column].values.flatten() != 0)[0]
@@ -1407,8 +1407,6 @@ def View_Summary():
             reporting_month_data.loc[i,"Sabra_Account"]="Total - "+reporting_month_data.loc[i,'Category']
             if reporting_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 reporting_month_data.loc[i,set_empty]=np.nan
-
-
 	
     entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
@@ -1416,7 +1414,9 @@ def View_Summary():
 	
     PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
+    st.write("PL_total1",PL_total)
     PL_total = PL_total[PL_total["Total"] != 0]
+    st.write("PL_total2",PL_total)
     
     # DataFrame with all other rows
     PL_total = PL_total.drop(columns="Total")	    
