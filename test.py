@@ -2579,6 +2579,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             elif len(Total_PL.columns)>1 and BPC_pull.shape[0]>0:  # there are previous months in P&L
                 diff_BPC_PL=Compare_PL_Sabra(Total_PL,reporting_month)
 
+
+
+            upload_reporting_month1=Total_PL[reporting_month].reset_index(drop=False)
+            st.write("upload_reporting_month1",upload_reporting_month1)
+            upload_reporting_month1 = upload_reporting_month1[~upload_reporting_month1['Sabra_Account'].str.startswith("TOTAL_")]
+            st.write("upload_reporting_month1",upload_reporting_month1)
+		
 	    # 1 Summary
             total_email_body=View_Summary()
             # Define the button and handle the click event
