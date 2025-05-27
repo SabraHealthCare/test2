@@ -1415,7 +1415,7 @@ def View_Summary():
     PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
     missing_total_accounts_PL = PL_total[PL_total.drop(columns='Sabra_Account').eq(0).any(axis=1)]
-    st.write("missing_total_accounts_PL",missing_total_accounts_PL)
+    
     if not missing_total_accounts_PL.empty:
         st.session_state.email_body_for_Sabra += f"""
         <p>Below properties are missing total accounts:</p>
