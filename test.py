@@ -1414,11 +1414,14 @@ def View_Summary():
 	
     PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
     PL_total = reporting_month_data[reporting_month_data["Sabra_Account"].isin(PL_total_names)]
-    filtered_df = PL_total[PL_total.drop(columns='Sabra_Account').eq(0).any(axis=1)]
-    st.write("PL_total1",PL_total,"filtered_df",filtered_df)
+    missing_total_accounts_PL = PL_total[PL_total.drop(columns='Sabra_Account').eq(0).any(axis=1)]
+    if not missing_total_accounts_PL.empty:
+    st.session_state.email_body_for_Sabra += f"""
+        "<p>Below properties are missing total accounts:</p>" +
+        missing_total_accounts_PL.to_html(index=False, escape=False)
+    """
     PL_total = PL_total[PL_total["Total"] != 0]
 
-    
     # DataFrame with all other rows
     PL_total = PL_total.drop(columns="Total")	    
     value_column=list(entity_columns)
@@ -1558,7 +1561,7 @@ def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
 
     if not st.session_state.email_sent:
         receiver_email_list= ["sli@sabrahealth.com"]   
-        #Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body) 
+        Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body) 
         
         if email_body!="" or st.session_state.email_body_for_Sabra!="":
             Send_Confirmation_Email(["sli@sabrahealth.com"], "!!! Issues for {} {} reporting".format(operator,reporting_month_display), email_body+st.session_state.email_body_for_Sabra)    
