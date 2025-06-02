@@ -1803,10 +1803,10 @@ def Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_n
 
     # Create a boolean mask using a list comprehension
     tenant_account_row_mask = [account in accounts_to_map for account in tenant_account_col_values]
-    #st.write("tenant_account_row_mask",tenant_account_row_mask)	
+    st.write("tenant_account_row_mask",tenant_account_row_mask)	
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
-    #st.write("first_tenant_account_row",first_tenant_account_row)
+    st.write("first_tenant_account_row",first_tenant_account_row)
     month_mask=[]
     # search the row with property column names	
     for row_i in range(first_tenant_account_row):
