@@ -926,15 +926,12 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
 
     # there is no month/year in PL
     elif len(candidate_date)==0: 
-        #st.write("there is no month/year in PL in sheet",sheet_name)
 	#  more than one column contain numeric data without any month date header
         if len(valid_col_index) > 1: 
-            #st.write("valid_col_index",valid_col_index,"PL",PL,"first_tenant_account_row",first_tenant_account_row)
             # search "current month" as reporting month
             current_month_cols=[]
 
             for col_i in valid_col_index:
-
                 column = PL.iloc[0:first_tenant_account_row, col_i].reset_index(drop=True)
                 if column.astype(str).str.contains('current month|current period|mtd|current', case=False, na=False).any():
                     current_month_cols.append(col_i)
@@ -1801,10 +1798,10 @@ def Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_n
 
     # Create a boolean mask using a list comprehension
     tenant_account_row_mask = [account in accounts_to_map for account in tenant_account_col_values]
-    st.write("tenant_account_row_mask",tenant_account_row_mask)	
+    #st.write("tenant_account_row_mask",tenant_account_row_mask)	
     #first_tenant_account_row is the row number for the first tenant account (except for no need to map)
     first_tenant_account_row=tenant_account_row_mask.index(max(tenant_account_row_mask))
-    st.write("first_tenant_account_row",first_tenant_account_row)
+    #st.write("first_tenant_account_row",first_tenant_account_row)
     month_mask=[]
     # search the row with property column names	
     for row_i in range(first_tenant_account_row):
@@ -2002,10 +1999,9 @@ def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,she
         PL.index=map(lambda x:str(x).upper().strip(),PL.index)
         PL=PL.map(lambda x: 0 if pd.isna(x) or isinstance(x, str) or x!=x or x==" " else x)	    
         # don't removes all nan/0, because some property may have no data and need to keep empty
-        #PL=PL.loc[:,(PL!= 0).any(axis=0)]
         # remove rows with all nan/0 value
-        #PL=PL.loc[(PL!= 0).any(axis=1),:]
-        PL = PL.loc[~PL.apply(lambda x: x.isna().all() or (x.fillna(0) == 0).all(), axis=1)]
+        PL = PL.loc[~PL.apply(lambda x: all(pd.isna(v) or v == 0 or isinstance(v, str) for v in x), axis=1)]
+
         #st.write("PL before mapping1",PL)	
         # mapping new tenant accounts
         new_tenant_account_list=list(filter(lambda x: str(x).upper().strip() not in list(account_mapping["Tenant_Account"]),PL.index))
@@ -2144,16 +2140,14 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
 
 	#set tenant_account_col_values as index of PL
         PL = PL.set_index(tenant_account_col_values)  
-        st.write("PL1",PL,"date_header[0],date_header[1],date_header[2]",date_header[0],date_header[1],date_header[2])
         #remove row above date, to prevent to map these value as new accounts
         PL=PL.iloc[date_header[1]+1:,:]
-        st.write("PL2",PL)
 	#remove rows with nan tenant account
         nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x!=x or x==0 ,PL.index))
         PL.drop(nan_index, inplace=True)
         #set index as str ,strip,upper
         PL.index=map(lambda x:str(x).strip().upper(),PL.index)
-        st.write("process PL1",PL)    
+        #st.write("process PL",PL)    
         # filter columns with month_select
         selected_month_columns = [val in select_months_list for val in date_header[0]]
         #st.write("selected_month_columns",selected_month_columns)
@@ -2167,9 +2161,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
         PL = PL.loc[~PL.apply(lambda x: all(pd.isna(v) or v == 0 or isinstance(v, str) for v in x), axis=1)]
 
 	# mapping new tenant accounts
-        st.write("PL.index",PL.index) 
         new_tenant_account_list=list(filter(lambda x: x not in list(account_mapping["Tenant_Account"]),PL.index))
-        st.write("new_tenant_account_list",new_tenant_account_list       ) 
         new_tenant_account_list=list(set(new_tenant_account_list))    
         if len(new_tenant_account_list)>0:
             Manage_Account_Mapping(new_tenant_account_list,sheet_name,sheet_type_name)   
@@ -2589,7 +2581,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 diff_BPC_PL=Compare_PL_Sabra(Total_PL,reporting_month)
 
 
-		
+	
 	    # 1 Summary
             total_email_body=View_Summary()
             # Define the button and handle the click event
