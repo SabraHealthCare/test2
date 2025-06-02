@@ -2146,8 +2146,10 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
 
 	#set tenant_account_col_values as index of PL
         PL = PL.set_index(tenant_account_col_values)  
+        st.write("PL1",PL,"date_header",date_header)
         #remove row above date, to prevent to map these value as new accounts
         PL=PL.iloc[date_header[1]+1:,:]
+        st.write("PL2",PL)
 	#remove rows with nan tenant account
         nan_index=list(filter(lambda x:pd.isna(x) or x=="nan" or x=="" or x==" " or x!=x or x==0 ,PL.index))
         PL.drop(nan_index, inplace=True)
