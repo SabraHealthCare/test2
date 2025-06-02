@@ -926,14 +926,18 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
 
     # there is no month/year in PL
     elif len(candidate_date)==0: 
+        st.write("there is no month/year in PL")
 	#  more than one column contain numeric data without any month date header
         if len(valid_col_index) > 1: 
             # search "current month" as reporting month
             current_month_cols=[]
 
             for col_i in valid_col_index:
+
                 column = PL.iloc[0:first_tenant_account_row, col_i].reset_index(drop=True)
+                st.write("col_i",col_i,column)
                 if column.astype(str).str.contains('current month|current period|mtd|current', case=False, na=False).any():
+                    st.write("it containds")
                     current_month_cols.append(col_i)
                     current_month_rows = column.index[column.astype(str).str.contains(r'(current month|current period|mtd|current)', case=False, na=False)][0]
                 elif sheet_type=="Sheet_Name_Occupancy" and column.astype(str).str.contains('#\\s*of\\s*days|total', case=False, na=False).any():
