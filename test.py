@@ -926,9 +926,10 @@ def Identify_Month_Row(PL,tenant_account_col_values,tenantAccount_col_no,sheet_n
 
     # there is no month/year in PL
     elif len(candidate_date)==0: 
-        st.write("there is no month/year in PL")
+        st.write("there is no month/year in PL in sheet",sheet_name)
 	#  more than one column contain numeric data without any month date header
         if len(valid_col_index) > 1: 
+            st.write("valid_col_index",valid_col_index,"PL",PL,"first_tenant_account_row",first_tenant_account_row)
             # search "current month" as reporting month
             current_month_cols=[]
 
