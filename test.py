@@ -2144,7 +2144,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
 
 	#set tenant_account_col_values as index of PL
         PL = PL.set_index(tenant_account_col_values)  
-        st.write("PL1",PL,"date_header",date_header)
+        st.write("PL1",PL,"date_header[0],date_header[1],date_header[2]",date_header[0],date_header[1],date_header[2])
         #remove row above date, to prevent to map these value as new accounts
         PL=PL.iloc[date_header[1]+1:,:]
         st.write("PL2",PL)
