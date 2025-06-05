@@ -74,7 +74,7 @@ master_template_path="Documents/Tenant Monthly Uploading/Master Template"
 SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with scheme
 SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full site URL
 sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
-sharepoint_password = "June2022SL!"
+sharepoint_password = "June2023SL!"
 email_body=""
 if "email_body_for_Sabra" not in st.session_state:
     st.session_state.email_body_for_Sabra = ""  # only email these info to sabra
@@ -2471,7 +2471,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
         if operator=="Ensign_Aspen":
-            SHAREPOINT_FOLDER = "Asset Management/01_Operators/Ensign/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(str(selected_year), month_map[selected_month], selected_month)  
+            SHAREPOINT_FOLDER = "Asset Management/01_Operators/Ensign/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(str(selected_year), month_map[selected_month], selected_month) 
+
+	    
         else:
             SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator, str(selected_year), month_map[selected_month], selected_month)  
       
