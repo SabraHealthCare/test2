@@ -2468,9 +2468,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         reporting_month_display=str(selected_month)+" "+str(selected_year)
         reporting_month=str(selected_year)+month_map[selected_month]
         if operator=="Ensign_Aspen":
-            SHAREPOINT_FOLDER = "Asset Management/01_Operators/Ensign/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(str(selected_year), month_map[selected_month], selected_month) 
-
-	    
+            SHAREPOINT_FOLDER = "Asset Management/01_Operators/Ensign/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(str(selected_year), month_map[selected_month], selected_month)  
         else:
             SHAREPOINT_FOLDER = "Asset Management/01_Operators/{}/Financials & Covenant Analysis/_Facility Financials/{}/.{} {}".format(operator, str(selected_year), month_map[selected_month], selected_month)  
       
