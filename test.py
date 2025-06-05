@@ -97,10 +97,7 @@ headers = {'Authorization': 'Bearer ' + access_token,}
 
 account_mapping_str_col=["Tenant_Account",]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
-SHAREPOINT_URL = "https://sabrahealthcare.sharepoint.com"  # Full URL with scheme
-SHAREPOINT_SITE = "https://sabrahealthcare.sharepoint.com/sites/S-Cloud"  # Full site URL
-sharepoint_username = "sli@sabrahealth.com"  # Replace with your SharePoint username
-sharepoint_password = "June2022SL!"
+
 
 def Upload_To_Sharepoint(files, sharepoint_folder,new_file_names):
     try:
