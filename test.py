@@ -1465,9 +1465,6 @@ def View_Summary():
             download_report(account_mapping,"mapping to check inconsistence")
 
     reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names+["Total - Total"])]
-
-
-	
 	
     placeholder = st.empty()
     placeholder.markdown("""
@@ -1502,7 +1499,8 @@ def View_Summary():
                           "Total - Patient Days", 
                           "Total - Revenue", 
                           "Total - Operating Expenses", 
-                          "Total - Non-Operating Expenses"
+                          "Total - Non-Operating Expenses",
+			  "Total - Management Fee"	  
                           ])) |
                           ((reporting_month_data["Sabra_Account"].str.startswith("Operating Beds-")) & 
                           (reporting_month_data["Total"].notna()) &  # Ensures "Total" is not NaN
