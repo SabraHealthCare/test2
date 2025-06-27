@@ -1334,7 +1334,7 @@ def Create_Account_Foluma(total_account):
 def View_Summary(): 
     global Total_PL,reporting_month_data,placeholder,email_body
     def highlight_total(df):
-        return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") or df.Sabra_Account.startswith("EBITDARM ") else ''*len(df)
+        return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") or df.Sabra_Account.startswith("EBITDARM") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
 
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
