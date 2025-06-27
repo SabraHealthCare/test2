@@ -1407,9 +1407,9 @@ def View_Summary():
 
     reporting_month_data = reporting_month_data.set_index("Sabra_Account")
     reporting_month_data.drop(columns=["Category"], inplace=True)
-	
+    st.write(reporting_month_data)
     # Calculate DARM
-    EBITDARM = reporting_month_data.loc["Total Revenue"] - reporting_month_data.loc["Total Operating Expenses"]
+    EBITDARM = reporting_month_data.loc["Total - Revenue"] - reporting_month_data.loc["Total - Operating Expenses"]
 
     # Convert it into a DataFrame row
     EBITDARM_row = pd.DataFrame([EBITDARM], index=["EBITDARM"])
