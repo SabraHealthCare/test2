@@ -1415,11 +1415,16 @@ def View_Summary():
     EBITDARM_row = pd.DataFrame([EBITDARM], index=["EBITDARM"])
     EBITDARM_row.index.name = "Sabra_Account"
 
-    # Reinsert index as column for final output
-    reporting_month_data = pd.concat([
-        reporting_month_data.loc[:'Total - Non-Operating Expenses'].iloc[:-1],
-        EBITDARM_row,
-        reporting_month_data.loc['Total - Non-Operating Expenses':]])
+    if "Total - Non-Operating Expenses" in reporting_month_data.index:
+        # Insert above 'Total - Non-Operating Expenses'
+        reporting_month_data = pd.concat([
+            reporting_month_data.loc[:'Total - Non-Operating Expenses'].iloc[:-1],
+            EBITDARM_row,
+            reporting_month_data.loc['Total - Non-Operating Expenses':]])
+    else:
+        # Append to the bottom
+        reporting_month_data = pd.concat([reporting_month_data, EBITDARM_row])
+
 
     # Reset index to have "Sabra_Account" as a column again
     entity_columns=reporting_month_data.columns
