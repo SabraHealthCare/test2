@@ -1334,7 +1334,7 @@ def Create_Account_Foluma(total_account):
 def View_Summary(): 
     global Total_PL,reporting_month_data,placeholder,email_body
     def highlight_total(df):
-        return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") else ''*len(df)
+        return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ") or df.Sabra_Account.startswith("EBITDARM ") else ''*len(df)
     Total_PL = Total_PL.fillna(0).infer_objects(copy=False)
 
     reporting_month_data=Total_PL[reporting_month].reset_index(drop=False)
@@ -1416,7 +1416,10 @@ def View_Summary():
     EBITDARM_row.index.name = "Sabra_Account"
 
     # Reinsert index as column for final output
-    reporting_month_data = pd.concat([reporting_month_data.loc[:'Total - Operating Expenses'], EBITDARM_row, reporting_month_data.loc['Total - Operating Expenses':].iloc[1:]])
+    reporting_month_data = pd.concat([
+        reporting_month_data.loc[:'Total - Non-Operating Expenses'].iloc[:-1],
+        EBITDARM_row,
+        reporting_month_data.loc['Total - Non-Operating Expenses':]])
 
     # Reset index to have "Sabra_Account" as a column again
     entity_columns=reporting_month_data.columns
