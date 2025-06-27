@@ -1415,7 +1415,7 @@ def View_Summary():
     EBITDARM_row = pd.DataFrame([EBITDARM], index=["EBITDARM"])
 
     # Reinsert index as column for final output
-    reporting_month_data = pd.concat([reporting_month_data.loc[:'Total Operating Expenses'], EBITDARM_row, df.loc['Total Operating Expenses':].iloc[1:]])
+    reporting_month_data = pd.concat([reporting_month_data.loc[:'Total - Operating Expenses'], EBITDARM_row, df.loc['Total - Operating Expenses':].iloc[1:]])
 
     # Reset index to have "Sabra_Account" as a column again
     reporting_month_data = reporting_month_data.reset_index()
