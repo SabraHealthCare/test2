@@ -1406,7 +1406,7 @@ def View_Summary():
                 reporting_month_data.loc[i,set_empty]=np.nan
 
     reporting_month_data = reporting_month_data.set_index("Sabra_Account")
-    df.drop(columns=["Category"], inplace=True)
+    reporting_month_data.drop(columns=["Category"], inplace=True)
 	
     # Calculate DARM
     EBITDARM = reporting_month_data.loc["Total Revenue"] - reporting_month_data.loc["Total Operating Expenses"]
