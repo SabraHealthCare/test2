@@ -1418,14 +1418,9 @@ def View_Summary():
     reporting_month_data = pd.concat([reporting_month_data.loc[:'Total - Operating Expenses'], EBITDARM_row, reporting_month_data.loc['Total - Operating Expenses':].iloc[1:]])
 
     # Reset index to have "Sabra_Account" as a column again
+    entity_columns=reporting_month_data.columns
     reporting_month_data = reporting_month_data.reset_index()
-
-    #entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns
-    st.write(reporting_month_data.dtypes)
-    reporting_month_data = reporting_month_data.apply(pd.to_numeric, errors='coerce')
-    reporting_month_data["Total"] = reporting_month_data.sum(axis=1)
-
-    reporting_month_data = reporting_month_data.reset_index()
+    reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
     reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
 	
     PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
