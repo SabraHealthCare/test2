@@ -1421,8 +1421,7 @@ def View_Summary():
     reporting_month_data = reporting_month_data.reset_index()
 
     #entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns
-
-    reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
+    reporting_month_data["Total"] = reporting_month_data.sum(axis=1)
     reporting_month_data = reporting_month_data.reset_index()
     reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
 	
