@@ -1407,7 +1407,7 @@ def View_Summary():
 
     reporting_month_data = reporting_month_data.set_index("Sabra_Account")
     reporting_month_data.drop(columns=["Category"], inplace=True)
-    st.write(reporting_month_data)
+
     # Calculate DARM
     EBITDARM = reporting_month_data.loc["Total - Revenue"] - reporting_month_data.loc["Total - Operating Expenses"]
 
@@ -1419,8 +1419,9 @@ def View_Summary():
 
     # Reset index to have "Sabra_Account" as a column again
     entity_columns=reporting_month_data.columns
-    reporting_month_data = reporting_month_data.reset_index()
+    reporting_month_data = reporting_month_data.reset_index(drop=False)
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
+    st.write(reporting_month_data)
     reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
 	
     PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
