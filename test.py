@@ -1404,9 +1404,26 @@ def View_Summary():
             reporting_month_data.loc[i,"Sabra_Account"]="Total - "+reporting_month_data.loc[i,'Category']
             if reporting_month_data.loc[i,'Category'] in ["Facility Information","Additional Statistical Information","Balance Sheet"]:                
                 reporting_month_data.loc[i,set_empty]=np.nan
+
+    reporting_month_data = reporting_month_data.set_index("Sabra_Account")
+    df.drop(columns=["Category"], inplace=True)
 	
-    entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
+    # Calculate DARM
+    EBITDARM = reporting_month_data.loc["Total Revenue"] - reporting_month_data.loc["Total Operating Expenses"]
+
+    # Convert it into a DataFrame row
+    EBITDARM_row = pd.DataFrame([EBITDARM], index=["EBITDARM"])
+
+    # Reinsert index as column for final output
+    reporting_month_data = pd.concat([reporting_month_data.loc[:'Total Operating Expenses'], EBITDARM_row, df.loc['Total Operating Expenses':].iloc[1:]])
+
+    # Reset index to have "Sabra_Account" as a column again
+    reporting_month_data = reporting_month_data.reset_index()
+
+    #entity_columns=reporting_month_data.drop(["Sabra_Account","Category"],axis=1).columns
+
     reporting_month_data["Total"] = reporting_month_data[entity_columns].sum(axis=1)
+    reporting_month_data = reporting_month_data.reset_index()
     reporting_month_data=reporting_month_data[["Sabra_Account","Total"]+list(entity_columns)]
 	
     PL_total_names=["Total Patient Days in P&L","Total Revenue in P&L","Total OPEX in P&L","Total Expense in P&L"]
@@ -1434,6 +1451,8 @@ def View_Summary():
             account_string=Create_Account_Foluma(total_account)
             if Compare_Total_with_Total(row1_PL,row2_Sabra,value_column,"total patient days",account_string):
                 download_mapping=True
+
+            
         if "Total Revenue in P&L" in compare_metric:
             row1_PL = PL_total[PL_total["Sabra_Account"] == "Total Revenue in P&L"]
             row2_Sabra = reporting_month_data[reporting_month_data["Sabra_Account"] == "Total - Revenue"]
@@ -1465,7 +1484,7 @@ def View_Summary():
             download_report(account_mapping,"mapping to check inconsistence")
 
     reporting_month_data = reporting_month_data[~reporting_month_data["Sabra_Account"].isin(PL_total_names+["Total - Total"])]
-	
+
     placeholder = st.empty()
     placeholder.markdown("""
             <div style="background-color: #fff1ad; padding: 10px; border-radius: 5px;">
@@ -1500,7 +1519,8 @@ def View_Summary():
                           "Total - Revenue", 
                           "Total - Operating Expenses", 
                           "Total - Non-Operating Expenses",
-			  "Total - Management Fee"	  
+			  "EBITDARM",
+                          "Total - Management Fee"  
                           ])) |
                           ((reporting_month_data["Sabra_Account"].str.startswith("Operating Beds-")) & 
                           (reporting_month_data["Total"].notna()) &  # Ensures "Total" is not NaN
@@ -1921,6 +1941,7 @@ def Identify_Column_Name_Header(PL,tenant_account_col_values,entity_list,sheet_n
 # no cache
 def Read_Clean_PL_Multiple(entity_list,sheet_type,uploaded_file,account_pool,sheet_name):  
     global tenant_account_col
+    #st.write("tenant_account_col",tenant_account_col)
     #st.write("account_mapping",account_mapping)
     #check if sheet names in list are same, otherwise, ask user to select correct sheet name.
     #st.write("sheet_type",sheet_type,"account_pool","account_pool",sheet_name)
@@ -2200,7 +2221,7 @@ def Read_Clean_PL_Single(entity_i,sheet_type,uploaded_file,wb,account_pool):
 
 # no cache
 def Upload_And_Process(uploaded_file,wb,file_type):
-    global  tenant_account_col
+    global tenant_account_col
     Total_PL=pd.DataFrame()
     #Total_PL_detail=pd.DataFrame()
     total_entity_list=list(entity_mapping.index)
