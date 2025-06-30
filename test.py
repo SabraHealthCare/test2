@@ -101,7 +101,7 @@ account_mapping_str_col=["Tenant_Account",]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
 
 
-def Upload_To_Sharepoint(files, sharepoint_folder,new_file_names):
+def Upload_To_Sharepoint(files, sharepoint_folder, new_file_names):
     try:
         # Authenticate with SharePoint
         authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
@@ -113,17 +113,27 @@ def Upload_To_Sharepoint(files, sharepoint_folder,new_file_names):
 
         for i, file in enumerate(files):
             new_file_name = new_file_names[i]
-            try:
-                # Read file content in binary
-                file_content = file.read()
-                
-                # Upload file directly from memory
-                sharepoint_folder_obj.upload_file(file_content, new_file_name)
+            temp_file_path = os.path.join(".", new_file_name)
+
+            try:   
+                # Save uploaded file temporarily
+                with open(temp_file_path, "wb") as f:
+                    f.write(file.getbuffer())
+
+                # Upload to SharePoint
+                with open(temp_file_path, "rb") as file_content:
+                    sharepoint_folder.upload_file(file_content, new_file_name)
 
                 success_files.append(file.name)
-            except Exception as upload_error:
-                print(f"Upload failed for {file.name}: {upload_error}")
+
+            except Exception as inner_error:
+                print(f"[UPLOAD ERROR] {file.name} failed: {inner_error}")
                 failed_files.append(file.name)
+
+            finally:
+                # Always try to delete temp file
+                if os.path.exists(temp_file_path):
+                    os.remove(temp_file_path)
 
         if len(success_files) == len(files):
             return True, success_files
@@ -131,9 +141,8 @@ def Upload_To_Sharepoint(files, sharepoint_folder,new_file_names):
             return False, failed_files
 
     except Exception as e:
-        print(f"Authentication or overall failure: {e}")
+        print(f"[AUTH ERROR] SharePoint authentication or connection failed: {e}")
         return False, []
-
 
  
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
