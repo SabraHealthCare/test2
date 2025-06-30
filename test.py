@@ -127,7 +127,7 @@ def Upload_To_Sharepoint(files, sharepoint_folder, new_file_names):
                 success_files.append(file.name)
 
             except Exception as inner_error:
-                print(f"[UPLOAD ERROR] {file.name} failed: {inner_error}")
+                st.write(f"[UPLOAD ERROR] {file.name} failed: {inner_error}")
                 failed_files.append(file.name)
 
             finally:
@@ -141,7 +141,7 @@ def Upload_To_Sharepoint(files, sharepoint_folder, new_file_names):
             return False, failed_files
 
     except Exception as e:
-        print(f"[AUTH ERROR] SharePoint authentication or connection failed: {e}")
+        st.write(f"[AUTH ERROR] SharePoint authentication or connection failed: {e}")
         return False, []
 
  
