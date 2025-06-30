@@ -101,19 +101,27 @@ account_mapping_str_col=["Tenant_Account",]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
 
 
+def sanitize_filename(filename):
+    """Sanitize filename for SharePoint (removes or replaces special characters)"""
+    filename = filename.replace("'", "")  # Remove apostrophes
+    filename = filename.replace("&", "and")  # Replace &
+    filename = re.sub(r"[#%*:<>\?/\\{|}\"\.]+", "", filename)  # Remove other unsafe chars (optional)
+    return filename
+
 def Upload_To_Sharepoint(files, sharepoint_folder, new_file_names):
     try:
         # Authenticate with SharePoint
         authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
 
-        sharepoint_folder = site.Folder(sharepoint_folder)
+        sharepoint_folder_obj = site.Folder(sharepoint_folder)
         success_files = []
         failed_files = []  
 
         for i, file in enumerate(files):
-            new_file_name = new_file_names[i]
-            temp_file_path = os.path.join(".", new_file_name)
+            original_name = new_file_names[i]
+            safe_name = sanitize_filename(original_name)  # Sanitize for SharePoint
+            temp_file_path = os.path.join(".", safe_name)
 
             try:   
                 # Save uploaded file temporarily
@@ -122,16 +130,14 @@ def Upload_To_Sharepoint(files, sharepoint_folder, new_file_names):
 
                 # Upload to SharePoint
                 with open(temp_file_path, "rb") as file_content:
-                    sharepoint_folder.upload_file(file_content, new_file_name)
+                    sharepoint_folder_obj.upload_file(file_content, safe_name)
 
                 success_files.append(file.name)
 
-            except Exception as inner_error:
-                st.write(f"[UPLOAD ERROR] {file.name} failed: {inner_error}")
+            except:
                 failed_files.append(file.name)
 
             finally:
-                # Always try to delete temp file
                 if os.path.exists(temp_file_path):
                     os.remove(temp_file_path)
 
@@ -140,8 +146,7 @@ def Upload_To_Sharepoint(files, sharepoint_folder, new_file_names):
         else:
             return False, failed_files
 
-    except Exception as e:
-        st.write(f"[AUTH ERROR] SharePoint authentication or connection failed: {e}")
+    except:
         return False, []
 
  
