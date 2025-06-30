@@ -107,33 +107,31 @@ def Upload_To_Sharepoint(files, sharepoint_folder,new_file_names):
         authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
 
-        sharepoint_folder_obj  = site.Folder(sharepoint_folder)
+        sharepoint_folder = site.Folder(sharepoint_folder)
         success_files = []
         failed_files = []  
-  
-        for i,file in enumerate(files):
+        i=0
+        for file in files:
             new_file_name=new_file_names[i]
-            temp_file_path = os.path.join(".", new_file_name)
+            i+=1
             try:   
+                temp_file_path = os.path.join(".", file.name)
                 with open(temp_file_path, "wb") as f:
-                    f.write(file.read()) 
-                # Upload the file to sharepoint
+                    f.write(file.getbuffer())
+                # Upload the file
                 with open(temp_file_path, "rb") as file_content:
                     sharepoint_folder.upload_file(file_content, new_file_name) 
                 success_files.append(file.name)
             except:
                 failed_files.append(file.name)
-
-            finally:
-                # Always try to remove the temp file
-                if os.path.exists(temp_file_path):
-                    os.remove(temp_file_path)
-
+                
+        # Clean up
+        os.remove(temp_file_path)
         if len(success_files) == len(files):
             return True,success_files
         else:
             return False, failed_files
-    except:
+    except Exception as e:
         return False,[]
  
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
