@@ -110,29 +110,31 @@ def Upload_To_Sharepoint(files, sharepoint_folder,new_file_names):
         sharepoint_folder = site.Folder(sharepoint_folder)
         success_files = []
         failed_files = []  
-        i=0
-        for file in files:
-            new_file_name=new_file_names[i]
-            i+=1
-            try:   
-                temp_file_path = os.path.join(".", file.name)
-                with open(temp_file_path, "wb") as f:
-                    f.write(file.getbuffer())
-                # Upload the file
-                with open(temp_file_path, "rb") as file_content:
-                    sharepoint_folder.upload_file(file_content, new_file_name) 
-                success_files.append(file.name)
-            except:
-                failed_files.append(file.name)
+
+        for i, file in enumerate(files):
+            new_file_name = new_file_names[i]
+            try:
+                # Read file content in binary
+                file_content = file.read()
                 
-        # Clean up
-        os.remove(temp_file_path)
+                # Upload file directly from memory
+                sharepoint_folder_obj.upload_file(file_content, new_file_name)
+
+                success_files.append(file.name)
+            except Exception as upload_error:
+                print(f"Upload failed for {file.name}: {upload_error}")
+                failed_files.append(file.name)
+
         if len(success_files) == len(files):
-            return True,success_files
+            return True, success_files
         else:
             return False, failed_files
+
     except Exception as e:
-        return False,[]
+        print(f"Authentication or overall failure: {e}")
+        return False, []
+
+
  
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
     username = 'sabrahealth.com'  
