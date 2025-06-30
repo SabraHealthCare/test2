@@ -32,6 +32,8 @@ import streamlit as st
 from shareplum import Site
 from shareplum import Office365
 from shareplum.site import Version
+from office365.runtime.auth.authentication_context import AuthenticationContext
+from office365.sharepoint.client_context import ClientContext
 import os
 import random
 
@@ -105,31 +107,33 @@ def Upload_To_Sharepoint(files, sharepoint_folder,new_file_names):
         authcookie = Office365(SHAREPOINT_URL, username=sharepoint_username, password=sharepoint_password).GetCookies()
         site = Site(SHAREPOINT_SITE, version=Version.v365, authcookie=authcookie)
 
-        sharepoint_folder = site.Folder(sharepoint_folder)
+        sharepoint_folder_obj  = site.Folder(sharepoint_folder)
         success_files = []
         failed_files = []  
-        i=0
-        for file in files:
+  
+        for i,file in enumerate(files):
             new_file_name=new_file_names[i]
-            i+=1
+            temp_file_path = os.path.join(".", new_file_name)
             try:   
-                temp_file_path = os.path.join(".", file.name)
                 with open(temp_file_path, "wb") as f:
-                    f.write(file.getbuffer())
-                # Upload the file
+                    f.write(file.read()) 
+                # Upload the file to sharepoint
                 with open(temp_file_path, "rb") as file_content:
                     sharepoint_folder.upload_file(file_content, new_file_name) 
                 success_files.append(file.name)
             except:
                 failed_files.append(file.name)
-                
-        # Clean up
-        os.remove(temp_file_path)
+
+            finally:
+                # Always try to remove the temp file
+                if os.path.exists(temp_file_path):
+                    os.remove(temp_file_path)
+
         if len(success_files) == len(files):
             return True,success_files
         else:
             return False, failed_files
-    except Exception as e:
+    except:
         return False,[]
  
 def Send_Confirmation_Email(receiver_email_list, subject, email_body):
@@ -1582,7 +1586,7 @@ def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
     </html>"""
 
     if not st.session_state.email_sent:
-        receiver_email_list= ["sli@sabrahealth.com"]   
+        #receiver_email_list= ["sli@sabrahealth.com"]   
         Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body) 
         
         if email_body!="" or st.session_state.email_body_for_Sabra!="":
@@ -2409,7 +2413,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         if not BPC_pull.empty:
             try:
                 reporting_month = BPC_pull["Reporting_Month"].dropna().iloc[0] if not BPC_pull["Reporting_Month"].dropna().empty else None
-            except:
+            except: 
                 reporting_month = None
         else:
             reporting_month = None		
