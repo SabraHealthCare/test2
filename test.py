@@ -100,13 +100,16 @@ headers = {'Authorization': 'Bearer ' + access_token,}
 account_mapping_str_col=["Tenant_Account",]
 entity_mapping_str_col=["DATE_ACQUIRED","DATE_SOLD_PAYOFF","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet","Column_Name"]
 
-
 def sanitize_filename(filename):
-    """Sanitize filename for SharePoint (removes or replaces special characters)"""
-    filename = filename.replace("'", "")  # Remove apostrophes
-    filename = filename.replace("&", "and")  # Replace &
-    filename = re.sub(r"[#%*:<>\?/\\{|}\"\.]+", "", filename)  # Remove other unsafe chars (optional)
-    return filename
+    """Sanitize only the base name of the file, keeping extension like .pdf"""
+    name, ext = os.path.splitext(filename)
+
+    # Remove apostrophes, replace &, remove other illegal SharePoint characters
+    name = name.replace("'", "")
+    name = name.replace("&", "and")
+    name = re.sub(r"[#%*:<>\?/\\{|}\"\.]", "", name)  # remove bad chars from name (keep dot only in ext)
+
+    return f"{name}{ext}"
 
 def Upload_To_Sharepoint(files, sharepoint_folder, new_file_names):
     try:
