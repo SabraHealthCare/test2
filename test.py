@@ -1583,8 +1583,9 @@ def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
 
     subject = "Confirmation of {} {} reporting".format(operator,reporting_month_display)
     # Get 'Asset_Manager' from entity_mapping
-    unique_asset_managers = entity_mapping['Asset_Manager'].unique()
- 
+
+    unique_asset_managers = (entity_mapping['Asset_Manager'].dropna().str.split(',').explode().str.strip().dropna().unique())
+    unique_asset_managers = unique_asset_managers.tolist()
     receiver_email_list = operator_email.split(",") + ["twarner@sabrahealth.com","sli@sabrahealth.com","jmanalastas@sabrahealth.com","amallawa@sabrahealth.com"]
     
     if '@*' in operator_email:
@@ -1603,7 +1604,7 @@ def Submit_Upload(total_email_body,SHAREPOINT_FOLDER):
     </html>"""
 
     if not st.session_state.email_sent:
-        receiver_email_list= ["sli@sabrahealth.com"]   
+        receiver_email_list=unique_asset_managers #["sli@sabrahealth.com"]   
         Send_Confirmation_Email(receiver_email_list, subject, format_total_email_body) 
         
         if email_body!="" or st.session_state.email_body_for_Sabra!="":
